@@ -68,7 +68,7 @@ function HealthRadar({ reports }: { reports: any[] }) {
   ]
 
   return (
-    <div className="rounded-2xl border border-white/[0.07] bg-[#111113] p-6">
+    <div className="rounded-2xl border border-white/[0.07] bg-[#0d1745] p-6">
       <h3 className="text-[16px] font-bold text-white mb-1">Health Score</h3>
       <p className="text-xs text-white/35 mb-4">
         Cada eje muestra qué tan cerca estás de tu mejor mes histórico (100 = tu máximo)
@@ -83,8 +83,8 @@ function HealthRadar({ reports }: { reports: any[] }) {
           <Radar
             name="Este mes"
             dataKey="A"
-            stroke="#ffde21"
-            fill="#ffde21"
+            stroke="#E42D2C"
+            fill="#E42D2C"
             fillOpacity={0.15}
             strokeWidth={2}
           />
@@ -97,7 +97,7 @@ function HealthRadar({ reports }: { reports: any[] }) {
 // ─── Summary KPI strip ────────────────────────────────────────────────────────
 
 const SUMMARY_KPIS = [
-  { key: "cash_collected",  label: "Cash Collected",  money: true,  color: "#ffde21" },
+  { key: "cash_collected",  label: "Cash Collected",  money: true,  color: "#E42D2C" },
   { key: "total_revenue",   label: "Total Revenue",    money: true,  color: "#fb923c" },
   { key: "mrr",             label: "MRR",              money: true,  color: "#60a5fa" },
   { key: "new_clients",     label: "Nuevos Clientes",  money: false, color: "#4ade80" },
@@ -118,7 +118,7 @@ function SummaryStrip({ current, previous }: { current: any; previous: any }) {
 
         return (
           <div key={kpi.key}
-            className="rounded-xl border border-white/[0.07] bg-[#111113] p-4 flex flex-col gap-2 hover:border-white/[0.12] transition-colors">
+            className="rounded-xl border border-white/[0.07] bg-[#0d1745] p-4 flex flex-col gap-2 hover:border-white/[0.12] transition-colors">
             <div className="flex items-center justify-between">
               <span className="h-2 w-2 rounded-full" style={{ backgroundColor: kpi.color }} />
               {pct !== null && (
@@ -157,12 +157,12 @@ function RollingTrend({ reports }: { reports: any[] }) {
   }
 
   return (
-    <div className="rounded-2xl border border-white/[0.07] bg-[#111113] p-6">
+    <div className="rounded-2xl border border-white/[0.07] bg-[#0d1745] p-6">
       <h3 className="text-[16px] font-bold text-white mb-1">Evolución financiera — 12 meses</h3>
       <p className="text-xs text-white/35 mb-5">Cash Collected, Total Revenue y MRR en el tiempo</p>
       <div className="flex flex-wrap gap-5 mb-4">
         {[
-          { label: "Cash Collected", color: "#ffde21" },
+          { label: "Cash Collected", color: "#E42D2C" },
           { label: "Total Revenue",  color: "#fb923c" },
           { label: "MRR",            color: "#60a5fa" },
         ].map(l => (
@@ -175,7 +175,7 @@ function RollingTrend({ reports }: { reports: any[] }) {
       <ResponsiveContainer width="100%" height={220}>
         <AreaChart data={data} margin={{ top: 4, right: 4, left: -12, bottom: 0 }}>
           <defs>
-            {[["cash","#ffde21"],["revenue","#fb923c"],["mrr","#60a5fa"]].map(([key, color]) => (
+            {[["cash","#E42D2C"],["revenue","#fb923c"],["mrr","#60a5fa"]].map(([key, color]) => (
               <linearGradient key={key} id={`grad_all_${key}`} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%"  stopColor={color} stopOpacity={0.2} />
                 <stop offset="95%" stopColor={color} stopOpacity={0}   />
@@ -187,7 +187,7 @@ function RollingTrend({ reports }: { reports: any[] }) {
           <YAxis stroke="transparent" tick={{ fill: "rgba(255,255,255,0.30)", fontSize: 10 }} tickLine={false} axisLine={false}
             tickFormatter={v => v >= 1000 ? `$${(v/1000).toFixed(0)}K` : `$${v}`} width={48} />
           <Tooltip {...tooltipStyle} formatter={(v: number, name: string) => [fmtVal(v, true), name]} />
-          <Area type="monotone" dataKey="cash"    name="Cash Collected" stroke="#ffde21" strokeWidth={2} fill="url(#grad_all_cash)"    dot={false} />
+          <Area type="monotone" dataKey="cash"    name="Cash Collected" stroke="#E42D2C" strokeWidth={2} fill="url(#grad_all_cash)"    dot={false} />
           <Area type="monotone" dataKey="revenue" name="Total Revenue"  stroke="#fb923c" strokeWidth={2} fill="url(#grad_all_revenue)" dot={false} />
           <Area type="monotone" dataKey="mrr"     name="MRR"           stroke="#60a5fa" strokeWidth={2} fill="url(#grad_all_mrr)"     dot={false} />
         </AreaChart>
@@ -339,7 +339,7 @@ export function MetricsView() {
         <section className="grid gap-5 md:grid-cols-2">
           <HealthRadar reports={reports} />
           {/* Texto explicativo */}
-          <div className="rounded-2xl border border-white/[0.07] bg-[#111113] p-6 flex flex-col justify-center gap-4">
+          <div className="rounded-2xl border border-white/[0.07] bg-[#0d1745] p-6 flex flex-col justify-center gap-4">
             <h3 className="text-[16px] font-bold text-white">¿Cómo leer el radar?</h3>
             <div className="space-y-3 text-sm text-white/50 leading-relaxed">
               <p>Cada eje representa una métrica clave. <span className="text-white/70 font-medium">100 = tu mejor mes histórico</span> en esa categoría.</p>

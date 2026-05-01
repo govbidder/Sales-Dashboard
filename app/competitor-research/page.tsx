@@ -58,7 +58,7 @@ function CellModal({ label, content, onClose }: { label: string; content: string
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative flex flex-col w-full max-w-2xl max-h-[85vh] rounded-2xl border border-white/[0.1] bg-[#111113] shadow-2xl overflow-hidden">
+      <div className="relative flex flex-col w-full max-w-2xl max-h-[85vh] rounded-2xl border border-white/[0.1] bg-[#0d1745] shadow-2xl overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.07] flex-shrink-0">
           <p className="text-xs font-semibold uppercase tracking-widest text-white/40">{label}</p>
           <div className="flex items-center gap-2">
@@ -91,7 +91,7 @@ function ExpandCell({ label, content, preview, yellow }: { label: string; conten
     <>
       <button
         onClick={e => { e.stopPropagation(); setOpen(true) }}
-        className={`block w-full text-left text-sm leading-snug line-clamp-2 overflow-hidden hover:opacity-80 transition-opacity ${yellow ? "text-[#ffde21]/80 font-medium" : "text-white/60"}`}
+        className={`block w-full text-left text-sm leading-snug line-clamp-2 overflow-hidden hover:opacity-80 transition-opacity ${yellow ? "text-[#E42D2C]/80 font-medium" : "text-white/60"}`}
       >
         {preview ?? content.slice(0, 90)}{content.length > 90 ? "…" : ""}
       </button>
@@ -117,7 +117,7 @@ function VideoRow({ video, channelName, platform }: { video: VideoResult; channe
       {/* URL */}
       <td className="px-4 py-4" onClick={e => e.stopPropagation()}>
         <a href={video.video_url} target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-sm text-[#ffde21] hover:text-[#ffe84d] transition-colors">
+          className="inline-flex items-center gap-1 text-sm text-[#E42D2C] hover:text-[#c42423] transition-colors">
           Ver <ExternalLink className="h-3.5 w-3.5" />
         </a>
       </td>
@@ -131,7 +131,7 @@ function VideoRow({ video, channelName, platform }: { video: VideoResult; channe
       </td>
       {/* VIEWS */}
       <td className="px-4 py-4 text-right whitespace-nowrap">
-        <span className="text-sm font-bold text-[#ffde21] tabular-nums">{fmt(video.views)}</span>
+        <span className="text-sm font-bold text-[#E42D2C] tabular-nums">{fmt(video.views)}</span>
       </td>
       {/* DURATION */}
       <td className="px-4 py-4 text-center whitespace-nowrap">
@@ -210,8 +210,8 @@ function AnalysisCard({ item, onDelete, deletingId }: {
         {/* Platform icon */}
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/[0.07] bg-[#1c1c1f]">
           {isInstagram
-            ? <Instagram className="h-[18px] w-[18px] text-[#ffde21]" />
-            : <Youtube className="h-[18px] w-[18px] text-[#ffde21]" />}
+            ? <Instagram className="h-[18px] w-[18px] text-[#E42D2C]" />
+            : <Youtube className="h-[18px] w-[18px] text-[#E42D2C]" />}
         </div>
 
         {/* Info */}
@@ -419,7 +419,7 @@ function CompetitorResearchContent() {
             <button
               type="submit"
               disabled={!channelUrl.trim() || loading}
-              className="inline-flex items-center gap-2 h-10 rounded-xl bg-[#ffde21] px-5 text-sm font-bold text-black hover:bg-[#ffe46b] disabled:opacity-40 transition"
+              className="inline-flex items-center gap-2 h-10 rounded-xl bg-[#E42D2C] px-5 text-sm font-bold text-black hover:bg-[#ffe46b] disabled:opacity-40 transition"
             >
               {loading ? (
                 <>
@@ -438,7 +438,7 @@ function CompetitorResearchContent() {
           {/* Usage counter */}
           {monthUsage && !limitReached && (
             <div className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5">
-              <Zap className="h-3.5 w-3.5 text-[#ffde21]/60 shrink-0" />
+              <Zap className="h-3.5 w-3.5 text-[#E42D2C]/60 shrink-0" />
               <span className="text-xs text-white/40">
                 Análisis este mes: <span className={`font-semibold ${monthUsage.used >= monthUsage.limit ? "text-red-400" : "text-white/70"}`}>{monthUsage.used}</span>
                 <span className="text-white/25"> / {monthUsage.limit}</span>
@@ -503,7 +503,7 @@ function CompetitorResearchContent() {
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/10 border-t-white/40" />
           </div>
         ) : history.length === 0 ? (
-          <div className="rounded-[24px] border border-white/[0.07] bg-[#111113] px-6 py-16 flex flex-col items-center gap-3">
+          <div className="rounded-[24px] border border-white/[0.07] bg-[#0d1745] px-6 py-16 flex flex-col items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.03]">
               <Search className="h-5 w-5 text-white/20" />
             </div>

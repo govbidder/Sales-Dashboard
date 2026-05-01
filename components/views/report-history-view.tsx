@@ -53,7 +53,7 @@ function ConfirmDeleteDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onCancel} />
-      <div className="relative w-full max-w-sm rounded-2xl border border-red-500/30 bg-[#111113] p-6 shadow-2xl">
+      <div className="relative w-full max-w-sm rounded-2xl border border-red-500/30 bg-[#0d1745] p-6 shadow-2xl">
         <button
           onClick={onCancel}
           className="absolute right-4 top-4 text-white/30 hover:text-white/70 transition-colors"
@@ -109,12 +109,12 @@ function ReportRow({
   const [expanded, setExpanded] = useState(false)
 
   return (
-    <div className="rounded-xl border border-white/[0.06] bg-[#111113] overflow-hidden transition-all">
+    <div className="rounded-xl border border-white/[0.06] bg-[#0d1745] overflow-hidden transition-all">
       {/* Main row */}
       <div className="flex items-center gap-3 px-4 py-3.5">
         {/* Month badge */}
-        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#ffde21]/10 border border-[#ffde21]/20">
-          <FileText className="h-4 w-4 text-[#ffde21]" />
+        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#E42D2C]/10 border border-[#E42D2C]/20">
+          <FileText className="h-4 w-4 text-[#E42D2C]" />
         </div>
 
         <div className="flex-1 min-w-0">
@@ -136,7 +136,7 @@ function ReportRow({
           </div>
           <div className="text-right">
             <p className="text-[10px] text-white/30 uppercase tracking-wider">Nuevos</p>
-            <p className="text-sm font-semibold text-[#ffde21]">{report.new_clients ?? "—"}</p>
+            <p className="text-sm font-semibold text-[#E42D2C]">{report.new_clients ?? "—"}</p>
           </div>
         </div>
 
@@ -296,11 +296,11 @@ export function ReportHistoryView() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-[#111113] px-6 py-5">
-        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#ffde21]/60 via-[#ffde21]/30 to-transparent" />
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0d1745] px-6 py-5">
+        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#E42D2C]/60 via-[#E42D2C]/30 to-transparent" />
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#ffde21]/70 mb-1">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#E42D2C]/70 mb-1">
               Datos
             </p>
             <h2 className="text-xl font-bold text-white">Historial de Reportes</h2>

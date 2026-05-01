@@ -139,12 +139,12 @@ const TEMPLATES: Record<SectionId, { label: string; content: string }[]> = {
     {
       label: "SOP de onboarding",
       content: `## Objetivo
-Dar de alta a un nuevo cliente en todos los sistemas de SmartScale.
+Dar de alta a un nuevo cliente en todos los sistemas de GovBidder.
 
 ## Paso a paso
 
 → Paso 1: Crear perfil en el CRM
-   - Ir a: smartscale.space/admin/clients
+   - Ir a: govbidder.com/admin/clients
    - Completar: nombre, email, canal, programa, cuotas
 
 → Paso 2: Enviar accesos al cliente
@@ -217,15 +217,15 @@ const MOCK_SEED: Omit<Item, "id" | "created_at">[] = [
     url: "#",
     description: "Qué automatizaciones existen, cómo funcionan y qué hacer si hay un error.",
     content: `## ¿Qué hace esta herramienta?
-Zapier conecta automáticamente las herramientas del equipo de SmartScale y ejecuta tareas sin intervención manual.
+Zapier conecta automáticamente las herramientas del equipo de GovBidder y ejecuta tareas sin intervención manual.
 
 ## Automatizaciones existentes
-- Zap 1: Nuevo lead en formulario → CRM (SmartScale)
+- Zap 1: Nuevo lead en formulario → CRM (GovBidder)
 - Zap 2: Pago confirmado → Email de bienvenida al cliente
 - Zap 3: Reporte mensual enviado → Notificación en Slack
 
 ## Herramientas que conecta
-→ Typeform → SmartScale CRM → Slack
+→ Typeform → GovBidder CRM → Slack
 → Stripe → Email (Gmail) → CRM
 
 ## Cómo acceder
@@ -250,12 +250,12 @@ Zapier conecta automáticamente las herramientas del equipo de SmartScale y ejec
     url: "#",
     description: "Proceso paso a paso para dar de alta un nuevo cliente.",
     content: `## Objetivo
-Dar de alta a un nuevo cliente en todos los sistemas de SmartScale correctamente.
+Dar de alta a un nuevo cliente en todos los sistemas de GovBidder correctamente.
 
 ## Paso a paso
 
 → Paso 1: Crear perfil en el CRM
-   - Ir a: smartscale.space/admin/clients
+   - Ir a: govbidder.com/admin/clients
    - Completar: nombre, email, canal, programa, cuotas
    - Estado inicial: "activo"
 
@@ -287,7 +287,7 @@ Dar de alta a un nuevo cliente en todos los sistemas de SmartScale correctamente
     url: "#",
     description: "Plantillas del equipo para seguimiento semanal y reportes.",
     content: `## Descripción
-Colección de plantillas que usa el equipo de SmartScale para el seguimiento interno de clientes y métricas.
+Colección de plantillas que usa el equipo de GovBidder para el seguimiento interno de clientes y métricas.
 
 ## Links
 - Plantilla semanal: [agregar link]
@@ -312,8 +312,8 @@ Colección de links que el equipo usa frecuentemente.
 ## Links
 - Drive del equipo: [agregar link]
 - Notion / base de conocimiento: [agregar link]
-- Portal SmartScale: https://smartscale.space
-- CRM interno: https://smartscale.space/admin/clients
+- Portal GovBidder: https://govbidder.com
+- CRM interno: https://govbidder.com/admin/clients
 - Zapier: https://zapier.com
 - Panel de pagos: [agregar link]
 
@@ -328,7 +328,7 @@ Actualizar cuando se agreguen nuevas herramientas al stack.
   {
     title: "Acceso Zapier",
     url: "https://zapier.com",
-    description: "Acceso a la cuenta de Zapier del equipo SmartScale.",
+    description: "Acceso a la cuenta de Zapier del equipo GovBidder.",
     content: `## Herramienta
 Zapier — plataforma de automatizaciones
 
@@ -370,7 +370,7 @@ function ContentRenderer({ content }: { content: string }) {
         if (line.startsWith("→ ")) {
           return (
             <div key={i} className="flex items-start gap-2 py-1">
-              <ArrowRight className="h-3.5 w-3.5 text-[#ffde21] flex-shrink-0 mt-0.5" />
+              <ArrowRight className="h-3.5 w-3.5 text-[#E42D2C] flex-shrink-0 mt-0.5" />
               <span className="text-sm text-white/80 font-medium">{line.replace("→ ", "")}</span>
             </div>
           )
@@ -387,7 +387,7 @@ function ContentRenderer({ content }: { content: string }) {
           const num = line.match(/^(\d+)\. /)?.[1]
           return (
             <div key={i} className="flex items-start gap-2.5 pl-2 py-0.5">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#ffde21]/15 text-[10px] font-bold text-[#ffde21] flex-shrink-0 mt-0.5">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#E42D2C]/15 text-[10px] font-bold text-[#E42D2C] flex-shrink-0 mt-0.5">
                 {num}
               </span>
               <span className="text-xs text-white/50 leading-relaxed">{line.replace(/^\d+\. /, "")}</span>
@@ -482,7 +482,7 @@ function SOPModal({
       />
 
       {/* Panel */}
-      <div className="relative z-10 flex flex-col w-full max-w-2xl max-h-[90vh] rounded-2xl border border-white/[0.1] bg-[#111113] shadow-2xl overflow-hidden">
+      <div className="relative z-10 flex flex-col w-full max-w-2xl max-h-[90vh] rounded-2xl border border-white/[0.1] bg-[#0d1745] shadow-2xl overflow-hidden">
 
         {/* Header */}
         <div className="flex items-start gap-3 p-5 border-b border-white/[0.07] flex-shrink-0">
@@ -504,7 +504,7 @@ function SOPModal({
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-[10px] font-medium text-[#ffde21]/60 hover:text-[#ffde21] transition-colors"
+                  className="flex items-center gap-1 text-[10px] font-medium text-[#E42D2C]/60 hover:text-[#E42D2C] transition-colors"
                 >
                   <ExternalLink className="h-3 w-3" />
                   Abrir link
@@ -563,7 +563,7 @@ function SOPModal({
               autoFocus
               rows={20}
               placeholder={`Escribí el contenido del SOP...\n\nUsá:\n## Título de sección\n→ Paso con flecha\n- Ítem de lista\n1. Paso numerado`}
-              className="w-full rounded-xl bg-white/[0.04] border border-[#ffde21]/20 px-4 py-3 text-sm text-white/80 placeholder-white/20 focus:outline-none focus:border-[#ffde21]/40 resize-none leading-relaxed font-mono"
+              className="w-full rounded-xl bg-white/[0.04] border border-[#E42D2C]/20 px-4 py-3 text-sm text-white/80 placeholder-white/20 focus:outline-none focus:border-[#E42D2C]/40 resize-none leading-relaxed font-mono"
             />
           ) : content ? (
             <ContentRenderer content={content} />
@@ -612,7 +612,7 @@ function SOPModal({
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="flex items-center gap-1.5 rounded-xl bg-[#ffde21] px-4 py-1.5 text-xs font-semibold text-black hover:bg-[#ffde21]/90 transition-colors disabled:opacity-50"
+                  className="flex items-center gap-1.5 rounded-xl bg-[#E42D2C] px-4 py-1.5 text-xs font-semibold text-black hover:bg-[#E42D2C]/90 transition-colors disabled:opacity-50"
                 >
                   {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
                   Guardar
@@ -674,7 +674,7 @@ function AddItemForm({
   }
 
   return (
-    <div className="rounded-2xl border border-[#ffde21]/20 bg-[#111113] p-5 mb-5">
+    <div className="rounded-2xl border border-[#E42D2C]/20 bg-[#0d1745] p-5 mb-5">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-white">Nuevo ítem</h3>
         <button onClick={onClose} className="text-white/30 hover:text-white/60 transition-colors">
@@ -698,21 +698,21 @@ function AddItemForm({
           placeholder="Título *"
           value={form.title}
           onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-          className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#ffde21]/40"
+          className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40"
         />
         <input
           type="text"
           placeholder={isAccesos ? "URL de la herramienta (opcional)" : "URL (opcional)"}
           value={form.url}
           onChange={e => setForm(f => ({ ...f, url: e.target.value }))}
-          className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#ffde21]/40"
+          className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40"
         />
         <textarea
           placeholder="Descripción breve (opcional)"
           value={form.description}
           rows={2}
           onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-          className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#ffde21]/40 resize-none"
+          className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40 resize-none"
         />
         <div className="flex gap-2 flex-wrap">
           {(Object.keys(TYPE_CONFIG) as ResourceType[]).map(t => {
@@ -724,7 +724,7 @@ function AddItemForm({
                 onClick={() => setForm(f => ({ ...f, type: t }))}
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium border transition-all ${
                   form.type === t
-                    ? "border-[#ffde21]/40 bg-[#ffde21]/10 text-[#ffde21]"
+                    ? "border-[#E42D2C]/40 bg-[#E42D2C]/10 text-[#E42D2C]"
                     : "border-white/[0.08] bg-white/[0.03] text-white/40 hover:text-white/70"
                 }`}
               >
@@ -739,7 +739,7 @@ function AddItemForm({
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 rounded-xl bg-[#ffde21] px-4 py-2 text-sm font-semibold text-black hover:bg-[#ffde21]/90 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 rounded-xl bg-[#E42D2C] px-4 py-2 text-sm font-semibold text-black hover:bg-[#E42D2C]/90 transition-colors disabled:opacity-50"
           >
             {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
             Crear
@@ -766,7 +766,7 @@ function ItemRow({
   return (
     <button
       onClick={onClick}
-      className="w-full group flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-[#111113] px-4 py-3.5 hover:border-white/[0.15] hover:bg-white/[0.03] transition-all text-left"
+      className="w-full group flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-[#0d1745] px-4 py-3.5 hover:border-white/[0.15] hover:bg-white/[0.03] transition-all text-left"
     >
       <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.05] flex-shrink-0">
         <Icon className={`h-4 w-4 ${cfg.color}`} />
@@ -855,12 +855,12 @@ function SectionPanel({
             placeholder="Buscar…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] pl-9 pr-4 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#ffde21]/40"
+            className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] pl-9 pr-4 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40"
           />
         </div>
         <button
           onClick={() => setShowForm(v => !v)}
-          className="flex items-center gap-1.5 rounded-xl bg-[#ffde21] px-3.5 py-2 text-sm font-semibold text-black hover:bg-[#ffde21]/90 transition-colors whitespace-nowrap"
+          className="flex items-center gap-1.5 rounded-xl bg-[#E42D2C] px-3.5 py-2 text-sm font-semibold text-black hover:bg-[#E42D2C]/90 transition-colors whitespace-nowrap"
         >
           <Plus className="h-3.5 w-3.5" />
           Agregar
@@ -886,7 +886,7 @@ function SectionPanel({
           {!showForm && !search && (
             <button
               onClick={() => setShowForm(true)}
-              className="text-xs text-[#ffde21]/40 hover:text-[#ffde21] transition-colors"
+              className="text-xs text-[#E42D2C]/40 hover:text-[#E42D2C] transition-colors"
             >
               + Agregar el primero
             </button>
@@ -964,11 +964,11 @@ export function AdminCentroOperativoView() {
       {/* Header */}
       <div>
         <div className="flex items-center gap-2.5 mb-1">
-          <span className="h-4 w-[3px] rounded-full bg-[#ffde21]" />
+          <span className="h-4 w-[3px] rounded-full bg-[#E42D2C]" />
           <h1 className="text-sm font-semibold uppercase tracking-widest text-white/70">Centro Operativo</h1>
         </div>
         <p className="text-xs text-white/30 ml-[18px]">
-          Base interna de SOPs, recursos, accesos y procesos del equipo SmartScale.
+          Base interna de SOPs, recursos, accesos y procesos del equipo GovBidder.
         </p>
       </div>
 
@@ -985,15 +985,15 @@ export function AdminCentroOperativoView() {
               className={cn(
                 "flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-medium border transition-all",
                 isActive
-                  ? "border-[#ffde21]/30 bg-[#ffde21]/10 text-[#ffde21]"
+                  ? "border-[#E42D2C]/30 bg-[#E42D2C]/10 text-[#E42D2C]"
                   : "border-white/[0.08] bg-white/[0.03] text-white/50 hover:text-white/80 hover:bg-white/[0.06]",
               )}
             >
-              <Icon className={`h-3.5 w-3.5 ${isActive ? "text-[#ffde21]" : s.color}`} />
+              <Icon className={`h-3.5 w-3.5 ${isActive ? "text-[#E42D2C]" : s.color}`} />
               {s.label}
               <span className={cn(
                 "text-[10px] rounded-full px-1.5 py-0.5",
-                isActive ? "bg-[#ffde21]/20 text-[#ffde21]" : "bg-white/[0.07] text-white/30",
+                isActive ? "bg-[#E42D2C]/20 text-[#E42D2C]" : "bg-white/[0.07] text-white/30",
               )}>
                 {count}
               </span>

@@ -28,7 +28,7 @@ function pct(num: number, den: number) {
 
 function convColor(p: number) {
   if (p >= 60) return { bar: "#4ade80", text: "text-emerald-300", bg: "bg-emerald-500/10", ring: "ring-emerald-500/20" }
-  if (p >= 30) return { bar: "#ffde21", text: "text-yellow-300",  bg: "bg-yellow-500/10",  ring: "ring-yellow-500/20"  }
+  if (p >= 30) return { bar: "#E42D2C", text: "text-yellow-300",  bg: "bg-yellow-500/10",  ring: "ring-yellow-500/20"  }
   return         { bar: "#f87171",  text: "text-red-300",     bg: "bg-red-500/10",     ring: "ring-red-500/20"     }
 }
 
@@ -43,7 +43,7 @@ function FunnelStep({
   const col = convColor(pctOfTop)
   return (
     <div>
-      <div className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113] p-5 hover:border-white/[0.12] transition-colors">
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745] p-5 hover:border-white/[0.12] transition-colors">
         {/* Proportional fill bar as background */}
         <div
           className="absolute inset-y-0 left-0 rounded-2xl opacity-[0.07] transition-all duration-700"
@@ -88,9 +88,9 @@ function FunnelStep({
 
 // ─── Mini stat card ───────────────────────────────────────────────────────────
 
-function MiniStat({ label, value, sub, color = "#ffde21" }: { label: string; value: string | number; sub?: string; color?: string }) {
+function MiniStat({ label, value, sub, color = "#E42D2C" }: { label: string; value: string | number; sub?: string; color?: string }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113] p-5 hover:border-white/[0.12] transition-colors">
+    <div className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745] p-5 hover:border-white/[0.12] transition-colors">
       <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: `${color}99` }}>{label}</p>
       <p className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-none">{value}</p>
       {sub && <p className="mt-2 text-xs text-white/30">{sub}</p>}
@@ -275,18 +275,18 @@ export function SalesView() {
               label="Cierres por Offer Doc"
               value={odCierres || "—"}
               sub={`Tasa: ${odCloseRate}${odCloseRate !== "—" ? "%" : ""}`}
-              color="#ffde21"
+              color="#E42D2C"
             />
           </div>
 
           {/* Offer Doc funnel */}
           {odSent > 0 && (
-            <div className="rounded-2xl border border-white/[0.07] bg-[#111113] p-5 space-y-3">
+            <div className="rounded-2xl border border-white/[0.07] bg-[#0d1745] p-5 space-y-3">
               <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Funnel Offer Doc</p>
               {[
                 { label: "Enviados", value: odSent,    pctW: 100,                         color: "#60a5fa" },
                 { label: "Respondidos", value: odResp, pctW: pct(odResp, odSent),         color: "#4ade80" },
-                { label: "Cerrados",  value: odCierres,pctW: pct(odCierres, odSent),      color: "#ffde21" },
+                { label: "Cerrados",  value: odCierres,pctW: pct(odCierres, odSent),      color: "#E42D2C" },
               ].map(row => (
                 <div key={row.label} className="space-y-1">
                   <div className="flex justify-between text-xs">
@@ -311,7 +311,7 @@ export function SalesView() {
             <h3 className="text-base font-bold text-white">Tendencia del Embudo</h3>
             <p className="text-xs text-white/35 mt-0.5">¿El pipeline está creciendo o deteriorándose?</p>
           </div>
-          <div className="rounded-2xl border border-white/[0.07] bg-[#111113] p-6">
+          <div className="rounded-2xl border border-white/[0.07] bg-[#0d1745] p-6">
             <div className="flex flex-wrap gap-5 mb-5">
               {[
                 { label: "Agendadas", color: "#818cf8" },
@@ -350,12 +350,12 @@ export function SalesView() {
             <h3 className="text-base font-bold text-white">Tendencia de Offer Docs</h3>
             <p className="text-xs text-white/35 mt-0.5">Evolución mensual del pipeline de Offer Docs</p>
           </div>
-          <div className="rounded-2xl border border-white/[0.07] bg-[#111113] p-6">
+          <div className="rounded-2xl border border-white/[0.07] bg-[#0d1745] p-6">
             <div className="flex flex-wrap gap-5 mb-5">
               {[
                 { label: "OD Enviados",    color: "#60a5fa" },
                 { label: "OD Respondidos", color: "#4ade80" },
-                { label: "Cierres x OD",   color: "#ffde21" },
+                { label: "Cierres x OD",   color: "#E42D2C" },
               ].map(l => (
                 <div key={l.label} className="flex items-center gap-1.5">
                   <span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: l.color }} />
@@ -375,7 +375,7 @@ export function SalesView() {
                 />
                 <Bar dataKey="odEnviados"    name="OD Enviados"    fill="#60a5fa" fillOpacity={0.7} radius={[3,3,0,0]} maxBarSize={32} />
                 <Line dataKey="odRespondidos" name="OD Respondidos" stroke="#4ade80" strokeWidth={2.5} dot={{ fill: "#4ade80", r: 3, strokeWidth: 0 }} activeDot={{ r: 5 }} />
-                <Line dataKey="odCierres"     name="Cierres x OD"  stroke="#ffde21" strokeWidth={2.5} dot={{ fill: "#ffde21", r: 3, strokeWidth: 0 }} activeDot={{ r: 5 }} />
+                <Line dataKey="odCierres"     name="Cierres x OD"  stroke="#E42D2C" strokeWidth={2.5} dot={{ fill: "#E42D2C", r: 3, strokeWidth: 0 }} activeDot={{ r: 5 }} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>

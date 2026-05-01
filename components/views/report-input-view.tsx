@@ -25,7 +25,7 @@ const FIELD_GROUPS = [
   {
     key: "sales",
     label: "Sales",
-    color: "bg-[#ffde21]",
+    color: "bg-[#E42D2C]",
     fields: [
       { key: "scheduled_calls",      label: "Llamadas Agendadas",     type: "number" },
       { key: "attended_calls",       label: "Llamadas Atendidas",     type: "number" },
@@ -80,7 +80,7 @@ const FIELD_GROUPS = [
       { key: "next_focus",     label: "Próximo Enfoque",                                        type: "text" },
       { key: "support_needed", label: "Soporte Necesario",                                      type: "text" },
       { key: "improvements",   label: "Mejoras",                                                type: "text" },
-      { key: "nps_score",      label: "¿Cuánto recomendarías Smart Scale?",  type: "number", hint: "del 1 al 10", min: 1, max: 10 },
+      { key: "nps_score",      label: "¿Cuánto recomendarías GovBidder?",  type: "number", hint: "del 1 al 10", min: 1, max: 10 },
     ],
   },
 ] as const
@@ -100,7 +100,7 @@ function ConfirmOverwriteDialog({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="relative overflow-hidden rounded-2xl border border-amber-400/20 bg-[#111113] shadow-2xl w-full max-w-md mx-4">
+      <div className="relative overflow-hidden rounded-2xl border border-amber-400/20 bg-[#0d1745] shadow-2xl w-full max-w-md mx-4">
         <div className="h-[2px] w-full bg-gradient-to-r from-amber-500/20 via-amber-500/60 to-amber-500/20" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(251,191,36,0.04),transparent_55%)]" />
         <div className="relative p-6 space-y-5">
@@ -269,13 +269,13 @@ export function ReportInputView() {
   return (
     <>
       {/* Tab switcher */}
-      <div className="flex gap-1 mb-8 rounded-xl border border-white/[0.06] bg-[#111113] p-1 w-fit">
+      <div className="flex gap-1 mb-8 rounded-xl border border-white/[0.06] bg-[#0d1745] p-1 w-fit">
         <button
           type="button"
           onClick={() => setTab("form")}
           className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
             tab === "form"
-              ? "bg-[#ffde21] text-black"
+              ? "bg-[#E42D2C] text-black"
               : "text-white/40 hover:text-white/70"
           }`}
         >
@@ -287,7 +287,7 @@ export function ReportInputView() {
           onClick={() => setTab("history")}
           className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
             tab === "history"
-              ? "bg-[#ffde21] text-black"
+              ? "bg-[#E42D2C] text-black"
               : "text-white/40 hover:text-white/70"
           }`}
         >
@@ -311,7 +311,7 @@ export function ReportInputView() {
         {/* Header */}
         <div>
           <div className="flex items-center gap-2.5 mb-1">
-            <span className="h-4 w-[3px] rounded-full bg-[#ffde21]" />
+            <span className="h-4 w-[3px] rounded-full bg-[#E42D2C]" />
             <h1 className="text-sm font-semibold uppercase tracking-widest text-white/70">
               Cargar Reporte Mensual
             </h1>
@@ -322,8 +322,8 @@ export function ReportInputView() {
         </div>
 
         {/* Month + client selector */}
-        <div className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113] p-5">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,222,33,0.04),transparent_55%)]" />
+        <div className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745] p-5">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(228,45,44,0.04),transparent_55%)]" />
           <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-widest text-white/35 mb-1.5">Mes del reporte</p>
@@ -331,7 +331,7 @@ export function ReportInputView() {
                 type="month"
                 value={month}
                 onChange={(e) => setMonth(e.target.value)}
-                className="rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-sm font-semibold text-white focus:border-[#ffde21]/40 focus:outline-none focus:ring-1 focus:ring-[#ffde21]/20 [color-scheme:dark]"
+                className="rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-sm font-semibold text-white focus:border-[#E42D2C]/40 focus:outline-none focus:ring-1 focus:ring-[#E42D2C]/20 [color-scheme:dark]"
               />
             </div>
             <div className="flex items-center gap-2 flex-wrap">
@@ -361,7 +361,7 @@ export function ReportInputView() {
 
         {/* Field groups */}
         {FIELD_GROUPS.map((group) => (
-          <div key={group.key} className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113]">
+          <div key={group.key} className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745]">
             <div className="flex items-center justify-between border-b border-white/[0.05] px-5 py-3">
               <div className="flex items-center gap-2">
                 <span className={`h-3 w-[2px] rounded-full ${group.color}`} />
@@ -377,7 +377,7 @@ export function ReportInputView() {
 
                 if (isNps) {
                   return (
-                    <div key={field.key} className="sm:col-span-2 lg:col-span-3 flex flex-col gap-2 rounded-2xl border border-[#ffde21]/15 bg-[#ffde21]/[0.03] p-5">
+                    <div key={field.key} className="sm:col-span-2 lg:col-span-3 flex flex-col gap-2 rounded-2xl border border-[#E42D2C]/15 bg-[#E42D2C]/[0.03] p-5">
                       <label className="text-xs font-semibold uppercase tracking-widest text-white/65">
                         {field.label}
                         <span className="ml-1.5 text-white/35 normal-case tracking-normal font-normal">— del 1 al 10</span>
@@ -390,8 +390,8 @@ export function ReportInputView() {
                             onClick={() => setValue(field.key, String(n))}
                             className={`h-10 w-10 rounded-xl text-sm font-bold transition-all ${
                               values[field.key] === String(n)
-                                ? "bg-[#ffde21] text-black"
-                                : "border border-white/[0.08] bg-white/[0.03] text-white/50 hover:border-[#ffde21]/30 hover:text-white"
+                                ? "bg-[#E42D2C] text-black"
+                                : "border border-white/[0.08] bg-white/[0.03] text-white/50 hover:border-[#E42D2C]/30 hover:text-white"
                             }`}
                           >
                             {n}
@@ -425,7 +425,7 @@ export function ReportInputView() {
                         onChange={(e) => setValue(field.key, e.target.value)}
                         rows={2}
                         placeholder="—"
-                        className="w-full resize-none rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-base text-white placeholder:text-white/20 focus:border-[#ffde21]/40 focus:outline-none focus:ring-1 focus:ring-[#ffde21]/20"
+                        className="w-full resize-none rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-base text-white placeholder:text-white/20 focus:border-[#E42D2C]/40 focus:outline-none focus:ring-1 focus:ring-[#E42D2C]/20"
                       />
                     ) : (
                       <input
@@ -437,8 +437,8 @@ export function ReportInputView() {
                         step="any"
                         className={`w-full rounded-xl border px-3 py-2 text-base font-semibold text-white placeholder:text-white/20 focus:outline-none focus:ring-1 ${
                           isHighlight
-                            ? "border-[#ffde21]/20 bg-[#ffde21]/[0.04] focus:border-[#ffde21]/40 focus:ring-[#ffde21]/20"
-                            : "border-white/[0.08] bg-white/[0.04] focus:border-[#ffde21]/40 focus:ring-[#ffde21]/20"
+                            ? "border-[#E42D2C]/20 bg-[#E42D2C]/[0.04] focus:border-[#E42D2C]/40 focus:ring-[#E42D2C]/20"
+                            : "border-white/[0.08] bg-white/[0.04] focus:border-[#E42D2C]/40 focus:ring-[#E42D2C]/20"
                         }`}
                       />
                     )}
@@ -469,7 +469,7 @@ export function ReportInputView() {
           <button
             type="submit"
             disabled={status === "loading" || !activeClientId}
-            className="flex items-center gap-2 rounded-xl bg-[#ffde21] px-6 py-2.5 text-sm font-bold text-black transition hover:bg-[#ffe46b] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 rounded-xl bg-[#E42D2C] px-6 py-2.5 text-sm font-bold text-black transition hover:bg-[#ffe46b] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {status === "loading" && <Loader2 className="h-4 w-4 animate-spin" />}
             {status === "loading" ? "Guardando…" : isUpdate ? "Actualizar reporte" : "Guardar reporte"}

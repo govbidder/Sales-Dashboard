@@ -110,10 +110,10 @@ function DetailDrawer({ lead, onClose, onPatch, onDelete, deleting }: {
   return (
     <>
       <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed right-0 top-0 bottom-0 z-50 flex w-full max-w-[440px] flex-col border-l border-white/[0.08] shadow-2xl" style={{ backgroundColor: "#111113" }}>
+      <div className="fixed right-0 top-0 bottom-0 z-50 flex w-full max-w-[440px] flex-col border-l border-white/[0.08] shadow-2xl" style={{ backgroundColor: "#0d1745" }}>
 
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 border-b border-white/[0.06] px-6 py-5" style={{ backgroundColor: "#111113" }}>
+        <div className="flex items-start justify-between gap-4 border-b border-white/[0.06] px-6 py-5" style={{ backgroundColor: "#0d1745" }}>
           <div className="min-w-0">
             <h2 className="text-lg font-bold text-white truncate">{lead.name ?? "Lead"}</h2>
             <p className="text-[12px] text-white/35 mt-0.5">{fmtDate(lead.created_at)}</p>
@@ -131,12 +131,12 @@ function DetailDrawer({ lead, onClose, onPatch, onDelete, deleting }: {
         </div>
 
         {/* Rating + tag + instagram */}
-        <div className="border-b border-white/[0.06] px-6 py-4 space-y-3" style={{ backgroundColor: "#111113" }}>
+        <div className="border-b border-white/[0.06] px-6 py-4 space-y-3" style={{ backgroundColor: "#0d1745" }}>
           <div className="flex items-center justify-between">
             <StarRating size="md" value={lead.rating}
               onChange={n => onPatch(lead.id, { rating: n || null })} />
             {lead.tag && (
-              <span className="rounded-full border border-[#ffde21]/20 bg-[#ffde21]/[0.06] px-3 py-0.5 text-[11px] font-bold text-[#ffde21]/70">
+              <span className="rounded-full border border-[#E42D2C]/20 bg-[#E42D2C]/[0.06] px-3 py-0.5 text-[11px] font-bold text-[#E42D2C]/70">
                 {lead.tag}
               </span>
             )}
@@ -152,7 +152,7 @@ function DetailDrawer({ lead, onClose, onPatch, onDelete, deleting }: {
         </div>
 
         {/* Editable fields */}
-        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4" style={{ backgroundColor: "#111113" }}>
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4" style={{ backgroundColor: "#0d1745" }}>
 
           <div className="space-y-1.5">
             <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Estado</p>
@@ -219,7 +219,7 @@ function NewLeadModal({
         <form
           onSubmit={handleSubmit}
           className="w-full max-w-sm rounded-2xl border border-white/[0.10] shadow-2xl p-6 space-y-4"
-          style={{ backgroundColor: "#111113" }}
+          style={{ backgroundColor: "#0d1745" }}
         >
           <div className="flex items-center justify-between mb-1">
             <h3 className="text-base font-bold text-white">Nuevo lead</h3>
@@ -271,7 +271,7 @@ function NewLeadModal({
           <button
             type="submit"
             disabled={!name.trim() || creating}
-            className="w-full h-10 rounded-xl bg-[#ffde21] text-black text-[13px] font-bold hover:bg-[#ffe84d] transition-all disabled:opacity-40 flex items-center justify-center gap-2"
+            className="w-full h-10 rounded-xl bg-[#E42D2C] text-black text-[13px] font-bold hover:bg-[#c42423] transition-all disabled:opacity-40 flex items-center justify-center gap-2"
           >
             {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             Crear lead
@@ -386,7 +386,7 @@ export function AdminLeadsView() {
 
   const webhookUrl = typeof window !== "undefined"
     ? `${window.location.origin}/api/webhooks/lead`
-    : "https://smartscale.space/api/webhooks/lead"
+    : "https://govbidder.com/api/webhooks/lead"
 
   return (
     <>
@@ -428,7 +428,7 @@ export function AdminLeadsView() {
             </button>
             <button
               onClick={() => setShowNewForm(true)}
-              className="flex items-center gap-2 h-9 rounded-xl bg-[#ffde21] px-4 text-sm font-bold text-black hover:bg-[#ffe84d] transition-all">
+              className="flex items-center gap-2 h-9 rounded-xl bg-[#E42D2C] px-4 text-sm font-bold text-black hover:bg-[#c42423] transition-all">
               <Plus className="h-3.5 w-3.5" />
               Nuevo lead
             </button>
@@ -436,12 +436,12 @@ export function AdminLeadsView() {
         </div>
 
         {/* Webhook card */}
-        <div className="rounded-2xl border border-white/[0.07] bg-[#111113] px-5 py-4">
+        <div className="rounded-2xl border border-white/[0.07] bg-[#0d1745] px-5 py-4">
           <p className="text-[11px] font-bold uppercase tracking-widest text-white/30 mb-2">
             Webhook URL — ManyChat / Zapier
           </p>
           <div className="flex items-center gap-2">
-            <code className="flex-1 rounded-lg bg-white/[0.04] px-3 py-2 text-[12px] text-[#ffde21]/70 font-mono truncate">
+            <code className="flex-1 rounded-lg bg-white/[0.04] px-3 py-2 text-[12px] text-[#E42D2C]/70 font-mono truncate">
               {webhookUrl}
             </code>
             <button
@@ -472,7 +472,7 @@ export function AdminLeadsView() {
               onClick={() => setFilterRating(0)}
               className={`h-8 rounded-xl border px-3 text-[12px] font-medium transition-all ${
                 filterRating === 0
-                  ? "border-[#ffde21]/40 bg-[#ffde21]/10 text-[#ffde21]"
+                  ? "border-[#E42D2C]/40 bg-[#E42D2C]/10 text-[#E42D2C]"
                   : "border-white/[0.07] text-white/40 hover:text-white hover:border-white/20"
               }`}>
               Todas
@@ -494,13 +494,13 @@ export function AdminLeadsView() {
         </div>
 
         {/* Table */}
-        <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111113]">
+        <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0d1745]">
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <Loader2 className="h-6 w-6 animate-spin text-[#ffde21]/40" />
+              <Loader2 className="h-6 w-6 animate-spin text-[#E42D2C]/40" />
             </div>
           ) : (
-            <div className="overflow-x-auto" style={{ backgroundColor: "#111113" }}>
+            <div className="overflow-x-auto" style={{ backgroundColor: "#0d1745" }}>
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b border-white/[0.06] bg-white/[0.02]">
@@ -518,9 +518,9 @@ export function AdminLeadsView() {
                     <tr key={lead.id}
                       onClick={() => setSelected(lead)}
                       className="border-b border-white/[0.04] cursor-pointer transition-colors group"
-                      style={{ backgroundColor: "#111113" }}
+                      style={{ backgroundColor: "#0d1745" }}
                       onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#18181b")}
-                      onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#111113")}>
+                      onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#0d1745")}>
 
                       <td className="px-4 py-4 whitespace-nowrap">
                         <span className="text-[14px] font-semibold text-white">{lead.name ?? <span className="text-white/30">—</span>}</span>
@@ -532,7 +532,7 @@ export function AdminLeadsView() {
 
                       <td className="px-4 py-4 whitespace-nowrap">
                         {lead.tag
-                          ? <span className="rounded-full border border-[#ffde21]/20 bg-[#ffde21]/[0.06] px-2.5 py-0.5 text-[12px] font-semibold text-[#ffde21]/90">{lead.tag}</span>
+                          ? <span className="rounded-full border border-[#E42D2C]/20 bg-[#E42D2C]/[0.06] px-2.5 py-0.5 text-[12px] font-semibold text-[#E42D2C]/90">{lead.tag}</span>
                           : <span className="text-white/30 text-[13px]">—</span>}
                       </td>
 

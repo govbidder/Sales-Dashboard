@@ -78,7 +78,7 @@ function DetailLink({ label, value }: { label: string; value?: string | null }) 
     <div className="space-y-1">
       <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">{label}</p>
       <a href={value} target="_blank" rel="noopener noreferrer"
-        className="flex items-center gap-1.5 text-[13px] text-[#ffde21]/70 hover:text-[#ffde21] transition-colors truncate">
+        className="flex items-center gap-1.5 text-[13px] text-[#E42D2C]/70 hover:text-[#E42D2C] transition-colors truncate">
         <Link2 className="h-3.5 w-3.5 shrink-0" />
         {value}
       </a>
@@ -107,7 +107,7 @@ function DetailDrawer({
       <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Panel */}
-      <div className="fixed right-0 top-0 bottom-0 z-50 flex w-full max-w-[520px] flex-col border-l border-white/[0.08] bg-[#111113] shadow-2xl">
+      <div className="fixed right-0 top-0 bottom-0 z-50 flex w-full max-w-[520px] flex-col border-l border-white/[0.08] bg-[#0d1745] shadow-2xl">
 
         {/* Header */}
         <div className="flex items-start justify-between gap-4 border-b border-white/[0.06] px-6 py-5">
@@ -161,7 +161,7 @@ function DetailDrawer({
 
           {/* Contacto */}
           <section className="space-y-3">
-            <h3 className="text-[11px] font-black uppercase tracking-widest text-[#ffde21]/50">Contacto</h3>
+            <h3 className="text-[11px] font-black uppercase tracking-widest text-[#E42D2C]/50">Contacto</h3>
             <div className="grid grid-cols-1 gap-3">
               {app.email && (
                 <div className="flex items-center gap-2">
@@ -192,7 +192,7 @@ function DetailDrawer({
 
           {/* Negocio */}
           <section className="space-y-3">
-            <h3 className="text-[11px] font-black uppercase tracking-widest text-[#ffde21]/50">Negocio</h3>
+            <h3 className="text-[11px] font-black uppercase tracking-widest text-[#E42D2C]/50">Negocio</h3>
             <div className="space-y-3">
               <DetailLink label="Canal corto" value={app.short_content_link} />
               <DetailLink label="YouTube / Podcast" value={app.youtube_podcast_link} />
@@ -201,7 +201,7 @@ function DetailDrawer({
 
           {/* Métricas */}
           <section className="space-y-3">
-            <h3 className="text-[11px] font-black uppercase tracking-widest text-[#ffde21]/50">Métricas</h3>
+            <h3 className="text-[11px] font-black uppercase tracking-widest text-[#E42D2C]/50">Métricas</h3>
             <div className="grid grid-cols-2 gap-3">
               {[
                 { label: "Lista de emails",   value: app.email_list_size },
@@ -219,7 +219,7 @@ function DetailDrawer({
 
           {/* Objetivos */}
           <section className="space-y-3">
-            <h3 className="text-[11px] font-black uppercase tracking-widest text-[#ffde21]/50">Objetivos y Bloqueos</h3>
+            <h3 className="text-[11px] font-black uppercase tracking-widest text-[#E42D2C]/50">Objetivos y Bloqueos</h3>
             <div className="space-y-3">
               <DetailRow label="Objetivo de ingresos" value={app.income_goal} />
               <DetailRow label="Principal bloqueo" value={app.main_blocker} />
@@ -228,10 +228,10 @@ function DetailDrawer({
 
           {/* Por qué vos */}
           <section className="space-y-3">
-            <h3 className="text-[11px] font-black uppercase tracking-widest text-[#ffde21]/50">¿Por qué vos?</h3>
+            <h3 className="text-[11px] font-black uppercase tracking-widest text-[#E42D2C]/50">¿Por qué vos?</h3>
             <div className="space-y-3">
               <DetailRow label="Superpoderes" value={app.superpowers} />
-              <DetailRow label="Aporte a Smart Scale" value={app.contribution} />
+              <DetailRow label="Aporte a GovBidder" value={app.contribution} />
               <DetailRow label="Motivación para aplicar" value={app.motivation} />
               <DetailRow label="Visión a 1 año" value={app.one_year_goal} />
             </div>
@@ -393,7 +393,7 @@ export function AdminApplicationsView() {
         {/* Summary cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {(["nueva","revisada","aceptada","rechazada"] as const).map(s => (
-            <div key={s} className="rounded-2xl border border-white/[0.07] bg-[#111113] px-4 py-3.5">
+            <div key={s} className="rounded-2xl border border-white/[0.07] bg-[#0d1745] px-4 py-3.5">
               <p className="text-[10px] font-bold uppercase tracking-widest text-white/25 capitalize">{s}</p>
               <p className={`mt-1 text-2xl font-bold ${STATUS_STYLE[s].split(" ")[1]}`}>
                 {apps.filter(a => a.status === s).length}
@@ -416,7 +416,7 @@ export function AdminApplicationsView() {
               <button key={s} onClick={() => setFilterStatus(s)}
                 className={`h-8 rounded-xl border px-3 text-[12px] font-medium capitalize transition-all ${
                   filterStatus === s
-                    ? "border-[#ffde21]/40 bg-[#ffde21]/10 text-[#ffde21]"
+                    ? "border-[#E42D2C]/40 bg-[#E42D2C]/10 text-[#E42D2C]"
                     : "border-white/[0.07] text-white/40 hover:text-white hover:border-white/20"
                 }`}>
                 {s}
@@ -427,10 +427,10 @@ export function AdminApplicationsView() {
         </div>
 
         {/* Table */}
-        <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111113]">
+        <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0d1745]">
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <Loader2 className="h-6 w-6 animate-spin text-[#ffde21]/40" />
+              <Loader2 className="h-6 w-6 animate-spin text-[#E42D2C]/40" />
             </div>
           ) : (
             <div className="overflow-x-auto">

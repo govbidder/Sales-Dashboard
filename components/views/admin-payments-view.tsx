@@ -54,7 +54,7 @@ function NewPaymentRow({ onSave, onCancel }: { onSave: (p: Omit<Payment, "id" | 
   const inputCls = "h-8 rounded-lg border border-white/[0.08] bg-[#1a1a1d] px-3 text-[13px] text-white placeholder:text-white/20 focus:border-white/20 focus:outline-none w-full"
 
   return (
-    <tr className="border-b border-[#ffde21]/10 bg-[#ffde21]/[0.03]">
+    <tr className="border-b border-[#E42D2C]/10 bg-[#E42D2C]/[0.03]">
       <td className="px-4 py-2.5"><input value={name}  onChange={e => setName(e.target.value)}  placeholder="Nombre completo *" className={inputCls} /></td>
       <td className="px-4 py-2.5"><input value={email} onChange={e => setEmail(e.target.value)} placeholder="email@ejemplo.com"  className={inputCls} /></td>
       <td className="px-4 py-2.5">
@@ -72,7 +72,7 @@ function NewPaymentRow({ onSave, onCancel }: { onSave: (p: Omit<Payment, "id" | 
       <td className="px-4 py-2.5 whitespace-nowrap">
         <div className="flex items-center gap-1.5">
           <button onClick={handleSave} disabled={saving || !name.trim() || !amount.trim()}
-            className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#ffde21] text-black hover:bg-[#ffe84d] disabled:opacity-40 transition-all">
+            className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#E42D2C] text-black hover:bg-[#c42423] disabled:opacity-40 transition-all">
             {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
           </button>
           <button onClick={onCancel} className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.08] text-white/40 hover:text-white transition-all">
@@ -191,7 +191,7 @@ export function AdminPaymentsView() {
             CSV
           </button>
           <button onClick={() => setAdding(true)} disabled={adding}
-            className="flex items-center gap-2 h-9 rounded-xl bg-[#ffde21] px-4 text-sm font-bold text-black hover:bg-[#ffe84d] disabled:opacity-50 transition-all">
+            className="flex items-center gap-2 h-9 rounded-xl bg-[#E42D2C] px-4 text-sm font-bold text-black hover:bg-[#c42423] disabled:opacity-50 transition-all">
             <Plus className="h-4 w-4" />
             Nuevo pago
           </button>
@@ -205,7 +205,7 @@ export function AdminPaymentsView() {
           { label: "Pagos aceptados", value: String(payments.filter(p => p.status === "aceptado").length),  color: "text-emerald-300" },
           { label: "Pagos rechazados",value: String(payments.filter(p => p.status === "rechazado").length), color: "text-red-300"     },
         ].map(card => (
-          <div key={card.label} className="rounded-2xl border border-white/[0.07] bg-[#111113] px-5 py-4">
+          <div key={card.label} className="rounded-2xl border border-white/[0.07] bg-[#0d1745] px-5 py-4">
             <p className="text-[11px] font-bold uppercase tracking-widest text-white/30">{card.label}</p>
             <p className={`mt-1.5 text-2xl font-bold tabular-nums ${card.color}`}>{card.value}</p>
           </div>
@@ -218,7 +218,7 @@ export function AdminPaymentsView() {
           <button key={s} onClick={() => setFilterStatus(s)}
             className={`h-8 rounded-xl border px-3.5 text-[12px] font-medium capitalize transition-all ${
               filterStatus === s
-                ? "border-[#ffde21]/40 bg-[#ffde21]/10 text-[#ffde21]"
+                ? "border-[#E42D2C]/40 bg-[#E42D2C]/10 text-[#E42D2C]"
                 : "border-white/[0.07] text-white/40 hover:text-white hover:border-white/20"
             }`}>
             {s}
@@ -228,9 +228,9 @@ export function AdminPaymentsView() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111113]">
+      <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0d1745]">
         {loading ? (
-          <div className="flex items-center justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-[#ffde21]/40" /></div>
+          <div className="flex items-center justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-[#E42D2C]/40" /></div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">

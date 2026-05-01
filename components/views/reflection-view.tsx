@@ -157,7 +157,7 @@ export function ReflectionView() {
       {/* Header */}
       <div>
         <div className="flex items-center gap-2.5 mb-1">
-          <span className="h-4 w-[3px] rounded-full bg-[#ffde21]" />
+          <span className="h-4 w-[3px] rounded-full bg-[#E42D2C]" />
           <h1 className="text-sm font-semibold uppercase tracking-widest text-white/70">Reflexión Estratégica</h1>
         </div>
         <p className="text-white/30 text-xs ml-[18px]">Insights del mes · {selectedMonth}</p>
@@ -174,13 +174,13 @@ export function ReflectionView() {
           return (
             <div
               key={item.title}
-              className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113] p-5 transition-all duration-200 hover:border-white/15"
+              className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745] p-5 transition-all duration-200 hover:border-white/15"
             >
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,222,33,0.03),transparent_60%)]" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(228,45,44,0.03),transparent_60%)]" />
               <div className="relative">
                 <div className="flex items-center gap-2.5 mb-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#ffde21]/10 ring-1 ring-[#ffde21]/15">
-                    <Icon className="h-4 w-4 text-[#ffde21]" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E42D2C]/10 ring-1 ring-[#E42D2C]/15">
+                    <Icon className="h-4 w-4 text-[#E42D2C]" />
                   </div>
                   <p className="text-[10px] font-semibold uppercase tracking-widest text-white/35">{item.title}</p>
                 </div>

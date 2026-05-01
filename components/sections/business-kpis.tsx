@@ -55,7 +55,7 @@ function fmtNumber(v: any) {
 // ─── KPI definitions ──────────────────────────────────────────────────────────
 
 const KPI_DEFS = [
-  { key: "cash_collected",  label: "Cash Collected",      money: true,  icon: Wallet,     color: "#ffde21" },
+  { key: "cash_collected",  label: "Cash Collected",      money: true,  icon: Wallet,     color: "#E42D2C" },
   { key: "total_revenue",   label: "Total Revenue",        money: true,  icon: DollarSign, color: "#fb923c" },
   { key: "mrr",             label: "MRR",                  money: true,  icon: Repeat,     color: "#60a5fa" },
   { key: "ad_spend",        label: "Gasto Publicitario",   money: true,  icon: Megaphone,  color: "#ef4444" },
@@ -158,7 +158,7 @@ export function BusinessKPIs({ selectedMonth: propMonth }: { selectedMonth?: str
           return (
             <div
               key={kpi.key}
-              className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113] transition-all duration-200 hover:border-white/[0.12] hover:bg-[#141416]"
+              className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745] transition-all duration-200 hover:border-white/[0.12] hover:bg-[#141416]"
             >
               {/* Top accent */}
               <div className={`h-[2px] w-full ${isDown ? "bg-red-500/60" : isUp ? "bg-emerald-500/60" : "bg-white/[0.08]"}`} />

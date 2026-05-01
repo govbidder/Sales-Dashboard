@@ -119,7 +119,7 @@ function EditableCell({
 
   if (saving) return (
     <td className="whitespace-nowrap px-4 py-2.5 text-right">
-      <Loader2 className="inline h-3 w-3 animate-spin text-[#ffde21]/40" />
+      <Loader2 className="inline h-3 w-3 animate-spin text-[#E42D2C]/40" />
     </td>
   )
 
@@ -132,7 +132,7 @@ function EditableCell({
         onChange={e => setDraft(e.target.value)}
         onBlur={save}
         onKeyDown={e => { if (e.key === "Enter") save(); if (e.key === "Escape") cancel() }}
-        className="w-28 rounded-lg border border-[#ffde21]/40 bg-[#ffde21]/[0.07] px-2.5 py-1.5 text-right text-[13px] text-white focus:outline-none focus:ring-1 focus:ring-[#ffde21]/60"
+        className="w-28 rounded-lg border border-[#E42D2C]/40 bg-[#E42D2C]/[0.07] px-2.5 py-1.5 text-right text-[13px] text-white focus:outline-none focus:ring-1 focus:ring-[#E42D2C]/60"
       />
     </td>
   )
@@ -200,7 +200,7 @@ export function AdminDataView() {
     const csv  = [header, ...dataRows].join("\n")
     const blob = new Blob([csv], { type: "text/csv" })
     const url  = URL.createObjectURL(blob)
-    Object.assign(document.createElement("a"), { href: url, download: "smart-scale-data.csv" }).click()
+    Object.assign(document.createElement("a"), { href: url, download: "govbidder-data.csv" }).click()
     URL.revokeObjectURL(url)
   }
 
@@ -237,10 +237,10 @@ export function AdminDataView() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111113]">
+      <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0d1745]">
         {loading ? (
           <div className="flex items-center justify-center py-24">
-            <Loader2 className="h-6 w-6 animate-spin text-[#ffde21]/40" />
+            <Loader2 className="h-6 w-6 animate-spin text-[#E42D2C]/40" />
           </div>
         ) : !months.length ? (
           <div className="py-24 text-center">
@@ -251,7 +251,7 @@ export function AdminDataView() {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-white/[0.06] bg-white/[0.02]">
-                  <th className="sticky left-0 z-10 bg-[#111113] px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-[0.18em] text-white/30 min-w-[190px]">
+                  <th className="sticky left-0 z-10 bg-[#0d1745] px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-[0.18em] text-white/30 min-w-[190px]">
                     Métrica
                   </th>
                   {months.map(m => (
@@ -277,7 +277,7 @@ export function AdminDataView() {
                   }
                   return (
                     <tr key={row.key} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
-                      <td className="sticky left-0 z-10 bg-[#111113] px-5 py-2.5 text-[13px] text-white/55 whitespace-nowrap">
+                      <td className="sticky left-0 z-10 bg-[#0d1745] px-5 py-2.5 text-[13px] text-white/55 whitespace-nowrap">
                         {row.label}
                       </td>
                       {months.map(m => (

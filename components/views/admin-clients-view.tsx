@@ -158,7 +158,7 @@ function WebhookCard() {
   const [copied, setCopied] = useState(false)
   const url = typeof window !== "undefined"
     ? `${window.location.origin}/api/webhooks/client`
-    : "https://smartscale.space/api/webhooks/client"
+    : "https://govbidder.com/api/webhooks/client"
 
   const copy = () => {
     navigator.clipboard.writeText(url)
@@ -167,12 +167,12 @@ function WebhookCard() {
   }
 
   return (
-    <div className="rounded-2xl border border-white/[0.07] bg-[#111113] px-5 py-4">
+    <div className="rounded-2xl border border-white/[0.07] bg-[#0d1745] px-5 py-4">
       <p className="text-[11px] font-bold uppercase tracking-widest text-white/30 mb-2">
         Webhook URL — Zapier / Formulario de onboarding
       </p>
       <div className="flex items-center gap-2">
-        <code className="flex-1 rounded-lg bg-white/[0.04] px-3 py-2 text-[12px] text-[#ffde21]/70 font-mono truncate">
+        <code className="flex-1 rounded-lg bg-white/[0.04] px-3 py-2 text-[12px] text-[#E42D2C]/70 font-mono truncate">
           {url}
         </code>
         <button onClick={copy}
@@ -254,10 +254,10 @@ function DetailDrawer({
   return (
     <>
       <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed right-0 top-0 bottom-0 z-50 flex w-full max-w-[480px] flex-col border-l border-white/[0.08] shadow-2xl" style={{ backgroundColor: "#111113" }}>
+      <div className="fixed right-0 top-0 bottom-0 z-50 flex w-full max-w-[480px] flex-col border-l border-white/[0.08] shadow-2xl" style={{ backgroundColor: "#0d1745" }}>
 
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 border-b border-white/[0.06] px-6 py-5" style={{ backgroundColor: "#111113" }}>
+        <div className="flex items-start justify-between gap-4 border-b border-white/[0.06] px-6 py-5" style={{ backgroundColor: "#0d1745" }}>
           <div className="min-w-0">
             <h2 className="text-lg font-bold text-white truncate">{client.name}</h2>
             <div className="flex items-center gap-2 mt-1">
@@ -280,7 +280,7 @@ function DetailDrawer({
         </div>
 
         {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto" style={{ backgroundColor: "#111113" }}>
+        <div className="flex-1 overflow-y-auto" style={{ backgroundColor: "#0d1745" }}>
 
           {/* Section 1: Info fields */}
           <div className="px-6 py-5 space-y-4 border-b border-white/[0.06]">
@@ -444,7 +444,7 @@ function DetailDrawer({
             {/* Progress bar */}
             <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
               <div
-                className="h-full rounded-full bg-[#ffde21] transition-all duration-500"
+                className="h-full rounded-full bg-[#E42D2C] transition-all duration-500"
                 style={{ width: `${client.num_installments > 0 ? (paidCount / client.num_installments) * 100 : 0}%` }}
               />
             </div>
@@ -496,14 +496,14 @@ function DetailDrawer({
               <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Seguimientos</p>
               <button
                 onClick={() => setShowFollowupForm(v => !v)}
-                className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/[0.08] text-white/40 hover:text-[#ffde21] hover:border-[#ffde21]/30 transition-all">
+                className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/[0.08] text-white/40 hover:text-[#E42D2C] hover:border-[#E42D2C]/30 transition-all">
                 <Plus className="h-3.5 w-3.5" />
               </button>
             </div>
 
             {/* Add followup form */}
             {showFollowupForm && (
-              <div className="rounded-xl border border-[#ffde21]/15 bg-[#ffde21]/[0.02] p-3 space-y-3">
+              <div className="rounded-xl border border-[#E42D2C]/15 bg-[#E42D2C]/[0.02] p-3 space-y-3">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
                     <p className={labelCls}>Fecha</p>
@@ -526,7 +526,7 @@ function DetailDrawer({
                   className="w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-2.5 py-2 text-[12px] text-white placeholder:text-white/30 focus:border-white/20 focus:outline-none" />
                 <div className="flex items-center gap-2">
                   <button onClick={handleSaveFollowup} disabled={savingFu || !fuDate}
-                    className="flex items-center gap-1.5 h-7 rounded-lg bg-[#ffde21] px-3 text-[12px] font-bold text-black hover:bg-[#ffe84d] disabled:opacity-40 transition-all">
+                    className="flex items-center gap-1.5 h-7 rounded-lg bg-[#E42D2C] px-3 text-[12px] font-bold text-black hover:bg-[#c42423] disabled:opacity-40 transition-all">
                     {savingFu ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
                     Guardar
                   </button>
@@ -568,7 +568,7 @@ function DetailDrawer({
                           {fu.type}
                         </span>
                         {fu.scheduled_date === todayStr() && !fu.completed && (
-                          <span className="rounded-full bg-[#ffde21]/10 border border-[#ffde21]/20 px-2 py-0.5 text-[10px] font-bold text-[#ffde21]">hoy</span>
+                          <span className="rounded-full bg-[#E42D2C]/10 border border-[#E42D2C]/20 px-2 py-0.5 text-[10px] font-bold text-[#E42D2C]">hoy</span>
                         )}
                       </div>
                       {fu.notes && (
@@ -593,7 +593,7 @@ function DetailDrawer({
         </div>
 
         {/* Footer with summary */}
-        <div className="border-t border-white/[0.06] px-6 py-3" style={{ backgroundColor: "#111113" }}>
+        <div className="border-t border-white/[0.06] px-6 py-3" style={{ backgroundColor: "#0d1745" }}>
           <div className="flex items-center gap-4 text-[11px] text-white/30">
             <span>
               Fin estimado:{" "}
@@ -673,7 +673,7 @@ function SummaryCards({ clients }: { clients: Client[] }) {
     {
       label: "Follow-ups hoy",
       value: String(followupsHoy),
-      color: followupsHoy > 0 ? "text-[#ffde21]" : "text-white/50",
+      color: followupsHoy > 0 ? "text-[#E42D2C]" : "text-white/50",
       icon:  <Calendar className="h-4 w-4" />,
     },
   ]
@@ -681,7 +681,7 @@ function SummaryCards({ clients }: { clients: Client[] }) {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
       {cards.map(card => (
-        <div key={card.label} className="rounded-2xl border border-white/[0.07] bg-[#111113] px-5 py-4">
+        <div key={card.label} className="rounded-2xl border border-white/[0.07] bg-[#0d1745] px-5 py-4">
           <div className="flex items-center gap-2 mb-1.5">
             <span className="text-white/25">{card.icon}</span>
             <p className="text-[11px] font-bold uppercase tracking-widest text-white/30">{card.label}</p>
@@ -743,7 +743,7 @@ function CashSection({ clients }: { clients: Client[] }) {
   const monthName = now.toLocaleDateString("es-AR", { month: "long", year: "numeric" })
 
   return (
-    <div className="rounded-2xl border border-white/[0.07] bg-[#111113] px-5 py-5">
+    <div className="rounded-2xl border border-white/[0.07] bg-[#0d1745] px-5 py-5">
       <p className="text-[11px] font-bold uppercase tracking-widest text-white/30 mb-4">
         Cash — {monthName}
       </p>
@@ -752,7 +752,7 @@ function CashSection({ clients }: { clients: Client[] }) {
         {/* New Cash */}
         <div>
           <p className="text-[11px] text-white/35 mb-1 font-semibold uppercase tracking-wider">New Cash</p>
-          <p className="text-3xl font-bold text-[#ffde21] tabular-nums">{fmtMoney(newCash)}</p>
+          <p className="text-3xl font-bold text-[#E42D2C] tabular-nums">{fmtMoney(newCash)}</p>
           <p className="text-[12px] text-white/30 mt-1.5">
             {newClients.length > 0
               ? `${newClients.length} cliente${newClients.length !== 1 ? "s" : ""} nuevo${newClients.length !== 1 ? "s" : ""} este mes`
@@ -805,7 +805,7 @@ function InstallmentProgress({ client }: { client: Client }) {
       <span className="text-[12px] text-white/60 tabular-nums">{paid}/{total} pagadas</span>
       <div className="h-1.5 w-24 rounded-full bg-white/[0.06] overflow-hidden">
         <div
-          className="h-full rounded-full bg-[#ffde21] transition-all duration-500"
+          className="h-full rounded-full bg-[#E42D2C] transition-all duration-500"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -1039,7 +1039,7 @@ export function AdminClientsView() {
               <button key={key} onClick={() => setFilterStatus(key)}
                 className={`h-8 rounded-xl border px-3.5 text-[12px] font-medium transition-all ${
                   filterStatus === key
-                    ? "border-[#ffde21]/40 bg-[#ffde21]/10 text-[#ffde21]"
+                    ? "border-[#E42D2C]/40 bg-[#E42D2C]/10 text-[#E42D2C]"
                     : "border-white/[0.07] text-white/40 hover:text-white hover:border-white/20"
                 }`}>
                 {label}
@@ -1061,13 +1061,13 @@ export function AdminClientsView() {
         </div>
 
         {/* Table */}
-        <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111113]">
+        <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0d1745]">
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <Loader2 className="h-6 w-6 animate-spin text-[#ffde21]/40" />
+              <Loader2 className="h-6 w-6 animate-spin text-[#E42D2C]/40" />
             </div>
           ) : (
-            <div className="overflow-x-auto" style={{ backgroundColor: "#111113" }}>
+            <div className="overflow-x-auto" style={{ backgroundColor: "#0d1745" }}>
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b border-white/[0.06] bg-white/[0.02]">
@@ -1103,9 +1103,9 @@ export function AdminClientsView() {
                           key={client.id}
                           onClick={() => setSelected(client)}
                           className={`border-b border-white/[0.04] cursor-pointer transition-colors group ${rowBorder}`}
-                          style={{ backgroundColor: "#111113" }}
+                          style={{ backgroundColor: "#0d1745" }}
                           onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#18181b")}
-                          onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#111113")}
+                          onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#0d1745")}
                         >
                           {/* Cliente */}
                           <td className="px-4 py-3.5 whitespace-nowrap">
@@ -1170,7 +1170,7 @@ export function AdminClientsView() {
                                   {fmtDate(nextFu.scheduled_date)}
                                 </span>
                                 {nextFu.scheduled_date === today && (
-                                  <span className="h-1.5 w-1.5 rounded-full bg-[#ffde21] animate-pulse" />
+                                  <span className="h-1.5 w-1.5 rounded-full bg-[#E42D2C] animate-pulse" />
                                 )}
                               </div>
                             ) : (

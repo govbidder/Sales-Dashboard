@@ -11,7 +11,7 @@ const inputBase =
 function inputStyle(focused = false) {
   return {
     backgroundColor: focused ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.03)",
-    borderColor:     focused ? "rgba(255,222,33,0.45)"  : "rgba(255,255,255,0.09)",
+    borderColor:     focused ? "rgba(228,45,44,0.45)"  : "rgba(255,255,255,0.09)",
   }
 }
 
@@ -21,7 +21,7 @@ function Label({ children, required }: { children: React.ReactNode; required?: b
   return (
     <label className="block text-[13px] font-semibold text-white/60 mb-2 tracking-wide">
       {children}
-      {required && <span className="ml-1 text-[#ffde21]">*</span>}
+      {required && <span className="ml-1 text-[#E42D2C]">*</span>}
     </label>
   )
 }
@@ -30,7 +30,7 @@ function SectionCard({ children }: { children: React.ReactNode }) {
   return (
     <div
       className="rounded-2xl border border-white/[0.07] p-5 sm:p-7 space-y-5 sm:space-y-6"
-      style={{ backgroundColor: "#111113" }}
+      style={{ backgroundColor: "#0d1745" }}
     >
       {children}
     </div>
@@ -40,7 +40,7 @@ function SectionCard({ children }: { children: React.ReactNode }) {
 function SectionHeader({ number, title, subtitle }: { number: string; title: string; subtitle?: string }) {
   return (
     <div className="flex items-start gap-4 pb-1">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#ffde21] text-[13px] font-black text-black mt-0.5">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#E42D2C] text-[13px] font-black text-black mt-0.5">
         {number}
       </div>
       <div>
@@ -87,7 +87,7 @@ function StyledSelect(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
     <div className="relative">
       <select
         {...props}
-        style={{ ...inputStyle(focused), backgroundColor: "#111113" }}
+        style={{ ...inputStyle(focused), backgroundColor: "#0d1745" }}
         className={inputBase + " appearance-none cursor-pointer"}
         onFocus={e => { setFocused(true); props.onFocus?.(e) }}
         onBlur={e  => { setFocused(false); props.onBlur?.(e) }}
@@ -105,7 +105,7 @@ function RadioGroup({ name, options, value, onChange }: {
       {options.map(opt => (
         <label key={opt} className="flex items-center gap-3 cursor-pointer group" onClick={() => onChange(opt)}>
           <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
-            value === opt ? "border-[#ffde21] bg-[#ffde21]" : "border-white/20 group-hover:border-white/40"
+            value === opt ? "border-[#E42D2C] bg-[#E42D2C]" : "border-white/20 group-hover:border-white/40"
           }`}>
             {value === opt && <span className="h-2 w-2 rounded-full bg-black" />}
           </span>
@@ -186,9 +186,9 @@ export default function ApplyPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-20" style={{ backgroundColor: "#0a0a0b" }}>
+      <div className="min-h-screen flex items-center justify-center px-4 py-20" style={{ backgroundColor: "#080d1e" }}>
         <div className="max-w-md w-full text-center space-y-6 sm:space-y-8 px-2">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#ffde21]">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#E42D2C]">
             <Check className="h-10 w-10 text-black" strokeWidth={3} />
           </div>
           <div className="space-y-3">
@@ -197,19 +197,19 @@ export default function ApplyPage() {
               Revisamos cada aplicación personalmente. Si hay match, te contactamos por Instagram.
             </p>
           </div>
-          <div className="rounded-2xl border border-[#ffde21]/15 p-6 text-left space-y-3" style={{ backgroundColor: "#111113" }}>
-            <p className="text-[11px] font-black text-[#ffde21]/60 uppercase tracking-[0.2em]">Próximos pasos</p>
+          <div className="rounded-2xl border border-[#E42D2C]/15 p-6 text-left space-y-3" style={{ backgroundColor: "#0d1745" }}>
+            <p className="text-[11px] font-black text-[#E42D2C]/60 uppercase tracking-[0.2em]">Próximos pasos</p>
             <ul className="space-y-2.5 text-[13px] text-white/55">
               <li className="flex items-start gap-2.5">
-                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#ffde21] shrink-0" />
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#E42D2C] shrink-0" />
                 Revisamos tu aplicación en detalle
               </li>
               <li className="flex items-start gap-2.5">
-                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#ffde21] shrink-0" />
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#E42D2C] shrink-0" />
                 Si tu aplicación es aprobada, te contactamos por Instagram
               </li>
               <li className="flex items-start gap-2.5">
-                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#ffde21] shrink-0" />
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#E42D2C] shrink-0" />
                 Si no hay match, también te avisamos
               </li>
             </ul>
@@ -222,7 +222,7 @@ export default function ApplyPage() {
   // ── Form ─────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#0a0a0b" }} ref={topRef}>
+    <div className="min-h-screen" style={{ backgroundColor: "#080d1e" }} ref={topRef}>
 
       {/* ── Top bar (same style as portal header) */}
       <div
@@ -231,7 +231,7 @@ export default function ApplyPage() {
       >
         <div className="mx-auto max-w-2xl px-5 py-3.5 flex items-center justify-between">
           <a href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
-            <span className="text-white text-[17px] font-bold tracking-tight">Smart</span>
+            <span className="text-white text-[17px] font-bold tracking-tight">Gov</span>
             <span className="rounded-md bg-white px-2 py-0.5 text-[14px] font-bold tracking-tight text-black shadow-sm">
               Scale
             </span>
@@ -245,12 +245,12 @@ export default function ApplyPage() {
 
         {/* ── Hero */}
         <div className="space-y-5 pb-4">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#ffde21]/20 px-4 py-1.5" style={{ backgroundColor: "rgba(255,222,33,0.06)" }}>
-            <span className="h-1.5 w-1.5 rounded-full bg-[#ffde21] animate-pulse" />
-            <span className="text-[11px] font-bold text-[#ffde21] uppercase tracking-[0.18em]">Smart Scale™</span>
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#E42D2C]/20 px-4 py-1.5" style={{ backgroundColor: "rgba(228,45,44,0.06)" }}>
+            <span className="h-1.5 w-1.5 rounded-full bg-[#E42D2C] animate-pulse" />
+            <span className="text-[11px] font-bold text-[#E42D2C] uppercase tracking-[0.18em]">GovBidder™</span>
           </div>
           <h1 className="text-[28px] sm:text-[38px] font-black text-white leading-[1.1] tracking-tight">
-            Aplicá a<br />Smart Scale
+            Apply to<br />GovBidder
           </h1>
           <p className="text-[15px] text-white/50 leading-relaxed max-w-lg">
             Estamos buscando un tipo muy específico de creador que sabemos que podemos ayudar a escalar.
@@ -388,19 +388,19 @@ export default function ApplyPage() {
           {/* 5. ¿Por qué vos? */}
           <SectionCard>
             <SectionHeader number="5" title="¿Por qué vos?"
-              subtitle="Smart Scale™ es una comunidad de creadores de alto nivel." />
+              subtitle="GovBidder™ is the #1 platform for government contract automation." />
             <Field>
               <Label>¿Cuáles son tus superpoderes?</Label>
               <StyledTextarea value={form.superpowers} onChange={set("superpowers")} rows={3}
                 placeholder="¿En qué sos realmente bueno/a?" />
             </Field>
             <Field>
-              <Label required>¿Qué podés aportar al equipo de Smart Scale™?</Label>
+              <Label required>What can you bring to the GovBidder™ community?</Label>
               <StyledTextarea value={form.contribution} onChange={set("contribution")} rows={3}
                 placeholder="Tu perspectiva, experiencia, habilidades..." />
             </Field>
             <Field>
-              <Label required>¿Qué viste en Smart Scale que te hizo pensar "esto es lo que necesito"?</Label>
+              <Label required>What made you realize GovBidder is what you need?</Label>
               <StyledTextarea value={form.motivation} onChange={set("motivation")} rows={3}
                 placeholder="Sé específico/a..." />
             </Field>
@@ -418,21 +418,21 @@ export default function ApplyPage() {
               onClick={() => setForm(f => ({ ...f, terms_accepted: !f.terms_accepted }))}>
               <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all ${
                 form.terms_accepted
-                  ? "border-[#ffde21] bg-[#ffde21]"
+                  ? "border-[#E42D2C] bg-[#E42D2C]"
                   : "border-white/20 group-hover:border-white/40"
               }`}>
                 {form.terms_accepted && <Check className="h-3 w-3 text-black" strokeWidth={3} />}
               </span>
               <span className="text-[14px] text-white/60 leading-relaxed group-hover:text-white/80 transition-colors">
                 He leído y acepto los{" "}
-                <span className="text-[#ffde21] hover:underline">Términos y Condiciones</span>
-                <span className="text-[#ffde21] ml-1">*</span>
+                <span className="text-[#E42D2C] hover:underline">Términos y Condiciones</span>
+                <span className="text-[#E42D2C] ml-1">*</span>
               </span>
             </label>
           </SectionCard>
 
           {/* Notice */}
-          <div className="rounded-xl border border-white/[0.06] px-5 py-4 space-y-2" style={{ backgroundColor: "#111113" }}>
+          <div className="rounded-xl border border-white/[0.06] px-5 py-4 space-y-2" style={{ backgroundColor: "#0d1745" }}>
             <p className="text-[11px] font-black text-white/30 uppercase tracking-[0.18em]">Antes de enviar</p>
             <ul className="space-y-1.5 text-[13px] text-white/40">
               <li className="flex items-start gap-2">
@@ -455,7 +455,7 @@ export default function ApplyPage() {
             type="submit"
             disabled={loading}
             className="w-full flex items-center justify-center gap-3 h-14 rounded-2xl text-[16px] font-black text-black hover:opacity-90 active:scale-[0.98] disabled:opacity-50 transition-all"
-            style={{ backgroundColor: "#ffde21" }}
+            style={{ backgroundColor: "#E42D2C" }}
           >
             {loading ? (
               <><Loader2 className="h-5 w-5 animate-spin" /> Enviando...</>

@@ -73,9 +73,9 @@ function getHistoryStatus(item: HistoryItem): "pending" | "complete" {
 
 function PlatformPill({ isYT }: { isYT: boolean }) {
   return (
-    <div className="inline-flex items-center gap-1.5 rounded-xl border border-[#ffde21]/14 bg-[#ffde21]/7 px-2 py-1.5">
-      <div className="flex h-5 w-5 items-center justify-center rounded-md border border-[#ffde21]/12 bg-[#ffde21]/8">
-        {isYT ? <Youtube className="h-3 w-3 text-[#ffde21]" /> : <Instagram className="h-3 w-3 text-[#ffde21]" />}
+    <div className="inline-flex items-center gap-1.5 rounded-xl border border-[#E42D2C]/14 bg-[#E42D2C]/7 px-2 py-1.5">
+      <div className="flex h-5 w-5 items-center justify-center rounded-md border border-[#E42D2C]/12 bg-[#E42D2C]/8">
+        {isYT ? <Youtube className="h-3 w-3 text-[#E42D2C]" /> : <Instagram className="h-3 w-3 text-[#E42D2C]" />}
       </div>
       <span className="text-[11px] font-medium leading-none text-white/82">{isYT ? "YouTube" : "Instagram"}</span>
     </div>
@@ -86,7 +86,7 @@ function PlatformPill({ isYT }: { isYT: boolean }) {
 
 const SECTIONS: Record<string, { icon: string; color: string; border: string; bg: string }> = {
   "RESUMEN":      { icon: "📋", color: "text-blue-300",    border: "border-blue-500/20",    bg: "bg-blue-500/[0.06]"   },
-  "PUNTOS CLAVE": { icon: "🎯", color: "text-[#ffde21]",   border: "border-[#ffde21]/20",   bg: "bg-[#ffde21]/[0.05]" },
+  "PUNTOS CLAVE": { icon: "🎯", color: "text-[#E42D2C]",   border: "border-[#E42D2C]/20",   bg: "bg-[#E42D2C]/[0.05]" },
   "CONCLUSIÓN":   { icon: "✅", color: "text-emerald-300", border: "border-emerald-500/20", bg: "bg-emerald-500/[0.06]"},
 }
 
@@ -131,7 +131,7 @@ function CopyBtn({ text, label = "Copiar" }: { text: string; label?: string }) {
       onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
       className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-white/35 hover:text-white hover:border-white/20 hover:bg-white/[0.06] transition-all shrink-0"
     >
-      {copied ? <Check className="h-4 w-4 text-[#ffde21]" /> : <Copy className="h-4 w-4" />}
+      {copied ? <Check className="h-4 w-4 text-[#E42D2C]" /> : <Copy className="h-4 w-4" />}
     </button>
   )
 }
@@ -170,7 +170,7 @@ function HistoryTranscript({
         <p className="text-sm text-white/45 leading-[1.85] whitespace-pre-wrap font-light">{preview}{transcript.length > 280 ? "…" : ""}</p>
       </div>
 
-      <button onClick={onOpen} className="mt-3 text-xs text-[#ffde21]/50 hover:text-[#ffde21] transition-colors">
+      <button onClick={onOpen} className="mt-3 text-xs text-[#E42D2C]/50 hover:text-[#E42D2C] transition-colors">
         Abrir transcripción completa →
       </button>
     </div>
@@ -216,15 +216,15 @@ function TranscriptModal({
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
         <div className="relative flex h-full flex-col">
-          <div className="border-b border-white/[0.06] bg-[#111113]/90 px-5 py-4 sm:px-7 sm:py-5 backdrop-blur-xl">
+          <div className="border-b border-white/[0.06] bg-[#0d1745]/90 px-5 py-4 sm:px-7 sm:py-5 backdrop-blur-xl">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0 flex-1">
                 <div className="mb-3 flex items-center gap-2">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#ffde21]/20 bg-[#ffde21]/10">
-                    <FileText className="h-4 w-4 text-[#ffde21]" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#E42D2C]/20 bg-[#E42D2C]/10">
+                    <FileText className="h-4 w-4 text-[#E42D2C]" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-[#ffde21]/70">Transcript Viewer</p>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-[#E42D2C]/70">Transcript Viewer</p>
                     <p className="text-[11px] text-white/25">Lectura completa en una vista cómoda</p>
                   </div>
                 </div>
@@ -250,7 +250,7 @@ function TranscriptModal({
                   onClick={handleCopy}
                   className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 text-sm font-medium text-white/60 hover:border-white/[0.16] hover:bg-white/[0.07] hover:text-white transition-all"
                 >
-                  {copied ? <Check className="h-4 w-4 text-[#ffde21]" /> : <Copy className="h-4 w-4" />}
+                  {copied ? <Check className="h-4 w-4 text-[#E42D2C]" /> : <Copy className="h-4 w-4" />}
                   {copied ? "Copiado" : "Copiar"}
                 </button>
                 <button
@@ -267,7 +267,7 @@ function TranscriptModal({
             <div className="h-full overflow-hidden rounded-[24px] border border-white/[0.07] bg-[#121216] shadow-inner">
               <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-3">
                 <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.22em] text-white/25">
-                  <span className="h-2 w-2 rounded-full bg-[#ffde21]/80" />
+                  <span className="h-2 w-2 rounded-full bg-[#E42D2C]/80" />
                   Transcripción completa
                 </div>
                 <div className="text-[11px] text-white/20">Scroll para leer todo</div>
@@ -315,11 +315,11 @@ function DetailModal({
       <div className="relative w-full max-w-3xl max-h-[85vh] overflow-hidden rounded-[24px] border border-white/[0.08] bg-[#0b0b0d] shadow-[0_30px_120px_rgba(0,0,0,0.55)]">
         <div className="flex items-center justify-between border-b border-white/[0.06] px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#ffde21]/20 bg-[#ffde21]/10">
-              {data.kind === "transcript" ? <FileText className="h-4 w-4 text-[#ffde21]" /> : <Sparkles className="h-4 w-4 text-[#ffde21]" />}
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#E42D2C]/20 bg-[#E42D2C]/10">
+              {data.kind === "transcript" ? <FileText className="h-4 w-4 text-[#E42D2C]" /> : <Sparkles className="h-4 w-4 text-[#E42D2C]" />}
             </div>
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#ffde21]/70">
+              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#E42D2C]/70">
                 {data.kind === "transcript" ? "Transcripción" : "Análisis"}
               </p>
               <h3 className="text-lg font-semibold text-white">{data.title}</h3>
@@ -365,7 +365,7 @@ function HistoryDetailModal({ item, onClose }: { item: HistoryItem; onClose: () 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative flex flex-col w-full max-w-2xl max-h-[90vh] rounded-2xl border border-white/[0.1] bg-[#111113] shadow-2xl overflow-hidden">
+      <div className="relative flex flex-col w-full max-w-2xl max-h-[90vh] rounded-2xl border border-white/[0.1] bg-[#0d1745] shadow-2xl overflow-hidden">
 
         {/* Header */}
         <div className="flex items-start justify-between gap-4 px-6 py-4 border-b border-white/[0.07] flex-shrink-0">
@@ -399,7 +399,7 @@ function HistoryDetailModal({ item, onClose }: { item: HistoryItem; onClose: () 
           {item.transcript && (
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <FileText className="h-3.5 w-3.5 text-[#ffde21]/60" />
+                <FileText className="h-3.5 w-3.5 text-[#E42D2C]/60" />
                 <p className="text-[11px] font-bold uppercase tracking-widest text-white/70">Transcripción</p>
                 <span className="text-[10px] text-white/30">{wordCount.toLocaleString()} palabras</span>
                 <button onClick={() => navigator.clipboard.writeText(item.transcript!)}
@@ -602,7 +602,7 @@ export function TranscriptView() {
             <button
               type="submit"
               disabled={!url.trim() || loading}
-              className="inline-flex items-center gap-2 h-10 rounded-xl bg-[#ffde21] px-5 text-sm font-bold text-black hover:bg-[#ffe46b] disabled:opacity-40 transition"
+              className="inline-flex items-center gap-2 h-10 rounded-xl bg-[#E42D2C] px-5 text-sm font-bold text-black hover:bg-[#ffe46b] disabled:opacity-40 transition"
             >
               {loading ? (
                 <>
@@ -645,7 +645,7 @@ export function TranscriptView() {
       {result && (
         <div className="space-y-5">
           {/* Meta card */}
-          <div className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113]">
+          <div className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745]">
             <div className="h-[2px] w-full bg-gradient-to-r from-red-500/0 via-red-500/50 to-red-500/0" />
             <div className="px-6 py-5 flex flex-wrap items-center gap-5 justify-between">
               <button
@@ -689,13 +689,13 @@ export function TranscriptView() {
 
           {/* ── Transcript (primary) ── */}
           {(outputType === "transcript" || outputType === "both") && (
-            <div className="relative overflow-hidden rounded-2xl border border-white/[0.10] bg-[#111113]">
+            <div className="relative overflow-hidden rounded-2xl border border-white/[0.10] bg-[#0d1745]">
               {/* yellow top accent — this is the main product */}
-              <div className="h-[2px] w-full bg-gradient-to-r from-[#ffde21]/0 via-[#ffde21]/60 to-[#ffde21]/0" />
+              <div className="h-[2px] w-full bg-gradient-to-r from-[#E42D2C]/0 via-[#E42D2C]/60 to-[#E42D2C]/0" />
               <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#ffde21]/10 border border-[#ffde21]/20">
-                    <FileText className="h-4 w-4 text-[#ffde21]" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E42D2C]/10 border border-[#E42D2C]/20">
+                    <FileText className="h-4 w-4 text-[#E42D2C]" />
                   </div>
                   <div>
                     <p className="text-sm font-bold text-white">Transcripción</p>
@@ -788,7 +788,7 @@ export function TranscriptView() {
                     {/* Platform */}
                     <div className="flex items-center gap-2.5 pr-3">
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/[0.07] bg-[#1c1c1f]">
-                        {isYT ? <Youtube className="h-[15px] w-[15px] text-[#ffde21]" /> : <Instagram className="h-[15px] w-[15px] text-[#ffde21]" />}
+                        {isYT ? <Youtube className="h-[15px] w-[15px] text-[#E42D2C]" /> : <Instagram className="h-[15px] w-[15px] text-[#E42D2C]" />}
                       </div>
                       <span className="text-[13px] font-semibold text-white">{isYT ? "YouTube" : "Instagram"}</span>
                     </div>
@@ -804,7 +804,7 @@ export function TranscriptView() {
                         href={item.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[13px] font-semibold text-[#ffde21] hover:text-[#ffe46b] transition-colors whitespace-nowrap"
+                        className="inline-flex items-center gap-1 text-[13px] font-semibold text-[#E42D2C] hover:text-[#ffe46b] transition-colors whitespace-nowrap"
                       >
                         Ver
                         <ExternalLink className="h-3.5 w-3.5" />
@@ -819,7 +819,7 @@ export function TranscriptView() {
                           Completado
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-[#ffde21]/20 bg-[#ffde21]/10 px-2.5 py-1 text-[11px] font-semibold text-[#ffde21] whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E42D2C]/20 bg-[#E42D2C]/10 px-2.5 py-1 text-[11px] font-semibold text-[#E42D2C] whitespace-nowrap">
                           <Loader2 className="h-3 w-3 animate-spin" />
                           Pendiente
                         </span>
@@ -837,7 +837,7 @@ export function TranscriptView() {
                         disabled={!item.transcript}
                         className="min-w-0 flex-1 text-left"
                       >
-                        <p className={`block min-w-0 line-clamp-2 break-words text-[13px] leading-[1.6] ${item.transcript ? "text-[#ffde21]/90 hover:text-[#ffde21] transition-colors" : "text-white/30 italic"}`}>
+                        <p className={`block min-w-0 line-clamp-2 break-words text-[13px] leading-[1.6] ${item.transcript ? "text-[#E42D2C]/90 hover:text-[#E42D2C] transition-colors" : "text-white/30 italic"}`}>
                           {transcriptPreview || "Pendiente..."}
                         </p>
                       </button>
@@ -862,7 +862,7 @@ export function TranscriptView() {
                         disabled={!item.summary}
                         className="min-w-0 flex-1 text-left"
                       >
-                        <p className={`block min-w-0 line-clamp-2 break-words text-[13px] leading-[1.6] ${item.summary ? "text-[#ffde21]/90 hover:text-[#ffde21] transition-colors" : "text-white/30 italic"}`}>
+                        <p className={`block min-w-0 line-clamp-2 break-words text-[13px] leading-[1.6] ${item.summary ? "text-[#E42D2C]/90 hover:text-[#E42D2C] transition-colors" : "text-white/30 italic"}`}>
                           {summaryPreview || "Pendiente..."}
                         </p>
                       </button>

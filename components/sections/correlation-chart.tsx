@@ -67,7 +67,7 @@ function CorrCard({
   const avgLine = data.length ? data.reduce((s, d) => s + d[lineKey], 0) / data.length : 0
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113] hover:border-white/[0.12] transition-colors duration-200">
+    <div className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745] hover:border-white/[0.12] transition-colors duration-200">
       <div className="h-[2px] w-full bg-gradient-to-r"
         style={{ background: `linear-gradient(90deg, ${barColor}90, ${lineColor}90)` }} />
 
@@ -162,7 +162,7 @@ function CorrCard({
               stroke={lineColor}
               strokeWidth={2.5}
               dot={{ fill: lineColor, r: 3.5, strokeWidth: 0 }}
-              activeDot={{ r: 6, fill: lineColor, strokeWidth: 2, stroke: "#0a0a0b" }}
+              activeDot={{ r: 6, fill: lineColor, strokeWidth: 2, stroke: "#080d1e" }}
             />
           </ComposedChart>
         </ResponsiveContainer>
@@ -195,7 +195,7 @@ export function CorrelationChart() {
       <section>
         <div className="grid gap-5 md:grid-cols-2">
           {[0,1,2,3].map(i => (
-            <div key={i} className="h-[380px] animate-pulse rounded-2xl border border-white/[0.07] bg-[#111113]" />
+            <div key={i} className="h-[380px] animate-pulse rounded-2xl border border-white/[0.07] bg-[#0d1745]" />
           ))}
         </div>
       </section>
@@ -219,7 +219,7 @@ export function CorrelationChart() {
           title="Cash vs Cierres"
           insight="¿Cada cliente que cerraste se refleja en el cash? Si los cierres suben pero el cash no, hay un problema de pricing o de condiciones."
           data={data}
-          barKey="cash"    barLabel="Cash Collected" barColor="#ffde21"
+          barKey="cash"    barLabel="Cash Collected" barColor="#E42D2C"
           lineKey="clients" lineLabel="Nuevos Clientes" lineColor="#4ade80"
           fmtBar={fmtMoney}
           fmtLine={(v) => String(v)}
@@ -230,7 +230,7 @@ export function CorrelationChart() {
           title="Cash vs Instagram"
           insight="¿El crecimiento en seguidores precede al cash? Normalmente hay un lag de 1-3 meses entre la audiencia y los ingresos."
           data={data}
-          barKey="cash"  barLabel="Cash Collected"      barColor="#ffde21"
+          barKey="cash"  barLabel="Cash Collected"      barColor="#E42D2C"
           lineKey="ig"   lineLabel="Seguidores IG"       lineColor="#818cf8"
           fmtBar={fmtMoney}
           fmtLine={fmtNum}

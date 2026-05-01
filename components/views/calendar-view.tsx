@@ -100,7 +100,7 @@ export function CalendarView() {
     <section className="space-y-6">
       <div>
         <div className="flex items-center gap-2.5 mb-1">
-          <span className="h-4 w-[3px] rounded-full bg-[#ffde21]" />
+          <span className="h-4 w-[3px] rounded-full bg-[#E42D2C]" />
           <h1 className="text-sm font-semibold uppercase tracking-widest text-white/70">Agenda Semanal</h1>
         </div>
         <p className="text-xs text-white/30 ml-[18px]">
@@ -114,10 +114,10 @@ export function CalendarView() {
           return (
             <div
               key={`${item.day}-${item.time}-${item.title}`}
-              className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113] transition-all duration-200 hover:border-[#ffde21]/25 hover:shadow-[0_0_30px_rgba(255,222,33,0.06)]"
+              className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745] transition-all duration-200 hover:border-[#E42D2C]/25 hover:shadow-[0_0_30px_rgba(228,45,44,0.06)]"
             >
-              <div className={`h-[2px] w-full ${cancelled ? "bg-red-500/50" : "bg-gradient-to-r from-[#ffde21]/20 via-[#ffde21]/40 to-[#ffde21]/20"}`} />
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,222,33,0.04),transparent_55%)]" />
+              <div className={`h-[2px] w-full ${cancelled ? "bg-red-500/50" : "bg-gradient-to-r from-[#E42D2C]/20 via-[#E42D2C]/40 to-[#E42D2C]/20"}`} />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(228,45,44,0.04),transparent_55%)]" />
 
               <div className="relative p-5 space-y-4">
                 {/* Title + status */}
@@ -166,7 +166,7 @@ export function CalendarView() {
                   className={`w-full h-8 rounded-xl text-xs font-bold ${
                     cancelled
                       ? "bg-white/5 text-white/30 pointer-events-none"
-                      : "bg-[#ffde21] text-black hover:bg-[#ffe46b]"
+                      : "bg-[#E42D2C] text-black hover:bg-[#ffe46b]"
                   }`}
                   disabled={!item.zoomUrl || cancelled}
                 >
@@ -184,8 +184,8 @@ export function CalendarView() {
       </div>
 
       {/* Monthly call card */}
-      <div className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113] p-5">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,222,33,0.03),transparent_60%)]" />
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745] p-5">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(228,45,44,0.03),transparent_60%)]" />
         <div className="relative">
           <p className="text-xs font-semibold uppercase tracking-widest text-white/35 mb-3">Llamada mensual con Ann</p>
           <p className="text-sm text-white/55 mb-3">
@@ -194,7 +194,7 @@ export function CalendarView() {
               href="https://calendly.com/strategystudio-mkt/ann-s-privat-link"
               target="_blank"
               rel="noreferrer"
-              className="text-[#ffde21]/70 hover:text-[#ffde21] underline underline-offset-2 transition-colors"
+              className="text-[#E42D2C]/70 hover:text-[#E42D2C] underline underline-offset-2 transition-colors"
             >
               calendly.com/strategystudio-mkt
             </a>
@@ -207,7 +207,7 @@ export function CalendarView() {
               "Si no se agenda en ese período, no se traslada al mes siguiente.",
             ].map((item) => (
               <li key={item} className="flex items-start gap-2">
-                <span className="mt-1 h-1 w-1 rounded-full bg-[#ffde21]/40 flex-shrink-0" />
+                <span className="mt-1 h-1 w-1 rounded-full bg-[#E42D2C]/40 flex-shrink-0" />
                 {item}
               </li>
             ))}

@@ -57,7 +57,7 @@ function CopyBtn({ text }: { text: string | null }) {
   return (
     <button
       onClick={() => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1500) }}
-      className="inline-flex items-center gap-1.5 text-xs text-white/40 hover:text-[#ffde21] transition-colors"
+      className="inline-flex items-center gap-1.5 text-xs text-white/40 hover:text-[#E42D2C] transition-colors"
     >
       <span className="max-w-[140px] truncate text-white/50">{text.slice(0, 60)}{text.length > 60 ? "…" : ""}</span>
       {copied ? <Check className="h-3 w-3 text-emerald-400 flex-shrink-0" /> : <Copy className="h-3 w-3 flex-shrink-0" />}
@@ -182,8 +182,8 @@ function VideoRow({ video, rank }: { video: VideoResult; rank: number }) {
               {video.analysis && (
                 <div>
                   <div className="flex items-center gap-1.5 mb-3">
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-[#ffde21]/50">Análisis IA</p>
-                    <Sparkles className="h-3 w-3 text-[#ffde21]/30" />
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-[#E42D2C]/50">Análisis IA</p>
+                    <Sparkles className="h-3 w-3 text-[#E42D2C]/30" />
                     <button
                       onClick={() => navigator.clipboard.writeText(video.analysis)}
                       className="ml-auto inline-flex items-center gap-1 text-[10px] text-white/25 hover:text-white/50 transition-colors"
@@ -191,7 +191,7 @@ function VideoRow({ video, rank }: { video: VideoResult; rank: number }) {
                       <Copy className="h-3 w-3" /> Copiar
                     </button>
                   </div>
-                  <div className="rounded-xl border border-[#ffde21]/10 bg-[#ffde21]/[0.03] px-4 py-3">
+                  <div className="rounded-xl border border-[#E42D2C]/10 bg-[#E42D2C]/[0.03] px-4 py-3">
                     <p className="text-xs text-white/60 leading-relaxed whitespace-pre-wrap">{video.analysis}</p>
                   </div>
                 </div>
@@ -212,7 +212,7 @@ function ResultsTable({ result }: { result: ResearchResult }) {
   const totalComments = result.videos.reduce((s, v) => s + v.comments, 0)
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113]">
+    <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745]">
       {/* Channel header */}
       <div className="flex items-center gap-4 border-b border-white/[0.06] px-6 py-4">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-500/10 border border-red-500/20 overflow-hidden">
@@ -224,7 +224,7 @@ function ResultsTable({ result }: { result: ResearchResult }) {
           <div className="flex items-center gap-2">
             <p className="text-sm font-semibold text-white truncate">{result.channelName}</p>
             <a href={result.channelUrl} target="_blank" rel="noopener noreferrer"
-              className="text-white/30 hover:text-[#ffde21] transition-colors flex-shrink-0">
+              className="text-white/30 hover:text-[#E42D2C] transition-colors flex-shrink-0">
               <ExternalLink className="h-3.5 w-3.5" />
             </a>
           </div>
@@ -297,10 +297,10 @@ function HistorySection({ items, onSelect, onDelete }: {
   if (!items.length) return null
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113]">
+    <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745]">
       <div className="flex items-center justify-between border-b border-white/[0.06] px-6 py-4">
         <div className="flex items-center gap-2.5">
-          <span className="h-3 w-[2px] rounded-full bg-[#ffde21]/60" />
+          <span className="h-3 w-[2px] rounded-full bg-[#E42D2C]/60" />
           <h2 className="text-xs font-semibold uppercase tracking-widest text-white/50">Investigaciones anteriores</h2>
         </div>
         <span className="text-[10px] text-white/25 tabular-nums">{items.length} registros</span>
@@ -326,7 +326,7 @@ function HistorySection({ items, onSelect, onDelete }: {
             <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 onClick={() => onSelect(item)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-white/50 hover:border-[#ffde21]/30 hover:text-[#ffde21] transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-white/50 hover:border-[#E42D2C]/30 hover:text-[#E42D2C] transition-colors"
               >
                 Ver análisis
               </button>
@@ -413,16 +413,16 @@ function ContentResearchContent() {
       {/* Header */}
       <div>
         <div className="flex items-center gap-2.5 mb-1">
-          <span className="h-4 w-[3px] rounded-full bg-[#ffde21]" />
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-white/35">Smart Scale · IA 1.0</span>
+          <span className="h-4 w-[3px] rounded-full bg-[#E42D2C]" />
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-white/35">GovBidder · IA 1.0</span>
         </div>
         <h1 className="text-2xl font-bold text-white tracking-tight mb-1">Content Research</h1>
         <p className="text-sm text-white/40">Analizá los top 5 videos de cualquier canal de YouTube por métricas reales.</p>
       </div>
 
       {/* Form */}
-      <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113]">
-        <div className="h-[2px] w-full bg-gradient-to-r from-[#ffde21]/0 via-[#ffde21]/50 to-[#ffde21]/0" />
+      <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745]">
+        <div className="h-[2px] w-full bg-gradient-to-r from-[#E42D2C]/0 via-[#E42D2C]/50 to-[#E42D2C]/0" />
         <div className="p-6">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="flex flex-col sm:flex-row gap-3">
@@ -436,7 +436,7 @@ function ContentResearchContent() {
                   value={channelUrl}
                   onChange={e => { setChannelUrl(e.target.value); setError(null) }}
                   placeholder="https://youtube.com/@canal"
-                  className="h-11 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] pl-10 pr-4 text-sm text-white placeholder:text-white/20 focus:border-[#ffde21]/40 focus:outline-none focus:ring-1 focus:ring-[#ffde21]/15 transition-all"
+                  className="h-11 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] pl-10 pr-4 text-sm text-white placeholder:text-white/20 focus:border-[#E42D2C]/40 focus:outline-none focus:ring-1 focus:ring-[#E42D2C]/15 transition-all"
                   disabled={loading}
                 />
               </div>
@@ -448,7 +448,7 @@ function ContentResearchContent() {
                     key={t}
                     type="button"
                     onClick={() => setTimeframe(t)}
-                    className={`px-4 py-2 text-sm font-medium transition-colors ${timeframe === t ? "bg-[#ffde21] text-black" : "text-white/40 hover:text-white/70"}`}
+                    className={`px-4 py-2 text-sm font-medium transition-colors ${timeframe === t ? "bg-[#E42D2C] text-black" : "text-white/40 hover:text-white/70"}`}
                   >
                     {t}d
                   </button>
@@ -458,7 +458,7 @@ function ContentResearchContent() {
               <button
                 type="submit"
                 disabled={!channelUrl.trim() || loading}
-                className="h-11 rounded-xl bg-[#ffde21] px-6 text-sm font-bold text-black hover:bg-[#ffe46b] disabled:opacity-40 transition shrink-0"
+                className="h-11 rounded-xl bg-[#E42D2C] px-6 text-sm font-bold text-black hover:bg-[#ffe46b] disabled:opacity-40 transition shrink-0"
               >
                 {loading ? "Investigando…" : "Investigar"}
               </button>

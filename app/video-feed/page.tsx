@@ -76,11 +76,11 @@ function PostCard({ post, avg }: { post: Post; avg: number }) {
 
   return (
     <div className={`group relative flex flex-col overflow-hidden rounded-2xl border transition-all duration-200 ${
-      isTop ? "border-[#ffde21]/30 shadow-[0_0_20px_rgba(255,222,33,0.05)]" : "border-white/[0.07]"
-    } bg-[#111113]`}>
+      isTop ? "border-[#E42D2C]/30 shadow-[0_0_20px_rgba(228,45,44,0.05)]" : "border-white/[0.07]"
+    } bg-[#0d1745]`}>
 
       {isTop && (
-        <div className="absolute top-2.5 left-2.5 z-10 rounded-lg bg-[#ffde21] px-2 py-0.5 text-[10px] font-bold text-black shadow-sm">
+        <div className="absolute top-2.5 left-2.5 z-10 rounded-lg bg-[#E42D2C] px-2 py-0.5 text-[10px] font-bold text-black shadow-sm">
           {mult.toFixed(1)}x
         </div>
       )}
@@ -128,8 +128,8 @@ function PostCard({ post, avg }: { post: Post; avg: number }) {
         {post.analysis && (
           <div className="border-t border-white/[0.05] pt-2 mt-auto">
             <button onClick={() => setExpanded(v => !v)} className="flex w-full items-center gap-1.5 text-left">
-              <Sparkles className="h-2.5 w-2.5 text-[#ffde21]/50" />
-              <span className="text-[9px] font-semibold uppercase tracking-widest text-[#ffde21]/50 flex-1">Análisis IA</span>
+              <Sparkles className="h-2.5 w-2.5 text-[#E42D2C]/50" />
+              <span className="text-[9px] font-semibold uppercase tracking-widest text-[#E42D2C]/50 flex-1">Análisis IA</span>
               {expanded ? <ChevronUp className="h-3 w-3 text-white/20" /> : <ChevronDown className="h-3 w-3 text-white/20" />}
             </button>
             {expanded && (
@@ -199,7 +199,7 @@ function ConnectForm({ onConnect }: { onConnect: (account: Account) => void }) {
           Ingresá la URL de tu perfil para ver tus mejores posts de los últimos 30 días con análisis IA.
         </p>
 
-        <div className="rounded-2xl border border-white/[0.08] bg-[#111113] overflow-hidden">
+        <div className="rounded-2xl border border-white/[0.08] bg-[#0d1745] overflow-hidden">
           <div className="h-[2px] w-full bg-gradient-to-r from-pink-500/0 via-pink-500/40 to-pink-500/0" />
           <div className="p-6 space-y-4">
             <form onSubmit={handleSubmit} className="space-y-3">
@@ -219,7 +219,7 @@ function ConnectForm({ onConnect }: { onConnect: (account: Account) => void }) {
               <button
                 type="submit"
                 disabled={!url.trim() || loading}
-                className="h-11 w-full rounded-xl bg-[#ffde21] text-sm font-bold text-black hover:bg-[#ffe46b] disabled:opacity-40 transition"
+                className="h-11 w-full rounded-xl bg-[#E42D2C] text-sm font-bold text-black hover:bg-[#ffe46b] disabled:opacity-40 transition"
               >
                 {loading ? "Cargando tu perfil…" : "Conectar Instagram"}
               </button>
@@ -280,7 +280,7 @@ function FeedView({ account, onRefresh }: {
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-white">@{account.channel_name}</span>
             <a href={account.channel_url} target="_blank" rel="noopener noreferrer"
-              className="text-white/25 hover:text-[#ffde21] transition-colors">
+              className="text-white/25 hover:text-[#E42D2C] transition-colors">
               <ExternalLink className="h-3.5 w-3.5" />
             </a>
           </div>
@@ -311,7 +311,7 @@ function FeedView({ account, onRefresh }: {
           <button key={f} onClick={() => setFilter(f)}
             className={`h-8 rounded-lg px-4 text-xs font-semibold transition-all ${
               filter === f
-                ? "bg-[#ffde21] text-black"
+                ? "bg-[#E42D2C] text-black"
                 : "border border-white/[0.07] bg-white/[0.03] text-white/40 hover:text-white/70"
             }`}>
             {f === "all" ? "Todos" : "Top Performing"}
@@ -328,7 +328,7 @@ function FeedView({ account, onRefresh }: {
       ) : (
         <div className="flex flex-col items-center justify-center py-16 gap-3">
           <p className="text-sm text-white/30">No hay publicaciones que superen el umbral.</p>
-          <button onClick={() => setFilter("all")} className="text-xs text-[#ffde21]/60 hover:text-[#ffde21] transition-colors">
+          <button onClick={() => setFilter("all")} className="text-xs text-[#E42D2C]/60 hover:text-[#E42D2C] transition-colors">
             Ver todas →
           </button>
         </div>

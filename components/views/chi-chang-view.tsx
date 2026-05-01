@@ -9,7 +9,7 @@ const NIVEL_OPTIONS = [
   { value: "$5K", label: "$5K", color: "#ef4444", dot: "bg-red-500" },
   { value: "$10K", label: "$10K", color: "#3b82f6", dot: "bg-blue-500" },
   { value: "$20K", label: "$20K", color: "#8b5cf6", dot: "bg-violet-500" },
-  { value: "$50K", label: "$50K", color: "#ffde21", dot: "bg-yellow-400" },
+  { value: "$50K", label: "$50K", color: "#E42D2C", dot: "bg-yellow-400" },
   { value: "$100K", label: "$100K", color: "#22c55e", dot: "bg-green-500" },
 ]
 
@@ -18,14 +18,14 @@ function Field({ label, required, children }: { label: string; required?: boolea
     <div className="flex flex-col gap-2">
       <label className="text-[10px] font-semibold uppercase tracking-widest text-white/40">
         {label}
-        {required && <span className="ml-1 text-[#ffde21]">*</span>}
+        {required && <span className="ml-1 text-[#E42D2C]">*</span>}
       </label>
       {children}
     </div>
   )
 }
 
-const inputCls = "w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-2.5 text-sm font-medium text-white placeholder:text-white/20 focus:border-[#ffde21]/40 focus:outline-none focus:ring-1 focus:ring-[#ffde21]/20 transition-all"
+const inputCls = "w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-2.5 text-sm font-medium text-white placeholder:text-white/20 focus:border-[#E42D2C]/40 focus:outline-none focus:ring-1 focus:ring-[#E42D2C]/20 transition-all"
 
 export function ChiChangView() {
   const activeClientId = useActiveClient()
@@ -95,14 +95,14 @@ export function ChiChangView() {
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Header card */}
-      <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-[#111113] px-6 py-5">
-        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#ffde21]/60 via-[#ffde21]/30 to-transparent" />
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0d1745] px-6 py-5">
+        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#E42D2C]/60 via-[#E42D2C]/30 to-transparent" />
         <div className="flex items-center gap-4">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#ffde21]/10 ring-1 ring-[#ffde21]/20">
-            <Trophy className="h-5 w-5 text-[#ffde21]" />
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#E42D2C]/10 ring-1 ring-[#E42D2C]/20">
+            <Trophy className="h-5 w-5 text-[#E42D2C]" />
           </div>
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#ffde21]/70 mb-0.5">Cierre</p>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#E42D2C]/70 mb-0.5">Cierre</p>
             <h2 className="text-lg font-bold text-white">Cha-Ching 💰</h2>
             <p className="text-xs text-white/30 mt-0.5">¡Felicitaciones por cerrar el trato! Cargá los detalles.</p>
           </div>
@@ -110,9 +110,9 @@ export function ChiChangView() {
       </div>
 
       {/* Form fields */}
-      <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-[#111113]">
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0d1745]">
         <div className="flex items-center gap-2 border-b border-white/[0.05] px-5 py-3">
-          <span className="h-3 w-[2px] rounded-full bg-[#ffde21]" />
+          <span className="h-3 w-[2px] rounded-full bg-[#E42D2C]" />
           <span className="text-xs font-semibold uppercase tracking-widest text-white/40">Detalles del Trato</span>
         </div>
         <div className="p-5 space-y-5">
@@ -206,7 +206,7 @@ export function ChiChangView() {
         <button
           type="submit"
           disabled={status === "loading" || !activeClientId}
-          className="flex items-center gap-2 rounded-xl bg-[#ffde21] px-6 py-2.5 text-sm font-bold text-black transition hover:bg-[#ffe46b] disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 rounded-xl bg-[#E42D2C] px-6 py-2.5 text-sm font-bold text-black transition hover:bg-[#ffe46b] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {status === "loading" && <Loader2 className="h-4 w-4 animate-spin" />}
           {status === "loading" ? "Registrando…" : "Registrar venta"}

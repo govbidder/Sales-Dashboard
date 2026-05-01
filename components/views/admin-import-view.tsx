@@ -177,7 +177,7 @@ export function AdminImportView() {
         </div>
         <div className="flex items-center gap-3">
           {/* Year selector */}
-          <div className="flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#111113] p-1">
+          <div className="flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0d1745] p-1">
             {(["2024", "2023"] as const).map(y => (
               <button
                 key={y}
@@ -190,7 +190,7 @@ export function AdminImportView() {
                 }}
                 className={`h-7 rounded-lg px-3 text-[12px] font-semibold transition-all ${
                   year === y
-                    ? "bg-[#ffde21] text-black"
+                    ? "bg-[#E42D2C] text-black"
                     : "text-white/40 hover:text-white"
                 }`}
               >
@@ -202,7 +202,7 @@ export function AdminImportView() {
           <button
             onClick={handleImport}
             disabled={saving || filledCount === 0}
-            className="flex items-center gap-2 h-9 rounded-xl bg-[#ffde21] px-5 text-[13px] font-bold text-black hover:bg-[#ffe84d] transition-all disabled:opacity-40"
+            className="flex items-center gap-2 h-9 rounded-xl bg-[#E42D2C] px-5 text-[13px] font-bold text-black hover:bg-[#c42423] transition-all disabled:opacity-40"
           >
             {saving
               ? <Loader2 className="h-4 w-4 animate-spin" />
@@ -238,7 +238,7 @@ export function AdminImportView() {
       )}
 
       {/* Spreadsheet grid */}
-      <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111113]">
+      <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0d1745]">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse" style={{ minWidth: "900px" }}>
             <thead>
@@ -265,7 +265,7 @@ export function AdminImportView() {
                   <tr
                     key={row.month}
                     className="border-b border-white/[0.04] group"
-                    style={{ backgroundColor: isSaved ? "rgba(16,185,129,0.04)" : "#111113" }}
+                    style={{ backgroundColor: isSaved ? "rgba(16,185,129,0.04)" : "#0d1745" }}
                   >
                     {/* Month label */}
                     <td className="sticky left-0 z-10 px-4 py-2.5 whitespace-nowrap" style={{ backgroundColor: isSaved ? "rgba(16,185,129,0.06)" : "#0e0e10" }}>
@@ -302,7 +302,7 @@ export function AdminImportView() {
                         : hasError
                           ? <AlertCircle className="h-4 w-4 text-red-400 mx-auto" title={errors[row.month]} />
                           : hasData
-                            ? <div className="h-1.5 w-1.5 rounded-full bg-[#ffde21]/60 mx-auto" />
+                            ? <div className="h-1.5 w-1.5 rounded-full bg-[#E42D2C]/60 mx-auto" />
                             : null}
                     </td>
                   </tr>
@@ -314,7 +314,7 @@ export function AdminImportView() {
       </div>
 
       {/* Field reference */}
-      <div className="rounded-2xl border border-white/[0.05] bg-[#111113] px-5 py-4">
+      <div className="rounded-2xl border border-white/[0.05] bg-[#0d1745] px-5 py-4">
         <p className="text-[11px] font-bold uppercase tracking-widest text-white/25 mb-3">
           Referencia de campos (Google Sheets → Dashboard)
         </p>
@@ -335,7 +335,7 @@ export function AdminImportView() {
             <div key={from} className="flex items-center gap-1.5 text-[11px]">
               <span className="text-white/35">{from}</span>
               <span className="text-white/20">→</span>
-              <span className="text-[#ffde21]/60 font-medium">{to}</span>
+              <span className="text-[#E42D2C]/60 font-medium">{to}</span>
             </div>
           ))}
         </div>

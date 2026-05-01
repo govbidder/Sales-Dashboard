@@ -1,10 +1,10 @@
 "use client"
 
 import {
-  X, BarChart3, Radio, DollarSign, MessageSquare, Wrench,
-  CalendarDays, Lock, LayoutGrid, LineChart, ClipboardList,
-  Zap, Globe, Upload, History, Telescope, FileVideo, Clapperboard,
-  ChevronDown, Table2, Users2, ShieldCheck, Trophy, FileBarChart,
+  X, BarChart3, Radio, DollarSign, FileSearch, Wrench,
+  CalendarDays, Lock, LayoutGrid, ClipboardList,
+  Zap, Globe, Upload, FileVideo, Clapperboard,
+  ChevronDown, Table2, Users2, Trophy, FileBarChart,
   UserCheck, Layers,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -15,56 +15,54 @@ import { useState } from "react"
 interface SidebarProps {
   open: boolean
   onClose: () => void
-  isAdmin?: boolean
 }
 
 const NAV_GROUPS = [
   {
-    label: "Performance",
+    label: "Overview",
     items: [
-      { name: "Performance Center", href: "/dashboard",  icon: BarChart3 },
-      { name: "Channels",           href: "/channels",   icon: Radio },
-      { name: "Sales",              href: "/sales",      icon: DollarSign },
-      { name: "Reflection",         href: "/reflection", icon: MessageSquare },
-      { name: "All Metrics",        href: "/metrics",    icon: LayoutGrid },
+      { name: "Bid Dashboard",  href: "/dashboard",  icon: BarChart3 },
+      { name: "Bid Sources",    href: "/channels",   icon: Radio },
+      { name: "Revenue",        href: "/sales",      icon: DollarSign },
+      { name: "Review",         href: "/reflection", icon: FileSearch },
+      { name: "All Metrics",    href: "/metrics",    icon: LayoutGrid },
     ],
   },
   {
-    label: "Programa",
+    label: "GovBidder CRM",
     items: [
-      { name: "Audit",           href: "/audit",             icon: ClipboardList },
-      { name: "Implementacion",  href: "/program-checklist", icon: Zap },
-      { name: "Tools",           href: "/tools",             icon: Wrench },
-      { name: "Agenda",          href: "/calendar",          icon: CalendarDays },
-      { name: "Monday Win",      href: "/monday-win",        icon: Trophy },
-      { name: "Reporte Mensual", href: "/report-input",      icon: FileBarChart },
-      { name: "Cha-Ching 💰",    href: "/chi-chang",         icon: DollarSign },
+      { name: "Data Table",         href: "/admin/data",             icon: Table2        },
+      { name: "Prospects",          href: "/admin/leads",            icon: Users2        },
+      { name: "Payments",           href: "/admin/payments",         icon: DollarSign    },
+      { name: "Clients",            href: "/admin/clients",          icon: UserCheck     },
+      { name: "Applications",       href: "/admin/applications",     icon: ClipboardList },
+      { name: "Import Data",        href: "/admin/import",           icon: Upload        },
+      { name: "Operations Center",  href: "/admin/centro-operativo", icon: Layers        },
     ],
   },
   {
-    label: "Contenido",
+    label: "Program",
     items: [
-      { name: "Video Feed",           href: "/video-feed",          icon: Clapperboard },
-      { name: "Competitor Research",  href: "/competitor-research", icon: Globe },
-      { name: "Transcript de Videos", href: "/transcript",          icon: FileVideo },
+      { name: "Compliance Audit",  href: "/audit",             icon: ClipboardList },
+      { name: "Implementation",    href: "/program-checklist", icon: Zap           },
+      { name: "Tools",             href: "/tools",             icon: Wrench        },
+      { name: "Schedule",          href: "/calendar",          icon: CalendarDays  },
+      { name: "Weekly Win",        href: "/monday-win",        icon: Trophy        },
+      { name: "Monthly Report",    href: "/report-input",      icon: FileBarChart  },
+      { name: "Revenue Track",     href: "/chi-chang",         icon: DollarSign    },
+    ],
+  },
+  {
+    label: "Research",
+    items: [
+      { name: "Training Videos",   href: "/video-feed",          icon: Clapperboard },
+      { name: "Market Research",   href: "/competitor-research", icon: Globe        },
+      { name: "Video Transcripts", href: "/transcript",          icon: FileVideo    },
     ],
   },
 ]
 
-const ADMIN_NAV_GROUP = {
-  label: "Smart Scale CRM",
-  items: [
-    { name: "Tabla de Datos", href: "/admin/data",         icon: Table2  },
-    { name: "Leads",          href: "/admin/leads",        icon: Users2  },
-    { name: "Pagos",          href: "/admin/payments",     icon: DollarSign },
-    { name: "Clientes",       href: "/admin/clients",      icon: UserCheck },
-    { name: "Aplicaciones",   href: "/admin/applications", icon: ClipboardList },
-    { name: "Importar Datos",    href: "/admin/import",             icon: Upload  },
-    { name: "Centro Operativo", href: "/admin/centro-operativo",   icon: Layers  },
-  ],
-}
-
-export function Sidebar({ open, onClose, isAdmin = false }: SidebarProps) {
+export function Sidebar({ open, onClose }: SidebarProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
 
@@ -81,21 +79,21 @@ export function Sidebar({ open, onClose, isAdmin = false }: SidebarProps) {
       <aside
         className={cn(
           "fixed left-0 top-0 z-50 h-full w-[220px] border-r border-white/[0.07] transition-transform duration-300 ease-in-out lg:translate-x-0",
-          "bg-[#111113] flex flex-col",
+          "bg-[#0d1745] flex flex-col",
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
         {/* Logo */}
         <div className="flex h-16 flex-shrink-0 items-center justify-between border-b border-white/[0.07] px-5">
-          <a href="/" className="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
-            <span className="text-white text-xl font-bold tracking-tight">Smart</span>
-            <span className="rounded-md bg-white px-2.5 py-1 text-base font-bold tracking-tight text-black shadow-sm">
-              Scale
+          <a href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+            <span className="text-white text-xl font-bold tracking-tight">Gov</span>
+            <span className="rounded-md bg-[#E42D2C] px-2.5 py-1 text-base font-bold tracking-tight text-white shadow-sm">
+              Bidder
             </span>
           </a>
           <div className="flex items-center gap-2">
             <span className="text-[9px] font-semibold text-white/25 tracking-widest uppercase">
-              v2.0
+              v1.0
             </span>
             <button
               className="lg:hidden flex h-7 w-7 items-center justify-center rounded-md text-white/50 hover:text-white hover:bg-white/10 transition-all"
@@ -108,30 +106,18 @@ export function Sidebar({ open, onClose, isAdmin = false }: SidebarProps) {
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-          {[...NAV_GROUPS, ...(isAdmin ? [ADMIN_NAV_GROUP] : [])].map((group) => {
+          {NAV_GROUPS.map((group) => {
             const isCollapsed = collapsed[group.label]
             const hasActive = group.items.some(i => pathname === i.href)
-            const isAdminGroup = group.label === "Smart Scale CRM"
 
             return (
               <div key={group.label} className="mb-1">
-                {isAdminGroup && (
-                  <div className="mx-2 my-3 flex items-center gap-2">
-                    <div className="flex-1 h-px bg-white/[0.07]" />
-                    <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.15em] text-[#ffde21]/40 whitespace-nowrap">
-                      <ShieldCheck className="h-2.5 w-2.5 shrink-0" />
-                      Smart Scale CRM
-                    </span>
-                    <div className="flex-1 h-px bg-white/[0.07]" />
-                  </div>
-                )}
-                {/* Group header — clickable to collapse */}
                 <button
                   onClick={() => toggleGroup(group.label)}
                   className={cn(
                     "w-full flex items-center justify-between gap-2 rounded-lg px-3 py-2 transition-all duration-150",
                     "hover:bg-white/[0.05]",
-                    hasActive && isCollapsed ? "text-[#ffde21]" : "text-white/80"
+                    hasActive && isCollapsed ? "text-[#E42D2C]" : "text-white/80"
                   )}
                 >
                   <span className="text-[13px] font-semibold tracking-wide">{group.label}</span>
@@ -143,7 +129,6 @@ export function Sidebar({ open, onClose, isAdmin = false }: SidebarProps) {
                   />
                 </button>
 
-                {/* Items */}
                 {!isCollapsed && (
                   <div className="mt-0.5 space-y-0.5 pl-1">
                     {group.items.map((item) => {
@@ -168,12 +153,15 @@ export function Sidebar({ open, onClose, isAdmin = false }: SidebarProps) {
                             className={cn(
                               "flex items-center gap-2.5 rounded-lg px-3 py-[7px] transition-all duration-150",
                               isActive
-                                ? "bg-white/[0.07] text-[#ffde21]"
-                                : "text-white/80 hover:bg-white/[0.05] hover:text-white"
+                                ? "bg-[#E42D2C]/10 text-[#E42D2C]"
+                                : "text-white/75 hover:bg-white/[0.05] hover:text-white"
                             )}
                           >
                             <item.icon
-                              className="h-[14px] w-[14px] flex-shrink-0 text-[#ffde21]"
+                              className={cn(
+                                "h-[14px] w-[14px] flex-shrink-0",
+                                isActive ? "text-[#E42D2C]" : "text-white/50"
+                              )}
                             />
                             <span className={cn(
                               "text-[13px] leading-none",
@@ -194,11 +182,11 @@ export function Sidebar({ open, onClose, isAdmin = false }: SidebarProps) {
 
         {/* Footer */}
         <div className="flex-shrink-0 border-t border-white/[0.07] p-4">
-          <div className="flex items-center gap-2.5 rounded-xl bg-[#ffde21]/[0.07] px-3 py-2.5 border border-[#ffde21]/15">
-            <span className="flex h-1.5 w-1.5 rounded-full bg-[#ffde21] animate-pulse flex-shrink-0" />
+          <div className="flex items-center gap-2.5 rounded-xl bg-[#E42D2C]/[0.08] px-3 py-2.5 border border-[#E42D2C]/20">
+            <span className="flex h-1.5 w-1.5 rounded-full bg-[#E42D2C] animate-pulse flex-shrink-0" />
             <div>
-              <p className="text-[10px] font-bold text-[#ffde21]/80 tracking-widest uppercase">Client Analytics</p>
-              <p className="text-[10px] text-white/30 mt-0.5">Portal 2.0</p>
+              <p className="text-[10px] font-bold text-[#E42D2C]/80 tracking-widest uppercase">Gov Contracts</p>
+              <p className="text-[10px] text-white/30 mt-0.5">Sales Dashboard</p>
             </div>
           </div>
         </div>

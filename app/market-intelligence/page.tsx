@@ -204,17 +204,17 @@ function MarketIntelligenceContent() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-2.5 mb-2">
-            <span className="h-4 w-[3px] rounded-full bg-[#ffde21]" />
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-white/35">Smart Scale · IA 1.0</span>
+            <span className="h-4 w-[3px] rounded-full bg-[#E42D2C]" />
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-white/35">GovBidder · IA 1.0</span>
           </div>
           <h1 className="text-2xl font-bold text-white tracking-tight mb-1">Market Intelligence</h1>
           <p className="text-sm text-white/40">Investigación competitiva automatizada con inteligencia artificial.</p>
         </div>
 
         {/* Sección 1 – Laboratorio de Inteligencia */}
-        <div className="mb-8 overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113] p-6">
+        <div className="mb-8 overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745] p-6">
           <div className="flex items-center gap-2.5 mb-6">
-            <span className="h-3 w-[2px] rounded-full bg-[#ffde21]/60" />
+            <span className="h-3 w-[2px] rounded-full bg-[#E42D2C]/60" />
             <h2 className="text-xs font-semibold uppercase tracking-widest text-white/50">Laboratorio de Inteligencia de Mercado</h2>
           </div>
           {!hasSession ? (
@@ -263,7 +263,7 @@ function MarketIntelligenceContent() {
             </div>
             {error && <div className="text-red-500 mt-2 font-sans text-lg">{error}</div>}
             <div className="pt-6">
-                <Button type="submit" disabled={loading} className="w-full md:w-auto px-8 py-2.5 rounded-xl text-sm font-bold bg-[#ffde21] text-black hover:bg-[#ffe46b] disabled:opacity-50">
+                <Button type="submit" disabled={loading} className="w-full md:w-auto px-8 py-2.5 rounded-xl text-sm font-bold bg-[#E42D2C] text-black hover:bg-[#ffe46b] disabled:opacity-50">
                   {loading ? "Enviando…" : "Iniciar Investigación"}
                 </Button>
                 {!hasSession && (
@@ -287,10 +287,10 @@ function MarketIntelligenceContent() {
         </div>
 
         {/* Sección 2 – Historial de Investigaciones */}
-        <div className="mb-8 overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113]">
+        <div className="mb-8 overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745]">
           <div className="flex items-center justify-between border-b border-white/[0.06] px-6 py-4">
             <div className="flex items-center gap-2.5">
-              <span className="h-3 w-[2px] rounded-full bg-[#ffde21]/60" />
+              <span className="h-3 w-[2px] rounded-full bg-[#E42D2C]/60" />
               <h2 className="text-xs font-semibold uppercase tracking-widest text-white/50">Investigaciones anteriores</h2>
             </div>
             {requests.length > 0 && (
@@ -354,7 +354,7 @@ function MarketIntelligenceContent() {
                                 }, 80);
                               }
                             }}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-white/60 transition-colors hover:border-[#ffde21]/30 hover:bg-[#ffde21]/[0.06] hover:text-[#ffde21]"
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-white/60 transition-colors hover:border-[#E42D2C]/30 hover:bg-[#E42D2C]/[0.06] hover:text-[#E42D2C]"
                           >
                             <ExternalLink className="w-3 h-3" />
                             {isSelected ? "Ocultar" : "Ver análisis"}
@@ -390,7 +390,7 @@ function MarketIntelligenceContent() {
                                     <div key={idx} className="flex items-center gap-1.5 rounded-lg border border-white/[0.07] bg-white/[0.03] px-3 py-1.5">
                                       <span className="text-xs text-white/60 truncate max-w-[200px]">{name}</span>
                                       {url && (
-                                        <a href={url} target="_blank" rel="noopener noreferrer" className="text-white/25 hover:text-[#ffde21] transition-colors">
+                                        <a href={url} target="_blank" rel="noopener noreferrer" className="text-white/25 hover:text-[#E42D2C] transition-colors">
                                           <ExternalLink className="w-3 h-3" />
                                         </a>
                                       )}
@@ -419,9 +419,9 @@ function MarketIntelligenceContent() {
         </div>
 
         {/* Sección 3 – Estado del Análisis */}
-        <div ref={resultsRef} className="mb-8 overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113] p-6">
+        <div ref={resultsRef} className="mb-8 overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745] p-6">
           <div className="flex items-center gap-2.5 mb-5">
-            <span className="h-3 w-[2px] rounded-full bg-[#ffde21]/60" />
+            <span className="h-3 w-[2px] rounded-full bg-[#E42D2C]/60" />
             <h2 className="text-xs font-semibold uppercase tracking-widest text-white/50">Estado del Análisis</h2>
           </div>
           {selectedRequest ? (

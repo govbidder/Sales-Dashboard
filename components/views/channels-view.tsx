@@ -90,7 +90,7 @@ function ChannelCard({
   const hasDelta = delta.pct !== null
 
   return (
-    <div className="relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113] hover:border-white/[0.12] transition-colors duration-200">
+    <div className="relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745] hover:border-white/[0.12] transition-colors duration-200">
       <div className="h-[2px] w-full" style={{ backgroundColor: color, opacity: noData ? 0.2 : 0.7 }} />
 
       <div className="flex-1 p-5 pb-2">
@@ -184,7 +184,7 @@ function GrowthIndexChart({ reports }: { reports: any[] }) {
   const activeChannels = channels.filter(ch => bases[ch.key] > 0)
 
   return (
-    <div className="rounded-2xl border border-white/[0.07] bg-[#111113] p-6">
+    <div className="rounded-2xl border border-white/[0.07] bg-[#0d1745] p-6">
       <div className="flex items-start justify-between mb-1">
         <div>
           <h4 className="text-[16px] font-bold text-white">Índice de Crecimiento</h4>
@@ -226,7 +226,7 @@ function GrowthIndexChart({ reports }: { reports: any[] }) {
             <Line key={ch.key} type="monotone" dataKey={ch.key} name={ch.label}
               stroke={ch.color} strokeWidth={2.5} connectNulls
               dot={{ fill: ch.color, r: 3, strokeWidth: 0 }}
-              activeDot={{ r: 5, fill: ch.color, strokeWidth: 2, stroke: "#0a0a0b" }}
+              activeDot={{ r: 5, fill: ch.color, strokeWidth: 2, stroke: "#080d1e" }}
             />
           ))}
         </LineChart>
@@ -252,14 +252,14 @@ function ContentVsAudience({ reports }: { reports: any[] }) {
   const avgPosts = data.reduce((s, d) => s + d.posts, 0) / data.length
 
   return (
-    <div className="rounded-2xl border border-white/[0.07] bg-[#111113] p-6">
+    <div className="rounded-2xl border border-white/[0.07] bg-[#0d1745] p-6">
       <h4 className="text-[16px] font-bold text-white mb-1">Posts vs Seguidores Instagram</h4>
       <p className="text-xs text-white/35 mb-5">
         ¿Cuándo publicás más, la audiencia crece? Buscá el patrón entre las barras y la línea.
       </p>
       <div className="flex flex-wrap gap-5 mb-4">
         <div className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-sm bg-[#ffde21]" />
+          <span className="h-2.5 w-2.5 rounded-sm bg-[#E42D2C]" />
           <span className="text-[11px] text-white/50">Posts publicados</span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -280,8 +280,8 @@ function ContentVsAudience({ reports }: { reports: any[] }) {
             tickFormatter={v => v >= 1000 ? `${(v/1000).toFixed(0)}K` : String(v)}
             domain={[0, 'auto']} />
           {avgPosts > 0 && (
-            <ReferenceLine yAxisId="posts" y={avgPosts} stroke="#ffde2140" strokeDasharray="4 3"
-              label={{ value: "avg", position: "insideTopLeft", fill: "#ffde2150", fontSize: 9 }} />
+            <ReferenceLine yAxisId="posts" y={avgPosts} stroke="#E42D2C40" strokeDasharray="4 3"
+              label={{ value: "avg", position: "insideTopLeft", fill: "#E42D2C50", fontSize: 9 }} />
           )}
           <Tooltip {...tooltipBase}
             formatter={(v: number, name: string) => [
@@ -289,7 +289,7 @@ function ContentVsAudience({ reports }: { reports: any[] }) {
             ]}
           />
           <Bar yAxisId="posts" dataKey="posts" name="Posts publicados"
-            fill="#ffde21" fillOpacity={0.75} radius={[4,4,0,0]} maxBarSize={36} />
+            fill="#E42D2C" fillOpacity={0.75} radius={[4,4,0,0]} maxBarSize={36} />
           <Line yAxisId="followers" type="monotone" dataKey="followers" name="Seguidores IG"
             stroke="#818cf8" strokeWidth={2.5}
             dot={{ fill: "#818cf8", r: 3, strokeWidth: 0 }} activeDot={{ r: 5 }} />
@@ -313,7 +313,7 @@ function YouTubeTrend({ reports }: { reports: any[] }) {
   }))
 
   return (
-    <div className="rounded-2xl border border-white/[0.07] bg-[#111113] p-6">
+    <div className="rounded-2xl border border-white/[0.07] bg-[#0d1745] p-6">
       <h4 className="text-[16px] font-bold text-white mb-1">YouTube — Suscriptores vs Vistas</h4>
       <p className="text-xs text-white/35 mb-5">¿Las vistas generan suscriptores o son independientes?</p>
       <div className="flex flex-wrap gap-5 mb-4">

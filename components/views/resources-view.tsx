@@ -66,7 +66,7 @@ function AddResourceForm({ onAdd, onClose }: { onAdd: (r: Resource) => void; onC
   }
 
   return (
-    <div className="rounded-2xl border border-[#ffde21]/20 bg-[#111113] p-5 mb-6">
+    <div className="rounded-2xl border border-[#E42D2C]/20 bg-[#0d1745] p-5 mb-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-white">Agregar recurso</h3>
         <button onClick={onClose} className="text-white/30 hover:text-white/60 transition-colors">
@@ -81,14 +81,14 @@ function AddResourceForm({ onAdd, onClose }: { onAdd: (r: Resource) => void; onC
             placeholder="Título *"
             value={form.title}
             onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-            className="rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#ffde21]/40 w-full"
+            className="rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40 w-full"
           />
           <input
             type="text"
             placeholder="Categoría (ej: Marketing, Ventas…)"
             value={form.category}
             onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-            className="rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#ffde21]/40 w-full"
+            className="rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40 w-full"
           />
         </div>
 
@@ -97,7 +97,7 @@ function AddResourceForm({ onAdd, onClose }: { onAdd: (r: Resource) => void; onC
           placeholder="URL *"
           value={form.url}
           onChange={e => handleUrlChange(e.target.value)}
-          className="rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#ffde21]/40 w-full"
+          className="rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40 w-full"
         />
 
         <input
@@ -105,7 +105,7 @@ function AddResourceForm({ onAdd, onClose }: { onAdd: (r: Resource) => void; onC
           placeholder="Descripción (opcional)"
           value={form.description}
           onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-          className="rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#ffde21]/40 w-full"
+          className="rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40 w-full"
         />
 
         {/* Type selector */}
@@ -119,7 +119,7 @@ function AddResourceForm({ onAdd, onClose }: { onAdd: (r: Resource) => void; onC
                 onClick={() => setForm(f => ({ ...f, type: t }))}
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium border transition-all ${
                   form.type === t
-                    ? "border-[#ffde21]/40 bg-[#ffde21]/10 text-[#ffde21]"
+                    ? "border-[#E42D2C]/40 bg-[#E42D2C]/10 text-[#E42D2C]"
                     : "border-white/[0.08] bg-white/[0.03] text-white/40 hover:text-white/70"
                 }`}
               >
@@ -136,7 +136,7 @@ function AddResourceForm({ onAdd, onClose }: { onAdd: (r: Resource) => void; onC
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 rounded-xl bg-[#ffde21] px-4 py-2 text-sm font-semibold text-black hover:bg-[#ffde21]/90 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 rounded-xl bg-[#E42D2C] px-4 py-2 text-sm font-semibold text-black hover:bg-[#E42D2C]/90 transition-colors disabled:opacity-50"
           >
             {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
             Guardar
@@ -164,7 +164,7 @@ function ResourceCard({ resource, onDelete }: { resource: Resource; onDelete: (i
   }
 
   return (
-    <div className="group rounded-2xl border border-white/[0.07] bg-[#111113] p-4 flex flex-col gap-3 hover:border-white/[0.12] transition-all">
+    <div className="group rounded-2xl border border-white/[0.07] bg-[#0d1745] p-4 flex flex-col gap-3 hover:border-white/[0.12] transition-all">
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.05] flex-shrink-0">
@@ -194,7 +194,7 @@ function ResourceCard({ resource, onDelete }: { resource: Resource; onDelete: (i
         href={resource.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-auto flex items-center gap-1.5 text-xs font-medium text-[#ffde21]/70 hover:text-[#ffde21] transition-colors"
+        className="mt-auto flex items-center gap-1.5 text-xs font-medium text-[#E42D2C]/70 hover:text-[#E42D2C] transition-colors"
       >
         <ExternalLink className="h-3 w-3" />
         Abrir
@@ -236,14 +236,14 @@ export function ResourcesView() {
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <div className="flex items-center gap-2.5 mb-1">
-            <span className="h-4 w-[3px] rounded-full bg-[#ffde21]" />
+            <span className="h-4 w-[3px] rounded-full bg-[#E42D2C]" />
             <h1 className="text-sm font-semibold uppercase tracking-widest text-white/70">Biblioteca</h1>
           </div>
           <p className="text-xs text-white/30 ml-[18px]">Links, docs y recursos guardados</p>
         </div>
         <button
           onClick={() => setShowForm(v => !v)}
-          className="flex items-center gap-2 rounded-xl bg-[#ffde21] px-4 py-2 text-sm font-semibold text-black hover:bg-[#ffde21]/90 transition-colors"
+          className="flex items-center gap-2 rounded-xl bg-[#E42D2C] px-4 py-2 text-sm font-semibold text-black hover:bg-[#E42D2C]/90 transition-colors"
         >
           <Plus className="h-4 w-4" />
           Agregar
@@ -267,7 +267,7 @@ export function ResourcesView() {
             placeholder="Buscar…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] pl-9 pr-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#ffde21]/40"
+            className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] pl-9 pr-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40"
           />
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -277,7 +277,7 @@ export function ResourcesView() {
               onClick={() => setActiveCategory(cat)}
               className={`rounded-lg px-3 py-2 text-xs font-medium border transition-all ${
                 activeCategory === cat
-                  ? "border-[#ffde21]/40 bg-[#ffde21]/10 text-[#ffde21]"
+                  ? "border-[#E42D2C]/40 bg-[#E42D2C]/10 text-[#E42D2C]"
                   : "border-white/[0.08] bg-white/[0.03] text-white/40 hover:text-white/70"
               }`}
             >
@@ -301,7 +301,7 @@ export function ResourcesView() {
           {!showForm && (
             <button
               onClick={() => setShowForm(true)}
-              className="text-xs text-[#ffde21]/50 hover:text-[#ffde21] transition-colors"
+              className="text-xs text-[#E42D2C]/50 hover:text-[#E42D2C] transition-colors"
             >
               + Agregar el primero
             </button>

@@ -178,7 +178,7 @@ export function MetricsSection({
           className={cn(
             "w-full sm:w-[260px] h-8 rounded-xl text-xs",
             "bg-white/[0.04] text-white placeholder:text-white/25 border-white/8",
-            "focus-visible:ring-1 focus-visible:ring-[#ffde21]/30 focus-visible:border-[#ffde21]/30"
+            "focus-visible:ring-1 focus-visible:ring-[#E42D2C]/30 focus-visible:border-[#E42D2C]/30"
           )}
         />
       </div>
@@ -195,12 +195,12 @@ export function MetricsSection({
           {Object.entries(grouped).map(([category, items]) => (
             <div
               key={category}
-              className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113]"
+              className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745]"
             >
               {/* Category header */}
               <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-3">
                 <div className="flex items-center gap-2">
-                  <span className="h-3 w-[2px] rounded-full bg-[#ffde21]/60" />
+                  <span className="h-3 w-[2px] rounded-full bg-[#E42D2C]/60" />
                   <span className="text-xs font-semibold uppercase tracking-widest text-white/50">{category}</span>
                 </div>
                 <span className="text-[10px] text-white/25 tabular-nums">{items.length} campos</span>
@@ -209,7 +209,7 @@ export function MetricsSection({
               {/* Table */}
               <div className="max-h-[320px] overflow-auto">
                 <table className="w-full">
-                  <thead className="sticky top-0 bg-[#111113]/95 backdrop-blur-sm">
+                  <thead className="sticky top-0 bg-[#0d1745]/95 backdrop-blur-sm">
                     <tr className="border-b border-white/[0.05]">
                       <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wider text-white/25">Campo</th>
                       <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wider text-white/25">Mensual</th>

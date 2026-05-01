@@ -157,7 +157,7 @@ async function handleMonthlyReportCompleted(payload: Record<string, unknown>) {
     { type: "divider" },
     {
       type: "context",
-      elements: [{ type: "mrkdwn", text: `Cargado por: ${(payload.triggered_by as string) ?? "sistema"} · Smart Scale Portal 2.0` }],
+      elements: [{ type: "mrkdwn", text: `Cargado por: ${(payload.triggered_by as string) ?? "sistema"} · GovBidder Portal 2.0` }],
     },
   ]
 
@@ -187,7 +187,7 @@ async function handleSaleRegistered(payload: Record<string, unknown>) {
     { type: "divider" },
     {
       type: "context",
-      elements: [{ type: "mrkdwn", text: `Registrado por: ${(payload.triggered_by as string) ?? "sistema"} · Smart Scale Portal 2.0` }],
+      elements: [{ type: "mrkdwn", text: `Registrado por: ${(payload.triggered_by as string) ?? "sistema"} · GovBidder Portal 2.0` }],
     },
   ]
 

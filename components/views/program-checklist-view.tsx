@@ -22,8 +22,8 @@ const programData: Array<{
         tasks: [
           { label: "Completar tu Form de Onboarding", level: "Start Here", outcome: "Orientación", link: "https://airtable.com/appRJNO1KYgg2A5NZ/pagGBbDxGKYjYTYAV/form" },
           { label: "Presentarte en Slack canal #general", level: "Start Here", outcome: "Orientación", link: "https://app.slack.com/client/T08TDSD3M2R/C08TDSDC00M" },
-          { label: "Guardar los dias y horarios de las llamadas grupales en tu Calendario", level: "Start Here", outcome: "Orientación", link: "https://smartscale.space/calendar" },
-          { label: "Separa 10 min cada lunes en tu calendario y lanza tus monday wins", level: "Start Here", outcome: "Hábito", link: "https://smartscale.space/monday-win" },
+          { label: "Guardar los dias y horarios de las llamadas grupales en tu Calendario", level: "Start Here", outcome: "Orientación", link: "https://govbidder.com/calendar" },
+          { label: "Separa 10 min cada lunes en tu calendario y lanza tus monday wins", level: "Start Here", outcome: "Hábito", link: "https://govbidder.com/monday-win" },
           { label: "Separa 15 min en tu calendario cada mes para tus monthly report", level: "Start Here", outcome: "Hábito", link: "/report-input" },
           { label: "Tu Nueva Identidad - Declaracion", level: "Start Here", outcome: "Mentalidad", link: "https://www.skool.com/strategy-consulting/classroom/f41aa6b4?md=351ece87aa8a4c80914e6ce3f34af00e" },
           { label: "Pedir el libro Dollars Flow to me Easily", level: "Start Here", outcome: "Orientación", link: "https://www.skool.com/strategy-consulting/classroom/552a38a7?md=0479e58fae32495ca6922040269a4faf" },
@@ -38,7 +38,7 @@ const programData: Array<{
           { label: "Calculando tu numero de libertad", level: "Nivel 1 — Visión", outcome: "Estrategia", link: "https://www.skool.com/strategy-consulting/classroom/552a38a7?md=b8270a0a8be84237a3d92e60b29982c1" },
           { label: "Tu Actual Sistema Operativo revisa el GPT", level: "Nivel 1 — Visión", outcome: "Estrategia", link: "https://chatgpt.com/g/g-695303d24ad08191955f15ba514cb456-descubre-tu-sistema-operativo-central" },
           { label: "Revisa Ann AI y guardalo en tus GPT's", level: "Start Here", outcome: "Orientación", link: "https://chatgpt.com/g/g-695abe5acb4c8191a4092a38da71c883" },
-          { label: "Accede a tu plataforma de performance y familiarizate", level: "Start Here", outcome: "Plataforma", link: "https://smartscale.space/" },
+          { label: "Accede a tu plataforma de performance y familiarizate", level: "Start Here", outcome: "Plataforma", link: "https://govbidder.com/" },
           { label: "La Trampa del apalancamiento", level: "Nivel 1 — Visión", outcome: "Mentalidad", link: "https://www.skool.com/strategy-consulting/classroom/fa0f6055?md=6a92a4c76ae54f3b8ea194c6b629d509" },
         ],
       },
@@ -185,7 +185,7 @@ const programData: Array<{
           { label: "Crear el Roadmap de tu Cliente", level: "Nivel 6 — Escala", outcome: "Entrega", link: "https://www.skool.com/strategy-consulting/classroom/fb42ffd4?md=3038e1c85d064ea3af2e30952a1c71b6" },
           { label: "Revisar tu proceso de Onboarding", level: "Nivel 6 — Escala", outcome: "Entrega", link: "https://www.skool.com/strategy-consulting/classroom/fb42ffd4?md=6ab1072e74324d14b2b666f30f5a7092" },
           { label: "Priorizando tu pipeline de leads 5 estrellas", level: "Nivel 6 — Escala", outcome: "Prospección", link: "https://www.skool.com/strategy-consulting/classroom/cd022ec1?md=ad1eff5e3bc148dfb1fbaa577adad68c" },
-          { label: "Auditoria de tu Ecosistema Circular", level: "Nivel 6 — Escala", outcome: "Auditoría", link: "https://smartscale.space/audit" },
+          { label: "Auditoria de tu Ecosistema Circular", level: "Nivel 6 — Escala", outcome: "Auditoría", link: "https://govbidder.com/audit" },
           { label: "Enmarca tu Siguiente Paso para enfocarte", level: "Nivel 6 — Escala", outcome: "Estrategia", link: "" },
         ],
       },
@@ -264,7 +264,7 @@ export function ProgramChecklistView() {
       {/* Header */}
       <div>
         <div className="flex items-center gap-2.5 mb-1">
-          <span className="h-4 w-[3px] rounded-full bg-[#ffde21]" />
+          <span className="h-4 w-[3px] rounded-full bg-[#E42D2C]" />
           <h1 className="text-sm font-semibold uppercase tracking-widest text-white/70">Program Journey Checklist</h1>
         </div>
         <p className="text-xs text-white/30 ml-[18px]">Ecosistema circular mínimo viable · {completedCount}/{totalTasks} tareas completadas</p>
@@ -310,7 +310,7 @@ export function ProgramChecklistView() {
                       className="h-1.5 rounded-full transition-all duration-500"
                       style={{
                         width: `${monthPct}%`,
-                        backgroundColor: monthPct === 100 ? "#34d399" : "#ffde21",
+                        backgroundColor: monthPct === 100 ? "#34d399" : "#E42D2C",
                       }}
                     />
                   </div>
@@ -335,7 +335,7 @@ export function ProgramChecklistView() {
                       <ChevronDown
                         className={`h-3.5 w-3.5 flex-shrink-0 text-white/30 transition-transform duration-200 ${isWeekOpen ? "rotate-0" : "-rotate-90"}`}
                       />
-                      <span className="h-4 w-[3px] rounded-full bg-[#ffde21]/60 flex-shrink-0" />
+                      <span className="h-4 w-[3px] rounded-full bg-[#E42D2C]/60 flex-shrink-0" />
                       <span className="flex-1 text-[13px] font-semibold text-white/70">{week.title}</span>
                       <span className="text-[11px] text-white/30 tabular-nums flex-shrink-0">
                         {weekDone}/{week.tasks.length}
@@ -361,7 +361,7 @@ export function ProgramChecklistView() {
                         <div
                           key={task.label}
                           className={`grid grid-cols-[140px_1fr_180px_185px_110px_200px] border-t border-white/[0.04] transition-colors duration-150 ${
-                            isDone ? "bg-[#ffde21]/[0.02]" : "hover:bg-white/[0.015]"
+                            isDone ? "bg-[#E42D2C]/[0.02]" : "hover:bg-white/[0.015]"
                           }`}
                         >
                           {/* STATUS */}
@@ -429,7 +429,7 @@ export function ProgramChecklistView() {
                                 href={task.link}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="inline-flex items-center gap-1.5 text-[11px] text-white/35 hover:text-[#ffde21] transition-colors truncate max-w-full"
+                                className="inline-flex items-center gap-1.5 text-[11px] text-white/35 hover:text-[#E42D2C] transition-colors truncate max-w-full"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <ExternalLink className="h-3 w-3 flex-shrink-0" />

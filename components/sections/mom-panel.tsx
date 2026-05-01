@@ -29,7 +29,7 @@ function fmtNum(v: number) {
 // ─── Metric definitions ───────────────────────────────────────────────────────
 
 const METRICS = [
-  { key: "cash_collected",  label: "Cash Collected",      format: "money"  as const, color: "#ffde21", weight: 3 },
+  { key: "cash_collected",  label: "Cash Collected",      format: "money"  as const, color: "#E42D2C", weight: 3 },
   { key: "total_revenue",   label: "Total Revenue",        format: "money"  as const, color: "#fb923c", weight: 2 },
   { key: "mrr",             label: "MRR",                  format: "money"  as const, color: "#60a5fa", weight: 2 },
   { key: "new_clients",     label: "Nuevos Clientes",      format: "number" as const, color: "#4ade80", weight: 2 },
@@ -59,7 +59,7 @@ export function MoMPanel() {
   if (loading) {
     return (
       <section>
-        <div className="h-72 animate-pulse rounded-2xl border border-white/[0.07] bg-[#111113]" />
+        <div className="h-72 animate-pulse rounded-2xl border border-white/[0.07] bg-[#0d1745]" />
       </section>
     )
   }
@@ -106,7 +106,7 @@ export function MoMPanel() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113]">
+      <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745]">
         {/* Column headers */}
         <div className="grid grid-cols-[1.4fr_1fr_1.6fr_1fr] border-b border-white/[0.06] px-6 py-3">
           <span className="text-[10px] font-bold uppercase tracking-widest text-white/30">Métrica</span>

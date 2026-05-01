@@ -29,7 +29,7 @@ export function ToolsSection({
     <section className={cn("space-y-5", className)}>
       <div>
         <div className="flex items-center gap-2.5 mb-1">
-          <span className="h-4 w-[3px] rounded-full bg-[#ffde21]" />
+          <span className="h-4 w-[3px] rounded-full bg-[#E42D2C]" />
           <h2 className="text-sm font-semibold uppercase tracking-widest text-white/70">{title}</h2>
         </div>
         {subtitle && (
@@ -45,24 +45,24 @@ export function ToolsSection({
         {tools.map((t) => (
           <div
             key={t.href}
-            className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#111113] transition-all duration-200 hover:border-[#ffde21]/25 hover:shadow-[0_0_40px_rgba(255,222,33,0.07)]"
+            className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745] transition-all duration-200 hover:border-[#E42D2C]/25 hover:shadow-[0_0_40px_rgba(228,45,44,0.07)]"
           >
-            <div className="h-[2px] w-full bg-gradient-to-r from-[#ffde21]/40 via-[#ffde21]/20 to-transparent" />
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,222,33,0.05),transparent_55%)]" />
+            <div className="h-[2px] w-full bg-gradient-to-r from-[#E42D2C]/40 via-[#E42D2C]/20 to-transparent" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(228,45,44,0.05),transparent_55%)]" />
 
             <div className="relative p-5 space-y-4">
               {/* Header row */}
               <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#ffde21]/10 ring-1 ring-[#ffde21]/15">
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#E42D2C]/10 ring-1 ring-[#E42D2C]/15">
                   {variant === "gpt" ? (
-                    <Sparkles className="h-5 w-5 text-[#ffde21]" />
+                    <Sparkles className="h-5 w-5 text-[#E42D2C]" />
                   ) : (
-                    <FileText className="h-5 w-5 text-[#ffde21]" />
+                    <FileText className="h-5 w-5 text-[#E42D2C]" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-white tracking-tight leading-tight">{t.name}</p>
-                  <p className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-[#ffde21]/60">
+                  <p className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-[#E42D2C]/60">
                     {variant === "gpt" ? "AI Tool" : "Form"}
                   </p>
                 </div>
@@ -92,7 +92,7 @@ export function ToolsSection({
                 <Button
                   asChild
                   size="sm"
-                  className="h-7 rounded-lg bg-[#ffde21] px-3 text-xs font-bold text-black hover:bg-[#ffe46b]"
+                  className="h-7 rounded-lg bg-[#E42D2C] px-3 text-xs font-bold text-black hover:bg-[#ffe46b]"
                 >
                   <Link href={t.href} target="_blank" rel="noreferrer">
                     {variant === "gpt" ? "Abrir →" : "Abrir →"}
@@ -111,7 +111,7 @@ export function ToolsView() {
   return (
     <>
       <ToolsSection
-        title="Smart Scale Tools"
+        title="GovBidder Tools"
         subtitle="Herramientas internas para ejecutar, operar y escalar"
         variant="gpt"
         tools={[
@@ -130,11 +130,11 @@ export function ToolsView() {
               "https://chatgpt.com/g/g-6954b071cfe88191ad231a5959498ae7-coach-de-autoridad-de-contenido",
           },
           {
-            name: "Smart Scale Email Engine",
+            name: "GovBidder Email Engine",
             description:
               "GPT para convertir videos de YouTube y scripts en emails listos para enviar.",
             href:
-              "https://chatgpt.com/g/g-6954a6883b6c8191abb16fee1fe44200-smart-scale-email-engine",
+              "https://chatgpt.com/g/g-6954a6883b6c8191abb16fee1fe44200-govbidder-email-engine",
           },
           {
             name: "Simple Offer Builder",
@@ -148,7 +148,7 @@ export function ToolsView() {
             description:
               "GPT para armar el setting flow de DMs y mejorar el cierre por conversación.",
             href:
-              "https://chatgpt.com/g/g-69541576dd98819189c7b14b046cc897-dm-close-coach-by-smart-scale",
+              "https://chatgpt.com/g/g-69541576dd98819189c7b14b046cc897-dm-close-coach-by-govbidder",
           },
           {
             name: "Offer Doc Builder",
@@ -162,7 +162,7 @@ export function ToolsView() {
             description:
               "GPT para convertir videos en carruseles listos para publicar, con copy optimizado para Instagram.",
             href:
-              "https://chatgpt.com/g/g-69cde322c25c819182cb9207bce35a92-video-a-carrousel-copywriter-smart-scaletm",
+              "https://chatgpt.com/g/g-69cde322c25c819182cb9207bce35a92-video-a-carrousel-copywriter-govbiddertm",
           },
         ]}
       />

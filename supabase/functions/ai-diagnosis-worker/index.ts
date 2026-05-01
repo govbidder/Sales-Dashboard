@@ -95,7 +95,7 @@ serve(async (req) => {
     }),
   })
 
-  const system = `Actúa como un advisor estratégico de Smart Scale.
+  const system = `Actúa como un advisor estratégico de GovBidder.
 
 Tu trabajo es devolver una respuesta SIMPLE, CORTA, DIRECTA y ESTRUCTURADA.
 
@@ -176,7 +176,7 @@ INSTRUCCIÓN IMPORTANTE:
 
 QUIERO QUE RESPONDAS SOLO CON ESTA ESTRUCTURA Y NADA MÁS:
 
-# Mapa de Ruta Smart Scale
+# Mapa de Ruta GovBidder
 
 ## En primer lugar
 Aquí debes poner únicamente los puntos críticos que requieren atención inmediata.
