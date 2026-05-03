@@ -99,7 +99,6 @@ export default function SignupPage() {
       error: errInfo(error),
     };
 
-    console.log("SIGNUP RESULT", { data, error, debug: debugPayload });
     setDebug(debugPayload);
 
     if (error) {
@@ -200,10 +199,10 @@ export default function SignupPage() {
         <div className="w-full max-w-md">
           {/* Brand */}
           <div className="mb-6 text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 backdrop-blur">
-              <span className="text-sm font-semibold tracking-widest text-white/90">SS</span>
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#E42D2C]/30 bg-[#E42D2C]/10 backdrop-blur">
+              <span className="text-sm font-bold tracking-widest text-[#E42D2C]">GB</span>
             </div>
-            <div className="text-xs font-semibold tracking-[0.35em] text-white/70">SMART SCALE</div>
+            <div className="text-xs font-semibold tracking-[0.35em] text-white/70">GOVBIDDER</div>
             <h1 className="mt-2 text-2xl font-semibold tracking-tight">Crear cuenta</h1>
             <p className="mt-1 text-sm text-white/60">Creá tu acceso al portal y confirmá el email para continuar.</p>
           </div>
@@ -296,7 +295,7 @@ export default function SignupPage() {
             </div>
           </form>
 
-          <p className="mt-6 text-center text-xs text-white/35">© {new Date().getFullYear()} SMART SCALE</p>
+          <p className="mt-6 text-center text-xs text-white/35">© {new Date().getFullYear()} GovBidder</p>
         </div>
       </div>
     </div>

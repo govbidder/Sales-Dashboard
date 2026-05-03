@@ -109,20 +109,26 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       setCurrentUser({ email: user.email ?? "", name, role, clientId })
       setActiveClientId(clientId)
 
-      // Admins load all crm_clients for the selector
+      // Admins load all crm_clients for the selector (via API to bypass RLS edge cases)
       if (role === "admin") {
         try {
-          const { data: allClients } = await supabase
-            .from("crm_clients")
-            .select("id, name")
-            .order("name")
-          if (allClients?.length) {
-            setClientOptions(allClients)
-            const stored = typeof window !== "undefined" ? window.localStorage.getItem("activeClientId") : null
-            if (stored && allClients.find((c: ClientOption) => c.id === stored)) {
-              setActiveClientId(stored)
-            } else {
-              setActiveClientId(allClients[0].id)
+          const { data: { session: s } } = await supabase.auth.getSession()
+          if (s) {
+            const res = await fetch("/api/admin/clients", {
+              headers: { Authorization: `Bearer ${s.access_token}` },
+            })
+            if (res.ok) {
+              const json = await res.json()
+              const allClients: ClientOption[] = (json.clients ?? []).map((c: any) => ({ id: c.id, name: c.name }))
+              if (allClients.length) {
+                setClientOptions(allClients)
+                const stored = typeof window !== "undefined" ? window.localStorage.getItem("activeClientId") : null
+                if (stored && allClients.find((c: ClientOption) => c.id === stored)) {
+                  setActiveClientId(stored)
+                } else {
+                  setActiveClientId(allClients[0].id)
+                }
+              }
             }
           }
         } catch {}

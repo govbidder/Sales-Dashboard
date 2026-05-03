@@ -55,9 +55,9 @@ export default function LoginPage() {
 
         {/* Top: Logo */}
         <div className="relative flex items-center gap-3">
-          <span className="text-white text-sm font-bold tracking-[0.22em]">SMART</span>
-          <span className="rounded-md bg-white px-2.5 py-1 text-xs font-bold tracking-wide text-black">
-            SCALE
+          <span className="text-white text-sm font-bold tracking-[0.22em]">GOV</span>
+          <span className="rounded-md bg-[#E42D2C] px-2.5 py-1 text-xs font-bold tracking-wide text-white">
+            BIDDER
           </span>
         </div>
 
@@ -109,9 +109,9 @@ export default function LoginPage() {
 
         {/* Mobile logo */}
         <div className="mb-10 flex items-center gap-3 lg:hidden">
-          <span className="text-white text-sm font-bold tracking-[0.22em]">SMART</span>
-          <span className="rounded-md bg-white px-2.5 py-1 text-xs font-bold tracking-wide text-black">
-            SCALE
+          <span className="text-white text-sm font-bold tracking-[0.22em]">GOV</span>
+          <span className="rounded-md bg-[#E42D2C] px-2.5 py-1 text-xs font-bold tracking-wide text-white">
+            BIDDER
           </span>
         </div>
 
