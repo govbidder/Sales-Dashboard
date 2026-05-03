@@ -2,9 +2,8 @@
 
 import {
   X, BarChart3, Radio, DollarSign, FileSearch, Wrench,
-  CalendarDays, Lock, LayoutGrid, ClipboardList,
-  Zap, Globe, Upload, FileVideo, Clapperboard,
-  ChevronDown, Table2, Users2, Trophy, FileBarChart,
+  CalendarDays, LayoutGrid, ClipboardList,
+  Zap, Upload, ChevronDown, Table2, Users2, Trophy, FileBarChart,
   UserCheck, Layers,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -50,14 +49,6 @@ const NAV_GROUPS = [
       { name: "Weekly Win",        href: "/monday-win",        icon: Trophy        },
       { name: "Monthly Report",    href: "/report-input",      icon: FileBarChart  },
       { name: "Revenue Track",     href: "/chi-chang",         icon: DollarSign    },
-    ],
-  },
-  {
-    label: "Research",
-    items: [
-      { name: "Training Videos",   href: "/video-feed",          icon: Clapperboard },
-      { name: "Market Research",   href: "/competitor-research", icon: Globe        },
-      { name: "Video Transcripts", href: "/transcript",          icon: FileVideo    },
     ],
   },
 ]
