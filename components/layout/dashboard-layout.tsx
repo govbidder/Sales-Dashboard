@@ -3,7 +3,7 @@
 import type React from "react"
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { ChevronDown, LogOut, Menu, User, Users } from "lucide-react"
+import { ChevronDown, LogOut, Menu, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { MonthSelector } from "@/components/layout/month-selector"
 import { Sidebar } from "@/components/layout/sidebar"
@@ -18,28 +18,19 @@ type CurrentUser = {
   clientId: string
 }
 
-type ClientOption = { id: string; name: string }
-
 const PAGE_TITLES: Record<string, string> = {
-  "/dashboard":           "Bid Dashboard",
-  "/channels":            "Bid Sources",
-  "/sales":               "Revenue",
-  "/reflection":          "Review",
-  "/metrics":             "All Metrics",
-  "/audit":               "Compliance Audit",
-  "/program-checklist":   "Implementation Checklist",
-  "/tools":               "Tools",
-  "/calendar":            "Schedule",
-  "/monday-win":          "Weekly Win",
-  "/report-input":        "Monthly Report",
-  "/report-history":      "Report History",
-  "/chi-chang":           "Revenue Track",
-  "/recursos":            "Resources",
-  "/admin/data":          "Data Table",
-  "/admin/leads":         "Prospects",
-  "/admin/payments":      "Payments",
-  "/admin/applications":  "Applications",
-  "/admin/clients":       "Clients",
+  "/dashboard":                   "Bid Dashboard",
+  "/channels":                    "Bid Sources",
+  "/sales":                       "Revenue",
+  "/reflection":                  "Review",
+  "/metrics":                     "All Metrics",
+  "/audit":                       "Compliance Audit",
+  "/program-checklist":           "Implementation",
+  "/tools":                       "Tools",
+  "/calendar":                    "Schedule",
+  "/recursos":                    "Resources",
+  "/admin/leads":                 "Personas Agendadas",
+  "/admin/centro-operativo":      "Operations Center",
 }
 
 const SelectedMonthContext = createContext<string | null>(null)
@@ -55,14 +46,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   const [authChecked, setAuthChecked] = useState(false)
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null)
-  const [clientOptions, setClientOptions] = useState<ClientOption[]>([])
   const [activeClientId, setActiveClientId] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [selectedMonth, setSelectedMonth] = useState<string>("2025-12")
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const profileMenuRef = useRef<HTMLDivElement | null>(null)
 
-  const pageTitle = PAGE_TITLES[pathname] ?? "GovBidder Sales Dashboard"
+  const pageTitle = PAGE_TITLES[pathname] ?? "GovBidder"
 
   // Auth check + subscribe to changes
   useEffect(() => {
@@ -102,32 +92,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       setCurrentUser({ email: user.email ?? "", name, role, clientId })
       setActiveClientId(clientId)
-
-      // Admins load all crm_clients for the selector (via API to bypass RLS edge cases)
-      if (role === "admin") {
-        try {
-          const { data: { session: s } } = await supabase.auth.getSession()
-          if (s) {
-            const res = await fetch("/api/admin/clients", {
-              headers: { Authorization: `Bearer ${s.access_token}` },
-            })
-            if (res.ok) {
-              const json = await res.json()
-              const allClients: ClientOption[] = (json.clients ?? []).map((c: any) => ({ id: c.id, name: c.name }))
-              if (allClients.length) {
-                setClientOptions(allClients)
-                const stored = typeof window !== "undefined" ? window.localStorage.getItem("activeClientId") : null
-                if (stored && allClients.find((c: ClientOption) => c.id === stored)) {
-                  setActiveClientId(stored)
-                } else {
-                  setActiveClientId(allClients[0].id)
-                }
-              }
-            }
-          }
-        } catch {}
-      }
-
       setAuthChecked(true)
     }
 
@@ -198,39 +162,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               </Button>
               <div>
                 <h1 className="text-base sm:text-lg font-bold text-white leading-tight tracking-tight">{pageTitle}</h1>
-                <p className="hidden sm:block text-[10px] text-white/35 leading-none mt-0.5 tracking-wide">GovBidder Sales Dashboard</p>
+                <p className="hidden sm:block text-[10px] text-white/35 leading-none mt-0.5 tracking-wide">GovBidder · Internal Dashboard</p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <Button asChild size="sm" className="hidden sm:inline-flex bg-[#E42D2C] text-white font-semibold hover:bg-[#c42423] border-0 text-xs px-3 h-8" title="Weekly Win">
-                <a href="/monday-win">Weekly Win</a>
-              </Button>
-              <Button asChild size="sm" className="hidden sm:inline-flex bg-[#E42D2C] text-white font-semibold hover:bg-[#c42423] border-0 text-xs px-3 h-8" title="Monthly Report">
-                <a href="/report-input">Monthly Report</a>
-              </Button>
-              <Button asChild size="sm" className="hidden sm:inline-flex bg-[#152978] text-white font-semibold hover:bg-[#1a3494] border-0 text-xs px-3 h-8 gap-1.5" title="Revenue Track">
-                <a href="/chi-chang"><span className="text-[13px]">📊</span>Revenue Track</a>
-              </Button>
-
-              {currentUser?.role === "admin" && clientOptions.length > 0 && (
-                <div className="relative hidden sm:flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 h-8">
-                  <Users className="h-3.5 w-3.5 text-white/30 shrink-0" />
-                  <select
-                    value={activeClientId ?? ""}
-                    onChange={(e) => {
-                      setActiveClientId(e.target.value)
-                      if (typeof window !== "undefined") window.localStorage.setItem("activeClientId", e.target.value)
-                    }}
-                    className="appearance-none bg-transparent text-xs font-medium text-white/80 focus:outline-none cursor-pointer pr-1 max-w-[140px] truncate"
-                  >
-                    {clientOptions.map(c => (
-                      <option key={c.id} value={c.id} className="bg-[#0d1745] text-white">{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
               <MonthSelector
                 value={selectedMonth}
                 onChange={(m) => {

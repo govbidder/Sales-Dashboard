@@ -3,8 +3,7 @@
 import {
   X, BarChart3, Radio, DollarSign, FileSearch, Wrench,
   CalendarDays, LayoutGrid, ClipboardList,
-  Zap, Upload, ChevronDown, Table2, Users2, Trophy, FileBarChart,
-  UserCheck, Layers, BookOpen, Lock,
+  Zap, ChevronDown, Users2, BookOpen, Layers, Lock,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
@@ -28,15 +27,10 @@ const NAV_GROUPS = [
     ],
   },
   {
-    label: "GovBidder CRM",
+    label: "Pipeline",
     items: [
-      { name: "Data Table",         href: "/admin/data",             icon: Table2        },
-      { name: "Prospects",          href: "/admin/leads",            icon: Users2        },
-      { name: "Payments",           href: "/admin/payments",         icon: DollarSign    },
-      { name: "Clients",            href: "/admin/clients",          icon: UserCheck     },
-      { name: "Applications",       href: "/admin/applications",     icon: ClipboardList },
-      { name: "Import Data",        href: "/admin/import",           icon: Upload        },
-      { name: "Operations Center",  href: "/admin/centro-operativo", icon: Layers        },
+      { name: "Personas Agendadas", href: "/admin/leads",            icon: Users2  },
+      { name: "Operations Center",  href: "/admin/centro-operativo", icon: Layers  },
     ],
   },
   {
@@ -47,9 +41,6 @@ const NAV_GROUPS = [
       { name: "Tools",             href: "/tools",             icon: Wrench        },
       { name: "Resources",         href: "/recursos",          icon: BookOpen      },
       { name: "Schedule",          href: "/calendar",          icon: CalendarDays  },
-      { name: "Weekly Win",        href: "/monday-win",        icon: Trophy        },
-      { name: "Monthly Report",    href: "/report-input",      icon: FileBarChart  },
-      { name: "Revenue Track",     href: "/chi-chang",         icon: DollarSign    },
     ],
   },
 ]
@@ -177,8 +168,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           <div className="flex items-center gap-2.5 rounded-xl bg-[#E42D2C]/[0.08] px-3 py-2.5 border border-[#E42D2C]/20">
             <span className="flex h-1.5 w-1.5 rounded-full bg-[#E42D2C] animate-pulse flex-shrink-0" />
             <div>
-              <p className="text-[10px] font-bold text-[#E42D2C]/80 tracking-widest uppercase">Gov Contracts</p>
-              <p className="text-[10px] text-white/30 mt-0.5">Sales Dashboard</p>
+              <p className="text-[10px] font-bold text-[#E42D2C]/80 tracking-widest uppercase">Internal</p>
+              <p className="text-[10px] text-white/30 mt-0.5">Operations Dashboard</p>
             </div>
           </div>
         </div>

@@ -1,7 +1,8 @@
--- Monthly Reports: one row per client per month with all KPIs
+-- Monthly Reports: company-wide metrics, one row per month
+-- (client_id retained for legacy compat; no longer FK'd, will be removed in Phase 2)
 create table if not exists public.monthly_reports (
   id          uuid primary key default gen_random_uuid(),
-  client_id   uuid not null references public.clients(id) on delete cascade,
+  client_id   uuid,
   month       date not null,  -- stored as YYYY-MM-01
 
   -- Business
