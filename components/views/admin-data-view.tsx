@@ -2,9 +2,10 @@
 
 import { useEffect, useState, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase"
+import { useActiveClient } from "@/components/layout/dashboard-layout"
 import { Loader2, RefreshCw, Download } from "lucide-react"
 
-// ─── Metrics — all fields Ann actually fills ──────────────────────────────────
+// ─── Metrics ──────────────────────────────────────────────────────────────────
 
 type Fmt = "money" | "number"
 
@@ -150,13 +151,10 @@ function EditableCell({
   )
 }
 
-// Ann's fixed client_id — this view always shows her data only
-const ANN_CLIENT_ID = "9d2aebb4-93a7-490c-8ac9-afe1d1a42d57"
-
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function AdminDataView() {
-  const [clientId] = useState<string>(ANN_CLIENT_ID)
+  const clientId = useActiveClient()
   const [months,   setMonths]   = useState<string[]>([])
   const [pivot,    setPivot]    = useState<Record<string, Record<string, number | null>>>({})
   const [loading,  setLoading]  = useState(true)
@@ -186,7 +184,10 @@ export function AdminDataView() {
     } finally { setLoading(false) }
   }, [])
 
-  useEffect(() => { loadReports(ANN_CLIENT_ID) }, [loadReports])
+  useEffect(() => {
+    if (!clientId) { setLoading(false); setMonths([]); setPivot({}); return }
+    loadReports(clientId)
+  }, [clientId, loadReports])
 
   const handleSaved = useCallback((month: string, key: string, val: number | null) => {
     setPivot(prev => ({ ...prev, [month]: { ...(prev[month] ?? {}), [key]: val } }))
@@ -241,6 +242,10 @@ export function AdminDataView() {
         {loading ? (
           <div className="flex items-center justify-center py-24">
             <Loader2 className="h-6 w-6 animate-spin text-[#E42D2C]/40" />
+          </div>
+        ) : !clientId ? (
+          <div className="py-24 text-center">
+            <p className="text-sm text-white/25">Seleccioná un cliente para ver sus métricas.</p>
           </div>
         ) : !months.length ? (
           <div className="py-24 text-center">

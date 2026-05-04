@@ -233,9 +233,8 @@ export default function ApplyPage() {
           <a href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
             <span className="text-white text-[17px] font-bold tracking-tight">Gov</span>
             <span className="rounded-md bg-white px-2 py-0.5 text-[14px] font-bold tracking-tight text-black shadow-sm">
-              Scale
+              Bidder
             </span>
-            <span className="text-[9px] font-semibold text-white/25 tracking-widest uppercase ml-0.5">v2.0</span>
           </a>
           <span className="text-[11px] font-bold text-white/25 uppercase tracking-[0.18em]">Application</span>
         </div>

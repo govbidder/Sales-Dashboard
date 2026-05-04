@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 
@@ -13,26 +13,6 @@ function isAlreadyRegisteredError(error: any) {
   );
 }
 
-function safeProjectRefFromUrl(url?: string) {
-  if (!url) return "";
-  try {
-    const u = new URL(url);
-    return u.hostname.split(".")[0] ?? "";
-  } catch {
-    return "";
-  }
-}
-
-function errInfo(e: any) {
-  if (!e) return null;
-  return {
-    message: String(e.message ?? e),
-    name: e?.name,
-    status: e?.status,
-    code: e?.code,
-  };
-}
-
 export default function SignupPage() {
   const router = useRouter();
 
@@ -41,14 +21,10 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
-  const [debug, setDebug] = useState<any>(null);
 
   const [pendingConfirmEmail, setPendingConfirmEmail] = useState<string | null>(null);
   const [pendingRedirectTo, setPendingRedirectTo] = useState<string | null>(null);
   const [resendLoading, setResendLoading] = useState(false);
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const projectRef = useMemo(() => safeProjectRefFromUrl(supabaseUrl), [supabaseUrl]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -56,7 +32,6 @@ export default function SignupPage() {
     setLoading(true);
     setErr(null);
     setMsg(null);
-    setDebug(null);
 
     setPendingConfirmEmail(null);
     setPendingRedirectTo(null);
@@ -86,20 +61,6 @@ export default function SignupPage() {
         emailRedirectTo,
       },
     });
-
-    const identities = (data?.user as any)?.identities;
-
-    const debugPayload = {
-      supabaseUrl,
-      projectRef,
-      emailRedirectTo,
-      returnedUserId: data?.user?.id ?? null,
-      returnedSession: Boolean(data?.session),
-      identitiesLen: Array.isArray(identities) ? identities.length : null,
-      error: errInfo(error),
-    };
-
-    setDebug(debugPayload);
 
     if (error) {
       if (isAlreadyRegisteredError(error)) {
@@ -283,15 +244,6 @@ export default function SignupPage() {
                 </a>
               </div>
 
-              {/* Debug panel (dev only) */}
-              {debug ? (
-                <details className="rounded-xl border border-white/10 bg-black/20 p-3 text-xs text-white/70">
-                  <summary className="cursor-pointer select-none text-white/70">Debug</summary>
-                  <pre className="mt-2 overflow-auto whitespace-pre-wrap break-words">
-                    {JSON.stringify(debug, null, 2)}
-                  </pre>
-                </details>
-              ) : null}
             </div>
           </form>
 
