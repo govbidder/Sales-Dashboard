@@ -25,13 +25,6 @@ export async function POST(req: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    // Enqueue event
-    await db.from("outbound_events").insert({
-      event_type: "client.created",
-      payload:    { client_id: data.id, name: data.name },
-      status:     "pending",
-    }).then(() => {})
-
     return NextResponse.json({ client: data })
   } catch {
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 })

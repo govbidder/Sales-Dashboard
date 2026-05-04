@@ -233,10 +233,7 @@ export function ReportInputView() {
 
       setStatus("success")
       setExistingData(data.report)
-      const eventsMsg = data.events_enqueued > 0
-        ? ` ${data.events_enqueued} notificación(es) enviadas.`
-        : ""
-      setMessage(`Reporte guardado exitosamente.${eventsMsg}`)
+      setMessage("Reporte guardado exitosamente.")
       setTimeout(() => setStatus("idle"), 5000)
     } catch (err: any) {
       setStatus("error")
@@ -317,7 +314,7 @@ export function ReportInputView() {
             </h1>
           </div>
           <p className="text-xs text-white/30 ml-[18px]">
-            {isUpdate ? "Actualizando reporte existente" : "Nuevo reporte"} · Supabase → Slack → Airtable
+            {isUpdate ? "Actualizando reporte existente" : "Nuevo reporte"}
           </p>
         </div>
 
