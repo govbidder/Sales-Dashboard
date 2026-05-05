@@ -3,7 +3,7 @@
 import {
   X, BarChart3, Radio, DollarSign, FileSearch, Wrench,
   CalendarDays, LayoutGrid, ClipboardList,
-  Zap, ChevronDown, Users2, BookOpen, Layers, Lock,
+  Zap, ChevronDown, Users2, BookOpen, Layers, Lock, ListTodo,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
@@ -29,8 +29,9 @@ const NAV_GROUPS = [
   {
     label: "Pipeline",
     items: [
-      { name: "Personas Agendadas", href: "/admin/personas",         icon: Users2  },
-      { name: "Operations Center",  href: "/admin/centro-operativo", icon: Layers  },
+      { name: "Personas Agendadas", href: "/admin/personas",         icon: Users2   },
+      { name: "Tareas",             href: "/admin/tasks",            icon: ListTodo },
+      { name: "Operations Center",  href: "/admin/centro-operativo", icon: Layers   },
     ],
   },
   {
