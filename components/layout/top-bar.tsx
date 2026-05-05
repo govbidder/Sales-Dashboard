@@ -77,13 +77,16 @@ export function TopBar({
       <div className="grid h-16 items-center px-4 lg:px-6 grid-cols-[auto_1fr_auto] gap-3">
 
         {/* Left: Brand */}
-        <Link href="/inicio" className="group shrink-0 hover:opacity-90 transition-opacity">
+        <Link
+          href="/inicio"
+          className="group shrink-0 hover:opacity-90 transition-opacity flex items-center h-16 overflow-hidden"
+        >
           <Image
             src="/LogoSuperior.png"
             alt="GovBidder · The Bid That Wins"
-            width={200}
-            height={56}
-            className="h-12 w-auto object-contain"
+            width={400}
+            height={112}
+            className="h-28 w-auto object-contain object-left -ml-2"
             priority
           />
         </Link>
