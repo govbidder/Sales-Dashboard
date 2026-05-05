@@ -21,7 +21,6 @@ const CRUMB_GROUPS: Record<string, string> = {
   "/inicio":                "Inicio",
   "/dashboard":             "General",
   "/sales":                 "General",
-  "/reflection":            "General",
   "/metrics":               "General",
   "/admin/reports":         "General",
   "/admin/personas":        "Operación",

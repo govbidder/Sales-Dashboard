@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import {
-  Search, ArrowRight, Command, BarChart3, DollarSign, FileSearch, LayoutGrid,
+  Search, ArrowRight, Command, BarChart3, DollarSign, LayoutGrid,
   FileBarChart, Users2, ListTodo, Users, Layers, Wrench, BookOpen,
   CalendarDays, Plus, LogOut, Activity,
 } from "lucide-react"
@@ -34,7 +34,6 @@ const PAGES: Item[] = [
   // General
   { id: "p:dashboard", kind: "page", title: "Panel",           subtitle: "KPIs, rentabilidad, proyecciones", icon: BarChart3,    href: "/dashboard",       group: "General", keywords: ["dashboard","home","kpi","resumen"] },
   { id: "p:revenue",   kind: "page", title: "Ingresos",        subtitle: "Embudo de ventas",                icon: DollarSign,   href: "/sales",           group: "General", keywords: ["sales","ventas","revenue","funnel"] },
-  { id: "p:review",    kind: "page", title: "Reflexión",       subtitle: "Insights del mes",                icon: FileSearch,   href: "/reflection",      group: "General", keywords: ["review","resumen","reflexion"] },
   { id: "p:metrics",   kind: "page", title: "Métricas",        subtitle: "Tabla completa de KPIs",          icon: LayoutGrid,   href: "/metrics",         group: "General", keywords: ["todas","tabla","numbers"] },
   { id: "p:reports",   kind: "page", title: "Cargar Métricas", subtitle: "Form mensual de KPIs",            icon: FileBarChart, href: "/admin/reports",   group: "General", keywords: ["input","form","mes","cargar","reports"] },
 

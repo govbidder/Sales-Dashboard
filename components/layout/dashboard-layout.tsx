@@ -20,7 +20,6 @@ const PAGE_TITLES: Record<string, string> = {
   "/inicio":                      "Página Principal",
   "/dashboard":                   "Panel",
   "/sales":                       "Ingresos",
-  "/reflection":                  "Reflexión",
   "/metrics":                     "Métricas",
   "/tools":                       "Herramientas",
   "/calendar":                    "Agenda",
