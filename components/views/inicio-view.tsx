@@ -5,8 +5,8 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase"
 import {
   Loader2, AlertCircle, AlertTriangle, CheckCircle2, RefreshCw,
-  Calendar as CalIcon, Users2, ListTodo, FileBarChart, TrendingDown,
-  TrendingUp, Activity, ArrowRight, Flag,
+  Users2, ListTodo, FileBarChart, TrendingDown, TrendingUp,
+  Activity, ArrowRight, Flag, Sparkles, BarChart3, Target,
 } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -99,51 +99,95 @@ const PRIORITY_FLAG: Record<string, string> = {
   urgente: "text-red-300",
 }
 
-// ─── Issue Card primitive ─────────────────────────────────────────────────────
+// ─── Stat Tile (top-row counters) ─────────────────────────────────────────────
 
-function IssueCard({
-  icon: Icon, title, count, href, accent, children,
+function StatTile({
+  label, value, icon: Icon, accent,
+}: {
+  label: string
+  value: number | string
+  icon:  any
+  accent: "red" | "amber" | "blue" | "emerald" | "neutral"
+}) {
+  const palette = {
+    red:     { ring: "ring-red-500/25",     icon: "bg-red-500/15     text-red-300",     glow: "rgba(248,113,113,0.10)" },
+    amber:   { ring: "ring-amber-500/25",   icon: "bg-amber-500/15   text-amber-300",   glow: "rgba(251,191,36,0.10)"  },
+    blue:    { ring: "ring-blue-500/25",    icon: "bg-blue-500/15    text-blue-300",    glow: "rgba(96,165,250,0.10)"  },
+    emerald: { ring: "ring-emerald-500/25", icon: "bg-emerald-500/15 text-emerald-300", glow: "rgba(16,185,129,0.10)"  },
+    neutral: { ring: "ring-white/[0.10]",   icon: "bg-white/[0.05]   text-white/65",    glow: "rgba(255,255,255,0.04)" },
+  }[accent]
+
+  return (
+    <div
+      className={`relative overflow-hidden rounded-2xl ring-1 ${palette.ring} bg-[#0d1745]/70 backdrop-blur-sm p-4`}
+    >
+      <div
+        className="pointer-events-none absolute -top-8 -right-8 h-24 w-24 rounded-full blur-2xl"
+        style={{ backgroundColor: palette.glow }}
+      />
+      <div className="relative flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[28px] font-bold tabular-nums text-white leading-none">{value}</p>
+          <p className="mt-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/50">{label}</p>
+        </div>
+        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${palette.icon}`}>
+          <Icon className="h-4 w-4" />
+        </span>
+      </div>
+    </div>
+  )
+}
+
+// ─── Issue Section ─────────────────────────────────────────────────────────────
+
+function IssueSection({
+  icon: Icon, title, count, href, accent, severity, children,
 }: {
   icon: any
   title: string
   count: number
   href?: string
   accent: "red" | "amber" | "blue"
+  severity?: "high" | "medium" | "low"
   children?: React.ReactNode
 }) {
-  const ringClass =
-    accent === "red"   ? "ring-red-500/20    bg-red-500/[0.04]"   :
-    accent === "amber" ? "ring-amber-500/20  bg-amber-500/[0.04]" :
-                         "ring-blue-500/20   bg-blue-500/[0.04]"
-  const accentColor =
-    accent === "red"   ? "#f87171" :
-    accent === "amber" ? "#fbbf24" :
-                         "#60a5fa"
+  const palette = {
+    red:   { headerBg: "bg-red-500/[0.04]",   border: "border-red-500/15",   iconBg: "bg-red-500/15 ring-red-500/30",      iconColor: "text-red-300",     pillBg: "bg-red-500/10 text-red-300 border-red-500/25" },
+    amber: { headerBg: "bg-amber-500/[0.04]", border: "border-amber-500/15", iconBg: "bg-amber-500/15 ring-amber-500/30",  iconColor: "text-amber-300",   pillBg: "bg-amber-500/10 text-amber-300 border-amber-500/25" },
+    blue:  { headerBg: "bg-blue-500/[0.04]",  border: "border-blue-500/15",  iconBg: "bg-blue-500/15 ring-blue-500/30",    iconColor: "text-blue-300",    pillBg: "bg-blue-500/10 text-blue-300 border-blue-500/25" },
+  }[accent]
+
+  const pulseDot = severity === "high"
 
   return (
-    <div className={`rounded-2xl ring-1 ${ringClass} bg-[#0d1745] overflow-hidden`}>
-      <div className="flex items-start justify-between gap-3 px-5 py-4 border-b border-white/[0.05]">
-        <div className="flex items-center gap-3">
-          <span
-            className="flex h-9 w-9 items-center justify-center rounded-xl ring-1"
-            style={{ backgroundColor: `${accentColor}15`, boxShadow: `0 0 0 1px ${accentColor}30` }}
-          >
-            <Icon className="h-4 w-4" style={{ color: accentColor }} />
+    <div className={`overflow-hidden rounded-2xl border ${palette.border} bg-[#0d1745]`}>
+      <div className={`flex items-center justify-between gap-3 px-5 py-4 border-b border-white/[0.05] ${palette.headerBg}`}>
+        <div className="flex items-center gap-3 min-w-0">
+          <span className={`flex h-9 w-9 items-center justify-center rounded-xl ring-1 ${palette.iconBg}`}>
+            <Icon className={`h-4 w-4 ${palette.iconColor}`} />
           </span>
-          <div>
-            <h3 className="text-[14px] font-bold text-white leading-none">{title}</h3>
-            <p className="text-[11px] text-white/40 mt-1">
-              {count} {count === 1 ? "ítem" : "ítems"}
-            </p>
+          <div className="min-w-0">
+            <h3 className="text-[14px] font-bold text-white leading-none truncate">{title}</h3>
+            <div className="flex items-center gap-2 mt-1">
+              <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-bold tabular-nums uppercase tracking-wider ${palette.pillBg}`}>
+                {pulseDot && (
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-current opacity-70 animate-ping" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-current" />
+                  </span>
+                )}
+                {count} {count === 1 ? "ítem" : "ítems"}
+              </span>
+            </div>
           </div>
         </div>
         {href && count > 0 && (
           <Link
             href={href}
-            className="flex items-center gap-1 text-[11px] font-semibold text-white/55 hover:text-white transition-colors"
+            className="group flex shrink-0 items-center gap-1 rounded-lg border border-white/[0.08] bg-white/[0.04] px-2.5 py-1.5 text-[11px] font-semibold text-white/65 hover:bg-white/[0.08] hover:text-white transition-colors"
           >
             Ver todo
-            <ArrowRight className="h-3 w-3" />
+            <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
           </Link>
         )}
       </div>
@@ -206,212 +250,338 @@ export function InicioView() {
   const { issuesCount, counts, overdueTasks, stalePersonas, missingCurrentReport,
           currentMonth, declining, improving } = data
 
-  const allClear = issuesCount === 0
-  const heroAccent = allClear ? "emerald" : issuesCount > 5 ? "red" : "amber"
+  const allClear  = issuesCount === 0
+  const heroState = allClear ? "good" : issuesCount > 5 ? "critical" : "warning"
+
+  // Health score: rough proxy 0-100 based on issues count
+  const healthScore = Math.max(0, Math.min(100, 100 - issuesCount * 10))
+  const scoreColor =
+    healthScore >= 80 ? "text-emerald-300" :
+    healthScore >= 50 ? "text-amber-300" :
+                        "text-red-300"
+  const ringColor =
+    healthScore >= 80 ? "stroke-emerald-400" :
+    healthScore >= 50 ? "stroke-amber-400" :
+                        "stroke-red-400"
+  const ringBgColor =
+    healthScore >= 80 ? "stroke-emerald-500/15" :
+    healthScore >= 50 ? "stroke-amber-500/15" :
+                        "stroke-red-500/15"
+
+  // Circumference for SVG progress ring (r=42)
+  const circumference = 2 * Math.PI * 42
+  const offset = circumference * (1 - healthScore / 100)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
 
-      {/* HERO BANNER ──────────────────────────────────────────────────────── */}
+      {/* HERO ─────────────────────────────────────────────────────────────── */}
       <div
-        className={`relative overflow-hidden rounded-2xl border p-6 sm:p-8 ${
-          heroAccent === "emerald" ? "border-emerald-500/20 bg-gradient-to-br from-emerald-500/[0.06] via-[#0d1745] to-[#0d1745]" :
-          heroAccent === "red"     ? "border-red-500/20     bg-gradient-to-br from-red-500/[0.08]     via-[#0d1745] to-[#0d1745]" :
-                                     "border-amber-500/20   bg-gradient-to-br from-amber-500/[0.06]   via-[#0d1745] to-[#0d1745]"
-        }`}
+        className="relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[#0d1745]"
+        style={{ boxShadow: "0 30px 80px -30px rgba(0,0,0,0.6)" }}
       >
-        <div className="pointer-events-none absolute -top-20 -right-20 h-[300px] w-[300px] rounded-full blur-[100px]"
-          style={{ backgroundColor: heroAccent === "emerald" ? "rgba(16,185,129,0.10)" : heroAccent === "red" ? "rgba(248,113,113,0.10)" : "rgba(251,191,36,0.10)" }}
-        />
-        <div className="relative flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className={`flex h-8 w-8 items-center justify-center rounded-xl ring-1 ${
-                heroAccent === "emerald" ? "bg-emerald-500/15 ring-emerald-500/30" :
-                heroAccent === "red"     ? "bg-red-500/15     ring-red-500/30"     :
+        {/* Ambient glow background */}
+        <div className="pointer-events-none absolute inset-0">
+          <div
+            className="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full blur-[100px]"
+            style={{
+              backgroundColor:
+                heroState === "good"     ? "rgba(16,185,129,0.10)" :
+                heroState === "critical" ? "rgba(228,45,44,0.14)"  :
+                                           "rgba(251,191,36,0.10)",
+            }}
+          />
+          <div
+            className="absolute -bottom-32 -left-32 h-[400px] w-[400px] rounded-full blur-[120px]"
+            style={{ backgroundColor: "rgba(21,41,120,0.30)" }}
+          />
+        </div>
+
+        <div className="relative grid lg:grid-cols-[1fr_auto] gap-6 p-6 sm:p-8 items-center">
+
+          {/* LEFT — title + message */}
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 mb-3">
+              <span className={`flex h-7 w-7 items-center justify-center rounded-lg ring-1 ${
+                heroState === "good"     ? "bg-emerald-500/15 ring-emerald-500/30" :
+                heroState === "critical" ? "bg-red-500/15     ring-red-500/30"     :
                                            "bg-amber-500/15   ring-amber-500/30"
               }`}>
-                {heroAccent === "emerald" ? <CheckCircle2 className="h-4 w-4 text-emerald-300" /> :
-                 heroAccent === "red"     ? <AlertCircle  className="h-4 w-4 text-red-300"     /> :
-                                            <AlertTriangle className="h-4 w-4 text-amber-300"  />}
+                {heroState === "good"     ? <CheckCircle2 className="h-3.5 w-3.5 text-emerald-300" /> :
+                 heroState === "critical" ? <AlertCircle  className="h-3.5 w-3.5 text-red-300"     /> :
+                                            <AlertTriangle className="h-3.5 w-3.5 text-amber-300"  />}
               </span>
-              <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/50">
+              <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/50">
                 Estado del Dashboard
               </span>
             </div>
-            <h1 className="text-[28px] sm:text-[34px] font-bold tracking-tight text-white leading-tight">
-              {allClear
-                ? "Todo en orden"
-                : issuesCount === 1
-                ? "1 ítem requiere atención"
-                : `${issuesCount} ítems requieren atención`}
+
+            <h1 className="text-[36px] sm:text-[44px] font-bold tracking-tight text-white leading-[1.05]">
+              {allClear ? (
+                <>Todo en orden.</>
+              ) : (
+                <>
+                  <span className={heroState === "critical" ? "text-red-300" : "text-amber-300"}>
+                    {issuesCount}
+                  </span>{" "}
+                  {issuesCount === 1 ? "ítem requiere" : "ítems requieren"}
+                  <br className="hidden sm:block" />
+                  <span className="text-white/85"> tu atención.</span>
+                </>
+              )}
             </h1>
-            <p className="text-sm text-white/50 mt-2">
+
+            <p className="text-sm text-white/45 mt-3 max-w-xl">
               {allClear
-                ? "Sin tareas vencidas, métricas al día, equipo activo."
+                ? "Sin tareas vencidas, métricas al día, equipo activo. Buen trabajo."
                 : "Revisá los puntos críticos abajo para mantener el dashboard saludable."}
             </p>
+
+            <button
+              onClick={fetchHealth}
+              disabled={loading}
+              className="mt-5 inline-flex items-center gap-2 h-9 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3.5 text-[12px] font-semibold text-white/75 hover:bg-white/[0.07] hover:text-white transition-all disabled:opacity-40"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+              Actualizar estado
+            </button>
           </div>
 
-          <button
-            onClick={fetchHealth}
-            disabled={loading}
-            className="flex items-center gap-2 h-10 rounded-xl border border-white/[0.10] bg-white/[0.05] px-4 text-[13px] font-semibold text-white/85 hover:bg-white/[0.08] transition-all disabled:opacity-40"
-          >
-            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-            Actualizar
-          </button>
+          {/* RIGHT — health ring */}
+          <div className="flex items-center justify-center lg:justify-end">
+            <div className="relative">
+              <svg width="140" height="140" viewBox="0 0 100 100" className="-rotate-90">
+                <circle cx="50" cy="50" r="42" strokeWidth="6" fill="none" className={ringBgColor} />
+                <circle
+                  cx="50" cy="50" r="42"
+                  strokeWidth="6"
+                  fill="none"
+                  className={ringColor}
+                  strokeDasharray={circumference}
+                  strokeDashoffset={offset}
+                  strokeLinecap="round"
+                  style={{ transition: "stroke-dashoffset 800ms cubic-bezier(0.22,1,0.36,1)" }}
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <p className={`text-[34px] font-bold tabular-nums leading-none ${scoreColor}`}>
+                  {healthScore}
+                </p>
+                <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white/40 mt-1">
+                  Salud
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Quick stats row */}
-        <div className="relative mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {/* STATS STRIP at bottom of hero */}
+        <div className="relative border-t border-white/[0.05] grid grid-cols-2 sm:grid-cols-4">
           {[
-            { label: "Tareas vencidas",      val: counts.overdueTasks,      tone: counts.overdueTasks > 0 ? "red" : "neutral" },
-            { label: "Sin seguimiento",      val: counts.stalePersonas,     tone: counts.stalePersonas > 0 ? "amber" : "neutral" },
-            { label: "Personas activas",     val: counts.activePersonas,    tone: "neutral" },
-            { label: "Equipo",               val: counts.teamMembers,       tone: "neutral" },
-          ].map(s => (
-            <div key={s.label} className="rounded-xl border border-white/[0.07] bg-white/[0.02] px-4 py-3">
-              <p className={`text-2xl font-bold tabular-nums ${
-                s.tone === "red" ? "text-red-300" : s.tone === "amber" ? "text-amber-300" : "text-white"
-              }`}>
-                {s.val}
-              </p>
-              <p className="text-[11px] text-white/45 mt-1">{s.label}</p>
-            </div>
-          ))}
+            { label: "Tareas vencidas",  val: counts.overdueTasks,      icon: ListTodo, accent: counts.overdueTasks > 0 ? "red" as const : "neutral" as const },
+            { label: "Sin seguimiento",  val: counts.stalePersonas,     icon: Users2,   accent: counts.stalePersonas > 0 ? "amber" as const : "neutral" as const },
+            { label: "Personas activas", val: counts.activePersonas,    icon: Target,   accent: "neutral" as const },
+            { label: "Equipo",           val: counts.teamMembers,       icon: Users2,   accent: "neutral" as const },
+          ].map((s, i) => {
+            const StatIcon = s.icon
+            const accentText =
+              s.accent === "red"   ? "text-red-300" :
+              s.accent === "amber" ? "text-amber-300" :
+              "text-white"
+            return (
+              <div
+                key={s.label}
+                className={`relative px-5 py-4 ${i < 3 ? "sm:border-r border-white/[0.05]" : ""} ${i < 2 ? "border-b sm:border-b-0 border-white/[0.05]" : ""}`}
+              >
+                <div className="flex items-center gap-2 mb-1.5">
+                  <StatIcon className="h-3 w-3 text-white/30" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/40">
+                    {s.label}
+                  </span>
+                </div>
+                <p className={`text-[26px] font-bold tabular-nums leading-none ${accentText}`}>
+                  {s.val}
+                </p>
+              </div>
+            )
+          })}
         </div>
       </div>
 
       {/* ALERTS GRID ──────────────────────────────────────────────────────── */}
-      {(overdueTasks.length > 0 || stalePersonas.length > 0 || missingCurrentReport || declining.length > 0) && (
-        <div className="grid gap-5 lg:grid-cols-2">
+      {(overdueTasks.length > 0 || stalePersonas.length > 0 || missingCurrentReport || declining.length > 0) ? (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 px-1">
+            <AlertCircle className="h-3.5 w-3.5 text-red-300/80" />
+            <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/70">
+              Requieren Atención
+            </h2>
+            <div className="flex-1 h-px bg-gradient-to-r from-white/[0.08] to-transparent" />
+          </div>
 
-          {/* Overdue tasks */}
-          {overdueTasks.length > 0 && (
-            <IssueCard icon={ListTodo} title="Tareas vencidas" count={overdueTasks.length} href="/admin/tasks" accent="red">
-              <div className="divide-y divide-white/[0.04]">
-                {overdueTasks.slice(0, 6).map(t => (
+          <div className="grid gap-4 lg:grid-cols-2">
+
+            {/* Overdue tasks */}
+            {overdueTasks.length > 0 && (
+              <IssueSection
+                icon={ListTodo}
+                title="Tareas vencidas"
+                count={overdueTasks.length}
+                href="/admin/tasks"
+                accent="red"
+                severity={overdueTasks.length > 3 ? "high" : "medium"}
+              >
+                <div className="divide-y divide-white/[0.04]">
+                  {overdueTasks.slice(0, 5).map(t => (
+                    <Link
+                      key={t.id}
+                      href="/admin/tasks"
+                      className="group flex items-center gap-3 px-5 py-3 hover:bg-white/[0.02] transition-colors"
+                    >
+                      <Flag className={`h-3.5 w-3.5 shrink-0 ${PRIORITY_FLAG[t.priority]}`} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-medium text-white/90 truncate">{t.title}</p>
+                        <p className="text-[11px] text-red-300/80 mt-0.5">
+                          Venció {fmtRelative(t.due_at)}
+                          {t.owner && <span className="text-white/35"> · {t.owner}</span>}
+                        </p>
+                      </div>
+                      <ArrowRight className="h-3.5 w-3.5 text-white/20 group-hover:text-white/55 group-hover:translate-x-0.5 transition-all" />
+                    </Link>
+                  ))}
+                  {overdueTasks.length > 5 && (
+                    <Link href="/admin/tasks" className="flex items-center justify-center gap-1.5 px-5 py-2.5 text-[11px] font-semibold text-white/55 hover:text-white transition-colors hover:bg-white/[0.02]">
+                      + {overdueTasks.length - 5} más
+                      <ArrowRight className="h-3 w-3" />
+                    </Link>
+                  )}
+                </div>
+              </IssueSection>
+            )}
+
+            {/* Stale personas */}
+            {stalePersonas.length > 0 && (
+              <IssueSection
+                icon={Users2}
+                title="Personas sin seguimiento"
+                count={stalePersonas.length}
+                href="/admin/personas"
+                accent="amber"
+                severity={stalePersonas.length > 3 ? "high" : "medium"}
+              >
+                <div className="divide-y divide-white/[0.04]">
+                  {stalePersonas.slice(0, 5).map(p => (
+                    <Link
+                      key={p.id}
+                      href="/admin/personas"
+                      className="group flex items-center gap-3 px-5 py-3 hover:bg-white/[0.02] transition-colors"
+                    >
+                      <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#ff6b6a] to-[#c42423] text-[10px] font-bold text-white shadow-sm shrink-0">
+                        {(p.name ?? "?").split(/\s+/).map(s => s[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-medium text-white/90 truncate">{p.name}</p>
+                        <p className="text-[11px] text-amber-300/80 mt-0.5">
+                          Último contacto {fmtRelative(p.last_contact)}
+                          {p.owner && <span className="text-white/35"> · {p.owner}</span>}
+                        </p>
+                      </div>
+                      <ArrowRight className="h-3.5 w-3.5 text-white/20 group-hover:text-white/55 group-hover:translate-x-0.5 transition-all" />
+                    </Link>
+                  ))}
+                </div>
+              </IssueSection>
+            )}
+
+            {/* Missing current month report */}
+            {missingCurrentReport && (
+              <IssueSection
+                icon={FileBarChart}
+                title="Métricas del mes"
+                count={1}
+                href="/admin/reports"
+                accent="blue"
+                severity="medium"
+              >
+                <div className="px-5 py-5 space-y-4">
+                  <p className="text-[13px] text-white/75 leading-relaxed">
+                    No hay reporte cargado para{" "}
+                    <span className="font-semibold text-white">{fmtMonthLabel(currentMonth)}</span>.
+                    {" "}Sin datos del mes actual los KPIs y proyecciones quedan ciegos.
+                  </p>
                   <Link
-                    key={t.id}
-                    href="/admin/tasks"
-                    className="group flex items-center gap-3 px-5 py-3 hover:bg-white/[0.02] transition-colors"
+                    href="/admin/reports"
+                    className="inline-flex items-center gap-2 h-10 rounded-xl bg-[#E42D2C] px-4 text-[12px] font-bold text-white hover:bg-[#c42423] hover:shadow-[0_8px_24px_rgba(228,45,44,0.30)] transition-all"
                   >
-                    <Flag className={`h-3.5 w-3.5 shrink-0 ${PRIORITY_FLAG[t.priority]}`} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-medium text-white/90 truncate">{t.title}</p>
-                      <p className="text-[11px] text-red-300/80 mt-0.5">
-                        Venció {fmtRelative(t.due_at)}
-                        {t.owner && <span className="text-white/35"> · {t.owner}</span>}
-                      </p>
-                    </div>
-                    <ArrowRight className="h-3.5 w-3.5 text-white/20 group-hover:text-white/55 group-hover:translate-x-0.5 transition-all" />
+                    <FileBarChart className="h-3.5 w-3.5" />
+                    Cargar Métricas
+                    <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
-                ))}
-                {overdueTasks.length > 6 && (
-                  <Link href="/admin/tasks" className="flex items-center justify-center gap-1.5 px-5 py-3 text-[12px] font-semibold text-white/55 hover:text-white transition-colors">
-                    Ver las {overdueTasks.length - 6} restantes
-                    <ArrowRight className="h-3 w-3" />
-                  </Link>
-                )}
-              </div>
-            </IssueCard>
-          )}
+                </div>
+              </IssueSection>
+            )}
 
-          {/* Stale personas */}
-          {stalePersonas.length > 0 && (
-            <IssueCard icon={Users2} title="Personas sin seguimiento" count={stalePersonas.length} href="/admin/personas" accent="amber">
-              <div className="divide-y divide-white/[0.04]">
-                {stalePersonas.slice(0, 6).map(p => (
-                  <Link
-                    key={p.id}
-                    href="/admin/personas"
-                    className="group flex items-center gap-3 px-5 py-3 hover:bg-white/[0.02] transition-colors"
-                  >
-                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#ff6b6a] to-[#c42423] text-[10px] font-bold text-white shadow-sm shrink-0">
-                      {(p.name ?? "?").split(/\s+/).map(s => s[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-medium text-white/90 truncate">{p.name}</p>
-                      <p className="text-[11px] text-amber-300/80 mt-0.5">
-                        Último contacto {fmtRelative(p.last_contact)}
-                        {p.owner && <span className="text-white/35"> · {p.owner}</span>}
-                      </p>
+            {/* Declining metrics */}
+            {declining.length > 0 && (
+              <IssueSection
+                icon={TrendingDown}
+                title="Métricas en caída"
+                count={declining.length}
+                href="/dashboard"
+                accent="red"
+                severity={declining.length > 2 ? "high" : "medium"}
+              >
+                <div className="divide-y divide-white/[0.04]">
+                  {declining.map(m => (
+                    <div key={m.key} className="flex items-center justify-between gap-3 px-5 py-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[13px] font-medium text-white/90 truncate">{m.label}</p>
+                        <p className="text-[11px] text-white/45 mt-0.5">
+                          {m.format === "money" ? fmtMoney(m.previous) : fmtNumber(m.previous)}{" "}
+                          <span className="text-white/30">→</span>{" "}
+                          {m.format === "money" ? fmtMoney(m.current) : fmtNumber(m.current)}
+                        </p>
+                      </div>
+                      <span className="rounded-full border border-red-500/25 bg-red-500/10 px-2.5 py-1 text-[11px] font-bold tabular-nums text-red-300 shrink-0 flex items-center gap-1">
+                        <TrendingDown className="h-3 w-3" />
+                        {m.pct.toFixed(0)}%
+                      </span>
                     </div>
-                    <ArrowRight className="h-3.5 w-3.5 text-white/20 group-hover:text-white/55 group-hover:translate-x-0.5 transition-all" />
-                  </Link>
-                ))}
-              </div>
-            </IssueCard>
-          )}
-
-          {/* Missing current month report */}
-          {missingCurrentReport && (
-            <IssueCard icon={FileBarChart} title="Métricas del mes" count={1} href="/admin/reports" accent="blue">
-              <div className="px-5 py-4">
-                <p className="text-[13px] text-white/75 leading-relaxed">
-                  No hay reporte cargado para <span className="font-semibold text-white">{fmtMonthLabel(currentMonth)}</span>. Sin datos del mes actual, los KPIs y proyecciones quedan ciegos.
-                </p>
-                <Link
-                  href="/admin/reports"
-                  className="mt-3 inline-flex items-center gap-2 h-9 rounded-xl bg-[#E42D2C] px-4 text-[12px] font-bold text-white hover:bg-[#c42423] transition-colors"
-                >
-                  <FileBarChart className="h-3.5 w-3.5" />
-                  Cargar Métricas
-                </Link>
-              </div>
-            </IssueCard>
-          )}
-
-          {/* Declining metrics */}
-          {declining.length > 0 && (
-            <IssueCard icon={TrendingDown} title="Métricas en caída" count={declining.length} href="/dashboard" accent="red">
-              <div className="divide-y divide-white/[0.04]">
-                {declining.map(m => (
-                  <div key={m.key} className="flex items-center justify-between gap-3 px-5 py-3">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-[13px] font-medium text-white/90 truncate">{m.label}</p>
-                      <p className="text-[11px] text-white/45 mt-0.5">
-                        {m.format === "money" ? fmtMoney(m.previous) : fmtNumber(m.previous)} → {m.format === "money" ? fmtMoney(m.current) : fmtNumber(m.current)}
-                      </p>
-                    </div>
-                    <span className="rounded-full border border-red-500/25 bg-red-500/10 px-2.5 py-1 text-[11px] font-bold tabular-nums text-red-300">
-                      {m.pct.toFixed(0)}%
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </IssueCard>
-          )}
+                  ))}
+                </div>
+              </IssueSection>
+            )}
+          </div>
         </div>
-      )}
+      ) : null}
 
       {/* IMPROVEMENTS / WHAT'S GOOD ───────────────────────────────────────── */}
       {improving.length > 0 && (
-        <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/[0.03] overflow-hidden">
-          <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-white/[0.05]">
-            <div className="flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/15 ring-1 ring-emerald-500/30">
-                <TrendingUp className="h-4 w-4 text-emerald-300" />
-              </span>
-              <div>
-                <h3 className="text-[14px] font-bold text-white leading-none">Lo que está mejorando</h3>
-                <p className="text-[11px] text-white/40 mt-1">{improving.length} {improving.length === 1 ? "métrica" : "métricas"} al alza</p>
-              </div>
-            </div>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 px-1">
+            <Sparkles className="h-3.5 w-3.5 text-emerald-300/80" />
+            <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/70">
+              Lo que está mejorando
+            </h2>
+            <div className="flex-1 h-px bg-gradient-to-r from-white/[0.08] to-transparent" />
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/[0.04]">
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {improving.map(m => (
-              <div key={m.key} className="bg-[#0d1745] px-5 py-3.5 flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-[13px] font-medium text-white/85">{m.label}</p>
-                  <p className="text-[11px] text-white/40 mt-0.5">
-                    {m.format === "money" ? fmtMoney(m.current) : fmtNumber(m.current)}
-                  </p>
+              <div key={m.key} className="rounded-2xl border border-emerald-500/15 bg-gradient-to-br from-emerald-500/[0.04] via-[#0d1745] to-[#0d1745] p-4 hover:border-emerald-500/25 transition-colors">
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <p className="text-[12px] font-medium text-white/85 truncate">{m.label}</p>
+                  <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold tabular-nums text-emerald-300 shrink-0 flex items-center gap-0.5">
+                    <TrendingUp className="h-3 w-3" />
+                    {m.pct.toFixed(0)}%
+                  </span>
                 </div>
-                <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold tabular-nums text-emerald-300">
-                  +{m.pct.toFixed(0)}%
-                </span>
+                <p className="text-[20px] font-bold tabular-nums text-white">
+                  {m.format === "money" ? fmtMoney(m.current) : fmtNumber(m.current)}
+                </p>
+                <p className="text-[10px] text-white/35 mt-0.5">
+                  vs {m.format === "money" ? fmtMoney(m.previous) : fmtNumber(m.previous)} mes anterior
+                </p>
               </div>
             ))}
           </div>
@@ -419,28 +589,40 @@ export function InicioView() {
       )}
 
       {/* QUICK NAV ────────────────────────────────────────────────────────── */}
-      <div className="rounded-2xl border border-white/[0.07] bg-[#0d1745] p-5">
-        <div className="flex items-center gap-2 mb-3">
-          <Activity className="h-4 w-4 text-white/40" />
-          <h3 className="text-[12px] font-bold uppercase tracking-widest text-white/55">Atajos</h3>
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 px-1">
+          <Activity className="h-3.5 w-3.5 text-white/45" />
+          <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/70">
+            Atajos rápidos
+          </h2>
+          <div className="flex-1 h-px bg-gradient-to-r from-white/[0.08] to-transparent" />
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
-            { href: "/dashboard",       label: "Panel",              icon: TrendingUp },
-            { href: "/admin/personas",  label: "Personas Agendadas", icon: Users2     },
-            { href: "/admin/tasks",     label: "Tareas",             icon: ListTodo   },
-            { href: "/admin/reports",   label: "Cargar Métricas",    icon: FileBarChart },
+            { href: "/dashboard",       label: "Panel",              desc: "KPIs y proyecciones",  icon: BarChart3 },
+            { href: "/admin/personas",  label: "Personas Agendadas", desc: "Pipeline + seguimientos", icon: Users2 },
+            { href: "/admin/tasks",     label: "Tareas",             desc: "Gestión de pendientes", icon: ListTodo },
+            { href: "/admin/reports",   label: "Cargar Métricas",    desc: "Form mensual",         icon: FileBarChart },
           ].map(s => {
             const Icon = s.icon
             return (
               <Link
                 key={s.href}
                 href={s.href}
-                className="group flex items-center gap-2.5 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:border-white/[0.14] hover:bg-white/[0.04] px-3.5 py-3 transition-all"
+                className="group relative overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0d1745] hover:border-[#E42D2C]/30 hover:shadow-[0_4px_20px_rgba(228,45,44,0.10)] transition-all p-4"
               >
-                <Icon className="h-4 w-4 text-white/45 group-hover:text-[#ff6b6a] transition-colors" />
-                <span className="flex-1 text-[12px] font-semibold text-white/85 group-hover:text-white">{s.label}</span>
-                <ArrowRight className="h-3 w-3 text-white/20 group-hover:text-white/65 group-hover:translate-x-0.5 transition-all" />
+                <div className="pointer-events-none absolute -top-12 -right-12 h-24 w-24 rounded-full bg-[#E42D2C]/[0.08] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                <div className="relative flex items-start justify-between gap-3 mb-3">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.04] ring-1 ring-white/[0.06] group-hover:bg-[#E42D2C]/10 group-hover:ring-[#E42D2C]/25 transition-colors">
+                    <Icon className="h-4 w-4 text-white/55 group-hover:text-[#ff6b6a] transition-colors" />
+                  </span>
+                  <ArrowRight className="h-4 w-4 text-white/20 group-hover:text-[#ff6b6a] group-hover:translate-x-0.5 transition-all" />
+                </div>
+
+                <p className="relative text-[13px] font-bold text-white">{s.label}</p>
+                <p className="relative text-[11px] text-white/40 mt-0.5">{s.desc}</p>
               </Link>
             )
           })}
