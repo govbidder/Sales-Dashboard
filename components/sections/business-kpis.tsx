@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
-import { TrendingDown, TrendingUp, DollarSign, Wallet, Repeat, Megaphone, Users, UserPlus } from "lucide-react"
+import { TrendingDown, TrendingUp, DollarSign, Wallet, Repeat, Megaphone, Phone, UserPlus } from "lucide-react"
 import { useSelectedMonth } from "@/components/layout/dashboard-layout"
 import { useMonthlyReports } from "@/hooks/use-monthly-reports"
 import { useMarkPageReady } from "@/hooks/use-mark-page-ready"
@@ -58,8 +58,8 @@ const KPI_DEFS = [
   { key: "cash_collected",  label: "Cash Collected",      money: true,  icon: Wallet,     color: "#E42D2C" },
   { key: "total_revenue",   label: "Total Revenue",        money: true,  icon: DollarSign, color: "#fb923c" },
   { key: "mrr",             label: "MRR",                  money: true,  icon: Repeat,     color: "#60a5fa" },
-  { key: "ad_spend",        label: "Gasto Publicitario",   money: true,  icon: Megaphone,  color: "#ef4444" },
-  { key: "short_followers", label: "Seguidores Instagram", money: false, icon: Users,      color: "#818cf8" },
+  { key: "ad_spend",        label: "Ad Spend",             money: true,  icon: Megaphone,  color: "#ef4444" },
+  { key: "attended_calls",  label: "Calls Atendidas",      money: false, icon: Phone,      color: "#818cf8" },
   { key: "new_clients",     label: "Nuevos Clientes",      money: false, icon: UserPlus,   color: "#4ade80" },
 ]
 
