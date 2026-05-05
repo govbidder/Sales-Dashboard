@@ -8,6 +8,7 @@ import {
   ChevronRight, ArrowRight, Check, Copy, Pencil, Save,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Portal } from "@/components/ui/portal"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -474,15 +475,16 @@ function SOPModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <Portal>
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        className="fixed inset-0 z-[100] bg-black/40"
         onClick={onClose}
       />
 
-      {/* Panel */}
-      <div className="relative z-10 flex flex-col w-full max-w-2xl max-h-[90vh] rounded-2xl border border-white/[0.1] bg-[#0d1745] shadow-2xl overflow-hidden">
+      {/* Panel container */}
+      <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+        <div className="relative flex flex-col w-full max-w-2xl max-h-[90vh] rounded-2xl border border-white/[0.1] bg-[#0d1745] shadow-2xl overflow-hidden">
 
         {/* Header */}
         <div className="flex items-start gap-3 p-5 border-b border-white/[0.07] flex-shrink-0">
@@ -629,8 +631,9 @@ function SOPModal({
             )}
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </Portal>
   )
 }
 

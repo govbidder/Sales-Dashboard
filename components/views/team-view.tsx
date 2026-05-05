@@ -7,6 +7,7 @@ import {
   Loader2, Plus, X, RefreshCw, Mail, Users2, ChevronRight,
   Crown, Shield, ListTodo, Clock, UserPlus, CheckCircle2,
 } from "lucide-react"
+import { Portal } from "@/components/ui/portal"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -55,7 +56,7 @@ function DetailDrawer({
   const displayName = member.full_name || member.email || "Sin nombre"
 
   return (
-    <>
+    <Portal>
       <div className="fixed inset-0 z-[100] bg-black/40" onClick={onClose} />
       <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[460px] flex-col border-l border-white/[0.08] shadow-2xl" style={{ backgroundColor: "#0d1745" }}>
 
@@ -181,7 +182,7 @@ function DetailDrawer({
           )}
         </div>
       </div>
-    </>
+    </Portal>
   )
 }
 
@@ -211,9 +212,9 @@ function InviteModal({
   const canSubmit = email.trim().length > 0 && !inviting
 
   return (
-    <>
-      <div className="fixed inset-0 z-40 bg-black/70 backdrop-blur-md" onClick={onClose} />
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <Portal>
+      <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-md" onClick={onClose} />
+      <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
         <form
           onSubmit={handleSubmit}
           className="relative w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden rounded-3xl border border-white/[0.08] shadow-[0_30px_80px_rgba(0,0,0,0.6)] page-enter"
@@ -322,7 +323,7 @@ function InviteModal({
           </div>
         </form>
       </div>
-    </>
+    </Portal>
   )
 }
 

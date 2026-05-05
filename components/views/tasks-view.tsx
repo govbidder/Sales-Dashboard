@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { createClient } from "@/lib/supabase"
+import { Portal } from "@/components/ui/portal"
 import {
   Loader2, Trash2, RefreshCw, Plus, X, Calendar as CalIcon,
   Flag, ChevronRight, AlertCircle, Tag as TagIcon,
@@ -346,7 +347,7 @@ function DetailDrawer({
   }
 
   return (
-    <>
+    <Portal>
       <div className="fixed inset-0 z-[100] bg-black/40" onClick={onClose} />
       <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[520px] flex-col border-l border-white/[0.08] shadow-2xl" style={{ backgroundColor: "#0d1745" }}>
 
@@ -526,7 +527,7 @@ function DetailDrawer({
           {tab === "comments" && <CommentsSection taskId={task.id} />}
         </div>
       </div>
-    </>
+    </Portal>
   )
 }
 
@@ -563,9 +564,9 @@ function NewTaskModal({
   }
 
   return (
-    <>
+    <Portal>
       <div className="fixed inset-0 z-[100] bg-black/40" onClick={onClose} />
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
         <form
           onSubmit={handleSubmit}
           className="w-full max-w-md rounded-2xl border border-white/[0.10] shadow-2xl p-6 space-y-3.5 max-h-[90vh] overflow-y-auto"
@@ -632,7 +633,7 @@ function NewTaskModal({
           </button>
         </form>
       </div>
-    </>
+    </Portal>
   )
 }
 

@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { createClient } from "@/lib/supabase"
+import { Portal } from "@/components/ui/portal"
 import {
   Loader2, Trash2, RefreshCw, Download, X, Star, Plus,
   Instagram, ExternalLink, ChevronRight, Phone, Mail, Calendar as CalIcon,
@@ -152,7 +153,7 @@ function DetailDrawer({
   const inputCls = "w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-[13px] text-white placeholder:text-white/40 focus:border-white/20 focus:outline-none transition-all"
 
   return (
-    <>
+    <Portal>
       <div className="fixed inset-0 z-[100] bg-black/40" onClick={onClose} />
       <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[480px] flex-col border-l border-white/[0.08] shadow-2xl" style={{ backgroundColor: "#0d1745" }}>
 
@@ -397,7 +398,7 @@ function DetailDrawer({
 
         </div>
       </div>
-    </>
+    </Portal>
   )
 }
 
@@ -437,9 +438,9 @@ function NewPersonaModal({
   const inputCls = "w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-[13px] text-white placeholder:text-white/40 focus:border-white/20 focus:outline-none transition-all"
 
   return (
-    <>
+    <Portal>
       <div className="fixed inset-0 z-[100] bg-black/40" onClick={onClose} />
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
         <form
           onSubmit={handleSubmit}
           className="w-full max-w-md rounded-2xl border border-white/[0.10] shadow-2xl p-6 space-y-3.5 max-h-[90vh] overflow-y-auto"
@@ -505,7 +506,7 @@ function NewPersonaModal({
           </button>
         </form>
       </div>
-    </>
+    </Portal>
   )
 }
 
