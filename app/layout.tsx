@@ -16,11 +16,8 @@ export const metadata: Metadata = {
     template: "%s · GovBidder",
   },
   description: "Government Contracts Intelligence Platform",
-  icons: {
-    icon:     [{ url: "/govbidder-logo.png", type: "image/png" }],
-    apple:    { url: "/govbidder-logo.png" },
-    shortcut: "/govbidder-logo.png",
-  },
+  // Favicon auto-detected from app/icon.png (Next.js convention).
+  // Don't redeclare here — Next will generate the proper <link> tags.
   openGraph: {
     title: "GovBidder Sales Dashboard",
     description: "Government Contracts Intelligence Platform",
