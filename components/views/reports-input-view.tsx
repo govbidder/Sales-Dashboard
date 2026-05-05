@@ -226,7 +226,7 @@ function ReportForm({
       {/* Month + status header */}
       <div className="flex flex-wrap items-end justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4">
         <div className="space-y-1.5">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Mes</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">Mes</p>
           <input
             type="month"
             value={month}
@@ -274,7 +274,7 @@ function ReportForm({
                 <div className={`grid gap-3 ${sec.id === "reflection" ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2"}`}>
                   {sec.fields.map(f => (
                     <div key={f.key} className="space-y-1.5">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{f.label}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">{f.label}</p>
                       {renderField(f)}
                     </div>
                   ))}

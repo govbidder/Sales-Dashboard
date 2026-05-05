@@ -82,7 +82,7 @@ export function Profitability() {
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Beneficio neto</p>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">Beneficio neto</p>
               <p className={`mt-1.5 text-3xl font-bold tracking-tight tabular-nums ${profitColor}`}>
                 {fmtMoney(cur.profit)}
               </p>
@@ -104,7 +104,7 @@ export function Profitability() {
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Margen</p>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">Margen</p>
               <p className="mt-1.5 text-3xl font-bold tracking-tight tabular-nums text-slate-900">
                 {cur.margin != null ? `${cur.margin.toFixed(1)}%` : "—"}
               </p>

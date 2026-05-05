@@ -109,10 +109,10 @@ export function MoMPanel() {
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
         {/* Column headers */}
         <div className="grid grid-cols-[1.4fr_1fr_1.6fr_1fr] border-b border-slate-200 px-6 py-3">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Métrica</span>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 text-right">{fmtMonthLong(previous.month)}</span>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 text-center">Cambio</span>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 text-right">{fmtMonthLong(current.month)}</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">Métrica</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80 text-right">{fmtMonthLong(previous.month)}</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80 text-center">Cambio</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80 text-right">{fmtMonthLong(current.month)}</span>
         </div>
 
         {METRICS.map((metric) => {

@@ -70,7 +70,7 @@ function KPI({
         </span>
       </div>
       <p className="text-2xl font-bold tracking-tight text-slate-900 tabular-nums">{value}</p>
-      <p className="mt-1 text-[11px] font-bold uppercase tracking-widest text-slate-400">{label}</p>
+      <p className="mt-1 text-[11px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">{label}</p>
       {hint && <p className="mt-1 text-[11px] text-slate-400">{hint}</p>}
     </div>
   )

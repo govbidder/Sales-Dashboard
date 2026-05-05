@@ -81,13 +81,13 @@ function DetailDrawer({
           {/* Stats */}
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">
                 <Users2 className="h-3 w-3" /> Personas
               </div>
               <p className="mt-1 text-2xl font-bold text-slate-900 tabular-nums">{member.personas_owned}</p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">
                 <ListTodo className="h-3 w-3" /> Tareas
               </div>
               <p className="mt-1 text-2xl font-bold text-slate-900 tabular-nums">{member.tasks_assigned}</p>
@@ -107,7 +107,7 @@ function DetailDrawer({
           {/* Editable fields (admin only) */}
           <fieldset disabled={!isAdmin} className="space-y-4 disabled:opacity-60">
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Nombre completo</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Nombre completo</p>
               <input
                 type="text"
                 defaultValue={member.full_name ?? ""}
@@ -119,7 +119,7 @@ function DetailDrawer({
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Rol</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Rol</p>
                 <select
                   defaultValue={member.role}
                   onChange={e => onPatch(member.id, { role: e.target.value as Role })}
@@ -130,7 +130,7 @@ function DetailDrawer({
                 </select>
               </div>
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Estado</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Estado</p>
                 <select
                   defaultValue={member.status}
                   onChange={e => onPatch(member.id, { status: e.target.value as Status })}
@@ -143,7 +143,7 @@ function DetailDrawer({
             </div>
 
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Posición / Cargo</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Posición / Cargo</p>
               <input
                 type="text"
                 defaultValue={member.position ?? ""}
@@ -154,7 +154,7 @@ function DetailDrawer({
             </div>
 
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Empezó el</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Empezó el</p>
               <input
                 type="date"
                 defaultValue={member.started_at ?? ""}
@@ -164,7 +164,7 @@ function DetailDrawer({
             </div>
 
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Notas</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Notas</p>
               <textarea
                 defaultValue={member.notes ?? ""}
                 placeholder="Contexto, especialidad, etc."
@@ -251,7 +251,7 @@ function InviteModal({
           {/* Body */}
           <div className="relative flex-1 overflow-y-auto px-6 py-5 space-y-4">
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Email *</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">Email *</p>
               <input
                 autoFocus type="email" value={email}
                 onChange={e => setEmail(e.target.value)}
@@ -261,7 +261,7 @@ function InviteModal({
             </div>
 
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Nombre</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">Nombre</p>
               <input
                 type="text" value={fullName}
                 onChange={e => setFullName(e.target.value)}
@@ -272,7 +272,7 @@ function InviteModal({
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Posición</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">Posición</p>
                 <input
                   type="text" value={position}
                   onChange={e => setPosition(e.target.value)}
@@ -281,7 +281,7 @@ function InviteModal({
                 />
               </div>
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Rol</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">Rol</p>
                 <select
                   value={role}
                   onChange={e => setRole(e.target.value as Role)}
@@ -519,7 +519,7 @@ export function TeamView() {
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#E42D2C]/15 ring-1 ring-[#E42D2C]/30">
                   <Users2 className="h-3.5 w-3.5 text-[#ff6b6a]" />
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-500">
+                <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1e3a8a]">
                   Equipo
                 </span>
               </div>
@@ -576,7 +576,7 @@ export function TeamView() {
                 >
                   <div className="flex items-center gap-2 mb-1.5">
                     <StatIcon className="h-3 w-3 text-slate-400" />
-                    <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#1e3a8a]/80">
                       {s.label}
                     </span>
                   </div>

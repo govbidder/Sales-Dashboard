@@ -395,7 +395,7 @@ export function InicioView() {
               >
                 <div className="flex items-center gap-2 mb-1.5">
                   <StatIcon className="h-3 w-3 text-slate-400" />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#1e3a8a]/80">
                     {s.label}
                   </span>
                 </div>

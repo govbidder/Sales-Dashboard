@@ -72,7 +72,7 @@ export function TopBar({
 
   return (
     <header
-      className="sticky top-0 z-10 border-b border-slate-200 bg-white/85 backdrop-blur-xl"
+      className="sticky top-0 z-10 border-b-2 border-[#1e3a8a]/15 bg-white/85 backdrop-blur-xl"
     >
       <div className="grid h-16 items-center px-4 lg:px-6 grid-cols-[auto_1fr_auto] gap-3">
 

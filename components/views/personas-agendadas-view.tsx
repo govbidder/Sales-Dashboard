@@ -305,7 +305,7 @@ function DetailDrawer({
           <div className="px-6 py-5 space-y-4">
 
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Llamada agendada</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Llamada agendada</p>
               <input
                 type="datetime-local"
                 defaultValue={toLocalInputValue(persona.scheduled_at)}
@@ -316,7 +316,7 @@ function DetailDrawer({
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Email</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Email</p>
                 <input
                   type="email"
                   defaultValue={persona.email ?? ""}
@@ -326,7 +326,7 @@ function DetailDrawer({
                 />
               </div>
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Teléfono</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Teléfono</p>
                 <input
                   type="tel"
                   defaultValue={persona.phone ?? ""}
@@ -339,7 +339,7 @@ function DetailDrawer({
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Instagram</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Instagram</p>
                 <input
                   type="text"
                   defaultValue={persona.instagram ?? ""}
@@ -349,7 +349,7 @@ function DetailDrawer({
                 />
               </div>
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">De dónde llegó</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">De dónde llegó</p>
                 <input
                   type="text"
                   defaultValue={persona.source ?? ""}
@@ -361,7 +361,7 @@ function DetailDrawer({
             </div>
 
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Owner (responsable)</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Owner (responsable)</p>
               <input
                 type="text"
                 defaultValue={persona.owner ?? ""}
@@ -372,7 +372,7 @@ function DetailDrawer({
             </div>
 
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Notas</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Notas</p>
               <textarea
                 defaultValue={persona.notes ?? ""}
                 placeholder="Contexto, intereses, observaciones..."
@@ -530,44 +530,44 @@ function NewPersonaModal({
           </div>
 
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Nombre *</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Nombre *</p>
             <input autoFocus type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Nombre completo" className={inputCls} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Email</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Email</p>
               <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="correo@..." className={inputCls} />
             </div>
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Teléfono</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Teléfono</p>
               <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+54..." className={inputCls} />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Instagram</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Instagram</p>
             <input type="text" value={instagram} onChange={e => setInstagram(e.target.value)} placeholder="@usuario" className={inputCls} />
           </div>
 
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Llamada agendada</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Llamada agendada</p>
             <input type="datetime-local" value={scheduledAt} onChange={e => setScheduledAt(e.target.value)} className={inputCls} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">De dónde llegó</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">De dónde llegó</p>
               <input type="text" value={source} onChange={e => setSource(e.target.value)} placeholder="Instagram, ad..." className={inputCls} />
             </div>
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Owner</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Owner</p>
               <input type="text" value={owner} onChange={e => setOwner(e.target.value)} placeholder="Quien hace seguimiento" className={inputCls} />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Calificación</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Calificación</p>
             <StarRating size="md" value={rating || null} onChange={n => setRating(n === rating ? 0 : n)} />
           </div>
 

@@ -401,7 +401,7 @@ function DetailDrawer({
               {/* Status + priority */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Estado</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Estado</p>
                   <select
                     value={task.status}
                     onChange={e => onPatch(task.id, { status: e.target.value as Status })}
@@ -413,7 +413,7 @@ function DetailDrawer({
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Prioridad</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Prioridad</p>
                   <select
                     value={task.priority}
                     onChange={e => onPatch(task.id, { priority: e.target.value as Priority })}
@@ -428,7 +428,7 @@ function DetailDrawer({
 
               {/* Due date */}
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Vence</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Vence</p>
                 <input
                   type="datetime-local"
                   defaultValue={toLocalInputValue(task.due_at)}
@@ -439,19 +439,19 @@ function DetailDrawer({
 
               {/* Assignees */}
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Asignados</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Asignados</p>
                 <AssigneesEditor value={task.assignees ?? []} onChange={v => onPatch(task.id, { assignees: v })} />
               </div>
 
               {/* Tags */}
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Tags</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Tags</p>
                 <TagsEditor value={task.tags ?? []} onChange={v => onPatch(task.id, { tags: v })} />
               </div>
 
               {/* Linked persona */}
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Vinculada a persona agendada</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Vinculada a persona agendada</p>
                 <select
                   value={task.persona_id ?? ""}
                   onChange={e => onPatch(task.id, { persona_id: e.target.value || null })}
@@ -466,7 +466,7 @@ function DetailDrawer({
 
               {/* Description */}
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Descripción</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Descripción</p>
                 <textarea
                   defaultValue={task.description ?? ""}
                   placeholder="Detalle de la tarea..."
@@ -480,7 +480,7 @@ function DetailDrawer({
               <div className="space-y-2 pt-2 border-t border-slate-200">
                 <div className="flex items-center gap-2">
                   <GitBranch className="h-3.5 w-3.5 text-slate-400" />
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Subtareas</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">Subtareas</p>
                   <span className="text-[11px] text-slate-400">({subtasks.length})</span>
                 </div>
 
@@ -581,41 +581,41 @@ function NewTaskModal({
           </div>
 
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Título *</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Título *</p>
             <input autoFocus type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="¿Qué hay que hacer?" className={inputCls} />
           </div>
 
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Descripción</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Descripción</p>
             <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Detalle..." rows={3} className={`${inputCls} resize-none`} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Prioridad</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Prioridad</p>
               <select value={priority} onChange={e => setPriority(e.target.value as Priority)} className={inputCls + " capitalize"}>
                 {PRIORITY_OPTIONS.map(p => <option key={p} value={p} className="bg-white capitalize">{p}</option>)}
               </select>
             </div>
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Vence</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Vence</p>
               <input type="datetime-local" value={dueAt} onChange={e => setDueAt(e.target.value)} className={inputCls} />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Asignados</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Asignados</p>
             <AssigneesEditor value={assignees} onChange={setAssignees} />
           </div>
 
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Tags</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Tags</p>
             <TagsEditor value={tags} onChange={setTags} />
           </div>
 
           {personas.length > 0 && (
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Vincular a persona agendada</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Vincular a persona agendada</p>
               <select value={personaId} onChange={e => setPersonaId(e.target.value)} className={inputCls}>
                 <option value="" className="bg-white">— Ninguna —</option>
                 {personas.map(p => <option key={p.id} value={p.id} className="bg-white">{p.name}</option>)}

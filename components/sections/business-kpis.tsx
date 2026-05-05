@@ -55,12 +55,12 @@ function fmtNumber(v: any) {
 // ─── KPI definitions ──────────────────────────────────────────────────────────
 
 const KPI_DEFS = [
-  { key: "cash_collected",  label: "Cobrado",      money: true,  icon: Wallet,     color: "#E42D2C" },
-  { key: "total_revenue",   label: "Ingresos Totales",        money: true,  icon: DollarSign, color: "#fb923c" },
-  { key: "mrr",             label: "MRR",                  money: true,  icon: Repeat,     color: "#60a5fa" },
-  { key: "ad_spend",        label: "Gasto en Ads",             money: true,  icon: Megaphone,  color: "#ef4444" },
-  { key: "attended_calls",  label: "Llamadas Atendidas",      money: false, icon: Phone,      color: "#818cf8" },
-  { key: "new_clients",     label: "Nuevos Clientes",      money: false, icon: UserPlus,   color: "#4ade80" },
+  { key: "cash_collected",  label: "Cobrado",            money: true,  icon: Wallet,     color: "#1e3a8a" },
+  { key: "total_revenue",   label: "Ingresos Totales",   money: true,  icon: DollarSign, color: "#E42D2C" },
+  { key: "mrr",             label: "MRR",                money: true,  icon: Repeat,     color: "#1e3a8a" },
+  { key: "ad_spend",        label: "Gasto en Ads",       money: true,  icon: Megaphone,  color: "#E42D2C" },
+  { key: "attended_calls",  label: "Llamadas Atendidas", money: false, icon: Phone,      color: "#1e3a8a" },
+  { key: "new_clients",     label: "Nuevos Clientes",    money: false, icon: UserPlus,   color: "#059669" },
 ]
 
 // ─── Component ────────────────────────────────────────────────────────────────

@@ -54,7 +54,7 @@ function FunnelStep({
 
         <div className="relative flex items-center justify-between">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">{label}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80 mb-1">{label}</p>
             <p className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-900 leading-none">
               {count > 0 ? count : "—"}
             </p>
@@ -243,7 +243,7 @@ export function SalesView() {
               : "border-red-500/20 bg-red-500/[0.04]"
           }`}>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Tasa de cierre</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">Tasa de cierre</p>
               <p className="text-xs text-slate-400 mt-0.5">cierres / llamadas atendidas</p>
             </div>
             <p className={`text-2xl sm:text-4xl font-bold tabular-nums ${
@@ -280,7 +280,7 @@ export function SalesView() {
           {/* Offer Doc funnel */}
           {odSent > 0 && (
             <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-3">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Funnel Offer Doc</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">Funnel Offer Doc</p>
               {[
                 { label: "Enviados", value: odSent,    pctW: 100,                         color: "#60a5fa" },
                 { label: "Respondidos", value: odResp, pctW: pct(odResp, odSent),         color: "#4ade80" },
