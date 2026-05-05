@@ -242,26 +242,26 @@ export function CommandPalette({ open, onClose, onSignOut }: CommandPaletteProps
   return (
     <div className="fixed inset-0 z-[100] flex items-start justify-center px-4 pt-[12vh]" onClick={onClose}>
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-md" />
+      <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-md" />
 
       {/* Modal */}
       <div
-        className="relative w-full max-w-[640px] overflow-hidden rounded-2xl border border-white/[0.08] shadow-[0_30px_80px_rgba(0,0,0,0.8)] page-enter"
-        style={{ backgroundColor: "rgba(13,23,69,0.92)", backdropFilter: "blur(20px)" }}
+        className="relative w-full max-w-[640px] overflow-hidden rounded-2xl border border-slate-200 shadow-[0_30px_80px_rgba(15,23,42,0.25)] page-enter"
+        style={{ backgroundColor: "rgba(255,255,255,0.95)", backdropFilter: "blur(20px)" }}
         onClick={e => e.stopPropagation()}
       >
         {/* Search input */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-white/[0.06]">
-          <Search className="h-4 w-4 text-white/40 shrink-0" />
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-200">
+          <Search className="h-4 w-4 text-slate-400 shrink-0" />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={e => { setQuery(e.target.value); setActiveIdx(0) }}
             placeholder="Buscar páginas, acciones, atajos…"
-            className="flex-1 bg-transparent text-[15px] text-white placeholder:text-white/30 outline-none"
+            className="flex-1 bg-transparent text-[15px] text-slate-900 placeholder:text-slate-400 outline-none"
           />
-          <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded-md border border-white/[0.08] bg-white/[0.04] px-2 py-0.5 text-[10px] font-semibold text-white/45">
+          <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-500">
             ESC
           </kbd>
         </div>
@@ -270,14 +270,14 @@ export function CommandPalette({ open, onClose, onSignOut }: CommandPaletteProps
         <div className="max-h-[60vh] overflow-y-auto py-2">
           {finalResults.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <Search className="h-6 w-6 text-white/20 mb-3" />
-              <p className="text-sm text-white/35">Sin resultados para <span className="text-white/65">"{query}"</span></p>
-              <p className="text-[11px] text-white/25 mt-1">Probá con otro término o abrí el listado.</p>
+              <Search className="h-6 w-6 text-slate-300 mb-3" />
+              <p className="text-sm text-slate-400">Sin resultados para <span className="text-slate-600">"{query}"</span></p>
+              <p className="text-[11px] text-slate-300 mt-1">Probá con otro término o abrí el listado.</p>
             </div>
           ) : (
             grouped.map((g, gi) => (
               <div key={g.group} className={gi > 0 ? "mt-1" : ""}>
-                <p className="px-5 pt-3 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/30">
+                <p className="px-5 pt-3 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
                   {g.group}
                 </p>
                 <div>
@@ -294,33 +294,33 @@ export function CommandPalette({ open, onClose, onSignOut }: CommandPaletteProps
                         onClick={() => trigger(item)}
                         onMouseEnter={() => setActiveIdx(localIdx)}
                         className={`group flex w-full items-center gap-3 px-5 py-2.5 text-left transition-colors ${
-                          isActive ? "bg-white/[0.06]" : "hover:bg-white/[0.03]"
+                          isActive ? "bg-slate-100" : "hover:bg-slate-50"
                         }`}
                       >
                         <span className={`flex h-8 w-8 items-center justify-center rounded-lg shrink-0 transition-colors ${
-                          isActive ? "bg-[#E42D2C]/15 text-[#ff6b6a]" : "bg-white/[0.04] text-white/55"
+                          isActive ? "bg-[#E42D2C]/15 text-[#ff6b6a]" : "bg-slate-50 text-slate-500"
                         }`}>
                           <Icon className="h-4 w-4" />
                         </span>
 
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
-                            <p className={`text-[14px] font-medium truncate ${isActive ? "text-white" : "text-white/85"}`}>
+                            <p className={`text-[14px] font-medium truncate ${isActive ? "text-slate-900" : "text-slate-800"}`}>
                               {item.title}
                             </p>
                             {isCurrentPage && (
-                              <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+                              <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-700">
                                 Actual
                               </span>
                             )}
                           </div>
                           {item.subtitle && (
-                            <p className="text-[12px] text-white/35 truncate">{item.subtitle}</p>
+                            <p className="text-[12px] text-slate-400 truncate">{item.subtitle}</p>
                           )}
                         </div>
 
                         <ArrowRight className={`h-3.5 w-3.5 shrink-0 transition-all ${
-                          isActive ? "text-[#ff6b6a] translate-x-0.5" : "text-white/15"
+                          isActive ? "text-[#ff6b6a] translate-x-0.5" : "text-slate-300"
                         }`} />
                       </button>
                     )
@@ -332,18 +332,18 @@ export function CommandPalette({ open, onClose, onSignOut }: CommandPaletteProps
         </div>
 
         {/* Footer hint */}
-        <div className="flex items-center justify-between gap-3 border-t border-white/[0.06] bg-white/[0.02] px-5 py-2.5">
-          <div className="flex items-center gap-3 text-[10px] text-white/35">
+        <div className="flex items-center justify-between gap-3 border-t border-slate-200 bg-slate-50 px-5 py-2.5">
+          <div className="flex items-center gap-3 text-[10px] text-slate-400">
             <span className="flex items-center gap-1">
-              <kbd className="rounded border border-white/[0.08] bg-white/[0.04] px-1.5 py-0.5 text-[9px] font-semibold">↑↓</kbd>
+              <kbd className="rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[9px] font-semibold">↑↓</kbd>
               navegar
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="rounded border border-white/[0.08] bg-white/[0.04] px-1.5 py-0.5 text-[9px] font-semibold">↵</kbd>
+              <kbd className="rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[9px] font-semibold">↵</kbd>
               abrir
             </span>
           </div>
-          <span className="flex items-center gap-1 text-[10px] text-white/30">
+          <span className="flex items-center gap-1 text-[10px] text-slate-400">
             <Command className="h-3 w-3" />
             <span className="font-semibold tracking-wider">GovBidder</span>
           </span>

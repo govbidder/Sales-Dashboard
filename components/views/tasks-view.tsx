@@ -81,28 +81,28 @@ function initials(s: string) {
 }
 
 const STATUS_COLUMNS: { key: Status; label: string; accent: string }[] = [
-  { key: "pendiente",   label: "Pendiente",   accent: "bg-white/[0.05] border-white/15"          },
+  { key: "pendiente",   label: "Pendiente",   accent: "bg-slate-100 border-white/15"          },
   { key: "en_progreso", label: "En progreso", accent: "bg-blue-500/10  border-blue-500/30"       },
   { key: "completada",  label: "Completadas", accent: "bg-emerald-500/10 border-emerald-500/30"  },
   { key: "cancelada",   label: "Canceladas",  accent: "bg-zinc-500/10  border-zinc-500/30"       },
 ]
 
 const PRIORITY_STYLE: Record<Priority, { flag: string; pill: string }> = {
-  baja:    { flag: "text-zinc-400",   pill: "text-zinc-300  border-zinc-400/25  bg-zinc-400/10"   },
-  media:   { flag: "text-amber-300",  pill: "text-amber-300 border-amber-400/25 bg-amber-400/10"  },
-  alta:    { flag: "text-orange-300", pill: "text-orange-300 border-orange-400/25 bg-orange-400/10"},
-  urgente: { flag: "text-red-300",    pill: "text-red-300   border-red-500/25   bg-red-500/10"   },
+  baja:    { flag: "text-zinc-600",   pill: "text-zinc-700  border-zinc-400/25  bg-zinc-400/10"   },
+  media:   { flag: "text-amber-700",  pill: "text-amber-700 border-amber-400/25 bg-amber-400/10"  },
+  alta:    { flag: "text-orange-700", pill: "text-orange-700 border-orange-400/25 bg-orange-400/10"},
+  urgente: { flag: "text-red-700",    pill: "text-red-700   border-red-500/25   bg-red-500/10"   },
 }
 
 const STATUS_STYLE: Record<Status, string> = {
-  pendiente:   "text-white/70    border-white/15        bg-white/[0.03]",
-  en_progreso: "text-blue-300    border-blue-500/30     bg-blue-500/10",
-  completada:  "text-emerald-300 border-emerald-500/30  bg-emerald-500/10",
-  cancelada:   "text-zinc-400    border-zinc-500/30     bg-zinc-500/10",
+  pendiente:   "text-slate-600    border-white/15        bg-slate-50",
+  en_progreso: "text-blue-700    border-blue-500/30     bg-blue-500/10",
+  completada:  "text-emerald-700 border-emerald-500/30  bg-emerald-500/10",
+  cancelada:   "text-zinc-600    border-zinc-500/30     bg-zinc-500/10",
 }
 
 // ─── Reusable input class ─────────────────────────────────────────────────────
-const inputCls = "w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-[13px] text-white placeholder:text-white/40 focus:border-white/20 focus:outline-none transition-all"
+const inputCls = "w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none transition-all"
 
 // ─── Avatar Stack ─────────────────────────────────────────────────────────────
 
@@ -115,12 +115,12 @@ function AvatarStack({ users, size = "sm" }: { users: string[]; size?: "sm" | "m
     <div className="flex -space-x-1.5">
       {visible.map((u, i) => (
         <div key={i} title={u}
-          className={`${dim} flex items-center justify-center rounded-full border border-[#0d1745] bg-gradient-to-br from-[#E42D2C]/40 to-[#152978] font-bold text-white`}>
+          className={`${dim} flex items-center justify-center rounded-full border border-slate-200 bg-gradient-to-br from-[#E42D2C]/40 to-[#152978] font-bold text-white`}>
           {initials(u)}
         </div>
       ))}
       {extra > 0 && (
-        <div className={`${dim} flex items-center justify-center rounded-full border border-[#0d1745] bg-white/10 text-white/70 font-bold`}>
+        <div className={`${dim} flex items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-700 font-bold`}>
           +{extra}
         </div>
       )}
@@ -142,10 +142,10 @@ function TagsEditor({ value, onChange }: { value: string[]; onChange: (v: string
     <div className="space-y-2">
       <div className="flex flex-wrap gap-1.5 min-h-[24px]">
         {value.map(t => (
-          <span key={t} className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.05] px-2 py-0.5 text-[11px] text-white/80">
-            <TagIcon className="h-2.5 w-2.5 text-white/40" />
+          <span key={t} className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[11px] text-slate-700">
+            <TagIcon className="h-2.5 w-2.5 text-slate-400" />
             {t}
-            <button onClick={() => remove(t)} className="text-white/30 hover:text-red-400 transition-colors ml-0.5">
+            <button onClick={() => remove(t)} className="text-slate-400 hover:text-red-600 transition-colors ml-0.5">
               <X className="h-2.5 w-2.5" />
             </button>
           </span>
@@ -158,7 +158,7 @@ function TagsEditor({ value, onChange }: { value: string[]; onChange: (v: string
         onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); add() } }}
         onBlur={add}
         placeholder="Agregar tag y Enter"
-        className="h-7 w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-2.5 text-[12px] text-white placeholder:text-white/35 focus:border-white/20 focus:outline-none"
+        className="h-7 w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none"
       />
     </div>
   )
@@ -178,12 +178,12 @@ function AssigneesEditor({ value, onChange }: { value: string[]; onChange: (v: s
     <div className="space-y-2">
       <div className="flex flex-wrap gap-1.5 min-h-[24px]">
         {value.map(a => (
-          <span key={a} className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.05] pl-1 pr-2 py-0.5 text-[11px] text-white/80">
+          <span key={a} className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-100 pl-1 pr-2 py-0.5 text-[11px] text-slate-700">
             <span className="flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-br from-[#E42D2C]/40 to-[#152978] text-[8px] font-bold text-white">
               {initials(a)}
             </span>
             {a}
-            <button onClick={() => remove(a)} className="text-white/30 hover:text-red-400 transition-colors">
+            <button onClick={() => remove(a)} className="text-slate-400 hover:text-red-600 transition-colors">
               <X className="h-2.5 w-2.5" />
             </button>
           </span>
@@ -196,7 +196,7 @@ function AssigneesEditor({ value, onChange }: { value: string[]; onChange: (v: s
         onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); add() } }}
         onBlur={add}
         placeholder="email o nombre + Enter"
-        className="h-7 w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-2.5 text-[12px] text-white placeholder:text-white/35 focus:border-white/20 focus:outline-none"
+        className="h-7 w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none"
       />
     </div>
   )
@@ -263,13 +263,13 @@ function CommentsSection({ taskId }: { taskId: string }) {
   return (
     <div className="space-y-3">
       {loading ? (
-        <div className="flex justify-center py-3"><Loader2 className="h-4 w-4 animate-spin text-white/30" /></div>
+        <div className="flex justify-center py-3"><Loader2 className="h-4 w-4 animate-spin text-slate-400" /></div>
       ) : comments.length === 0 ? (
-        <p className="text-[12px] text-white/30 text-center py-3">Sin actividad todavía.</p>
+        <p className="text-[12px] text-slate-400 text-center py-3">Sin actividad todavía.</p>
       ) : (
         <div className="space-y-2">
           {comments.map(c => (
-            <div key={c.id} className={`flex items-start gap-2 rounded-xl px-3 py-2 ${c.kind === "system" ? "" : "border border-white/[0.06] bg-white/[0.02]"}`}>
+            <div key={c.id} className={`flex items-start gap-2 rounded-xl px-3 py-2 ${c.kind === "system" ? "" : "border border-slate-200 bg-slate-50"}`}>
               {c.kind === "system" ? (
                 <span className="h-1 w-1 mt-2 rounded-full bg-white/30 shrink-0" />
               ) : (
@@ -279,18 +279,18 @@ function CommentsSection({ taskId }: { taskId: string }) {
               )}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-[11px] text-white/35">
-                    {c.kind === "system" ? "" : <span className="font-semibold text-white/55">{c.author}</span>}
+                  <p className="text-[11px] text-slate-400">
+                    {c.kind === "system" ? "" : <span className="font-semibold text-slate-500">{c.author}</span>}
                     {c.kind === "system" ? "" : " · "}
                     {fmtRelative(c.created_at)}
                   </p>
                   {c.kind === "comment" && (
-                    <button onClick={() => del(c.id)} className="text-white/15 hover:text-red-400 transition-colors">
+                    <button onClick={() => del(c.id)} className="text-slate-300 hover:text-red-600 transition-colors">
                       <X className="h-3 w-3" />
                     </button>
                   )}
                 </div>
-                <p className={`text-[13px] ${c.kind === "system" ? "text-white/45 italic" : "text-white/85"}`}>
+                <p className={`text-[13px] ${c.kind === "system" ? "text-slate-500 italic" : "text-slate-800"}`}>
                   {c.content}
                 </p>
               </div>
@@ -304,7 +304,7 @@ function CommentsSection({ taskId }: { taskId: string }) {
           value={draft}
           onChange={e => setDraft(e.target.value)}
           placeholder="Escribir comentario..."
-          className="h-9 flex-1 rounded-lg border border-white/[0.08] bg-[#080d1e] px-3 text-[13px] text-white placeholder:text-white/30 outline-none focus:border-white/20"
+          className="h-9 flex-1 rounded-lg border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#1e3a8a]/40"
         />
         <button
           type="submit"
@@ -348,36 +348,36 @@ function DetailDrawer({
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-[100] bg-black/40" onClick={onClose} />
-      <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[520px] flex-col border-l border-white/[0.08] shadow-2xl" style={{ backgroundColor: "#0d1745" }}>
+      <div className="fixed inset-0 z-[100] bg-slate-900/30" onClick={onClose} />
+      <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[520px] flex-col border-l border-slate-200 shadow-2xl" style={{ backgroundColor: "#ffffff" }}>
 
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 border-b border-white/[0.06] px-6 py-5">
+        <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5">
           <div className="min-w-0 flex-1">
             <input
               type="text"
               defaultValue={task.title}
               onBlur={e => { const v = e.target.value.trim(); if (v && v !== task.title) onPatch(task.id, { title: v }) }}
-              className="w-full bg-transparent text-lg font-bold text-white outline-none"
+              className="w-full bg-transparent text-lg font-bold text-slate-900 outline-none"
             />
-            <p className="text-[12px] text-white/35 mt-0.5">
+            <p className="text-[12px] text-slate-400 mt-0.5">
               Creada {fmtDateTime(task.created_at)}{task.created_by ? ` · ${task.created_by}` : ""}
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button onClick={() => onDelete(task.id)} disabled={deleting}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-white/20 hover:text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-40">
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-300 hover:text-red-600 hover:bg-red-500/10 transition-all disabled:opacity-40">
               {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             </button>
             <button onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-white/30 hover:text-white hover:bg-white/[0.06] transition-all">
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
               <X className="h-4 w-4" />
             </button>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-white/[0.06] px-6">
+        <div className="flex border-b border-slate-200 px-6">
           {[
             { k: "detail" as const, l: "Detalle" },
             { k: "comments" as const, l: "Actividad" },
@@ -387,8 +387,8 @@ function DetailDrawer({
               onClick={() => setTab(t.k)}
               className={`px-4 py-3 text-[12px] font-bold uppercase tracking-widest transition-colors border-b-2 ${
                 tab === t.k
-                  ? "border-[#E42D2C] text-white"
-                  : "border-transparent text-white/35 hover:text-white/70"
+                  ? "border-[#E42D2C] text-slate-900"
+                  : "border-transparent text-slate-400 hover:text-slate-600"
               }`}>
               {t.l}
             </button>
@@ -401,26 +401,26 @@ function DetailDrawer({
               {/* Status + priority */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Estado</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Estado</p>
                   <select
                     value={task.status}
                     onChange={e => onPatch(task.id, { status: e.target.value as Status })}
                     className={inputCls + " capitalize"}
                   >
                     {STATUS_OPTIONS.map(s => (
-                      <option key={s} value={s} className="bg-[#0d1745] text-white capitalize">{s.replace("_", " ")}</option>
+                      <option key={s} value={s} className="bg-white text-slate-900 capitalize">{s.replace("_", " ")}</option>
                     ))}
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Prioridad</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Prioridad</p>
                   <select
                     value={task.priority}
                     onChange={e => onPatch(task.id, { priority: e.target.value as Priority })}
                     className={inputCls + " capitalize"}
                   >
                     {PRIORITY_OPTIONS.map(p => (
-                      <option key={p} value={p} className="bg-[#0d1745] text-white capitalize">{p}</option>
+                      <option key={p} value={p} className="bg-white text-slate-900 capitalize">{p}</option>
                     ))}
                   </select>
                 </div>
@@ -428,7 +428,7 @@ function DetailDrawer({
 
               {/* Due date */}
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Vence</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Vence</p>
                 <input
                   type="datetime-local"
                   defaultValue={toLocalInputValue(task.due_at)}
@@ -439,34 +439,34 @@ function DetailDrawer({
 
               {/* Assignees */}
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Asignados</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Asignados</p>
                 <AssigneesEditor value={task.assignees ?? []} onChange={v => onPatch(task.id, { assignees: v })} />
               </div>
 
               {/* Tags */}
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Tags</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Tags</p>
                 <TagsEditor value={task.tags ?? []} onChange={v => onPatch(task.id, { tags: v })} />
               </div>
 
               {/* Linked persona */}
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Vinculada a persona agendada</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Vinculada a persona agendada</p>
                 <select
                   value={task.persona_id ?? ""}
                   onChange={e => onPatch(task.id, { persona_id: e.target.value || null })}
                   className={inputCls}
                 >
-                  <option value="" className="bg-[#0d1745] text-white">— Ninguna —</option>
+                  <option value="" className="bg-white text-slate-900">— Ninguna —</option>
                   {personas.map(p => (
-                    <option key={p.id} value={p.id} className="bg-[#0d1745] text-white">{p.name}</option>
+                    <option key={p.id} value={p.id} className="bg-white text-slate-900">{p.name}</option>
                   ))}
                 </select>
               </div>
 
               {/* Description */}
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Descripción</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Descripción</p>
                 <textarea
                   defaultValue={task.description ?? ""}
                   placeholder="Detalle de la tarea..."
@@ -477,27 +477,27 @@ function DetailDrawer({
               </div>
 
               {/* Subtasks */}
-              <div className="space-y-2 pt-2 border-t border-white/[0.06]">
+              <div className="space-y-2 pt-2 border-t border-slate-200">
                 <div className="flex items-center gap-2">
-                  <GitBranch className="h-3.5 w-3.5 text-white/40" />
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Subtareas</p>
-                  <span className="text-[11px] text-white/30">({subtasks.length})</span>
+                  <GitBranch className="h-3.5 w-3.5 text-slate-400" />
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Subtareas</p>
+                  <span className="text-[11px] text-slate-400">({subtasks.length})</span>
                 </div>
 
                 {subtasks.length > 0 && (
                   <div className="space-y-1">
                     {subtasks.map(s => (
-                      <div key={s.id} className="flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white/[0.02] px-2.5 py-1.5">
+                      <div key={s.id} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5">
                         <button
                           onClick={() => onPatch(s.id, { status: s.status === "completada" ? "pendiente" : "completada" })}
                           className={`shrink-0 h-3 w-3 rounded-full border-2 transition-all ${
                             s.status === "completada" ? "bg-emerald-400 border-emerald-400" : "border-white/30 hover:border-white/60"
                           }`}
                         />
-                        <span className={`flex-1 text-[12px] ${s.status === "completada" ? "text-white/40 line-through" : "text-white/85"}`}>
+                        <span className={`flex-1 text-[12px] ${s.status === "completada" ? "text-slate-400 line-through" : "text-slate-800"}`}>
                           {s.title}
                         </span>
-                        <button onClick={() => onDelete(s.id)} className="text-white/15 hover:text-red-400 transition-colors">
+                        <button onClick={() => onDelete(s.id)} className="text-slate-300 hover:text-red-600 transition-colors">
                           <Trash2 className="h-3 w-3" />
                         </button>
                       </div>
@@ -510,12 +510,12 @@ function DetailDrawer({
                     value={newSub}
                     onChange={e => setNewSub(e.target.value)}
                     placeholder="Sumar subtarea..."
-                    className="h-8 flex-1 rounded-lg border border-white/[0.06] bg-white/[0.02] px-2.5 text-[12px] text-white placeholder:text-white/30 outline-none focus:border-white/15"
+                    className="h-8 flex-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 text-[12px] text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#1e3a8a]/40"
                   />
                   <button
                     type="submit"
                     disabled={!newSub.trim() || savingSub}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.05] text-white/60 hover:bg-white/[0.10] hover:text-white disabled:opacity-30 transition-all"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-30 transition-all"
                   >
                     {savingSub ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
                   </button>
@@ -565,60 +565,60 @@ function NewTaskModal({
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-[100] bg-black/40" onClick={onClose} />
+      <div className="fixed inset-0 z-[100] bg-slate-900/30" onClick={onClose} />
       <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-md rounded-2xl border border-white/[0.10] shadow-2xl p-6 space-y-3.5 max-h-[90vh] overflow-y-auto"
-          style={{ backgroundColor: "#0d1745" }}
+          className="w-full max-w-md rounded-2xl border border-slate-200 shadow-2xl p-6 space-y-3.5 max-h-[90vh] overflow-y-auto"
+          style={{ backgroundColor: "#ffffff" }}
         >
           <div className="flex items-center justify-between mb-1">
-            <h3 className="text-base font-bold text-white">Nueva tarea</h3>
+            <h3 className="text-base font-bold text-slate-900">Nueva tarea</h3>
             <button type="button" onClick={onClose}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-white/30 hover:text-white hover:bg-white/[0.06] transition-all">
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
               <X className="h-4 w-4" />
             </button>
           </div>
 
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Título *</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Título *</p>
             <input autoFocus type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="¿Qué hay que hacer?" className={inputCls} />
           </div>
 
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Descripción</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Descripción</p>
             <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Detalle..." rows={3} className={`${inputCls} resize-none`} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Prioridad</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Prioridad</p>
               <select value={priority} onChange={e => setPriority(e.target.value as Priority)} className={inputCls + " capitalize"}>
-                {PRIORITY_OPTIONS.map(p => <option key={p} value={p} className="bg-[#0d1745] capitalize">{p}</option>)}
+                {PRIORITY_OPTIONS.map(p => <option key={p} value={p} className="bg-white capitalize">{p}</option>)}
               </select>
             </div>
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Vence</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Vence</p>
               <input type="datetime-local" value={dueAt} onChange={e => setDueAt(e.target.value)} className={inputCls} />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Asignados</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Asignados</p>
             <AssigneesEditor value={assignees} onChange={setAssignees} />
           </div>
 
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Tags</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Tags</p>
             <TagsEditor value={tags} onChange={setTags} />
           </div>
 
           {personas.length > 0 && (
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Vincular a persona agendada</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Vincular a persona agendada</p>
               <select value={personaId} onChange={e => setPersonaId(e.target.value)} className={inputCls}>
-                <option value="" className="bg-[#0d1745]">— Ninguna —</option>
-                {personas.map(p => <option key={p.id} value={p.id} className="bg-[#0d1745]">{p.name}</option>)}
+                <option value="" className="bg-white">— Ninguna —</option>
+                {personas.map(p => <option key={p.id} value={p.id} className="bg-white">{p.name}</option>)}
               </select>
             </div>
           )}
@@ -661,7 +661,7 @@ function TaskCard({
   return (
     <div
       onClick={onClick}
-      className="group cursor-pointer rounded-xl border border-white/[0.07] bg-[#0d1745] hover:border-white/[0.15] hover:shadow-[0_0_24px_rgba(228,45,44,0.05)] transition-all p-3 space-y-2"
+      className="group cursor-pointer rounded-xl border border-slate-200 bg-white hover:border-slate-300 hover:shadow-[0_0_24px_rgba(228,45,44,0.05)] transition-all p-3 space-y-2"
     >
       <div className="flex items-start gap-2">
         <button
@@ -673,7 +673,7 @@ function TaskCard({
                                             "border-white/30 hover:border-white/60"
           }`}
         />
-        <p className={`flex-1 text-[13px] font-medium leading-snug ${task.status === "completada" || task.status === "cancelada" ? "text-white/40 line-through" : "text-white"}`}>
+        <p className={`flex-1 text-[13px] font-medium leading-snug ${task.status === "completada" || task.status === "cancelada" ? "text-slate-400 line-through" : "text-slate-900"}`}>
           {task.title}
         </p>
         <Flag className={`shrink-0 h-3 w-3 ${PRIORITY_STYLE[task.priority].flag}`} />
@@ -683,15 +683,15 @@ function TaskCard({
       {task.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 pl-5">
           {task.tags.slice(0, 4).map(t => (
-            <span key={t} className="rounded-full border border-white/10 bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-white/60">{t}</span>
+            <span key={t} className="rounded-full border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] text-slate-600">{t}</span>
           ))}
-          {task.tags.length > 4 && <span className="text-[10px] text-white/40">+{task.tags.length - 4}</span>}
+          {task.tags.length > 4 && <span className="text-[10px] text-slate-400">+{task.tags.length - 4}</span>}
         </div>
       )}
 
       {/* Metadata row */}
       <div className="flex items-center justify-between gap-2 pl-5">
-        <div className="flex items-center gap-2.5 text-[11px] text-white/40">
+        <div className="flex items-center gap-2.5 text-[11px] text-slate-400">
           {subtaskCount > 0 && (
             <span className="flex items-center gap-1" title="Subtareas">
               <GitBranch className="h-3 w-3" />
@@ -699,7 +699,7 @@ function TaskCard({
             </span>
           )}
           {due && (
-            <span className={`flex items-center gap-1 ${overdue ? "text-red-300" : ""}`}>
+            <span className={`flex items-center gap-1 ${overdue ? "text-red-700" : ""}`}>
               {overdue ? <AlertCircle className="h-3 w-3" /> : <CalIcon className="h-3 w-3" />}
               {due}
             </span>
@@ -710,7 +710,7 @@ function TaskCard({
 
       {persona && (
         <div className="pl-5">
-          <span className="inline-block rounded-md bg-white/[0.04] px-2 py-0.5 text-[10px] text-white/50">
+          <span className="inline-block rounded-md bg-slate-50 px-2 py-0.5 text-[10px] text-slate-500">
             ↳ {persona.name}
           </span>
         </div>
@@ -903,11 +903,11 @@ export function TasksView() {
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">Tareas</h1>
-            <p className="text-sm text-white/40 mt-0.5">
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Tareas</h1>
+            <p className="text-sm text-slate-400 mt-0.5">
               {topLevel.length} {topLevel.length === 1 ? "tarea" : "tareas"}
               {overdueCount > 0 && (
-                <span className="ml-2 inline-flex items-center gap-1 text-red-300">
+                <span className="ml-2 inline-flex items-center gap-1 text-red-700">
                   · <AlertCircle className="h-3 w-3" /> {overdueCount} vencidas
                 </span>
               )}
@@ -915,25 +915,25 @@ export function TasksView() {
           </div>
           <div className="flex items-center gap-2">
             {/* View toggle */}
-            <div className="inline-flex h-9 rounded-xl border border-white/[0.08] bg-white/[0.03] p-0.5">
+            <div className="inline-flex h-9 rounded-xl border border-slate-200 bg-slate-50 p-0.5">
               <button
                 onClick={() => setView("board")}
                 className={`flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium transition-all ${
-                  view === "board" ? "bg-white/[0.10] text-white" : "text-white/45 hover:text-white"
+                  view === "board" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-900"
                 }`}>
                 <LayoutGrid className="h-3.5 w-3.5" /> Board
               </button>
               <button
                 onClick={() => setView("list")}
                 className={`flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium transition-all ${
-                  view === "list" ? "bg-white/[0.10] text-white" : "text-white/45 hover:text-white"
+                  view === "list" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-900"
                 }`}>
                 <List className="h-3.5 w-3.5" /> Lista
               </button>
             </div>
 
             <button onClick={fetchAll} disabled={loading}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-white/40 hover:text-white hover:border-white/20 transition-all disabled:opacity-40">
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40">
               <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             </button>
             <button
@@ -952,24 +952,24 @@ export function TasksView() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar tareas, tags, asignados..."
-            className="h-9 rounded-xl border border-white/[0.08] bg-[#080d1e] px-4 text-sm text-white placeholder:text-white/25 focus:border-white/20 focus:outline-none flex-1 min-w-[220px] max-w-sm"
+            className="h-9 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 placeholder:text-slate-300 focus:border-[#1e3a8a]/40 focus:outline-none flex-1 min-w-[220px] max-w-sm"
           />
           {allAssignees.length > 0 && (
             <select
               value={filterAssignee}
               onChange={e => setFilterAssignee(e.target.value)}
-              className="h-9 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 text-[12px] text-white outline-none cursor-pointer">
-              <option value="todos" className="bg-[#0d1745]">Todos los asignados</option>
-              {allAssignees.map(a => <option key={a} value={a} className="bg-[#0d1745]">{a}</option>)}
+              className="h-9 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[12px] text-slate-900 outline-none cursor-pointer">
+              <option value="todos" className="bg-white">Todos los asignados</option>
+              {allAssignees.map(a => <option key={a} value={a} className="bg-white">{a}</option>)}
             </select>
           )}
           {allTags.length > 0 && (
             <select
               value={filterTag}
               onChange={e => setFilterTag(e.target.value)}
-              className="h-9 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 text-[12px] text-white outline-none cursor-pointer">
-              <option value="todos" className="bg-[#0d1745]">Todos los tags</option>
-              {allTags.map(t => <option key={t} value={t} className="bg-[#0d1745]">{t}</option>)}
+              className="h-9 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[12px] text-slate-900 outline-none cursor-pointer">
+              <option value="todos" className="bg-white">Todos los tags</option>
+              {allTags.map(t => <option key={t} value={t} className="bg-white">{t}</option>)}
             </select>
           )}
         </div>
@@ -984,14 +984,14 @@ export function TasksView() {
             {STATUS_COLUMNS.map(col => {
               const list = grouped[col.key]
               return (
-                <div key={col.key} className="flex flex-col rounded-2xl border border-white/[0.05] bg-white/[0.01] min-h-[200px]">
-                  <div className={`flex items-center justify-between gap-2 border-b border-white/[0.06] px-4 py-3 rounded-t-2xl ${col.accent}`}>
-                    <h3 className="text-[12px] font-bold uppercase tracking-widest text-white/85">{col.label}</h3>
-                    <span className="text-[11px] font-semibold text-white/50">{list.length}</span>
+                <div key={col.key} className="flex flex-col rounded-2xl border border-slate-100 bg-slate-50 min-h-[200px]">
+                  <div className={`flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-3 rounded-t-2xl ${col.accent}`}>
+                    <h3 className="text-[12px] font-bold uppercase tracking-widest text-slate-800">{col.label}</h3>
+                    <span className="text-[11px] font-semibold text-slate-500">{list.length}</span>
                   </div>
                   <div className="flex-1 p-3 space-y-2">
                     {list.length === 0 ? (
-                      <p className="py-4 text-center text-[12px] text-white/25">—</p>
+                      <p className="py-4 text-center text-[12px] text-slate-300">—</p>
                     ) : list.map(t => {
                       const stat = subtaskStats.get(t.id)
                       return (
@@ -1013,16 +1013,16 @@ export function TasksView() {
           </div>
         ) : (
           /* LIST VIEW */
-          <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0d1745]">
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
             {filtered.length === 0 ? (
-              <p className="py-16 text-center text-sm text-white/25">No hay tareas.</p>
+              <p className="py-16 text-center text-sm text-slate-300">No hay tareas.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse">
                   <thead>
-                    <tr className="border-b border-white/[0.06] bg-white/[0.02]">
+                    <tr className="border-b border-slate-200 bg-slate-50">
                       {["", "Título", "Estado", "Prioridad", "Asignados", "Tags", "Vence", "Subtareas", ""].map((h, i) => (
-                        <th key={i} className="px-3 py-3 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-white/40 whitespace-nowrap">{h}</th>
+                        <th key={i} className="px-3 py-3 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400 whitespace-nowrap">{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -1034,7 +1034,7 @@ export function TasksView() {
                       return (
                         <tr key={t.id}
                           onClick={() => setSelected(t)}
-                          className="border-b border-white/[0.04] cursor-pointer transition-colors hover:bg-white/[0.02]">
+                          className="border-b border-slate-100 cursor-pointer transition-colors hover:bg-slate-50">
 
                           <td className="px-3 py-3 whitespace-nowrap" onClick={e => e.stopPropagation()}>
                             <button
@@ -1049,11 +1049,11 @@ export function TasksView() {
                           </td>
 
                           <td className="px-3 py-3">
-                            <div className={`text-[13px] font-medium ${t.status === "completada" || t.status === "cancelada" ? "text-white/40 line-through" : "text-white"}`}>
+                            <div className={`text-[13px] font-medium ${t.status === "completada" || t.status === "cancelada" ? "text-slate-400 line-through" : "text-slate-900"}`}>
                               {t.title}
                             </div>
                             {persona && (
-                              <span className="mt-0.5 inline-block rounded-md bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-white/40">
+                              <span className="mt-0.5 inline-block rounded-md bg-slate-50 px-1.5 py-0.5 text-[10px] text-slate-400">
                                 ↳ {persona.name}
                               </span>
                             )}
@@ -1078,27 +1078,27 @@ export function TasksView() {
                           <td className="px-3 py-3 whitespace-nowrap max-w-[200px]">
                             <div className="flex flex-wrap gap-1">
                               {t.tags.slice(0, 3).map(tag => (
-                                <span key={tag} className="rounded-full border border-white/10 bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-white/60">{tag}</span>
+                                <span key={tag} className="rounded-full border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] text-slate-600">{tag}</span>
                               ))}
-                              {t.tags.length > 3 && <span className="text-[10px] text-white/40">+{t.tags.length - 3}</span>}
+                              {t.tags.length > 3 && <span className="text-[10px] text-slate-400">+{t.tags.length - 3}</span>}
                             </div>
                           </td>
 
                           <td className="px-3 py-3 whitespace-nowrap">
                             {t.due_at ? (
-                              <span className={`flex items-center gap-1 text-[11px] ${overdue ? "text-red-300" : "text-white/55"}`}>
+                              <span className={`flex items-center gap-1 text-[11px] ${overdue ? "text-red-700" : "text-slate-500"}`}>
                                 {overdue ? <AlertCircle className="h-3 w-3" /> : <CalIcon className="h-3 w-3" />}
                                 {fmtDateTime(t.due_at)}
                               </span>
-                            ) : <span className="text-white/25 text-[11px]">—</span>}
+                            ) : <span className="text-slate-300 text-[11px]">—</span>}
                           </td>
 
-                          <td className="px-3 py-3 whitespace-nowrap text-[11px] text-white/55">
+                          <td className="px-3 py-3 whitespace-nowrap text-[11px] text-slate-500">
                             {stat ? `${stat.done}/${stat.total}` : "—"}
                           </td>
 
                           <td className="px-3 py-3 whitespace-nowrap">
-                            <ChevronRight className="h-4 w-4 text-white/25 group-hover:text-white/60 transition-colors" />
+                            <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-slate-600 transition-colors" />
                           </td>
                         </tr>
                       )

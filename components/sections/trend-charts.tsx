@@ -93,18 +93,18 @@ function ChartCard({
 
   const tooltipStyle = {
     contentStyle: {
-      backgroundColor: "#0f0f10",
-      border: "1px solid rgba(255,255,255,0.08)",
+      backgroundColor: "#ffffff",
+      border: "1px solid #e2e8f0",
       borderRadius: "12px",
-      boxShadow: "0 20px 40px rgba(0,0,0,0.6)",
+      boxShadow: "0 8px 24px rgba(15,23,42,0.10)",
       padding: "10px 14px",
     },
-    labelStyle:  { color: "#ffffff", fontWeight: 700, marginBottom: 4, fontSize: 12 },
+    labelStyle:  { color: "#0f172a", fontWeight: 700, marginBottom: 4, fontSize: 12 },
     itemStyle:   { color: cfg.color, fontWeight: 600, fontSize: 13 },
   }
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745] hover:border-white/[0.12] transition-colors duration-200">
+    <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-slate-300 transition-colors duration-200">
       {/* Subtle top accent */}
       <div className="h-[2px] w-full" style={{ backgroundColor: cfg.color, opacity: 0.6 }} />
 
@@ -112,15 +112,15 @@ function ChartCard({
         {/* Header */}
         <div className="flex items-start justify-between mb-1">
           <div>
-            <h3 className="text-[19px] font-bold text-white leading-tight tracking-tight">{cfg.label}</h3>
-            <p className="text-[13px] text-white/45 mt-0.5">{cfg.subtitle}</p>
+            <h3 className="text-[19px] font-bold text-slate-900 leading-tight tracking-tight">{cfg.label}</h3>
+            <p className="text-[13px] text-slate-500 mt-0.5">{cfg.subtitle}</p>
           </div>
           {diff !== null && (
             <span
               className={`mt-0.5 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold shrink-0 ml-3 ${
-                isUp   ? "bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20"
-                : isDown ? "bg-red-500/10 text-red-400 ring-1 ring-red-500/20"
-                :          "bg-white/5 text-white/40 ring-1 ring-white/10"
+                isUp   ? "bg-emerald-500/10 text-emerald-600 ring-1 ring-emerald-500/20"
+                : isDown ? "bg-red-500/10 text-red-600 ring-1 ring-red-500/20"
+                :          "bg-white/5 text-slate-400 ring-1 ring-white/10"
               }`}
             >
               {isUp && <TrendingUp className="h-3 w-3" />}
@@ -150,24 +150,24 @@ function ChartCard({
                     <stop offset="100%" stopColor={cfg.color} stopOpacity={0.65} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.05)" />
+                <CartesianGrid vertical={false} stroke="#e2e8f0" />
                 <XAxis
                   dataKey="month"
                   stroke="transparent"
-                  tick={{ fill: "rgba(255,255,255,0.35)", fontSize: 11 }}
+                  tick={{ fill: "#94a3b8", fontSize: 11 }}
                   tickLine={false}
                   axisLine={false}
                 />
                 <YAxis
                   stroke="transparent"
-                  tick={{ fill: "rgba(255,255,255,0.35)", fontSize: 11 }}
+                  tick={{ fill: "#94a3b8", fontSize: 11 }}
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={tickFmt}
                   width={52}
                 />
                 <Tooltip
-                  cursor={{ fill: "rgba(255,255,255,0.04)" }}
+                  cursor={{ fill: "#f1f5f9" }}
                   contentStyle={tooltipStyle.contentStyle}
                   labelStyle={tooltipStyle.labelStyle}
                   itemStyle={tooltipStyle.itemStyle}
@@ -183,17 +183,17 @@ function ChartCard({
                     <stop offset="95%" stopColor={cfg.color} stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.05)" />
+                <CartesianGrid vertical={false} stroke="#e2e8f0" />
                 <XAxis
                   dataKey="month"
                   stroke="transparent"
-                  tick={{ fill: "rgba(255,255,255,0.35)", fontSize: 11 }}
+                  tick={{ fill: "#94a3b8", fontSize: 11 }}
                   tickLine={false}
                   axisLine={false}
                 />
                 <YAxis
                   stroke="transparent"
-                  tick={{ fill: "rgba(255,255,255,0.35)", fontSize: 11 }}
+                  tick={{ fill: "#94a3b8", fontSize: 11 }}
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={tickFmt}
@@ -213,14 +213,14 @@ function ChartCard({
                   strokeWidth={2.5}
                   fill={`url(#${cfg.gradId})`}
                   dot={false}
-                  activeDot={{ r: 5, fill: cfg.color, strokeWidth: 2, stroke: "#080d1e" }}
+                  activeDot={{ r: 5, fill: cfg.color, strokeWidth: 2, stroke: "#ffffff" }}
                 />
               </AreaChart>
             )}
           </ResponsiveContainer>
         ) : (
           <div className="h-[220px] flex items-center justify-center">
-            <p className="text-sm text-white/25">Sin datos</p>
+            <p className="text-sm text-slate-300">Sin datos</p>
           </div>
         )}
       </div>
@@ -278,7 +278,7 @@ export function TrendCharts() {
       <section>
         <div className="grid gap-5 md:grid-cols-2">
           {CHARTS.map(cfg => (
-            <div key={cfg.key} className="rounded-2xl border border-white/[0.07] bg-[#0d1745] h-[380px] animate-pulse" />
+            <div key={cfg.key} className="rounded-2xl border border-slate-200 bg-white h-[380px] animate-pulse" />
           ))}
         </div>
       </section>
@@ -286,13 +286,13 @@ export function TrendCharts() {
   }
 
   if (error) {
-    return <p className="text-red-400 text-sm">{error}</p>
+    return <p className="text-red-600 text-sm">{error}</p>
   }
 
   if (!rows.length) {
     return (
       <section>
-        <p className="text-white/40 text-sm">Este cliente todavía no tiene reportes cargados.</p>
+        <p className="text-slate-400 text-sm">Este cliente todavía no tiene reportes cargados.</p>
       </section>
     )
   }
@@ -301,8 +301,8 @@ export function TrendCharts() {
     <section className="space-y-5">
       <div className="flex items-center gap-2.5">
         <span className="h-4 w-[3px] rounded-full bg-[#E42D2C]" />
-        <h2 className="text-sm font-bold uppercase tracking-widest text-white/80">Analytics</h2>
-        <span className="ml-auto text-xs text-white/30 tabular-nums">{rows.length} meses</span>
+        <h2 className="text-sm font-bold uppercase tracking-widest text-slate-700">Analytics</h2>
+        <span className="ml-auto text-xs text-slate-400 tabular-nums">{rows.length} meses</span>
       </div>
 
       <div className="grid gap-5 md:grid-cols-2">

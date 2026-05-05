@@ -31,13 +31,13 @@ function fmtNum(v: number) {
 
 const tooltipBase = {
   contentStyle: {
-    backgroundColor: "#0f0f10",
-    border: "1px solid rgba(255,255,255,0.09)",
+    backgroundColor: "#ffffff",
+    border: "1px solid #e2e8f0",
     borderRadius: "14px",
-    boxShadow: "0 24px 48px rgba(0,0,0,0.6)",
+    boxShadow: "0 8px 24px rgba(15,23,42,0.10)",
     padding: "12px 16px",
   },
-  labelStyle: { color: "#fff", fontWeight: 700, marginBottom: 6, fontSize: 12 },
+  labelStyle: { color: "#0f172a", fontWeight: 700, marginBottom: 6, fontSize: 12 },
 }
 
 // ─── Single Correlation Card ──────────────────────────────────────────────────
@@ -67,24 +67,24 @@ function CorrCard({
   const avgLine = data.length ? data.reduce((s, d) => s + d[lineKey], 0) / data.length : 0
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745] hover:border-white/[0.12] transition-colors duration-200">
+    <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-slate-300 transition-colors duration-200">
       <div className="h-[2px] w-full bg-gradient-to-r"
         style={{ background: `linear-gradient(90deg, ${barColor}90, ${lineColor}90)` }} />
 
       <div className="p-6">
         {/* Header */}
-        <h3 className="text-[18px] font-bold text-white leading-tight">{title}</h3>
-        <p className="text-[12px] text-white/40 mt-1 mb-5 leading-relaxed">{insight}</p>
+        <h3 className="text-[18px] font-bold text-slate-900 leading-tight">{title}</h3>
+        <p className="text-[12px] text-slate-400 mt-1 mb-5 leading-relaxed">{insight}</p>
 
         {/* Legend */}
         <div className="flex items-center gap-5 mb-4">
           <div className="flex items-center gap-1.5">
             <span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: barColor }} />
-            <span className="text-[11px] text-white/50 font-medium">{barLabel}</span>
+            <span className="text-[11px] text-slate-500 font-medium">{barLabel}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="h-[3px] w-5 rounded-full" style={{ backgroundColor: lineColor }} />
-            <span className="text-[11px] text-white/50 font-medium">{lineLabel}</span>
+            <span className="text-[11px] text-slate-500 font-medium">{lineLabel}</span>
           </div>
         </div>
 
@@ -96,11 +96,11 @@ function CorrCard({
                 <stop offset="100%" stopColor={barColor}  stopOpacity={0.6} />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.05)" />
+            <CartesianGrid vertical={false} stroke="#e2e8f0" />
             <XAxis
               dataKey="month"
               stroke="transparent"
-              tick={{ fill: "rgba(255,255,255,0.35)", fontSize: 11 }}
+              tick={{ fill: "#94a3b8", fontSize: 11 }}
               tickLine={false}
               axisLine={false}
             />
@@ -108,7 +108,7 @@ function CorrCard({
             <YAxis
               yAxisId="bar"
               stroke="transparent"
-              tick={{ fill: "rgba(255,255,255,0.30)", fontSize: 10 }}
+              tick={{ fill: "#94a3b8", fontSize: 10 }}
               tickLine={false}
               axisLine={false}
               tickFormatter={fmtBar}
@@ -119,7 +119,7 @@ function CorrCard({
               yAxisId="line"
               orientation="right"
               stroke="transparent"
-              tick={{ fill: "rgba(255,255,255,0.30)", fontSize: 10 }}
+              tick={{ fill: "#94a3b8", fontSize: 10 }}
               tickLine={false}
               axisLine={false}
               tickFormatter={fmtLine}
@@ -162,7 +162,7 @@ function CorrCard({
               stroke={lineColor}
               strokeWidth={2.5}
               dot={{ fill: lineColor, r: 3.5, strokeWidth: 0 }}
-              activeDot={{ r: 6, fill: lineColor, strokeWidth: 2, stroke: "#080d1e" }}
+              activeDot={{ r: 6, fill: lineColor, strokeWidth: 2, stroke: "#ffffff" }}
             />
           </ComposedChart>
         </ResponsiveContainer>
@@ -195,7 +195,7 @@ export function CorrelationChart() {
       <section>
         <div className="grid gap-5 md:grid-cols-2">
           {[0,1,2,3].map(i => (
-            <div key={i} className="h-[380px] animate-pulse rounded-2xl border border-white/[0.07] bg-[#0d1745]" />
+            <div key={i} className="h-[380px] animate-pulse rounded-2xl border border-slate-200 bg-white" />
           ))}
         </div>
       </section>
@@ -207,8 +207,8 @@ export function CorrelationChart() {
   return (
     <section className="space-y-5">
       <div>
-        <h2 className="text-xl font-bold text-white">Correlaciones</h2>
-        <p className="text-[13px] text-white/40 mt-0.5">
+        <h2 className="text-xl font-bold text-slate-900">Correlaciones</h2>
+        <p className="text-[13px] text-slate-400 mt-0.5">
           ¿Qué acciones generan los resultados? Compará métricas en el mismo eje de tiempo.
         </p>
       </div>

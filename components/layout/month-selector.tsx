@@ -59,10 +59,10 @@ export function MonthSelector({ value, onChange, enabledMonths }: MonthSelectorP
         onChange?.(v)
       }}
     >
-      <SelectTrigger className="w-[110px] sm:w-[140px] bg-white/5 text-white border-border text-xs sm:text-sm">
-        <SelectValue className="text-white" />
+      <SelectTrigger className="w-[110px] sm:w-[140px] bg-white/5 text-slate-900 border-border text-xs sm:text-sm">
+        <SelectValue className="text-slate-900" />
       </SelectTrigger>
-      <SelectContent className="bg-black text-white border-border shadow-xl">
+      <SelectContent className="bg-black text-slate-900 border-border shadow-xl">
         {months.map((m) => (
           <SelectItem
             key={m.value}
@@ -70,8 +70,8 @@ export function MonthSelector({ value, onChange, enabledMonths }: MonthSelectorP
             disabled={m.disabled}
             className={
               m.disabled
-                ? "text-white/30"
-                : "text-white data-[highlighted]:bg-white/10 data-[highlighted]:text-white data-[state=checked]:bg-white/10 data-[state=checked]:text-white"
+                ? "text-slate-400"
+                : "text-slate-900 data-[highlighted]:bg-white/10 data-[highlighted]:text-slate-900 data-[state=checked]:bg-white/10 data-[state=checked]:text-slate-900"
             }
           >
             {m.value}

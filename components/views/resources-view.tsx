@@ -23,10 +23,10 @@ interface Resource {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const TYPE_CONFIG: Record<ResourceType, { label: string; icon: React.ElementType; color: string }> = {
-  link:  { label: "Link",     icon: Link2,    color: "text-blue-400" },
+  link:  { label: "Link",     icon: Link2,    color: "text-blue-600" },
   doc:   { label: "Doc",      icon: FileText,  color: "text-green-400" },
-  video: { label: "Video",    icon: Video,     color: "text-purple-400" },
-  file:  { label: "Archivo",  icon: File,      color: "text-amber-400" },
+  video: { label: "Video",    icon: Video,     color: "text-purple-600" },
+  file:  { label: "Archivo",  icon: File,      color: "text-amber-600" },
 }
 
 function typeFromUrl(url: string): ResourceType {
@@ -66,10 +66,10 @@ function AddResourceForm({ onAdd, onClose }: { onAdd: (r: Resource) => void; onC
   }
 
   return (
-    <div className="rounded-2xl border border-[#E42D2C]/20 bg-[#0d1745] p-5 mb-6">
+    <div className="rounded-2xl border border-[#E42D2C]/20 bg-white p-5 mb-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-white">Agregar recurso</h3>
-        <button onClick={onClose} className="text-white/30 hover:text-white/60 transition-colors">
+        <h3 className="text-sm font-semibold text-slate-900">Agregar recurso</h3>
+        <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
           <X className="h-4 w-4" />
         </button>
       </div>
@@ -81,14 +81,14 @@ function AddResourceForm({ onAdd, onClose }: { onAdd: (r: Resource) => void; onC
             placeholder="Título *"
             value={form.title}
             onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-            className="rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40 w-full"
+            className="rounded-xl bg-slate-100 border border-slate-200 px-3 py-2.5 text-sm text-slate-900 placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40 w-full"
           />
           <input
             type="text"
             placeholder="Categoría (ej: Marketing, Ventas…)"
             value={form.category}
             onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-            className="rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40 w-full"
+            className="rounded-xl bg-slate-100 border border-slate-200 px-3 py-2.5 text-sm text-slate-900 placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40 w-full"
           />
         </div>
 
@@ -97,7 +97,7 @@ function AddResourceForm({ onAdd, onClose }: { onAdd: (r: Resource) => void; onC
           placeholder="URL *"
           value={form.url}
           onChange={e => handleUrlChange(e.target.value)}
-          className="rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40 w-full"
+          className="rounded-xl bg-slate-100 border border-slate-200 px-3 py-2.5 text-sm text-slate-900 placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40 w-full"
         />
 
         <input
@@ -105,7 +105,7 @@ function AddResourceForm({ onAdd, onClose }: { onAdd: (r: Resource) => void; onC
           placeholder="Descripción (opcional)"
           value={form.description}
           onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-          className="rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40 w-full"
+          className="rounded-xl bg-slate-100 border border-slate-200 px-3 py-2.5 text-sm text-slate-900 placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40 w-full"
         />
 
         {/* Type selector */}
@@ -120,7 +120,7 @@ function AddResourceForm({ onAdd, onClose }: { onAdd: (r: Resource) => void; onC
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium border transition-all ${
                   form.type === t
                     ? "border-[#E42D2C]/40 bg-[#E42D2C]/10 text-[#E42D2C]"
-                    : "border-white/[0.08] bg-white/[0.03] text-white/40 hover:text-white/70"
+                    : "border-slate-200 bg-slate-50 text-slate-400 hover:text-slate-600"
                 }`}
               >
                 <cfg.icon className="h-3 w-3" />
@@ -130,7 +130,7 @@ function AddResourceForm({ onAdd, onClose }: { onAdd: (r: Resource) => void; onC
           })}
         </div>
 
-        {error && <p className="text-xs text-red-400">{error}</p>}
+        {error && <p className="text-xs text-red-600">{error}</p>}
 
         <div className="flex justify-end">
           <button
@@ -164,15 +164,15 @@ function ResourceCard({ resource, onDelete }: { resource: Resource; onDelete: (i
   }
 
   return (
-    <div className="group rounded-2xl border border-white/[0.07] bg-[#0d1745] p-4 flex flex-col gap-3 hover:border-white/[0.12] transition-all">
+    <div className="group rounded-2xl border border-slate-200 bg-white p-4 flex flex-col gap-3 hover:border-slate-300 transition-all">
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.05] flex-shrink-0">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 flex-shrink-0">
             <Icon className={`h-4 w-4 ${cfg.color}`} />
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-white truncate">{resource.title}</p>
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-white/30">
+            <p className="text-sm font-semibold text-slate-900 truncate">{resource.title}</p>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
               {resource.category}
             </span>
           </div>
@@ -180,14 +180,14 @@ function ResourceCard({ resource, onDelete }: { resource: Resource; onDelete: (i
         <button
           onClick={handleDelete}
           disabled={deleting}
-          className="opacity-0 group-hover:opacity-100 flex-shrink-0 text-white/20 hover:text-red-400 transition-all"
+          className="opacity-0 group-hover:opacity-100 flex-shrink-0 text-slate-300 hover:text-red-600 transition-all"
         >
           {deleting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
         </button>
       </div>
 
       {resource.description && (
-        <p className="text-xs text-white/40 leading-relaxed line-clamp-2">{resource.description}</p>
+        <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">{resource.description}</p>
       )}
 
       <a
@@ -237,9 +237,9 @@ export function ResourcesView() {
         <div>
           <div className="flex items-center gap-2.5 mb-1">
             <span className="h-4 w-[3px] rounded-full bg-[#E42D2C]" />
-            <h1 className="text-sm font-semibold uppercase tracking-widest text-white/70">Biblioteca</h1>
+            <h1 className="text-sm font-semibold uppercase tracking-widest text-slate-600">Biblioteca</h1>
           </div>
-          <p className="text-xs text-white/30 ml-[18px]">Links, docs y recursos guardados</p>
+          <p className="text-xs text-slate-400 ml-[18px]">Links, docs y recursos guardados</p>
         </div>
         <button
           onClick={() => setShowForm(v => !v)}
@@ -261,13 +261,13 @@ export function ResourcesView() {
       {/* Search + category filter */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-white/30" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
           <input
             type="text"
             placeholder="Buscar…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] pl-9 pr-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40"
+            className="w-full rounded-xl bg-slate-100 border border-slate-200 pl-9 pr-4 py-2.5 text-sm text-slate-900 placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40"
           />
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -278,7 +278,7 @@ export function ResourcesView() {
               className={`rounded-lg px-3 py-2 text-xs font-medium border transition-all ${
                 activeCategory === cat
                   ? "border-[#E42D2C]/40 bg-[#E42D2C]/10 text-[#E42D2C]"
-                  : "border-white/[0.08] bg-white/[0.03] text-white/40 hover:text-white/70"
+                  : "border-slate-200 bg-slate-50 text-slate-400 hover:text-slate-600"
               }`}
             >
               {cat}
@@ -290,12 +290,12 @@ export function ResourcesView() {
       {/* Grid */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-6 w-6 animate-spin text-white/20" />
+          <Loader2 className="h-6 w-6 animate-spin text-slate-300" />
         </div>
       ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 gap-3">
-          <FolderOpen className="h-10 w-10 text-white/10" />
-          <p className="text-sm text-white/20">
+          <FolderOpen className="h-10 w-10 text-slate-300" />
+          <p className="text-sm text-slate-300">
             {search || activeCategory !== "Todos" ? "Sin resultados" : "Todavía no hay recursos guardados"}
           </p>
           {!showForm && (

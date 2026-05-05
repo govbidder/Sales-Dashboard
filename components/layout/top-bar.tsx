@@ -92,12 +92,12 @@ export function TopBar({
         <div className="flex items-center justify-center min-w-0">
           <button
             onClick={onOpenPalette}
-            className="group flex items-center gap-2 h-10 rounded-full border border-slate-200 bg-white px-4 transition-all hover:border-[#E42D2C]/30 hover:shadow-[0_2px_12px_rgba(228,45,44,0.10)] max-w-full"
+            className="group flex items-center gap-2 h-10 rounded-full border border-slate-200 bg-white px-4 transition-all hover:border-[#1e3a8a]/30 hover:shadow-[0_2px_12px_rgba(30,58,138,0.10)] max-w-full"
             title="Cambiar de página · ⌘K"
           >
             {crumb && (
               <>
-                <span className="hidden sm:inline text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 group-hover:text-slate-700 transition-colors">
+                <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a] group-hover:text-[#1e40af] transition-colors">
                   {crumb}
                 </span>
                 <span className="hidden sm:inline text-slate-300">/</span>
@@ -128,7 +128,7 @@ export function TopBar({
               className="group flex items-center h-10 rounded-full pl-1 pr-1 transition-all hover:bg-slate-100"
               onClick={() => setProfileOpen(v => !v)}
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#E42D2C] text-[11px] font-bold text-white shadow-sm">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] text-[11px] font-bold text-white shadow-sm ring-2 ring-white">
                 {initials}
               </span>
             </button>

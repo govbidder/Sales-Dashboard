@@ -94,7 +94,7 @@ function getCurrentMonth() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
 }
 
-const inputCls = "w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-[13px] text-white placeholder:text-white/40 focus:border-white/20 focus:outline-none transition-all tabular-nums"
+const inputCls = "w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none transition-all tabular-nums"
 
 // ─── Form ─────────────────────────────────────────────────────────────────────
 
@@ -224,28 +224,28 @@ function ReportForm({
     <form onSubmit={handleSubmit} className="space-y-5">
 
       {/* Month + status header */}
-      <div className="flex flex-wrap items-end justify-between gap-3 rounded-2xl border border-white/[0.07] bg-[#0d1745] px-5 py-4">
+      <div className="flex flex-wrap items-end justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4">
         <div className="space-y-1.5">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-white/35">Mes</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Mes</p>
           <input
             type="month"
             value={month}
             onChange={e => setMonth(e.target.value)}
-            className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-[14px] text-white outline-none focus:border-white/20"
+            className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-[14px] text-slate-900 outline-none focus:border-[#1e3a8a]/40"
           />
         </div>
 
         <div className="flex items-center gap-2">
           {isUpdate ? (
-            <span className="rounded-full border border-amber-400/25 bg-amber-400/10 px-3 py-1 text-[11px] font-bold text-amber-300 uppercase tracking-wide">
+            <span className="rounded-full border border-amber-400/25 bg-amber-400/10 px-3 py-1 text-[11px] font-bold text-amber-700 uppercase tracking-wide">
               Actualizando existente
             </span>
           ) : (
-            <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-[11px] font-bold text-emerald-300 uppercase tracking-wide">
+            <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-[11px] font-bold text-emerald-700 uppercase tracking-wide">
               Nuevo reporte
             </span>
           )}
-          {loading && <Loader2 className="h-4 w-4 animate-spin text-white/40" />}
+          {loading && <Loader2 className="h-4 w-4 animate-spin text-slate-400" />}
         </div>
       </div>
 
@@ -254,27 +254,27 @@ function ReportForm({
         const isCollapsed = collapsed[sec.id]
         const Icon = sec.icon
         return (
-          <div key={sec.id} className="rounded-2xl border border-white/[0.07] bg-[#0d1745] overflow-hidden">
+          <div key={sec.id} className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
             <button
               type="button"
               onClick={() => toggle(sec.id)}
-              className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left transition-colors hover:bg-white/[0.02]"
+              className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left transition-colors hover:bg-slate-50"
             >
               <div className="flex items-center gap-2.5">
                 <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E42D2C]/10 ring-1 ring-[#E42D2C]/20">
                   <Icon className="h-4 w-4 text-[#E42D2C]" />
                 </span>
-                <h3 className="text-sm font-bold text-white tracking-tight">{sec.title}</h3>
+                <h3 className="text-sm font-bold text-slate-900 tracking-tight">{sec.title}</h3>
               </div>
-              {isCollapsed ? <ChevronDown className="h-4 w-4 text-white/35" /> : <ChevronUp className="h-4 w-4 text-white/35" />}
+              {isCollapsed ? <ChevronDown className="h-4 w-4 text-slate-400" /> : <ChevronUp className="h-4 w-4 text-slate-400" />}
             </button>
 
             {!isCollapsed && (
-              <div className="border-t border-white/[0.05] px-5 py-4">
+              <div className="border-t border-slate-100 px-5 py-4">
                 <div className={`grid gap-3 ${sec.id === "reflection" ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2"}`}>
                   {sec.fields.map(f => (
                     <div key={f.key} className="space-y-1.5">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">{f.label}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{f.label}</p>
                       {renderField(f)}
                     </div>
                   ))}
@@ -287,9 +287,9 @@ function ReportForm({
 
       {/* Submit row */}
       <div className="sticky bottom-4 z-10">
-        <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/[0.10] bg-[#0d1745]/95 backdrop-blur-md px-5 py-3 shadow-2xl">
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white/95 backdrop-blur-md px-5 py-3 shadow-2xl">
           {message && (
-            <div className={`flex items-center gap-2 text-[13px] ${status === "success" ? "text-emerald-300" : status === "error" ? "text-red-300" : "text-white/60"}`}>
+            <div className={`flex items-center gap-2 text-[13px] ${status === "success" ? "text-emerald-700" : status === "error" ? "text-red-700" : "text-slate-600"}`}>
               {status === "success" && <Check className="h-4 w-4" />}
               {status === "error"   && <AlertCircle className="h-4 w-4" />}
               {message}
@@ -319,20 +319,20 @@ function HistoryView({ reports, onPick, onDelete, deletingId }: {
 }) {
   if (reports.length === 0) {
     return (
-      <div className="rounded-2xl border border-white/[0.07] bg-[#0d1745] py-12 text-center">
-        <p className="text-sm text-white/35">Todavía no hay reportes cargados.</p>
+      <div className="rounded-2xl border border-slate-200 bg-white py-12 text-center">
+        <p className="text-sm text-slate-400">Todavía no hay reportes cargados.</p>
       </div>
     )
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0d1745]">
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="border-b border-white/[0.06] bg-white/[0.02]">
+            <tr className="border-b border-slate-200 bg-slate-50">
               {["Mes","Cobrado","Revenue","MRR","Cierres","NPS","Última edición",""].map(h => (
-                <th key={h} className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.12em] text-white/40 whitespace-nowrap">{h}</th>
+                <th key={h} className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 whitespace-nowrap">{h}</th>
               ))}
             </tr>
           </thead>
@@ -342,35 +342,35 @@ function HistoryView({ reports, onPick, onDelete, deletingId }: {
               return (
                 <tr
                   key={r.id}
-                  className="border-b border-white/[0.04] cursor-pointer transition-colors hover:bg-white/[0.02]"
+                  className="border-b border-slate-100 cursor-pointer transition-colors hover:bg-slate-50"
                   onClick={() => onPick(String(r.month).slice(0, 7))}
                 >
-                  <td className="px-4 py-3 whitespace-nowrap text-[14px] font-semibold text-white">
+                  <td className="px-4 py-3 whitespace-nowrap text-[14px] font-semibold text-slate-900">
                     {fmtMonthLabel(r.month)}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-[13px] tabular-nums text-emerald-300/80">
+                  <td className="px-4 py-3 whitespace-nowrap text-[13px] tabular-nums text-emerald-700/80">
                     {fmtMoney(r.cash_collected)}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-[13px] tabular-nums text-white/85">
+                  <td className="px-4 py-3 whitespace-nowrap text-[13px] tabular-nums text-slate-800">
                     {fmtMoney(r.total_revenue)}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-[13px] tabular-nums text-white/65">
+                  <td className="px-4 py-3 whitespace-nowrap text-[13px] tabular-nums text-slate-600">
                     {fmtMoney(r.mrr)}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-[13px] tabular-nums text-white/65">
+                  <td className="px-4 py-3 whitespace-nowrap text-[13px] tabular-nums text-slate-600">
                     {r.new_clients ?? "—"}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-[13px] tabular-nums text-white/65">
+                  <td className="px-4 py-3 whitespace-nowrap text-[13px] tabular-nums text-slate-600">
                     {r.nps_score != null ? Number(r.nps_score).toFixed(1) : "—"}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-[12px] text-white/45">
+                  <td className="px-4 py-3 whitespace-nowrap text-[12px] text-slate-500">
                     {fmtDateTime(r.updated_at ?? r.created_at)}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap" onClick={e => e.stopPropagation()}>
                     <button
                       onClick={() => onDelete(r.id)}
                       disabled={deletingId === r.id}
-                      className="flex h-7 w-7 items-center justify-center rounded-lg text-white/20 hover:text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-40"
+                      className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-300 hover:text-red-600 hover:bg-red-500/10 transition-all disabled:opacity-40"
                     >
                       {deletingId === r.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                     </button>
@@ -444,24 +444,24 @@ export function ReportsInputView() {
       {/* Header + tabs */}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Métricas Mensuales</h1>
-          <p className="text-sm text-white/40 mt-0.5">
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Métricas Mensuales</h1>
+          <p className="text-sm text-slate-400 mt-0.5">
             Cargá los KPIs del mes para ver el dashboard alimentado.
           </p>
         </div>
 
-        <div className="inline-flex h-9 rounded-xl border border-white/[0.08] bg-white/[0.03] p-0.5">
+        <div className="inline-flex h-9 rounded-xl border border-slate-200 bg-slate-50 p-0.5">
           <button
             onClick={() => setTab("form")}
             className={`flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium transition-all ${
-              tab === "form" ? "bg-white/[0.10] text-white" : "text-white/45 hover:text-white"
+              tab === "form" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-900"
             }`}>
             Cargar
           </button>
           <button
             onClick={() => setTab("history")}
             className={`flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium transition-all ${
-              tab === "history" ? "bg-white/[0.10] text-white" : "text-white/45 hover:text-white"
+              tab === "history" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-900"
             }`}>
             Historial ({reports.length})
           </button>
@@ -485,7 +485,7 @@ export function ReportsInputView() {
         <>
           <div className="flex items-center justify-end">
             <button onClick={fetchReports} disabled={loading}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-white/40 hover:text-white hover:border-white/20 transition-all disabled:opacity-40">
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40">
               <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             </button>
           </div>

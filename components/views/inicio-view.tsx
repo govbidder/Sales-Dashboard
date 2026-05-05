@@ -93,10 +93,10 @@ function fmtMonthLabel(m: string) {
 }
 
 const PRIORITY_FLAG: Record<string, string> = {
-  baja:    "text-zinc-400",
-  media:   "text-amber-300",
-  alta:    "text-orange-300",
-  urgente: "text-red-300",
+  baja:    "text-zinc-600",
+  media:   "text-amber-700",
+  alta:    "text-orange-700",
+  urgente: "text-red-700",
 }
 
 // ─── Stat Tile (top-row counters) ─────────────────────────────────────────────
@@ -110,16 +110,16 @@ function StatTile({
   accent: "red" | "amber" | "blue" | "emerald" | "neutral"
 }) {
   const palette = {
-    red:     { ring: "ring-red-500/25",     icon: "bg-red-500/15     text-red-300",     glow: "rgba(248,113,113,0.10)" },
-    amber:   { ring: "ring-amber-500/25",   icon: "bg-amber-500/15   text-amber-300",   glow: "rgba(251,191,36,0.10)"  },
-    blue:    { ring: "ring-blue-500/25",    icon: "bg-blue-500/15    text-blue-300",    glow: "rgba(96,165,250,0.10)"  },
-    emerald: { ring: "ring-emerald-500/25", icon: "bg-emerald-500/15 text-emerald-300", glow: "rgba(16,185,129,0.10)"  },
-    neutral: { ring: "ring-white/[0.10]",   icon: "bg-white/[0.05]   text-white/65",    glow: "rgba(255,255,255,0.04)" },
+    red:     { ring: "ring-red-500/25",     icon: "bg-red-500/15     text-red-700",     glow: "rgba(248,113,113,0.10)" },
+    amber:   { ring: "ring-amber-500/25",   icon: "bg-amber-500/15   text-amber-700",   glow: "rgba(251,191,36,0.10)"  },
+    blue:    { ring: "ring-blue-500/25",    icon: "bg-blue-500/15    text-blue-700",    glow: "rgba(96,165,250,0.10)"  },
+    emerald: { ring: "ring-emerald-500/25", icon: "bg-emerald-500/15 text-emerald-700", glow: "rgba(16,185,129,0.10)"  },
+    neutral: { ring: "ring-slate-200",   icon: "bg-slate-100   text-slate-600",    glow: "rgba(15,23,42,0.05)" },
   }[accent]
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl ring-1 ${palette.ring} bg-[#0d1745]/70 backdrop-blur-sm p-4`}
+      className={`relative overflow-hidden rounded-2xl ring-1 ${palette.ring} bg-white/70 backdrop-blur-sm p-4`}
     >
       <div
         className="pointer-events-none absolute -top-8 -right-8 h-24 w-24 rounded-full blur-2xl"
@@ -127,8 +127,8 @@ function StatTile({
       />
       <div className="relative flex items-start justify-between gap-3">
         <div>
-          <p className="text-[28px] font-bold tabular-nums text-white leading-none">{value}</p>
-          <p className="mt-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/50">{label}</p>
+          <p className="text-[28px] font-bold tabular-nums text-slate-900 leading-none">{value}</p>
+          <p className="mt-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{label}</p>
         </div>
         <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${palette.icon}`}>
           <Icon className="h-4 w-4" />
@@ -152,22 +152,22 @@ function IssueSection({
   children?: React.ReactNode
 }) {
   const palette = {
-    red:   { headerBg: "bg-red-500/[0.04]",   border: "border-red-500/15",   iconBg: "bg-red-500/15 ring-red-500/30",      iconColor: "text-red-300",     pillBg: "bg-red-500/10 text-red-300 border-red-500/25" },
-    amber: { headerBg: "bg-amber-500/[0.04]", border: "border-amber-500/15", iconBg: "bg-amber-500/15 ring-amber-500/30",  iconColor: "text-amber-300",   pillBg: "bg-amber-500/10 text-amber-300 border-amber-500/25" },
-    blue:  { headerBg: "bg-blue-500/[0.04]",  border: "border-blue-500/15",  iconBg: "bg-blue-500/15 ring-blue-500/30",    iconColor: "text-blue-300",    pillBg: "bg-blue-500/10 text-blue-300 border-blue-500/25" },
+    red:   { headerBg: "bg-red-500/[0.04]",   border: "border-red-500/15",   iconBg: "bg-red-500/15 ring-red-500/30",      iconColor: "text-red-700",     pillBg: "bg-red-500/10 text-red-700 border-red-500/25" },
+    amber: { headerBg: "bg-amber-500/[0.04]", border: "border-amber-500/15", iconBg: "bg-amber-500/15 ring-amber-500/30",  iconColor: "text-amber-700",   pillBg: "bg-amber-500/10 text-amber-700 border-amber-500/25" },
+    blue:  { headerBg: "bg-blue-500/[0.04]",  border: "border-blue-500/15",  iconBg: "bg-blue-500/15 ring-blue-500/30",    iconColor: "text-blue-700",    pillBg: "bg-blue-500/10 text-blue-700 border-blue-500/25" },
   }[accent]
 
   const pulseDot = severity === "high"
 
   return (
-    <div className={`overflow-hidden rounded-2xl border ${palette.border} bg-[#0d1745]`}>
-      <div className={`flex items-center justify-between gap-3 px-5 py-4 border-b border-white/[0.05] ${palette.headerBg}`}>
+    <div className={`overflow-hidden rounded-2xl border ${palette.border} bg-white`}>
+      <div className={`flex items-center justify-between gap-3 px-5 py-4 border-b border-slate-100 ${palette.headerBg}`}>
         <div className="flex items-center gap-3 min-w-0">
           <span className={`flex h-9 w-9 items-center justify-center rounded-xl ring-1 ${palette.iconBg}`}>
             <Icon className={`h-4 w-4 ${palette.iconColor}`} />
           </span>
           <div className="min-w-0">
-            <h3 className="text-[14px] font-bold text-white leading-none truncate">{title}</h3>
+            <h3 className="text-[14px] font-bold text-slate-900 leading-none truncate">{title}</h3>
             <div className="flex items-center gap-2 mt-1">
               <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-bold tabular-nums uppercase tracking-wider ${palette.pillBg}`}>
                 {pulseDot && (
@@ -184,7 +184,7 @@ function IssueSection({
         {href && count > 0 && (
           <Link
             href={href}
-            className="group flex shrink-0 items-center gap-1 rounded-lg border border-white/[0.08] bg-white/[0.04] px-2.5 py-1.5 text-[11px] font-semibold text-white/65 hover:bg-white/[0.08] hover:text-white transition-colors"
+            className="group flex shrink-0 items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-[11px] font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
           >
             Ver todo
             <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
@@ -238,9 +238,9 @@ export function InicioView() {
   if (error || !data) {
     return (
       <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-8 text-center">
-        <AlertCircle className="mx-auto h-6 w-6 text-red-400 mb-2" />
-        <p className="text-sm text-red-300">{error ?? "Sin datos"}</p>
-        <button onClick={fetchHealth} className="mt-3 rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-1.5 text-[12px] font-semibold text-red-300 hover:bg-red-500/20">
+        <AlertCircle className="mx-auto h-6 w-6 text-red-600 mb-2" />
+        <p className="text-sm text-red-700">{error ?? "Sin datos"}</p>
+        <button onClick={fetchHealth} className="mt-3 rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-1.5 text-[12px] font-semibold text-red-700 hover:bg-red-500/20">
           Reintentar
         </button>
       </div>
@@ -256,9 +256,9 @@ export function InicioView() {
   // Health score: rough proxy 0-100 based on issues count
   const healthScore = Math.max(0, Math.min(100, 100 - issuesCount * 10))
   const scoreColor =
-    healthScore >= 80 ? "text-emerald-300" :
-    healthScore >= 50 ? "text-amber-300" :
-                        "text-red-300"
+    healthScore >= 80 ? "text-emerald-700" :
+    healthScore >= 50 ? "text-amber-700" :
+                        "text-red-700"
   const ringColor =
     healthScore >= 80 ? "stroke-emerald-400" :
     healthScore >= 50 ? "stroke-amber-400" :
@@ -277,8 +277,8 @@ export function InicioView() {
 
       {/* HERO ─────────────────────────────────────────────────────────────── */}
       <div
-        className="relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[#0d1745]"
-        style={{ boxShadow: "0 30px 80px -30px rgba(0,0,0,0.6)" }}
+        className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white"
+        style={{ boxShadow: "0 30px 80px -30px rgba(15,23,42,0.20)" }}
       >
         {/* Ambient glow background */}
         <div className="pointer-events-none absolute inset-0">
@@ -293,7 +293,7 @@ export function InicioView() {
           />
           <div
             className="absolute -bottom-32 -left-32 h-[400px] w-[400px] rounded-full blur-[120px]"
-            style={{ backgroundColor: "rgba(21,41,120,0.30)" }}
+            style={{ backgroundColor: "rgba(30,58,138,0.12)" }}
           />
         </div>
 
@@ -307,31 +307,31 @@ export function InicioView() {
                 heroState === "critical" ? "bg-red-500/15     ring-red-500/30"     :
                                            "bg-amber-500/15   ring-amber-500/30"
               }`}>
-                {heroState === "good"     ? <CheckCircle2 className="h-3.5 w-3.5 text-emerald-300" /> :
-                 heroState === "critical" ? <AlertCircle  className="h-3.5 w-3.5 text-red-300"     /> :
-                                            <AlertTriangle className="h-3.5 w-3.5 text-amber-300"  />}
+                {heroState === "good"     ? <CheckCircle2 className="h-3.5 w-3.5 text-emerald-700" /> :
+                 heroState === "critical" ? <AlertCircle  className="h-3.5 w-3.5 text-red-700"     /> :
+                                            <AlertTriangle className="h-3.5 w-3.5 text-amber-700"  />}
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/50">
+              <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1e3a8a]">
                 Estado del Dashboard
               </span>
             </div>
 
-            <h1 className="text-[36px] sm:text-[44px] font-bold tracking-tight text-white leading-[1.05]">
+            <h1 className="text-[36px] sm:text-[44px] font-bold tracking-tight text-slate-900 leading-[1.05]">
               {allClear ? (
                 <>Todo en orden.</>
               ) : (
                 <>
-                  <span className={heroState === "critical" ? "text-red-300" : "text-amber-300"}>
+                  <span className={heroState === "critical" ? "text-red-700" : "text-amber-700"}>
                     {issuesCount}
                   </span>{" "}
                   {issuesCount === 1 ? "ítem requiere" : "ítems requieren"}
                   <br className="hidden sm:block" />
-                  <span className="text-white/85"> tu atención.</span>
+                  <span className="text-slate-800"> tu atención.</span>
                 </>
               )}
             </h1>
 
-            <p className="text-sm text-white/45 mt-3 max-w-xl">
+            <p className="text-sm text-slate-500 mt-3 max-w-xl">
               {allClear
                 ? "Sin tareas vencidas, métricas al día, equipo activo. Buen trabajo."
                 : "Revisá los puntos críticos abajo para mantener el dashboard saludable."}
@@ -340,7 +340,7 @@ export function InicioView() {
             <button
               onClick={fetchHealth}
               disabled={loading}
-              className="mt-5 inline-flex items-center gap-2 h-9 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3.5 text-[12px] font-semibold text-white/75 hover:bg-white/[0.07] hover:text-white transition-all disabled:opacity-40"
+              className="mt-5 inline-flex items-center gap-2 h-9 rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-[12px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-all disabled:opacity-40"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
               Actualizar estado
@@ -367,7 +367,7 @@ export function InicioView() {
                 <p className={`text-[34px] font-bold tabular-nums leading-none ${scoreColor}`}>
                   {healthScore}
                 </p>
-                <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white/40 mt-1">
+                <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-slate-400 mt-1">
                   Salud
                 </p>
               </div>
@@ -376,7 +376,7 @@ export function InicioView() {
         </div>
 
         {/* STATS STRIP at bottom of hero */}
-        <div className="relative border-t border-white/[0.05] grid grid-cols-2 sm:grid-cols-4">
+        <div className="relative border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4">
           {[
             { label: "Tareas vencidas",  val: counts.overdueTasks,      icon: ListTodo, accent: counts.overdueTasks > 0 ? "red" as const : "neutral" as const },
             { label: "Sin seguimiento",  val: counts.stalePersonas,     icon: Users2,   accent: counts.stalePersonas > 0 ? "amber" as const : "neutral" as const },
@@ -385,17 +385,17 @@ export function InicioView() {
           ].map((s, i) => {
             const StatIcon = s.icon
             const accentText =
-              s.accent === "red"   ? "text-red-300" :
-              s.accent === "amber" ? "text-amber-300" :
-              "text-white"
+              s.accent === "red"   ? "text-red-700" :
+              s.accent === "amber" ? "text-amber-700" :
+              "text-slate-900"
             return (
               <div
                 key={s.label}
-                className={`relative px-5 py-4 ${i < 3 ? "sm:border-r border-white/[0.05]" : ""} ${i < 2 ? "border-b sm:border-b-0 border-white/[0.05]" : ""}`}
+                className={`relative px-5 py-4 ${i < 3 ? "sm:border-r border-slate-100" : ""} ${i < 2 ? "border-b sm:border-b-0 border-slate-100" : ""}`}
               >
                 <div className="flex items-center gap-2 mb-1.5">
-                  <StatIcon className="h-3 w-3 text-white/30" />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/40">
+                  <StatIcon className="h-3 w-3 text-slate-400" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
                     {s.label}
                   </span>
                 </div>
@@ -412,8 +412,8 @@ export function InicioView() {
       {(overdueTasks.length > 0 || stalePersonas.length > 0 || missingCurrentReport || declining.length > 0) ? (
         <div className="space-y-2">
           <div className="flex items-center gap-2 px-1">
-            <AlertCircle className="h-3.5 w-3.5 text-red-300/80" />
-            <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/70">
+            <AlertCircle className="h-3.5 w-3.5 text-red-700/80" />
+            <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-600">
               Requieren Atención
             </h2>
             <div className="flex-1 h-px bg-gradient-to-r from-white/[0.08] to-transparent" />
@@ -436,21 +436,21 @@ export function InicioView() {
                     <Link
                       key={t.id}
                       href="/admin/tasks"
-                      className="group flex items-center gap-3 px-5 py-3 hover:bg-white/[0.02] transition-colors"
+                      className="group flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors"
                     >
                       <Flag className={`h-3.5 w-3.5 shrink-0 ${PRIORITY_FLAG[t.priority]}`} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium text-white/90 truncate">{t.title}</p>
-                        <p className="text-[11px] text-red-300/80 mt-0.5">
+                        <p className="text-[13px] font-medium text-slate-900 truncate">{t.title}</p>
+                        <p className="text-[11px] text-red-700/80 mt-0.5">
                           Venció {fmtRelative(t.due_at)}
-                          {t.owner && <span className="text-white/35"> · {t.owner}</span>}
+                          {t.owner && <span className="text-slate-400"> · {t.owner}</span>}
                         </p>
                       </div>
-                      <ArrowRight className="h-3.5 w-3.5 text-white/20 group-hover:text-white/55 group-hover:translate-x-0.5 transition-all" />
+                      <ArrowRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all" />
                     </Link>
                   ))}
                   {overdueTasks.length > 5 && (
-                    <Link href="/admin/tasks" className="flex items-center justify-center gap-1.5 px-5 py-2.5 text-[11px] font-semibold text-white/55 hover:text-white transition-colors hover:bg-white/[0.02]">
+                    <Link href="/admin/tasks" className="flex items-center justify-center gap-1.5 px-5 py-2.5 text-[11px] font-semibold text-slate-500 hover:text-slate-900 transition-colors hover:bg-slate-50">
                       + {overdueTasks.length - 5} más
                       <ArrowRight className="h-3 w-3" />
                     </Link>
@@ -474,19 +474,19 @@ export function InicioView() {
                     <Link
                       key={p.id}
                       href="/admin/personas"
-                      className="group flex items-center gap-3 px-5 py-3 hover:bg-white/[0.02] transition-colors"
+                      className="group flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors"
                     >
                       <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#ff6b6a] to-[#c42423] text-[10px] font-bold text-white shadow-sm shrink-0">
                         {(p.name ?? "?").split(/\s+/).map(s => s[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium text-white/90 truncate">{p.name}</p>
-                        <p className="text-[11px] text-amber-300/80 mt-0.5">
+                        <p className="text-[13px] font-medium text-slate-900 truncate">{p.name}</p>
+                        <p className="text-[11px] text-amber-700/80 mt-0.5">
                           Último contacto {fmtRelative(p.last_contact)}
-                          {p.owner && <span className="text-white/35"> · {p.owner}</span>}
+                          {p.owner && <span className="text-slate-400"> · {p.owner}</span>}
                         </p>
                       </div>
-                      <ArrowRight className="h-3.5 w-3.5 text-white/20 group-hover:text-white/55 group-hover:translate-x-0.5 transition-all" />
+                      <ArrowRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all" />
                     </Link>
                   ))}
                 </div>
@@ -504,9 +504,9 @@ export function InicioView() {
                 severity="medium"
               >
                 <div className="px-5 py-5 space-y-4">
-                  <p className="text-[13px] text-white/75 leading-relaxed">
+                  <p className="text-[13px] text-slate-700 leading-relaxed">
                     No hay reporte cargado para{" "}
-                    <span className="font-semibold text-white">{fmtMonthLabel(currentMonth)}</span>.
+                    <span className="font-semibold text-slate-900">{fmtMonthLabel(currentMonth)}</span>.
                     {" "}Sin datos del mes actual los KPIs y proyecciones quedan ciegos.
                   </p>
                   <Link
@@ -535,14 +535,14 @@ export function InicioView() {
                   {declining.map(m => (
                     <div key={m.key} className="flex items-center justify-between gap-3 px-5 py-3">
                       <div className="min-w-0 flex-1">
-                        <p className="text-[13px] font-medium text-white/90 truncate">{m.label}</p>
-                        <p className="text-[11px] text-white/45 mt-0.5">
+                        <p className="text-[13px] font-medium text-slate-900 truncate">{m.label}</p>
+                        <p className="text-[11px] text-slate-500 mt-0.5">
                           {m.format === "money" ? fmtMoney(m.previous) : fmtNumber(m.previous)}{" "}
-                          <span className="text-white/30">→</span>{" "}
+                          <span className="text-slate-400">→</span>{" "}
                           {m.format === "money" ? fmtMoney(m.current) : fmtNumber(m.current)}
                         </p>
                       </div>
-                      <span className="rounded-full border border-red-500/25 bg-red-500/10 px-2.5 py-1 text-[11px] font-bold tabular-nums text-red-300 shrink-0 flex items-center gap-1">
+                      <span className="rounded-full border border-red-500/25 bg-red-500/10 px-2.5 py-1 text-[11px] font-bold tabular-nums text-red-700 shrink-0 flex items-center gap-1">
                         <TrendingDown className="h-3 w-3" />
                         {m.pct.toFixed(0)}%
                       </span>
@@ -559,8 +559,8 @@ export function InicioView() {
       {improving.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center gap-2 px-1">
-            <Sparkles className="h-3.5 w-3.5 text-emerald-300/80" />
-            <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/70">
+            <Sparkles className="h-3.5 w-3.5 text-emerald-700/80" />
+            <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-600">
               Lo que está mejorando
             </h2>
             <div className="flex-1 h-px bg-gradient-to-r from-white/[0.08] to-transparent" />
@@ -568,18 +568,18 @@ export function InicioView() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {improving.map(m => (
-              <div key={m.key} className="rounded-2xl border border-emerald-500/15 bg-gradient-to-br from-emerald-500/[0.04] via-[#0d1745] to-[#0d1745] p-4 hover:border-emerald-500/25 transition-colors">
+              <div key={m.key} className="rounded-2xl border border-emerald-500/15 bg-gradient-to-br from-emerald-500/[0.04] via-white to-white p-4 hover:border-emerald-500/25 transition-colors">
                 <div className="flex items-center justify-between gap-3 mb-2">
-                  <p className="text-[12px] font-medium text-white/85 truncate">{m.label}</p>
-                  <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold tabular-nums text-emerald-300 shrink-0 flex items-center gap-0.5">
+                  <p className="text-[12px] font-medium text-slate-800 truncate">{m.label}</p>
+                  <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold tabular-nums text-emerald-700 shrink-0 flex items-center gap-0.5">
                     <TrendingUp className="h-3 w-3" />
                     {m.pct.toFixed(0)}%
                   </span>
                 </div>
-                <p className="text-[20px] font-bold tabular-nums text-white">
+                <p className="text-[20px] font-bold tabular-nums text-slate-900">
                   {m.format === "money" ? fmtMoney(m.current) : fmtNumber(m.current)}
                 </p>
-                <p className="text-[10px] text-white/35 mt-0.5">
+                <p className="text-[10px] text-slate-400 mt-0.5">
                   vs {m.format === "money" ? fmtMoney(m.previous) : fmtNumber(m.previous)} mes anterior
                 </p>
               </div>
@@ -591,8 +591,8 @@ export function InicioView() {
       {/* QUICK NAV ────────────────────────────────────────────────────────── */}
       <div className="space-y-2">
         <div className="flex items-center gap-2 px-1">
-          <Activity className="h-3.5 w-3.5 text-white/45" />
-          <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/70">
+          <Activity className="h-3.5 w-3.5 text-slate-500" />
+          <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-600">
             Atajos rápidos
           </h2>
           <div className="flex-1 h-px bg-gradient-to-r from-white/[0.08] to-transparent" />
@@ -610,19 +610,19 @@ export function InicioView() {
               <Link
                 key={s.href}
                 href={s.href}
-                className="group relative overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0d1745] hover:border-[#E42D2C]/30 hover:shadow-[0_4px_20px_rgba(228,45,44,0.10)] transition-all p-4"
+                className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-[#E42D2C]/30 hover:shadow-[0_4px_20px_rgba(228,45,44,0.10)] transition-all p-4"
               >
                 <div className="pointer-events-none absolute -top-12 -right-12 h-24 w-24 rounded-full bg-[#E42D2C]/[0.08] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
 
                 <div className="relative flex items-start justify-between gap-3 mb-3">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.04] ring-1 ring-white/[0.06] group-hover:bg-[#E42D2C]/10 group-hover:ring-[#E42D2C]/25 transition-colors">
-                    <Icon className="h-4 w-4 text-white/55 group-hover:text-[#ff6b6a] transition-colors" />
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-50 ring-1 ring-slate-200 group-hover:bg-[#E42D2C]/10 group-hover:ring-[#E42D2C]/25 transition-colors">
+                    <Icon className="h-4 w-4 text-slate-500 group-hover:text-[#ff6b6a] transition-colors" />
                   </span>
-                  <ArrowRight className="h-4 w-4 text-white/20 group-hover:text-[#ff6b6a] group-hover:translate-x-0.5 transition-all" />
+                  <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-[#ff6b6a] group-hover:translate-x-0.5 transition-all" />
                 </div>
 
-                <p className="relative text-[13px] font-bold text-white">{s.label}</p>
-                <p className="relative text-[11px] text-white/40 mt-0.5">{s.desc}</p>
+                <p className="relative text-[13px] font-bold text-slate-900">{s.label}</p>
+                <p className="relative text-[11px] text-slate-400 mt-0.5">{s.desc}</p>
               </Link>
             )
           })}

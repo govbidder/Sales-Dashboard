@@ -59,7 +59,7 @@ export function MoMPanel() {
   if (loading) {
     return (
       <section>
-        <div className="h-72 animate-pulse rounded-2xl border border-white/[0.07] bg-[#0d1745]" />
+        <div className="h-72 animate-pulse rounded-2xl border border-slate-200 bg-white" />
       </section>
     )
   }
@@ -82,8 +82,8 @@ export function MoMPanel() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="text-xl font-bold text-white">Month vs Month</h2>
-          <p className="text-[13px] text-white/40 mt-0.5">
+          <h2 className="text-xl font-bold text-slate-900">Month vs Month</h2>
+          <p className="text-[13px] text-slate-400 mt-0.5">
             {fmtMonthLong(current.month)} vs {fmtMonthLong(previous.month)} — ¿qué cambió?
           </p>
         </div>
@@ -94,25 +94,25 @@ export function MoMPanel() {
             : "border-red-500/25 bg-red-500/10"
         }`}>
           {scorePositive
-            ? <TrendingUp   className="h-4 w-4 text-emerald-400" />
-            : <TrendingDown className="h-4 w-4 text-red-400" />}
-          <span className={`text-sm font-bold ${scorePositive ? "text-emerald-300" : "text-red-300"}`}>
+            ? <TrendingUp   className="h-4 w-4 text-emerald-600" />
+            : <TrendingDown className="h-4 w-4 text-red-600" />}
+          <span className={`text-sm font-bold ${scorePositive ? "text-emerald-700" : "text-red-700"}`}>
             {scorePositive ? "Mes positivo" : "Mes para revisar"}
           </span>
-          <span className="text-white/30 text-xs ml-1">
+          <span className="text-slate-400 text-xs ml-1">
             {totalUp}↑ · {totalDown}↓
           </span>
         </div>
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745]">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
         {/* Column headers */}
-        <div className="grid grid-cols-[1.4fr_1fr_1.6fr_1fr] border-b border-white/[0.06] px-6 py-3">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-white/30">Métrica</span>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-white/30 text-right">{fmtMonthLong(previous.month)}</span>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-white/30 text-center">Cambio</span>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-white/30 text-right">{fmtMonthLong(current.month)}</span>
+        <div className="grid grid-cols-[1.4fr_1fr_1.6fr_1fr] border-b border-slate-200 px-6 py-3">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Métrica</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 text-right">{fmtMonthLong(previous.month)}</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 text-center">Cambio</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 text-right">{fmtMonthLong(current.month)}</span>
         </div>
 
         {METRICS.map((metric) => {
@@ -128,30 +128,30 @@ export function MoMPanel() {
           return (
             <div
               key={metric.key}
-              className={`grid grid-cols-[1.4fr_1fr_1.6fr_1fr] items-center border-b border-white/[0.04] last:border-0 px-6 py-4 transition-colors ${
+              className={`grid grid-cols-[1.4fr_1fr_1.6fr_1fr] items-center border-b border-slate-100 last:border-0 px-6 py-4 transition-colors ${
                 isUp   ? "hover:bg-emerald-500/[0.03]"
                 : isDown ? "hover:bg-red-500/[0.03]"
-                :           "hover:bg-white/[0.02]"
+                :           "hover:bg-slate-50"
               }`}
             >
               {/* Metric name */}
               <div className="flex items-center gap-2.5">
                 <span className="h-2.5 w-2.5 rounded-full flex-shrink-0 ring-2 ring-black/40"
                   style={{ backgroundColor: metric.color }} />
-                <span className="text-[13px] font-medium text-white/70">{metric.label}</span>
+                <span className="text-[13px] font-medium text-slate-600">{metric.label}</span>
               </div>
 
               {/* Previous value */}
-              <span className="text-[13px] font-medium text-white/35 text-right tabular-nums pr-2">
+              <span className="text-[13px] font-medium text-slate-400 text-right tabular-nums pr-2">
                 {fmtVal(prev)}
               </span>
 
               {/* Change — THE KEY COLUMN */}
               <div className="flex flex-col items-center gap-1.5 px-2">
                 <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-bold ${
-                  isUp   ? "bg-emerald-500/15 text-emerald-300"
-                  : isDown ? "bg-red-500/15 text-red-300"
-                  :           "bg-white/[0.06] text-white/40"
+                  isUp   ? "bg-emerald-500/15 text-emerald-700"
+                  : isDown ? "bg-red-500/15 text-red-700"
+                  :           "bg-slate-100 text-slate-400"
                 }`}>
                   {isUp   && <TrendingUp   className="h-3 w-3 flex-shrink-0" />}
                   {isDown && <TrendingDown className="h-3 w-3 flex-shrink-0" />}
@@ -161,7 +161,7 @@ export function MoMPanel() {
                     : "Sin cambio"}
                 </span>
                 {/* Progress bar showing magnitude */}
-                <div className="w-full h-1 rounded-full bg-white/[0.05] overflow-hidden">
+                <div className="w-full h-1 rounded-full bg-slate-100 overflow-hidden">
                   <div
                     className={`h-full rounded-full ${isUp ? "bg-emerald-400" : isDown ? "bg-red-400" : "bg-white/20"}`}
                     style={{ width: `${absPct}%` }}
@@ -172,9 +172,9 @@ export function MoMPanel() {
               {/* Current value — highlighted */}
               <div className="text-right">
                 <span className={`text-[15px] font-bold tabular-nums ${
-                  isUp   ? "text-emerald-300"
-                  : isDown ? "text-red-300"
-                  :           "text-white"
+                  isUp   ? "text-emerald-700"
+                  : isDown ? "text-red-700"
+                  :           "text-slate-900"
                 }`}>
                   {fmtVal(cur)}
                 </span>

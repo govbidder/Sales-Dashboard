@@ -62,16 +62,16 @@ function KPI({
   hint?: string | null
 }) {
   return (
-    <div className="rounded-2xl border border-white/[0.07] bg-[#0d1745] p-5">
+    <div className="rounded-2xl border border-slate-200 bg-white p-5">
       <div className="mb-3 flex items-center justify-between">
         <span className="flex h-9 w-9 items-center justify-center rounded-xl"
           style={{ backgroundColor: `${accent}15`, boxShadow: `0 0 0 1px ${accent}25` }}>
           <Icon className="h-4 w-4" style={{ color: accent }} />
         </span>
       </div>
-      <p className="text-2xl font-bold tracking-tight text-white tabular-nums">{value}</p>
-      <p className="mt-1 text-[11px] font-bold uppercase tracking-widest text-white/35">{label}</p>
-      {hint && <p className="mt-1 text-[11px] text-white/40">{hint}</p>}
+      <p className="text-2xl font-bold tracking-tight text-slate-900 tabular-nums">{value}</p>
+      <p className="mt-1 text-[11px] font-bold uppercase tracking-widest text-slate-400">{label}</p>
+      {hint && <p className="mt-1 text-[11px] text-slate-400">{hint}</p>}
     </div>
   )
 }
@@ -155,15 +155,15 @@ export function Projections() {
     return (
       <section>
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-white">Proyecciones</h2>
-          <p className="text-[13px] text-white/40 mt-0.5">
+          <h2 className="text-xl font-bold text-slate-900">Proyecciones</h2>
+          <p className="text-[13px] text-slate-400 mt-0.5">
             Forecast lineal sobre los últimos meses · pace anual · YoY
           </p>
         </div>
-        <div className="rounded-2xl border border-white/[0.07] bg-[#0d1745] p-10 text-center">
-          <p className="text-sm text-white/40">
+        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center">
+          <p className="text-sm text-slate-400">
             Necesitamos al menos 2 meses de datos para generar proyecciones.
-            Cargá métricas en <span className="text-white/85">Cargar Métricas</span>.
+            Cargá métricas en <span className="text-slate-800">Cargar Métricas</span>.
           </p>
         </div>
       </section>
@@ -173,8 +173,8 @@ export function Projections() {
   return (
     <section>
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-white">Proyecciones</h2>
-        <p className="text-[13px] text-white/40 mt-0.5">
+        <h2 className="text-xl font-bold text-slate-900">Proyecciones</h2>
+        <p className="text-[13px] text-slate-400 mt-0.5">
           Forecast lineal sobre los últimos {data.monthsAvailable} meses · pace anual · YoY
         </p>
       </div>
@@ -214,10 +214,10 @@ export function Projections() {
       </div>
 
       {/* Chart */}
-      <div className="rounded-2xl border border-white/[0.07] bg-[#0d1745] p-5">
+      <div className="rounded-2xl border border-slate-200 bg-white p-5">
         <div className="mb-4 flex items-center gap-2">
           <TrendingUp className="h-4 w-4 text-[#E42D2C]" />
-          <h3 className="text-[12px] font-bold uppercase tracking-widest text-white/70">
+          <h3 className="text-[12px] font-bold uppercase tracking-widest text-slate-600">
             Revenue · Cash · MRR — histórico + forecast 3 meses
           </h3>
         </div>
@@ -231,17 +231,17 @@ export function Projections() {
                   <stop offset="95%" stopColor="#E42D2C" stopOpacity={0}   />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-              <XAxis dataKey="month" stroke="rgba(255,255,255,0.35)" fontSize={11} tickLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} tickLine={false} />
               <YAxis
-                stroke="rgba(255,255,255,0.35)"
+                stroke="#94a3b8"
                 fontSize={11}
                 tickLine={false}
                 tickFormatter={(v) => fmtMoney(Number(v))}
               />
               <Tooltip
-                contentStyle={{ backgroundColor: "#0f0f10", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 12 }}
-                labelStyle={{ color: "#fff", fontWeight: 700, fontSize: 12 }}
+                contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 12 }}
+                labelStyle={{ color: "#0f172a", fontWeight: 700, fontSize: 12 }}
                 itemStyle={{ fontSize: 12 }}
                 formatter={(value: any) => fmtMoney(Number(value))}
               />
@@ -282,7 +282,7 @@ export function Projections() {
           </ResponsiveContainer>
         </div>
 
-        <p className="mt-3 text-[11px] text-white/35 text-center">
+        <p className="mt-3 text-[11px] text-slate-400 text-center">
           Línea punteada vertical = mes actual · A partir de ahí, datos proyectados (regresión lineal sobre histórico)
         </p>
       </div>

@@ -168,7 +168,7 @@ export function MetricsSection({
   return (
     <section className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <span className="inline-flex items-center rounded-full border border-white/8 bg-white/[0.03] px-3 py-1 text-xs font-medium text-white/40">
+        <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-400">
           {totalCount} campos · {monthLabel}
         </span>
         <Input
@@ -177,17 +177,17 @@ export function MetricsSection({
           placeholder="Buscar métricas…"
           className={cn(
             "w-full sm:w-[260px] h-8 rounded-xl text-xs",
-            "bg-white/[0.04] text-white placeholder:text-white/25 border-white/8",
+            "bg-slate-50 text-slate-900 placeholder:text-slate-300 border-slate-200",
             "focus-visible:ring-1 focus-visible:ring-[#E42D2C]/30 focus-visible:border-[#E42D2C]/30"
           )}
         />
       </div>
 
-      {loading && <p className="text-white/40 text-sm">Cargando métricas…</p>}
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      {loading && <p className="text-slate-400 text-sm">Cargando métricas…</p>}
+      {error && <p className="text-red-600 text-sm">{error}</p>}
 
       {!loading && !error && !metrics && (
-        <p className="text-white/40 text-sm">No hay métricas cargadas para este mes.</p>
+        <p className="text-slate-400 text-sm">No hay métricas cargadas para este mes.</p>
       )}
 
       {!loading && !error && metrics && (
@@ -195,45 +195,45 @@ export function MetricsSection({
           {Object.entries(grouped).map(([category, items]) => (
             <div
               key={category}
-              className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0d1745]"
+              className="overflow-hidden rounded-2xl border border-slate-200 bg-white"
             >
               {/* Category header */}
-              <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-3">
+              <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3">
                 <div className="flex items-center gap-2">
                   <span className="h-3 w-[2px] rounded-full bg-[#E42D2C]/60" />
-                  <span className="text-xs font-semibold uppercase tracking-widest text-white/50">{category}</span>
+                  <span className="text-xs font-semibold uppercase tracking-widest text-slate-500">{category}</span>
                 </div>
-                <span className="text-[10px] text-white/25 tabular-nums">{items.length} campos</span>
+                <span className="text-[10px] text-slate-300 tabular-nums">{items.length} campos</span>
               </div>
 
               {/* Table */}
               <div className="max-h-[320px] overflow-auto">
                 <table className="w-full">
-                  <thead className="sticky top-0 bg-[#0d1745]/95 backdrop-blur-sm">
-                    <tr className="border-b border-white/[0.05]">
-                      <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wider text-white/25">Campo</th>
-                      <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wider text-white/25">Mensual</th>
-                      <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wider text-white/25">Últ. 12 meses</th>
+                  <thead className="sticky top-0 bg-white/95 backdrop-blur-sm">
+                    <tr className="border-b border-slate-100">
+                      <th className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-300">Campo</th>
+                      <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wider text-slate-300">Mensual</th>
+                      <th className="px-5 py-2.5 text-right text-[10px] font-semibold uppercase tracking-wider text-slate-300">Últ. 12 meses</th>
                     </tr>
                   </thead>
                   <tbody>
                     {items.map((item, i) => (
                       <tr
                         key={item.key}
-                        className={`border-b border-white/[0.04] last:border-b-0 transition-colors hover:bg-white/[0.02] ${i % 2 === 0 ? "" : "bg-white/[0.01]"}`}
+                        className={`border-b border-slate-100 last:border-b-0 transition-colors hover:bg-slate-50 ${i % 2 === 0 ? "" : "bg-slate-50"}`}
                       >
                         <td className="px-5 py-2.5">
-                          <span className="text-xs font-medium text-white/55">
+                          <span className="text-xs font-medium text-slate-500">
                             {getFieldLabel(item.key)}
                           </span>
                         </td>
                         <td className="px-5 py-2.5 text-right">
-                          <span className="font-mono text-sm font-semibold text-white/85">
+                          <span className="font-mono text-sm font-semibold text-slate-800">
                             {item.valueText}
                           </span>
                         </td>
                         <td className="px-5 py-2.5 text-right">
-                          <span className="font-mono text-xs text-white/35">{item.annualValueText}</span>
+                          <span className="font-mono text-xs text-slate-400">{item.annualValueText}</span>
                         </td>
                       </tr>
                     ))}

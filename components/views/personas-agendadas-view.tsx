@@ -68,17 +68,17 @@ function toLocalInputValue(iso: string | null) {
 }
 
 const CALL_STATUS_STYLE: Record<CallStatus, string> = {
-  agendada:   "bg-blue-500/10   text-blue-300   border-blue-500/25",
-  atendida:   "bg-emerald-500/10 text-emerald-300 border-emerald-500/25",
-  no_show:    "bg-red-500/10    text-red-300    border-red-500/25",
-  cancelada:  "bg-zinc-500/10   text-zinc-300   border-zinc-500/25",
-  reagendada: "bg-amber-500/10  text-amber-300  border-amber-500/25",
+  agendada:   "bg-blue-500/10   text-blue-700   border-blue-500/25",
+  atendida:   "bg-emerald-500/10 text-emerald-700 border-emerald-500/25",
+  no_show:    "bg-red-500/10    text-red-700    border-red-500/25",
+  cancelada:  "bg-zinc-500/10   text-zinc-700   border-zinc-500/25",
+  reagendada: "bg-amber-500/10  text-amber-700  border-amber-500/25",
 }
 const SALES_STATUS_STYLE: Record<SalesStatus, string> = {
-  pendiente: "bg-white/[0.05]   text-white/70    border-white/10",
-  propuesta: "bg-amber-500/10   text-amber-300   border-amber-500/25",
-  cerrada:   "bg-emerald-500/10 text-emerald-300 border-emerald-500/25",
-  perdida:   "bg-red-500/10     text-red-300     border-red-500/25",
+  pendiente: "bg-slate-100   text-slate-600    border-slate-200",
+  propuesta: "bg-amber-500/10   text-amber-700   border-amber-500/25",
+  cerrada:   "bg-emerald-500/10 text-emerald-700 border-emerald-500/25",
+  perdida:   "bg-red-500/10     text-red-700     border-red-500/25",
 }
 
 // ─── Star Rating ──────────────────────────────────────────────────────────────
@@ -105,7 +105,7 @@ function StarRating({
           className="transition-transform hover:scale-110 focus:outline-none"
         >
           <Star className={`${dim} transition-colors ${
-            star <= active ? "fill-amber-400 text-amber-400" : "fill-transparent text-white/20"
+            star <= active ? "fill-amber-400 text-amber-600" : "fill-transparent text-slate-300"
           }`} />
         </button>
       ))}
@@ -153,7 +153,7 @@ function ContactActions({ persona }: { persona: Persona }) {
             href={`https://wa.me/${phone}?text=${waText}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex items-center gap-1.5 h-8 rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-3 text-[12px] font-semibold text-emerald-300 hover:bg-emerald-500/20 transition-colors"
+            className="group flex items-center gap-1.5 h-8 rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-3 text-[12px] font-semibold text-emerald-700 hover:bg-emerald-500/20 transition-colors"
             title="Mandar WhatsApp"
           >
             <MessageCircle className="h-3.5 w-3.5" />
@@ -161,7 +161,7 @@ function ContactActions({ persona }: { persona: Persona }) {
           </a>
           <button
             onClick={() => copy(persona.phone!, "Teléfono")}
-            className="flex items-center gap-1.5 h-8 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 text-[12px] font-semibold text-white/65 hover:bg-white/[0.07] hover:text-white transition-colors"
+            className="flex items-center gap-1.5 h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-[12px] font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
             title="Copiar teléfono"
           >
             <Phone className="h-3.5 w-3.5" />
@@ -173,7 +173,7 @@ function ContactActions({ persona }: { persona: Persona }) {
         <>
           <a
             href={`mailto:${persona.email}?subject=${mailSubject}&body=${mailBody}`}
-            className="flex items-center gap-1.5 h-8 rounded-lg border border-blue-500/25 bg-blue-500/10 px-3 text-[12px] font-semibold text-blue-300 hover:bg-blue-500/20 transition-colors"
+            className="flex items-center gap-1.5 h-8 rounded-lg border border-blue-500/25 bg-blue-500/10 px-3 text-[12px] font-semibold text-blue-700 hover:bg-blue-500/20 transition-colors"
             title="Mandar email"
           >
             <Mail className="h-3.5 w-3.5" />
@@ -181,7 +181,7 @@ function ContactActions({ persona }: { persona: Persona }) {
           </a>
           <button
             onClick={() => copy(persona.email!, "Email")}
-            className="flex items-center gap-1.5 h-8 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 text-[12px] font-semibold text-white/65 hover:bg-white/[0.07] hover:text-white transition-colors"
+            className="flex items-center gap-1.5 h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-[12px] font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
             title="Copiar email"
           >
             <Copy className="h-3.5 w-3.5" />
@@ -194,7 +194,7 @@ function ContactActions({ persona }: { persona: Persona }) {
           href={`https://instagram.com/${ig}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 h-8 rounded-lg border border-pink-500/25 bg-pink-500/10 px-3 text-[12px] font-semibold text-pink-300 hover:bg-pink-500/20 transition-colors"
+          className="flex items-center gap-1.5 h-8 rounded-lg border border-pink-500/25 bg-pink-500/10 px-3 text-[12px] font-semibold text-pink-700 hover:bg-pink-500/20 transition-colors"
           title="Ver Instagram"
         >
           <Instagram className="h-3.5 w-3.5" />
@@ -243,26 +243,26 @@ function DetailDrawer({
     setSavingSeg(false)
   }
 
-  const inputCls = "w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-[13px] text-white placeholder:text-white/40 focus:border-white/20 focus:outline-none transition-all"
+  const inputCls = "w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none transition-all"
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-[100] bg-black/40" onClick={onClose} />
-      <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[480px] flex-col border-l border-white/[0.08] shadow-2xl" style={{ backgroundColor: "#0d1745" }}>
+      <div className="fixed inset-0 z-[100] bg-slate-900/30" onClick={onClose} />
+      <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[480px] flex-col border-l border-slate-200 shadow-2xl" style={{ backgroundColor: "#ffffff" }}>
 
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 border-b border-white/[0.06] px-6 py-5">
+        <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5">
           <div className="min-w-0">
-            <h2 className="text-lg font-bold text-white truncate">{persona.name}</h2>
-            <p className="text-[12px] text-white/35 mt-0.5">Agregada {fmtDate(persona.created_at)}</p>
+            <h2 className="text-lg font-bold text-slate-900 truncate">{persona.name}</h2>
+            <p className="text-[12px] text-slate-400 mt-0.5">Agregada {fmtDate(persona.created_at)}</p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button onClick={() => onDelete(persona.id)} disabled={deleting}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-white/20 hover:text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-40">
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-300 hover:text-red-600 hover:bg-red-500/10 transition-all disabled:opacity-40">
               {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             </button>
             <button onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-white/30 hover:text-white hover:bg-white/[0.06] transition-all">
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -271,7 +271,7 @@ function DetailDrawer({
         <div className="flex-1 overflow-y-auto">
 
           {/* Status pills + rating row */}
-          <div className="border-b border-white/[0.06] px-6 py-4 space-y-3">
+          <div className="border-b border-slate-200 px-6 py-4 space-y-3">
             <div className="flex items-center justify-between flex-wrap gap-3">
               <StarRating size="md" value={persona.rating}
                 onChange={n => onPatch(persona.id, { rating: n || null })} />
@@ -283,7 +283,7 @@ function DetailDrawer({
                 className={`rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-wide outline-none cursor-pointer ${CALL_STATUS_STYLE[persona.call_status]}`}
               >
                 {CALL_STATUS_OPTIONS.map(s => (
-                  <option key={s} value={s} className="bg-[#0d1745] text-white">{s}</option>
+                  <option key={s} value={s} className="bg-white text-slate-900">{s}</option>
                 ))}
               </select>
               <select
@@ -292,7 +292,7 @@ function DetailDrawer({
                 className={`rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-wide outline-none cursor-pointer ${SALES_STATUS_STYLE[persona.sales_status]}`}
               >
                 {SALES_STATUS_OPTIONS.map(s => (
-                  <option key={s} value={s} className="bg-[#0d1745] text-white">{s}</option>
+                  <option key={s} value={s} className="bg-white text-slate-900">{s}</option>
                 ))}
               </select>
             </div>
@@ -305,7 +305,7 @@ function DetailDrawer({
           <div className="px-6 py-5 space-y-4">
 
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Llamada agendada</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Llamada agendada</p>
               <input
                 type="datetime-local"
                 defaultValue={toLocalInputValue(persona.scheduled_at)}
@@ -316,7 +316,7 @@ function DetailDrawer({
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Email</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Email</p>
                 <input
                   type="email"
                   defaultValue={persona.email ?? ""}
@@ -326,7 +326,7 @@ function DetailDrawer({
                 />
               </div>
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Teléfono</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Teléfono</p>
                 <input
                   type="tel"
                   defaultValue={persona.phone ?? ""}
@@ -339,7 +339,7 @@ function DetailDrawer({
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Instagram</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Instagram</p>
                 <input
                   type="text"
                   defaultValue={persona.instagram ?? ""}
@@ -349,7 +349,7 @@ function DetailDrawer({
                 />
               </div>
               <div className="space-y-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">De dónde llegó</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">De dónde llegó</p>
                 <input
                   type="text"
                   defaultValue={persona.source ?? ""}
@@ -361,7 +361,7 @@ function DetailDrawer({
             </div>
 
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Owner (responsable)</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Owner (responsable)</p>
               <input
                 type="text"
                 defaultValue={persona.owner ?? ""}
@@ -372,7 +372,7 @@ function DetailDrawer({
             </div>
 
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Notas</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Notas</p>
               <textarea
                 defaultValue={persona.notes ?? ""}
                 placeholder="Contexto, intereses, observaciones..."
@@ -384,29 +384,29 @@ function DetailDrawer({
           </div>
 
           {/* Seguimientos timeline */}
-          <div className="border-t border-white/[0.06] px-6 py-5 space-y-4">
+          <div className="border-t border-slate-200 px-6 py-5 space-y-4">
             <div className="flex items-center gap-2">
               <span className="h-3 w-[3px] rounded-full bg-[#E42D2C]" />
-              <h3 className="text-[12px] font-bold uppercase tracking-widest text-white/70">Seguimientos</h3>
-              <span className="text-[11px] text-white/30">({seguimientos.length})</span>
+              <h3 className="text-[12px] font-bold uppercase tracking-widest text-slate-600">Seguimientos</h3>
+              <span className="text-[11px] text-slate-400">({seguimientos.length})</span>
             </div>
 
             {/* Add seguimiento form */}
-            <form onSubmit={submitSeg} className="space-y-2 rounded-xl border border-white/[0.07] bg-white/[0.02] p-3">
+            <form onSubmit={submitSeg} className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
               <div className="flex items-center gap-2">
                 <select
                   value={newSegType}
                   onChange={e => setNewSegType(e.target.value as SegType)}
-                  className="h-8 rounded-lg border border-white/[0.08] bg-[#080d1e] px-2 text-[12px] text-white outline-none capitalize"
+                  className="h-8 rounded-lg border border-slate-200 bg-slate-50 px-2 text-[12px] text-slate-900 outline-none capitalize"
                 >
-                  {SEGUIMIENTO_TYPES.map(t => <option key={t} value={t} className="bg-[#0d1745]">{t}</option>)}
+                  {SEGUIMIENTO_TYPES.map(t => <option key={t} value={t} className="bg-white">{t}</option>)}
                 </select>
                 <input
                   type="datetime-local"
                   value={newSegDue}
                   onChange={e => setNewSegDue(e.target.value)}
                   placeholder="Vence el..."
-                  className="h-8 flex-1 rounded-lg border border-white/[0.08] bg-[#080d1e] px-2 text-[12px] text-white/80 outline-none"
+                  className="h-8 flex-1 rounded-lg border border-slate-200 bg-slate-50 px-2 text-[12px] text-slate-700 outline-none"
                 />
               </div>
               <div className="flex gap-2">
@@ -414,7 +414,7 @@ function DetailDrawer({
                   value={newSegContent}
                   onChange={e => setNewSegContent(e.target.value)}
                   placeholder="¿Qué hay que hacer / qué pasó?"
-                  className="h-9 flex-1 rounded-lg border border-white/[0.08] bg-[#080d1e] px-3 text-[13px] text-white placeholder:text-white/30 outline-none"
+                  className="h-9 flex-1 rounded-lg border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 outline-none"
                 />
                 <button
                   type="submit"
@@ -429,38 +429,38 @@ function DetailDrawer({
 
             {/* List */}
             {seguimientos.length === 0 ? (
-              <p className="py-4 text-center text-[12px] text-white/30">Sin seguimientos todavía.</p>
+              <p className="py-4 text-center text-[12px] text-slate-400">Sin seguimientos todavía.</p>
             ) : (
               <div className="space-y-2">
                 {seguimientos.map(s => (
-                  <div key={s.id} className={`rounded-xl border px-3 py-2.5 transition-all ${s.completed ? "border-white/[0.04] bg-white/[0.01] opacity-60" : "border-white/[0.07] bg-white/[0.02]"}`}>
+                  <div key={s.id} className={`rounded-xl border px-3 py-2.5 transition-all ${s.completed ? "border-slate-100 bg-slate-50 opacity-60" : "border-slate-200 bg-slate-50"}`}>
                     <div className="flex items-start gap-2.5">
                       <button
                         onClick={() => onPatchSeguimiento(s.id, { completed: !s.completed })}
                         className="mt-0.5 shrink-0 transition-transform hover:scale-110"
                       >
                         {s.completed
-                          ? <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                          : <Circle className="h-4 w-4 text-white/30 hover:text-white/60" />}
+                          ? <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                          : <Circle className="h-4 w-4 text-slate-400 hover:text-slate-600" />}
                       </button>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="rounded-full bg-white/[0.04] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white/50 capitalize">
+                          <span className="rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 capitalize">
                             {s.type}
                           </span>
                           {s.due_at && (
-                            <span className="flex items-center gap-1 text-[11px] text-white/40">
+                            <span className="flex items-center gap-1 text-[11px] text-slate-400">
                               <CalIcon className="h-3 w-3" /> {fmtDateTime(s.due_at)}
                             </span>
                           )}
                         </div>
-                        <p className={`mt-1 text-[13px] leading-snug ${s.completed ? "text-white/40 line-through" : "text-white/85"}`}>
-                          {s.content || <span className="text-white/30 italic">Sin contenido</span>}
+                        <p className={`mt-1 text-[13px] leading-snug ${s.completed ? "text-slate-400 line-through" : "text-slate-800"}`}>
+                          {s.content || <span className="text-slate-400 italic">Sin contenido</span>}
                         </p>
                       </div>
                       <button
                         onClick={() => onDeleteSeguimiento(s.id)}
-                        className="shrink-0 text-white/15 hover:text-red-400 transition-colors"
+                        className="shrink-0 text-slate-300 hover:text-red-600 transition-colors"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -510,64 +510,64 @@ function NewPersonaModal({
     })
   }
 
-  const inputCls = "w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-[13px] text-white placeholder:text-white/40 focus:border-white/20 focus:outline-none transition-all"
+  const inputCls = "w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none transition-all"
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-[100] bg-black/40" onClick={onClose} />
+      <div className="fixed inset-0 z-[100] bg-slate-900/30" onClick={onClose} />
       <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-md rounded-2xl border border-white/[0.10] shadow-2xl p-6 space-y-3.5 max-h-[90vh] overflow-y-auto"
-          style={{ backgroundColor: "#0d1745" }}
+          className="w-full max-w-md rounded-2xl border border-slate-200 shadow-2xl p-6 space-y-3.5 max-h-[90vh] overflow-y-auto"
+          style={{ backgroundColor: "#ffffff" }}
         >
           <div className="flex items-center justify-between mb-1">
-            <h3 className="text-base font-bold text-white">Nueva persona agendada</h3>
+            <h3 className="text-base font-bold text-slate-900">Nueva persona agendada</h3>
             <button type="button" onClick={onClose}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-white/30 hover:text-white hover:bg-white/[0.06] transition-all">
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
               <X className="h-4 w-4" />
             </button>
           </div>
 
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Nombre *</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Nombre *</p>
             <input autoFocus type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Nombre completo" className={inputCls} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Email</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Email</p>
               <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="correo@..." className={inputCls} />
             </div>
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Teléfono</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Teléfono</p>
               <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+54..." className={inputCls} />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Instagram</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Instagram</p>
             <input type="text" value={instagram} onChange={e => setInstagram(e.target.value)} placeholder="@usuario" className={inputCls} />
           </div>
 
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Llamada agendada</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Llamada agendada</p>
             <input type="datetime-local" value={scheduledAt} onChange={e => setScheduledAt(e.target.value)} className={inputCls} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">De dónde llegó</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">De dónde llegó</p>
               <input type="text" value={source} onChange={e => setSource(e.target.value)} placeholder="Instagram, ad..." className={inputCls} />
             </div>
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Owner</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Owner</p>
               <input type="text" value={owner} onChange={e => setOwner(e.target.value)} placeholder="Quien hace seguimiento" className={inputCls} />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Calificación</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Calificación</p>
             <StarRating size="md" value={rating || null} onChange={n => setRating(n === rating ? 0 : n)} />
           </div>
 
@@ -784,18 +784,18 @@ export function PersonasAgendadasView() {
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">Personas Agendadas</h1>
-            <p className="text-sm text-white/40 mt-0.5">
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Personas Agendadas</h1>
+            <p className="text-sm text-slate-400 mt-0.5">
               {personas.length} {personas.length === 1 ? "persona" : "personas"} en pipeline
             </p>
           </div>
           <div className="flex items-center gap-2">
             <button onClick={fetchAll} disabled={loading}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-white/40 hover:text-white hover:border-white/20 transition-all disabled:opacity-40">
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40">
               <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             </button>
             <button onClick={exportCsv} disabled={!filtered.length}
-              className="flex items-center gap-2 h-9 rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-sm font-medium text-white/50 hover:text-white hover:border-white/20 transition-all disabled:opacity-40">
+              className="flex items-center gap-2 h-9 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-500 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40">
               <Download className="h-3.5 w-3.5" />
               CSV
             </button>
@@ -815,7 +815,7 @@ export function PersonasAgendadasView() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar por nombre, email, instagram, owner..."
-            className="h-9 rounded-xl border border-white/[0.08] bg-[#080d1e] px-4 text-sm text-white placeholder:text-white/25 focus:border-white/20 focus:outline-none flex-1 min-w-[220px] max-w-sm"
+            className="h-9 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 placeholder:text-slate-300 focus:border-[#1e3a8a]/40 focus:outline-none flex-1 min-w-[220px] max-w-sm"
           />
           <div className="flex items-center gap-1.5 flex-wrap">
             <button
@@ -823,7 +823,7 @@ export function PersonasAgendadasView() {
               className={`h-8 rounded-xl border px-3 text-[12px] font-medium transition-all ${
                 filterCallStatus === "todas"
                   ? "border-[#E42D2C]/40 bg-[#E42D2C]/10 text-[#E42D2C]"
-                  : "border-white/[0.07] text-white/40 hover:text-white hover:border-white/20"
+                  : "border-slate-200 text-slate-400 hover:text-slate-900 hover:border-slate-300"
               }`}>
               Todas
             </button>
@@ -834,7 +834,7 @@ export function PersonasAgendadasView() {
                 className={`h-8 rounded-xl border px-3 text-[12px] font-medium transition-all capitalize ${
                   filterCallStatus === s
                     ? CALL_STATUS_STYLE[s].replace(/border-/g, "border-").replace(/\/25/g, "/40")
-                    : "border-white/[0.07] text-white/40 hover:text-white hover:border-white/20"
+                    : "border-slate-200 text-slate-400 hover:text-slate-900 hover:border-slate-300"
                 }`}>
                 {s}
               </button>
@@ -843,7 +843,7 @@ export function PersonasAgendadasView() {
         </div>
 
         {/* Table */}
-        <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0d1745]">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <Loader2 className="h-6 w-6 animate-spin text-[#E42D2C]/40" />
@@ -852,28 +852,28 @@ export function PersonasAgendadasView() {
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="border-b border-white/[0.06] bg-white/[0.02]">
+                  <tr className="border-b border-slate-200 bg-slate-50">
                     {["Nombre","Llamada","Llamada","Venta","Owner","Source","Rating","Contacto",""].map((h, i) => (
-                      <th key={i} className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.12em] text-white/40 whitespace-nowrap">{h}</th>
+                      <th key={i} className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {!filtered.length ? (
-                    <tr><td colSpan={9} className="py-16 text-center text-sm text-white/25">
+                    <tr><td colSpan={9} className="py-16 text-center text-sm text-slate-300">
                       {personas.length ? "No hay coincidencias." : "Todavía no hay personas agendadas. Crea la primera."}
                     </td></tr>
                   ) : filtered.map(p => (
                     <tr key={p.id}
                       onClick={() => setSelected(p)}
-                      className="border-b border-white/[0.04] cursor-pointer transition-colors group hover:bg-white/[0.02]">
+                      className="border-b border-slate-100 cursor-pointer transition-colors group hover:bg-slate-50">
 
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="text-[14px] font-semibold text-white">{p.name}</div>
-                        <div className="text-[11px] text-white/40 mt-0.5">{p.email ?? "—"}</div>
+                        <div className="text-[14px] font-semibold text-slate-900">{p.name}</div>
+                        <div className="text-[11px] text-slate-400 mt-0.5">{p.email ?? "—"}</div>
                       </td>
 
-                      <td className="px-4 py-4 whitespace-nowrap text-[12px] text-white/60">
+                      <td className="px-4 py-4 whitespace-nowrap text-[12px] text-slate-600">
                         {fmtDateTime(p.scheduled_at)}
                       </td>
 
@@ -889,12 +889,12 @@ export function PersonasAgendadasView() {
                         </span>
                       </td>
 
-                      <td className="px-4 py-4 whitespace-nowrap text-[13px] text-white/70">
-                        {p.owner ?? <span className="text-white/30">—</span>}
+                      <td className="px-4 py-4 whitespace-nowrap text-[13px] text-slate-600">
+                        {p.owner ?? <span className="text-slate-400">—</span>}
                       </td>
 
-                      <td className="px-4 py-4 whitespace-nowrap text-[13px] text-white/70">
-                        {p.source ?? <span className="text-white/30">—</span>}
+                      <td className="px-4 py-4 whitespace-nowrap text-[13px] text-slate-600">
+                        {p.source ?? <span className="text-slate-400">—</span>}
                       </td>
 
                       <td className="px-4 py-4 whitespace-nowrap" onClick={e => e.stopPropagation()}>
@@ -905,13 +905,13 @@ export function PersonasAgendadasView() {
                       <td className="px-4 py-4 whitespace-nowrap" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center gap-2">
                           {p.phone && (
-                            <a href={`tel:${p.phone}`} className="text-white/40 hover:text-white transition-colors" title={p.phone}>
+                            <a href={`tel:${p.phone}`} className="text-slate-400 hover:text-slate-900 transition-colors" title={p.phone}>
                               <Phone className="h-3.5 w-3.5" />
                             </a>
                           )}
                           {p.instagram && (
                             <a href={`https://instagram.com/${p.instagram.replace("@","")}`} target="_blank" rel="noreferrer"
-                              className="text-pink-300/70 hover:text-pink-300 transition-colors" title={p.instagram}>
+                              className="text-pink-700/70 hover:text-pink-700 transition-colors" title={p.instagram}>
                               <Instagram className="h-3.5 w-3.5" />
                             </a>
                           )}
@@ -919,7 +919,7 @@ export function PersonasAgendadasView() {
                       </td>
 
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <ChevronRight className="h-4 w-4 text-white/25 group-hover:text-white/60 transition-colors" />
+                        <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-slate-600 transition-colors" />
                       </td>
                     </tr>
                   ))}

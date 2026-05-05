@@ -32,7 +32,7 @@ const SECTIONS = [
     id: "sop-sistemas",
     label: "SOPs de Sistemas",
     icon: Cog,
-    color: "text-blue-400",
+    color: "text-blue-600",
     accent: "border-blue-400/20 bg-blue-400/5",
     desc: "Automatizaciones, integraciones y documentación técnica de herramientas.",
   },
@@ -48,7 +48,7 @@ const SECTIONS = [
     id: "recursos-internos",
     label: "Recursos Internos",
     icon: FolderKanban,
-    color: "text-purple-400",
+    color: "text-purple-600",
     accent: "border-purple-400/20 bg-purple-400/5",
     desc: "Links, plantillas, documentos y materiales del equipo.",
   },
@@ -56,7 +56,7 @@ const SECTIONS = [
     id: "accesos",
     label: "Accesos y Herramientas",
     icon: KeyRound,
-    color: "text-amber-400",
+    color: "text-amber-600",
     accent: "border-amber-400/20 bg-amber-400/5",
     desc: "Referencia de herramientas del stack. No guardar contraseñas en texto plano.",
   },
@@ -65,10 +65,10 @@ const SECTIONS = [
 type SectionId = (typeof SECTIONS)[number]["id"]
 
 const TYPE_CONFIG: Record<ResourceType, { label: string; icon: React.ElementType; color: string }> = {
-  link:  { label: "Link",    icon: Link2,    color: "text-blue-400"   },
+  link:  { label: "Link",    icon: Link2,    color: "text-blue-600"   },
   doc:   { label: "Doc",     icon: FileText,  color: "text-green-400"  },
-  video: { label: "Video",   icon: Video,     color: "text-purple-400" },
-  file:  { label: "Archivo", icon: File,      color: "text-amber-400"  },
+  video: { label: "Video",   icon: Video,     color: "text-purple-600" },
+  file:  { label: "Archivo", icon: File,      color: "text-amber-600"  },
 }
 
 // ─── Templates ────────────────────────────────────────────────────────────────
@@ -363,7 +363,7 @@ function ContentRenderer({ content }: { content: string }) {
       {lines.map((line, i) => {
         if (line.startsWith("## ")) {
           return (
-            <h3 key={i} className="text-sm font-semibold text-white mt-5 mb-2 first:mt-0">
+            <h3 key={i} className="text-sm font-semibold text-slate-900 mt-5 mb-2 first:mt-0">
               {line.replace("## ", "")}
             </h3>
           )
@@ -372,7 +372,7 @@ function ContentRenderer({ content }: { content: string }) {
           return (
             <div key={i} className="flex items-start gap-2 py-1">
               <ArrowRight className="h-3.5 w-3.5 text-[#E42D2C] flex-shrink-0 mt-0.5" />
-              <span className="text-sm text-white/80 font-medium">{line.replace("→ ", "")}</span>
+              <span className="text-sm text-slate-700 font-medium">{line.replace("→ ", "")}</span>
             </div>
           )
         }
@@ -380,7 +380,7 @@ function ContentRenderer({ content }: { content: string }) {
           return (
             <div key={i} className="flex items-start gap-2 pl-2 py-0.5">
               <span className="h-1.5 w-1.5 rounded-full bg-white/20 flex-shrink-0 mt-2" />
-              <span className="text-xs text-white/50 leading-relaxed">{line.replace(/^- /, "")}</span>
+              <span className="text-xs text-slate-500 leading-relaxed">{line.replace(/^- /, "")}</span>
             </div>
           )
         }
@@ -391,13 +391,13 @@ function ContentRenderer({ content }: { content: string }) {
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#E42D2C]/15 text-[10px] font-bold text-[#E42D2C] flex-shrink-0 mt-0.5">
                 {num}
               </span>
-              <span className="text-xs text-white/50 leading-relaxed">{line.replace(/^\d+\. /, "")}</span>
+              <span className="text-xs text-slate-500 leading-relaxed">{line.replace(/^\d+\. /, "")}</span>
             </div>
           )
         }
         if (line.trim() === "") return <div key={i} className="h-1" />
         return (
-          <p key={i} className="text-xs text-white/50 leading-relaxed pl-2">{line}</p>
+          <p key={i} className="text-xs text-slate-500 leading-relaxed pl-2">{line}</p>
         )
       })}
     </div>
@@ -478,29 +478,29 @@ function SOPModal({
     <Portal>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-[100] bg-black/40"
+        className="fixed inset-0 z-[100] bg-slate-900/30"
         onClick={onClose}
       />
 
       {/* Panel container */}
       <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-        <div className="relative flex flex-col w-full max-w-2xl max-h-[90vh] rounded-2xl border border-white/[0.1] bg-[#0d1745] shadow-2xl overflow-hidden">
+        <div className="relative flex flex-col w-full max-w-2xl max-h-[90vh] rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden">
 
         {/* Header */}
-        <div className="flex items-start gap-3 p-5 border-b border-white/[0.07] flex-shrink-0">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.05] flex-shrink-0">
+        <div className="flex items-start gap-3 p-5 border-b border-slate-200 flex-shrink-0">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 flex-shrink-0">
             <Icon className={`h-5 w-5 ${cfg.color}`} />
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="text-base font-semibold text-white leading-snug">{item.title}</h2>
+            <h2 className="text-base font-semibold text-slate-900 leading-snug">{item.title}</h2>
             {item.description && (
-              <p className="text-xs text-white/40 mt-0.5">{item.description}</p>
+              <p className="text-xs text-slate-400 mt-0.5">{item.description}</p>
             )}
             <div className="flex items-center gap-3 mt-1.5">
               <span className={`text-[10px] font-semibold uppercase tracking-widest ${cfg.color}`}>
                 {cfg.label}
               </span>
-              <span className="text-[10px] text-white/20">{date}</span>
+              <span className="text-[10px] text-slate-300">{date}</span>
               {item.url && item.url !== "#" && (
                 <a
                   href={item.url}
@@ -516,7 +516,7 @@ function SOPModal({
           </div>
           <button
             onClick={onClose}
-            className="flex-shrink-0 text-white/30 hover:text-white/60 transition-colors"
+            className="flex-shrink-0 text-slate-400 hover:text-slate-600 transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -525,9 +525,9 @@ function SOPModal({
         {/* Security warning for accesos */}
         {isAccesos && (
           <div className="flex items-start gap-2.5 mx-5 mt-4 rounded-xl border border-amber-400/20 bg-amber-400/5 px-4 py-3 flex-shrink-0">
-            <AlertTriangle className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-amber-300/70 leading-relaxed">
-              <span className="font-semibold text-amber-300">No guardes contraseñas aquí.</span>{" "}
+            <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-amber-700/70 leading-relaxed">
+              <span className="font-semibold text-amber-700">No guardes contraseñas aquí.</span>{" "}
               Solo referencias (email, usuario). Las credenciales deben estar en el gestor de claves del equipo.
             </p>
           </div>
@@ -538,7 +538,7 @@ function SOPModal({
           {/* Templates — only when no content */}
           {!content && !editing && templates.length > 0 && (
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-white/30 mb-2">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-2">
                 Comenzar con un template
               </p>
               <div className="flex flex-wrap gap-2">
@@ -546,7 +546,7 @@ function SOPModal({
                   <button
                     key={t.label}
                     onClick={() => applyTemplate(t)}
-                    className="flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs text-white/50 hover:text-white hover:bg-white/[0.07] transition-all"
+                    className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all"
                   >
                     <Copy className="h-3 w-3" />
                     {t.label}
@@ -565,14 +565,14 @@ function SOPModal({
               autoFocus
               rows={20}
               placeholder={`Escribí el contenido del SOP...\n\nUsá:\n## Título de sección\n→ Paso con flecha\n- Ítem de lista\n1. Paso numerado`}
-              className="w-full rounded-xl bg-white/[0.04] border border-[#E42D2C]/20 px-4 py-3 text-sm text-white/80 placeholder-white/20 focus:outline-none focus:border-[#E42D2C]/40 resize-none leading-relaxed font-mono"
+              className="w-full rounded-xl bg-slate-50 border border-[#E42D2C]/20 px-4 py-3 text-sm text-slate-700 placeholder-white/20 focus:outline-none focus:border-[#E42D2C]/40 resize-none leading-relaxed font-mono"
             />
           ) : content ? (
             <ContentRenderer content={content} />
           ) : (
             <div className="flex flex-col items-center justify-center py-10 gap-3">
-              <FileText className="h-8 w-8 text-white/10" />
-              <p className="text-xs text-white/20 text-center">
+              <FileText className="h-8 w-8 text-slate-300" />
+              <p className="text-xs text-slate-300 text-center">
                 Este SOP todavía no tiene contenido.<br />
                 Usá un template o escribí desde cero.
               </p>
@@ -581,12 +581,12 @@ function SOPModal({
         </div>
 
         {/* Footer actions */}
-        <div className="flex items-center justify-between gap-3 p-4 border-t border-white/[0.07] flex-shrink-0">
+        <div className="flex items-center justify-between gap-3 p-4 border-t border-slate-200 flex-shrink-0">
           <div className="flex items-center gap-2">
             <button
               onClick={handleDelete}
               disabled={deleting}
-              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-white/30 hover:text-red-400 hover:bg-red-400/5 border border-transparent hover:border-red-400/10 transition-all"
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-slate-400 hover:text-red-600 hover:bg-red-400/5 border border-transparent hover:border-red-400/10 transition-all"
             >
               {deleting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
               Eliminar
@@ -594,7 +594,7 @@ function SOPModal({
             {content && !editing && (
               <button
                 onClick={handleCopy}
-                className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-white/30 hover:text-white/60 border border-transparent hover:border-white/[0.08] transition-all"
+                className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-slate-400 hover:text-slate-600 border border-transparent hover:border-slate-200 transition-all"
               >
                 {copied ? <Check className="h-3.5 w-3.5 text-green-400" /> : <Copy className="h-3.5 w-3.5" />}
                 {copied ? "Copiado" : "Copiar"}
@@ -607,7 +607,7 @@ function SOPModal({
               <>
                 <button
                   onClick={() => { setContent(item.content ?? ""); setEditing(false) }}
-                  className="rounded-lg px-3 py-1.5 text-xs text-white/40 hover:text-white/60 transition-colors"
+                  className="rounded-lg px-3 py-1.5 text-xs text-slate-400 hover:text-slate-600 transition-colors"
                 >
                   Cancelar
                 </button>
@@ -623,7 +623,7 @@ function SOPModal({
             ) : (
               <button
                 onClick={() => setEditing(true)}
-                className="flex items-center gap-1.5 rounded-xl bg-white/[0.07] px-4 py-1.5 text-xs font-semibold text-white hover:bg-white/[0.12] transition-colors border border-white/[0.08]"
+                className="flex items-center gap-1.5 rounded-xl bg-slate-100 px-4 py-1.5 text-xs font-semibold text-slate-900 hover:bg-slate-200 transition-colors border border-slate-200"
               >
                 <Pencil className="h-3.5 w-3.5" />
                 Editar
@@ -677,19 +677,19 @@ function AddItemForm({
   }
 
   return (
-    <div className="rounded-2xl border border-[#E42D2C]/20 bg-[#0d1745] p-5 mb-5">
+    <div className="rounded-2xl border border-[#E42D2C]/20 bg-white p-5 mb-5">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-white">Nuevo ítem</h3>
-        <button onClick={onClose} className="text-white/30 hover:text-white/60 transition-colors">
+        <h3 className="text-sm font-semibold text-slate-900">Nuevo ítem</h3>
+        <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
           <X className="h-4 w-4" />
         </button>
       </div>
 
       {isAccesos && (
         <div className="flex items-start gap-2.5 rounded-xl border border-amber-400/20 bg-amber-400/5 px-4 py-3 mb-4">
-          <AlertTriangle className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-amber-300/80 leading-relaxed">
-            <span className="font-semibold text-amber-300">No guardes contraseñas en texto plano.</span>{" "}
+          <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-amber-700/80 leading-relaxed">
+            <span className="font-semibold text-amber-700">No guardes contraseñas en texto plano.</span>{" "}
             Solo referencias (email, usuario, dónde encontrar las credenciales).
           </p>
         </div>
@@ -701,21 +701,21 @@ function AddItemForm({
           placeholder="Título *"
           value={form.title}
           onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-          className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40"
+          className="w-full rounded-xl bg-slate-100 border border-slate-200 px-3 py-2.5 text-sm text-slate-900 placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40"
         />
         <input
           type="text"
           placeholder={isAccesos ? "URL de la herramienta (opcional)" : "URL (opcional)"}
           value={form.url}
           onChange={e => setForm(f => ({ ...f, url: e.target.value }))}
-          className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40"
+          className="w-full rounded-xl bg-slate-100 border border-slate-200 px-3 py-2.5 text-sm text-slate-900 placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40"
         />
         <textarea
           placeholder="Descripción breve (opcional)"
           value={form.description}
           rows={2}
           onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-          className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40 resize-none"
+          className="w-full rounded-xl bg-slate-100 border border-slate-200 px-3 py-2.5 text-sm text-slate-900 placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40 resize-none"
         />
         <div className="flex gap-2 flex-wrap">
           {(Object.keys(TYPE_CONFIG) as ResourceType[]).map(t => {
@@ -728,7 +728,7 @@ function AddItemForm({
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium border transition-all ${
                   form.type === t
                     ? "border-[#E42D2C]/40 bg-[#E42D2C]/10 text-[#E42D2C]"
-                    : "border-white/[0.08] bg-white/[0.03] text-white/40 hover:text-white/70"
+                    : "border-slate-200 bg-slate-50 text-slate-400 hover:text-slate-600"
                 }`}
               >
                 <cfg.icon className="h-3 w-3" />
@@ -737,7 +737,7 @@ function AddItemForm({
             )
           })}
         </div>
-        {error && <p className="text-xs text-red-400">{error}</p>}
+        {error && <p className="text-xs text-red-600">{error}</p>}
         <div className="flex justify-end">
           <button
             type="submit"
@@ -769,16 +769,16 @@ function ItemRow({
   return (
     <button
       onClick={onClick}
-      className="w-full group flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-[#0d1745] px-4 py-3.5 hover:border-white/[0.15] hover:bg-white/[0.03] transition-all text-left"
+      className="w-full group flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3.5 hover:border-slate-300 hover:bg-slate-50 transition-all text-left"
     >
-      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.05] flex-shrink-0">
+      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 flex-shrink-0">
         <Icon className={`h-4 w-4 ${cfg.color}`} />
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-white truncate">{item.title}</p>
+        <p className="text-sm font-semibold text-slate-900 truncate">{item.title}</p>
         {item.description && (
-          <p className="text-xs text-white/35 truncate mt-0.5">{item.description}</p>
+          <p className="text-xs text-slate-400 truncate mt-0.5">{item.description}</p>
         )}
       </div>
 
@@ -788,7 +788,7 @@ function ItemRow({
             Documentado
           </span>
         )}
-        <ChevronRight className="h-4 w-4 text-white/20 group-hover:text-white/50 transition-colors" />
+        <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-slate-500 transition-colors" />
       </div>
     </button>
   )
@@ -826,23 +826,23 @@ function SectionPanel({
     <div className="space-y-4">
       {/* Section header */}
       <div className={`flex items-start gap-3 rounded-2xl border p-4 ${section.accent}`}>
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.05] flex-shrink-0">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 flex-shrink-0">
           <Icon className={`h-5 w-5 ${section.color}`} />
         </div>
         <div className="flex-1 min-w-0">
-          <h2 className="text-sm font-semibold text-white">{section.label}</h2>
-          <p className="text-xs text-white/40 mt-0.5">{section.desc}</p>
+          <h2 className="text-sm font-semibold text-slate-900">{section.label}</h2>
+          <p className="text-xs text-slate-400 mt-0.5">{section.desc}</p>
         </div>
-        <span className="text-[10px] font-semibold text-white/20 bg-white/[0.05] rounded-full px-2.5 py-1 flex-shrink-0">
+        <span className="text-[10px] font-semibold text-slate-300 bg-slate-100 rounded-full px-2.5 py-1 flex-shrink-0">
           {items.length}
         </span>
       </div>
 
       {isAccesos && (
         <div className="flex items-start gap-2.5 rounded-xl border border-amber-400/20 bg-amber-400/5 px-4 py-3">
-          <AlertTriangle className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-amber-300/70 leading-relaxed">
-            <span className="font-semibold text-amber-300">Aviso de seguridad:</span>{" "}
+          <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-amber-700/70 leading-relaxed">
+            <span className="font-semibold text-amber-700">Aviso de seguridad:</span>{" "}
             Guardá solo referencias (email, usuario, dónde están las credenciales). Las contraseñas deben
             vivir en el gestor de claves del equipo.
           </p>
@@ -852,13 +852,13 @@ function SectionPanel({
       {/* Toolbar */}
       <div className="flex items-center gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-white/30" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
           <input
             type="text"
             placeholder="Buscar…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] pl-9 pr-4 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40"
+            className="w-full rounded-xl bg-slate-100 border border-slate-200 pl-9 pr-4 py-2 text-sm text-slate-900 placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40"
           />
         </div>
         <button
@@ -882,8 +882,8 @@ function SectionPanel({
       {/* Items list */}
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-14 gap-3">
-          <FolderOpen className="h-8 w-8 text-white/10" />
-          <p className="text-xs text-white/20">
+          <FolderOpen className="h-8 w-8 text-slate-300" />
+          <p className="text-xs text-slate-300">
             {search ? "Sin resultados" : "Todavía no hay ítems en esta sección"}
           </p>
           {!showForm && !search && (
@@ -968,9 +968,9 @@ export function AdminCentroOperativoView() {
       <div>
         <div className="flex items-center gap-2.5 mb-1">
           <span className="h-4 w-[3px] rounded-full bg-[#E42D2C]" />
-          <h1 className="text-sm font-semibold uppercase tracking-widest text-white/70">Centro Operativo</h1>
+          <h1 className="text-sm font-semibold uppercase tracking-widest text-slate-600">Centro Operativo</h1>
         </div>
-        <p className="text-xs text-white/30 ml-[18px]">
+        <p className="text-xs text-slate-400 ml-[18px]">
           Base interna de SOPs, recursos, accesos y procesos del equipo GovBidder.
         </p>
       </div>
@@ -989,14 +989,14 @@ export function AdminCentroOperativoView() {
                 "flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-medium border transition-all",
                 isActive
                   ? "border-[#E42D2C]/30 bg-[#E42D2C]/10 text-[#E42D2C]"
-                  : "border-white/[0.08] bg-white/[0.03] text-white/50 hover:text-white/80 hover:bg-white/[0.06]",
+                  : "border-slate-200 bg-slate-50 text-slate-500 hover:text-slate-700 hover:bg-slate-100",
               )}
             >
               <Icon className={`h-3.5 w-3.5 ${isActive ? "text-[#E42D2C]" : s.color}`} />
               {s.label}
               <span className={cn(
                 "text-[10px] rounded-full px-1.5 py-0.5",
-                isActive ? "bg-[#E42D2C]/20 text-[#E42D2C]" : "bg-white/[0.07] text-white/30",
+                isActive ? "bg-[#E42D2C]/20 text-[#E42D2C]" : "bg-slate-100 text-slate-400",
               )}>
                 {count}
               </span>
@@ -1008,7 +1008,7 @@ export function AdminCentroOperativoView() {
       {/* Active section */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-6 w-6 animate-spin text-white/20" />
+          <Loader2 className="h-6 w-6 animate-spin text-slate-300" />
         </div>
       ) : (
         <SectionPanel

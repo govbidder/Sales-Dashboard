@@ -92,26 +92,26 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
   }, [])
 
   const palette = {
-    success: { icon: CheckCircle2, color: "text-emerald-300", ring: "ring-emerald-500/25", bg: "bg-emerald-500/[0.06]" },
-    error:   { icon: AlertCircle,  color: "text-red-300",     ring: "ring-red-500/25",     bg: "bg-red-500/[0.06]"     },
-    info:    { icon: Info,         color: "text-blue-300",    ring: "ring-blue-500/25",    bg: "bg-blue-500/[0.06]"    },
+    success: { icon: CheckCircle2, color: "text-emerald-700", ring: "ring-emerald-500/25", bg: "bg-emerald-500/[0.06]" },
+    error:   { icon: AlertCircle,  color: "text-red-700",     ring: "ring-red-500/25",     bg: "bg-red-500/[0.06]"     },
+    info:    { icon: Info,         color: "text-blue-700",    ring: "ring-blue-500/25",    bg: "bg-blue-500/[0.06]"    },
   }[toast.variant]
 
   const Icon = palette.icon
 
   return (
     <div
-      className={`pointer-events-auto flex items-start gap-2.5 min-w-[260px] max-w-[380px] rounded-xl border border-white/[0.08] backdrop-blur-xl px-3.5 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.4)] ring-1 ${palette.ring} ${palette.bg} transition-all duration-300 ${
+      className={`pointer-events-auto flex items-start gap-2.5 min-w-[260px] max-w-[380px] rounded-xl border border-slate-200 backdrop-blur-xl px-3.5 py-3 shadow-[0_12px_40px_rgba(15,23,42,0.15)] ring-1 ${palette.ring} ${palette.bg} transition-all duration-300 ${
         open ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
       }`}
-      style={{ backgroundColor: "rgba(13,23,69,0.92)" }}
+      style={{ backgroundColor: "rgba(255,255,255,0.95)" }}
       role="status"
     >
       <Icon className={`h-4 w-4 mt-0.5 shrink-0 ${palette.color}`} />
-      <p className="flex-1 text-[13px] text-white/90 leading-snug">{toast.message}</p>
+      <p className="flex-1 text-[13px] text-slate-900 leading-snug">{toast.message}</p>
       <button
         onClick={onDismiss}
-        className="shrink-0 text-white/30 hover:text-white/70 transition-colors -mt-0.5"
+        className="shrink-0 text-slate-400 hover:text-slate-600 transition-colors -mt-0.5"
         aria-label="Cerrar"
       >
         <X className="h-3.5 w-3.5" />
