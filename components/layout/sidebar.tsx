@@ -203,28 +203,29 @@ export function Sidebar({ open, onClose, collapsed, onToggleCollapse }: SidebarP
           ))}
         </nav>
 
-        {/* Collapse toggle (desktop only) */}
-        <div className="hidden lg:flex flex-shrink-0 border-t-2 border-[#1e3a8a]/10 p-2">
-          <button
-            onClick={onToggleCollapse}
-            className={cn(
-              "group flex items-center gap-2 rounded-lg transition-all hover:bg-slate-100",
-              showLabels ? "w-full px-3 py-2 justify-start" : "h-10 w-12 mx-auto justify-center",
-            )}
-            title={collapsed ? "Expandir" : "Colapsar"}
-          >
-            {collapsed ? (
-              <ChevronRight className="h-4 w-4 text-slate-500 group-hover:text-[#1e3a8a]" />
-            ) : (
-              <ChevronLeft className="h-4 w-4 text-slate-500 group-hover:text-[#1e3a8a]" />
-            )}
-            {showLabels && (
-              <span className="text-[12px] font-medium text-slate-500 group-hover:text-[#1e3a8a]">
-                Colapsar
-              </span>
-            )}
-          </button>
-        </div>
+        {/* Floating collapse toggle on right edge — desktop only.
+           Sits at topbar height (h-16/2 = 32px) so it visually anchors
+           to the corner where sidebar+topbar borders meet. */}
+        <button
+          onClick={onToggleCollapse}
+          aria-label={collapsed ? "Expandir sidebar" : "Colapsar sidebar"}
+          title={collapsed ? "Expandir" : "Colapsar"}
+          className={cn(
+            "hidden lg:flex absolute top-[20px] -right-3 z-10",
+            "h-6 w-6 items-center justify-center rounded-full",
+            "border border-[#1e3a8a]/15 bg-white text-slate-500",
+            "shadow-[0_2px_8px_rgba(15,23,42,0.08)]",
+            "transition-all duration-200",
+            "hover:border-[#1e3a8a]/40 hover:text-[#1e3a8a] hover:scale-110",
+            "hover:shadow-[0_4px_12px_rgba(30,58,138,0.18)]",
+          )}
+        >
+          {collapsed ? (
+            <ChevronRight className="h-3.5 w-3.5" />
+          ) : (
+            <ChevronLeft className="h-3.5 w-3.5" />
+          )}
+        </button>
       </aside>
     </>
   )
