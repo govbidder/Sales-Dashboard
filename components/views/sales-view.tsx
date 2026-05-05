@@ -127,19 +127,17 @@ export function SalesView() {
         const supabase = createClient()
         const { data: { user }, error: uErr } = await supabase.auth.getUser()
         if (uErr) throw uErr
-        if (!user || !activeClientId) return
+        if (!user) return
 
         const [curRes, histRes] = await Promise.all([
           supabase
             .from("monthly_reports")
             .select("scheduled_calls,attended_calls,aplications,new_clients,offer_docs_sent,offer_docs_responded,cierres_por_offerdoc")
-            .eq("client_id", activeClientId)
             .eq("month", monthValue)
             .maybeSingle(),
           supabase
             .from("monthly_reports")
             .select("month,scheduled_calls,attended_calls,new_clients,offer_docs_sent,offer_docs_responded,cierres_por_offerdoc,aplications")
-            .eq("client_id", activeClientId)
             .order("month", { ascending: true })
             .limit(12),
         ])

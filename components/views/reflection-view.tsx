@@ -57,11 +57,6 @@ export function ReflectionView() {
 
   useEffect(() => {
     let mounted = true
-    if (!activeClientId) {
-      setLoading(true)
-      setData(null)
-      return () => { mounted = false }
-    }
     async function load() {
       try {
         if (mounted) {
@@ -75,12 +70,9 @@ export function ReflectionView() {
         } = await supabase.auth.getUser()
         if (userErr) throw userErr
         if (!user) throw new Error("No session")
-        const clientId = activeClientId
-        if (!clientId) return
         const { data: report, error: rErr } = await supabase
           .from("monthly_reports")
           .select("*")
-          .eq("client_id", clientId)
           .eq("month", monthValue)
           .maybeSingle()
         if (rErr) throw rErr
@@ -100,7 +92,7 @@ export function ReflectionView() {
     return () => {
       mounted = false
     }
-  }, [monthValue, activeClientId])
+  }, [monthValue])
 
   const nps = pickNumber(data, ["nps_score"])
 

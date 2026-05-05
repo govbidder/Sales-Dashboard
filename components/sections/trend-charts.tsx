@@ -238,7 +238,6 @@ export function TrendCharts() {
 
   useEffect(() => {
     let mounted = true
-    if (!activeClientId) { setLoading(true); setRows([]); return () => { mounted = false } }
 
     async function load() {
       try {
@@ -247,15 +246,9 @@ export function TrendCharts() {
         const { data: u, error: uErr } = await supabase.auth.getUser()
         if (uErr) throw uErr
         if (!u?.user) throw new Error("No session")
-        const { data: profile, error: pErr } = await supabase
-          .from("profiles").select("client_id").eq("id", u.user.id).single()
-        if (pErr) throw pErr
-        const cid = activeClientId || profile?.client_id
-        if (!cid) return
         const { data: reports, error: rErr } = await supabase
           .from("monthly_reports")
           .select("month, cash_collected, total_revenue, mrr, new_clients, short_followers, yt_subscribers, ad_spend")
-          .eq("client_id", cid)
           .order("month", { ascending: true })
         if (rErr) throw rErr
         if (mounted) setRows(Array.isArray(reports) ? reports : [])
@@ -267,7 +260,7 @@ export function TrendCharts() {
     }
     load()
     return () => { mounted = false }
-  }, [activeClientId])
+  }, [])
 
   const chartDataMap = useMemo(() => {
     const map: Record<string, Array<{ month: string; value: number }>> = {}

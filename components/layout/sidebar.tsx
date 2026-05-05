@@ -29,7 +29,7 @@ const NAV_GROUPS = [
   {
     label: "Pipeline",
     items: [
-      { name: "Personas Agendadas", href: "/admin/leads",            icon: Users2  },
+      { name: "Personas Agendadas", href: "/admin/personas",         icon: Users2  },
       { name: "Operations Center",  href: "/admin/centro-operativo", icon: Layers  },
     ],
   },

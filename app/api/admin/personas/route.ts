@@ -14,17 +14,18 @@ export async function GET(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 
   const db = createServiceClient()
-  const { data: leads, error } = await db
-    .from("crm_leads")
+  const { data, error } = await db
+    .from("personas_agendadas")
     .select("*")
+    .order("scheduled_at", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false })
 
   if (error) {
-    console.error("[admin/leads GET]", error)
+    console.error("[admin/personas GET]", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json({ leads: leads ?? [] })
+  return NextResponse.json({ personas: data ?? [] })
 }
 
 export async function POST(req: NextRequest) {
@@ -32,27 +33,31 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 
   const body = await req.json()
-  const db = createServiceClient()
+  if (!body?.name?.trim()) {
+    return NextResponse.json({ error: "name es requerido" }, { status: 400 })
+  }
 
-  const { data: lead, error } = await db
-    .from("crm_leads")
+  const db = createServiceClient()
+  const { data, error } = await db
+    .from("personas_agendadas")
     .insert({
-      name:      body.name      ?? null,
-      email:     body.email     ?? null,
-      tag:       body.tag       ?? null,
-      source:    body.source    ?? null,
-      lead_type: body.lead_type ?? null,
-      status:    body.status    ?? "nuevo",
-      instagram: body.instagram ?? null,
-      rating:    body.rating    ?? null,
-      niche:     body.niche     ?? null,
-      notes:     body.notes     ?? null,
+      name:         body.name.trim(),
+      email:        body.email?.trim() || null,
+      phone:        body.phone?.trim() || null,
+      instagram:    body.instagram?.trim() || null,
+      scheduled_at: body.scheduled_at || null,
+      call_status:  body.call_status  || "agendada",
+      sales_status: body.sales_status || "pendiente",
+      owner:        body.owner?.trim()  || null,
+      source:       body.source?.trim() || null,
+      rating:       body.rating ?? null,
+      notes:        body.notes?.trim()  || null,
     })
     .select()
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ lead })
+  return NextResponse.json({ persona: data })
 }
 
 export async function PATCH(req: NextRequest) {
@@ -64,15 +69,15 @@ export async function PATCH(req: NextRequest) {
   if (!id) return NextResponse.json({ error: "id requerido" }, { status: 400 })
 
   const db = createServiceClient()
-  const { data: lead, error } = await db
-    .from("crm_leads")
+  const { data, error } = await db
+    .from("personas_agendadas")
     .update(updates)
     .eq("id", id)
     .select()
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ lead })
+  return NextResponse.json({ persona: data })
 }
 
 export async function DELETE(req: NextRequest) {
@@ -83,7 +88,7 @@ export async function DELETE(req: NextRequest) {
   if (!id) return NextResponse.json({ error: "id requerido" }, { status: 400 })
 
   const db = createServiceClient()
-  const { error } = await db.from("crm_leads").delete().eq("id", id)
+  const { error } = await db.from("personas_agendadas").delete().eq("id", id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ success: true })
 }

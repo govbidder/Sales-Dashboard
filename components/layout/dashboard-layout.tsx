@@ -29,7 +29,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/tools":                       "Tools",
   "/calendar":                    "Schedule",
   "/recursos":                    "Resources",
-  "/admin/leads":                 "Personas Agendadas",
+  "/admin/personas":              "Personas Agendadas",
   "/admin/centro-operativo":      "Operations Center",
 }
 

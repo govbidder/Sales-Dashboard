@@ -1,6 +1,9 @@
 -- ─────────────────────────────────────────────────────────────────────────────
--- Phase 1 Cleanup: drop tables for features removed from the dashboard
+-- Phase 1+2 Cleanup: drop tables for features removed from the dashboard
 -- Run this manually in Supabase → SQL Editor.
+--
+-- After running, only these tables should remain in `public`:
+--   profiles, monthly_reports, personas_agendadas, seguimientos, resources
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- Wipe monthly_reports data (Phase 2 will redesign as company-wide)
@@ -14,6 +17,9 @@ drop table if exists public.crm_followups cascade;
 drop table if exists public.crm_installments cascade;
 drop table if exists public.crm_clients cascade;
 drop table if exists public.clients cascade;
+
+-- Drop the old leads table (replaced by personas_agendadas)
+drop table if exists public.crm_leads cascade;
 
 -- Drop billing / external comms tables
 drop table if exists public.payments cascade;
@@ -39,6 +45,10 @@ drop table if exists public.market_intelligence cascade;
 notify pgrst, 'reload schema';
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- After running this, only these tables should remain in `public`:
---   profiles, monthly_reports, crm_leads, resources
+-- After this runs, also run the new migration to create personas_agendadas
+-- and seguimientos tables. Either via the Supabase CLI:
+--   supabase db push
+-- or copy-paste the contents of:
+--   supabase/migrations/20250504000001_personas_agendadas.sql
+-- into the SQL Editor.
 -- ─────────────────────────────────────────────────────────────────────────────

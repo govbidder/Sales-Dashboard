@@ -231,13 +231,11 @@ export function MetricsView() {
     let alive = true
     async function load() {
       try {
-        const clientId = activeClientId
-        if (!clientId) return
         setLoading(true); setError(null)
         const supabase = createClient()
 
         const { data: latestRow } = await supabase
-          .from("monthly_reports").select("month").eq("client_id", clientId)
+          .from("monthly_reports").select("month")
           .order("month", { ascending: false }).limit(1).maybeSingle()
         const latestISO = latestRow?.month
           ? (/^\d{4}-\d{2}$/.test(latestRow.month) ? `${latestRow.month}-01` : latestRow.month)
@@ -249,10 +247,10 @@ export function MetricsView() {
         const fmt = (d: Date) => `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,"0")}-01`
 
         const [annualRes, rangeRes] = await Promise.all([
-          supabase.from("monthly_reports").select("*").eq("client_id", clientId)
+          supabase.from("monthly_reports").select("*")
             .gte("month", fmt(rollingStart)).lt("month", fmt(rollingEnd))
             .order("month", { ascending: true }),
-          supabase.from("monthly_reports").select("*").eq("client_id", clientId)
+          supabase.from("monthly_reports").select("*")
             .gte("month", monthRange.start).lt("month", monthRange.end)
             .order("month", { ascending: true }).limit(1),
         ])
