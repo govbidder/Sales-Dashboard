@@ -147,20 +147,20 @@ function IssueSection({
   title: string
   count: number
   href?: string
-  accent: "red" | "amber" | "blue"
+  accent: "red" | "amber" | "navy"
   severity?: "high" | "medium" | "low"
   children?: React.ReactNode
 }) {
   const palette = {
-    red:   { headerBg: "bg-red-500/[0.04]",   border: "border-red-500/15",   iconBg: "bg-red-500/15 ring-red-500/30",      iconColor: "text-red-700",     pillBg: "bg-red-500/10 text-red-700 border-red-500/25" },
-    amber: { headerBg: "bg-amber-500/[0.04]", border: "border-amber-500/15", iconBg: "bg-amber-500/15 ring-amber-500/30",  iconColor: "text-amber-700",   pillBg: "bg-amber-500/10 text-amber-700 border-amber-500/25" },
-    blue:  { headerBg: "bg-blue-500/[0.04]",  border: "border-blue-500/15",  iconBg: "bg-blue-500/15 ring-blue-500/30",    iconColor: "text-blue-700",    pillBg: "bg-blue-500/10 text-blue-700 border-blue-500/25" },
+    red:   { headerBg: "bg-[#E42D2C]/[0.04]",  border: "border-[#E42D2C]/15", iconBg: "bg-[#E42D2C]/12 ring-[#E42D2C]/25", iconColor: "text-[#E42D2C]",   pillBg: "bg-[#E42D2C]/10 text-[#E42D2C] border-[#E42D2C]/25" },
+    amber: { headerBg: "bg-amber-500/[0.05]",  border: "border-amber-500/20", iconBg: "bg-amber-500/12 ring-amber-500/25", iconColor: "text-amber-700",  pillBg: "bg-amber-500/10 text-amber-700 border-amber-500/25" },
+    navy:  { headerBg: "bg-[#1e3a8a]/[0.04]",  border: "border-[#1e3a8a]/15", iconBg: "bg-[#1e3a8a]/12 ring-[#1e3a8a]/25", iconColor: "text-[#1e3a8a]",  pillBg: "bg-[#1e3a8a]/10 text-[#1e3a8a] border-[#1e3a8a]/25" },
   }[accent]
 
   const pulseDot = severity === "high"
 
   return (
-    <div className={`overflow-hidden rounded-2xl border ${palette.border} bg-white`}>
+    <div className={`overflow-hidden rounded-2xl border ${palette.border} bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]`}>
       <div className={`flex items-center justify-between gap-3 px-5 py-4 border-b border-slate-100 ${palette.headerBg}`}>
         <div className="flex items-center gap-3 min-w-0">
           <span className={`flex h-9 w-9 items-center justify-center rounded-xl ring-1 ${palette.iconBg}`}>
@@ -168,7 +168,7 @@ function IssueSection({
           </span>
           <div className="min-w-0">
             <h3 className="text-[14px] font-bold text-slate-900 leading-none truncate">{title}</h3>
-            <div className="flex items-center gap-2 mt-1">
+            <div className="flex items-center gap-2 mt-1.5">
               <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-bold tabular-nums uppercase tracking-wider ${palette.pillBg}`}>
                 {pulseDot && (
                   <span className="relative flex h-1.5 w-1.5">
@@ -184,7 +184,7 @@ function IssueSection({
         {href && count > 0 && (
           <Link
             href={href}
-            className="group flex shrink-0 items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-[11px] font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+            className="group flex shrink-0 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-600 hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors"
           >
             Ver todo
             <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
@@ -273,65 +273,74 @@ export function InicioView() {
   const offset = circumference * (1 - healthScore / 100)
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
 
       {/* HERO ─────────────────────────────────────────────────────────────── */}
       <div
-        className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white"
-        style={{ boxShadow: "0 30px 80px -30px rgba(15,23,42,0.20)" }}
+        className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white"
+        style={{ boxShadow: "0 1px 2px rgba(15,23,42,0.04), 0 16px 40px -16px rgba(15,23,42,0.10)" }}
       >
-        {/* Ambient glow background */}
+        {/* Ambient glow background — más sutil */}
         <div className="pointer-events-none absolute inset-0">
           <div
-            className="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full blur-[100px]"
+            className="absolute -top-32 -right-32 h-[420px] w-[420px] rounded-full blur-[100px]"
             style={{
               backgroundColor:
-                heroState === "good"     ? "rgba(16,185,129,0.10)" :
-                heroState === "critical" ? "rgba(228,45,44,0.14)"  :
-                                           "rgba(251,191,36,0.10)",
+                heroState === "good"     ? "rgba(16,185,129,0.07)" :
+                heroState === "critical" ? "rgba(228,45,44,0.10)"  :
+                                           "rgba(251,191,36,0.07)",
             }}
           />
           <div
-            className="absolute -bottom-32 -left-32 h-[400px] w-[400px] rounded-full blur-[120px]"
-            style={{ backgroundColor: "rgba(30,58,138,0.12)" }}
+            className="absolute -bottom-32 -left-32 h-[380px] w-[380px] rounded-full blur-[120px]"
+            style={{ backgroundColor: "rgba(30,58,138,0.07)" }}
+          />
+          {/* Grid pattern muy sutil */}
+          <div
+            className="absolute inset-0 opacity-[0.025]"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(15,23,42,1) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,1) 1px, transparent 1px)",
+              backgroundSize: "32px 32px",
+            }}
           />
         </div>
 
-        <div className="relative grid lg:grid-cols-[1fr_auto] gap-6 p-6 sm:p-8 items-center">
+        <div className="relative grid lg:grid-cols-[1fr_auto] gap-8 p-7 sm:p-9 items-center">
 
           {/* LEFT — title + message */}
           <div className="min-w-0">
-            <div className="flex items-center gap-2 mb-3">
-              <span className={`flex h-7 w-7 items-center justify-center rounded-lg ring-1 ${
-                heroState === "good"     ? "bg-emerald-500/15 ring-emerald-500/30" :
-                heroState === "critical" ? "bg-red-500/15     ring-red-500/30"     :
-                                           "bg-amber-500/15   ring-amber-500/30"
+            <div className="inline-flex items-center gap-2 mb-4 rounded-full border border-slate-200/80 bg-white/70 backdrop-blur-sm pl-1.5 pr-3 py-1">
+              <span className={`flex h-5 w-5 items-center justify-center rounded-full ${
+                heroState === "good"     ? "bg-emerald-500/15" :
+                heroState === "critical" ? "bg-[#E42D2C]/15"   :
+                                           "bg-amber-500/15"
               }`}>
-                {heroState === "good"     ? <CheckCircle2 className="h-3.5 w-3.5 text-emerald-700" /> :
-                 heroState === "critical" ? <AlertCircle  className="h-3.5 w-3.5 text-red-700"     /> :
-                                            <AlertTriangle className="h-3.5 w-3.5 text-amber-700"  />}
+                {heroState === "good"     ? <CheckCircle2  className="h-3 w-3 text-emerald-700" /> :
+                 heroState === "critical" ? <AlertCircle   className="h-3 w-3 text-[#E42D2C]"   /> :
+                                            <AlertTriangle className="h-3 w-3 text-amber-700"  />}
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#1e3a8a]">
+              <span className="text-[10px] font-bold uppercase tracking-[0.20em] text-[#1e3a8a]">
                 Estado del Dashboard
               </span>
             </div>
 
-            <h1 className="text-[36px] sm:text-[44px] font-bold tracking-tight text-slate-900 leading-[1.05]">
+            <h1 className="text-[30px] sm:text-[38px] font-bold tracking-tight text-slate-900 leading-[1.08]">
               {allClear ? (
                 <>Todo en orden.</>
               ) : (
                 <>
-                  <span className={heroState === "critical" ? "text-red-700" : "text-amber-700"}>
+                  <span className={heroState === "critical" ? "text-[#E42D2C]" : "text-amber-600"}>
                     {issuesCount}
                   </span>{" "}
-                  {issuesCount === 1 ? "ítem requiere" : "ítems requieren"}
+                  <span className="text-slate-900">{issuesCount === 1 ? "ítem requiere" : "ítems requieren"}</span>
                   <br className="hidden sm:block" />
-                  <span className="text-slate-800"> tu atención.</span>
+                  <span className="text-slate-500 font-semibold"> tu atención.</span>
                 </>
               )}
             </h1>
 
-            <p className="text-sm text-slate-500 mt-3 max-w-xl">
+            <p className="text-[13.5px] text-slate-500 mt-3 max-w-xl leading-relaxed">
               {allClear
                 ? "Sin tareas vencidas, métricas al día, equipo activo. Buen trabajo."
                 : "Revisá los puntos críticos abajo para mantener el dashboard saludable."}
@@ -340,7 +349,7 @@ export function InicioView() {
             <button
               onClick={fetchHealth}
               disabled={loading}
-              className="mt-5 inline-flex items-center gap-2 h-9 rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-[12px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-all disabled:opacity-40"
+              className="mt-5 inline-flex items-center gap-2 h-9 rounded-full border border-slate-200 bg-white px-3.5 text-[12px] font-semibold text-slate-700 hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] hover:shadow-[0_2px_8px_rgba(30,58,138,0.10)] transition-all disabled:opacity-40"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
               Actualizar estado
@@ -350,7 +359,7 @@ export function InicioView() {
           {/* RIGHT — health ring */}
           <div className="flex items-center justify-center lg:justify-end">
             <div className="relative">
-              <svg width="140" height="140" viewBox="0 0 100 100" className="-rotate-90">
+              <svg width="148" height="148" viewBox="0 0 100 100" className="-rotate-90 drop-shadow-[0_4px_16px_rgba(15,23,42,0.06)]">
                 <circle cx="50" cy="50" r="42" strokeWidth="6" fill="none" className={ringBgColor} />
                 <circle
                   cx="50" cy="50" r="42"
@@ -364,10 +373,10 @@ export function InicioView() {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <p className={`text-[34px] font-bold tabular-nums leading-none ${scoreColor}`}>
+                <p className={`text-[36px] font-bold tabular-nums leading-none ${scoreColor}`}>
                   {healthScore}
                 </p>
-                <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-slate-400 mt-1">
+                <p className="text-[9px] font-bold uppercase tracking-[0.20em] text-slate-400 mt-1.5">
                   Salud
                 </p>
               </div>
@@ -376,30 +385,37 @@ export function InicioView() {
         </div>
 
         {/* STATS STRIP at bottom of hero */}
-        <div className="relative border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4">
+        <div className="relative border-t border-slate-100 bg-slate-50/40 grid grid-cols-2 sm:grid-cols-4">
           {[
             { label: "Tareas vencidas",  val: counts.overdueTasks,      icon: ListTodo, accent: counts.overdueTasks > 0 ? "red" as const : "neutral" as const },
             { label: "Sin seguimiento",  val: counts.stalePersonas,     icon: Users2,   accent: counts.stalePersonas > 0 ? "amber" as const : "neutral" as const },
-            { label: "Personas activas", val: counts.activePersonas,    icon: Target,   accent: "neutral" as const },
-            { label: "Equipo",           val: counts.teamMembers,       icon: Users2,   accent: "neutral" as const },
+            { label: "Personas activas", val: counts.activePersonas,    icon: Target,   accent: "navy" as const },
+            { label: "Equipo",           val: counts.teamMembers,       icon: Users2,   accent: "navy" as const },
           ].map((s, i) => {
             const StatIcon = s.icon
             const accentText =
-              s.accent === "red"   ? "text-red-700" :
+              s.accent === "red"   ? "text-[#E42D2C]" :
               s.accent === "amber" ? "text-amber-700" :
+              s.accent === "navy"  ? "text-[#1e3a8a]" :
               "text-slate-900"
+            const dotColor =
+              s.accent === "red"   ? "bg-[#E42D2C]" :
+              s.accent === "amber" ? "bg-amber-500" :
+              s.accent === "navy"  ? "bg-[#1e3a8a]" :
+              "bg-slate-300"
             return (
               <div
                 key={s.label}
-                className={`relative px-5 py-4 ${i < 3 ? "sm:border-r border-slate-100" : ""} ${i < 2 ? "border-b sm:border-b-0 border-slate-100" : ""}`}
+                className={`relative px-5 py-4 ${i < 3 ? "sm:border-r border-slate-200/70" : ""} ${i < 2 ? "border-b sm:border-b-0 border-slate-200/70" : ""}`}
               >
-                <div className="flex items-center gap-2 mb-1.5">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`h-1.5 w-1.5 rounded-full ${dotColor}`} />
                   <StatIcon className="h-3 w-3 text-slate-400" />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#1e3a8a]/80">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">
                     {s.label}
                   </span>
                 </div>
-                <p className={`text-[26px] font-bold tabular-nums leading-none ${accentText}`}>
+                <p className={`text-[24px] font-bold tabular-nums leading-none ${accentText}`}>
                   {s.val}
                 </p>
               </div>
@@ -416,7 +432,7 @@ export function InicioView() {
             <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]">
               Requieren Atención
             </h2>
-            <div className="flex-1 h-px bg-gradient-to-r from-white/[0.08] to-transparent" />
+            <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent" />
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
@@ -431,7 +447,7 @@ export function InicioView() {
                 accent="red"
                 severity={overdueTasks.length > 3 ? "high" : "medium"}
               >
-                <div className="divide-y divide-white/[0.04]">
+                <div className="divide-y divide-slate-100">
                   {overdueTasks.slice(0, 5).map(t => (
                     <Link
                       key={t.id}
@@ -469,7 +485,7 @@ export function InicioView() {
                 accent="amber"
                 severity={stalePersonas.length > 3 ? "high" : "medium"}
               >
-                <div className="divide-y divide-white/[0.04]">
+                <div className="divide-y divide-slate-100">
                   {stalePersonas.slice(0, 5).map(p => (
                     <Link
                       key={p.id}
@@ -500,7 +516,7 @@ export function InicioView() {
                 title="Métricas del mes"
                 count={1}
                 href="/admin/reports"
-                accent="blue"
+                accent="navy"
                 severity="medium"
               >
                 <div className="px-5 py-5 space-y-4">
@@ -531,7 +547,7 @@ export function InicioView() {
                 accent="red"
                 severity={declining.length > 2 ? "high" : "medium"}
               >
-                <div className="divide-y divide-white/[0.04]">
+                <div className="divide-y divide-slate-100">
                   {declining.map(m => (
                     <div key={m.key} className="flex items-center justify-between gap-3 px-5 py-3">
                       <div className="min-w-0 flex-1">
@@ -563,7 +579,7 @@ export function InicioView() {
             <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]">
               Lo que está mejorando
             </h2>
-            <div className="flex-1 h-px bg-gradient-to-r from-white/[0.08] to-transparent" />
+            <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent" />
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">

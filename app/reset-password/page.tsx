@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Lock, ArrowLeft, AlertCircle, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase";
 
 function parseHashParams(hash: string) {
@@ -216,7 +218,6 @@ export default function ResetPasswordPage() {
     setErr(null);
     setInfo(null);
 
-    // Last chance to surface session
     if (!hasSession && linkValidated) {
       const { data } = await supabase.auth.getSession();
       if (data.session) setHasSession(true);
@@ -253,70 +254,80 @@ export default function ResetPasswordPage() {
     router.replace("/login");
   }
 
-  if (!ready) {
-    return (
-      <div className="relative min-h-screen bg-black text-white">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(700px_circle_at_20%_15%,rgba(255,255,255,0.10),transparent_55%),radial-gradient(700px_circle_at_80%_20%,rgba(255,255,255,0.08),transparent_55%),radial-gradient(900px_circle_at_50%_90%,rgba(255,255,255,0.06),transparent_55%)]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/70 to-black" />
-        </div>
-        <div className="relative flex min-h-screen items-center justify-center px-6 py-12">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-white/70 backdrop-blur-xl">
-            Cargando…
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const inputsEnabled = hasSession || linkValidated;
+  const inputsEnabled = ready && (hasSession || linkValidated);
 
   return (
-    <div className="relative min-h-screen bg-black text-white">
-      {/* Background */}
+    <div className="min-h-screen bg-white flex items-center justify-center px-6 py-12 relative overflow-hidden">
+
+      {/* Subtle ambient backdrop */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(700px_circle_at_20%_15%,rgba(255,255,255,0.10),transparent_55%),radial-gradient(700px_circle_at_80%_20%,rgba(255,255,255,0.08),transparent_55%),radial-gradient(900px_circle_at_50%_90%,rgba(255,255,255,0.06),transparent_55%)]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/70 to-black" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-[#E42D2C]/[0.05] blur-[160px]" />
+        <div className="absolute bottom-0 left-1/4 h-[400px] w-[400px] rounded-full bg-[#1e3a8a]/[0.04] blur-[140px]" />
       </div>
 
-      <div className="relative flex min-h-screen items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md">
-          {/* Brand */}
-          <div className="mb-6 text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#E42D2C]/30 bg-[#E42D2C]/10 backdrop-blur">
-              <span className="text-sm font-bold tracking-widest text-[#E42D2C]">GB</span>
+      <div className="relative w-full max-w-[420px]">
+
+        {/* Logo */}
+        <div className="mb-8 flex justify-center">
+          <Image
+            src="/icon.png"
+            alt="GovBidder · The Bid That Wins"
+            width={260}
+            height={200}
+            className="h-auto w-[200px] object-contain"
+            priority
+          />
+        </div>
+
+        {/* Card */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+
+          <div className="mb-7 text-center">
+            <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#E42D2C]/10 to-[#1e3a8a]/10 ring-1 ring-[#1e3a8a]/15">
+              <Lock className="h-5 w-5 text-[#1e3a8a]" />
             </div>
-            <div className="text-xs font-semibold tracking-[0.35em] text-white/70">
-              GOVBIDDER
-            </div>
-            <h1 className="mt-2 text-2xl font-semibold tracking-tight">Reseteá tu contraseña</h1>
-            <p className="mt-1 text-sm text-white/60">
-              Validá el link y elegí una nueva contraseña.
+            <h1 className="text-[22px] font-bold tracking-tight text-slate-900">
+              Restablecer contraseña
+            </h1>
+            <p className="mt-1.5 text-[13px] text-slate-500 leading-relaxed">
+              {ready && !hasSession && !linkValidated
+                ? "Validando el link de recuperación…"
+                : "Elegí una nueva contraseña para tu cuenta."}
             </p>
           </div>
 
-          {/* Card */}
-          <form
-            onSubmit={onSubmit}
-            className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-[0_30px_80px_rgba(0,0,0,0.65)] backdrop-blur-xl"
-          >
-            <div className="space-y-4">
-              {err ? (
-                <div className="rounded-xl border border-white/10 bg-black/40 p-3 text-sm text-white/80 whitespace-pre-wrap">
-                  {err}
-                </div>
-              ) : null}
+          {/* Loading state */}
+          {!ready && (
+            <div className="flex items-center justify-center py-6">
+              <span className="h-5 w-5 animate-spin rounded-full border-2 border-slate-200 border-t-[#E42D2C]" />
+            </div>
+          )}
 
-              {info ? (
-                <div className="rounded-xl border border-white/10 bg-black/30 p-3 text-sm text-white/75 whitespace-pre-wrap">
-                  {info}
-                </div>
-              ) : null}
+          {ready && (
+            <form onSubmit={onSubmit} className="space-y-4">
 
-              <div className="space-y-2">
-                <label className="block text-sm text-white/70">Nueva contraseña</label>
+              {/* Info banner */}
+              {info && (
+                <div className="flex items-start gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-[12px] leading-relaxed text-emerald-800">
+                  <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-emerald-600" />
+                  <span>{info}</span>
+                </div>
+              )}
+
+              {/* Error banner */}
+              {err && (
+                <div className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[12px] leading-relaxed text-red-700">
+                  <AlertCircle className="h-4 w-4 mt-0.5 shrink-0 text-red-500" />
+                  <span className="whitespace-pre-wrap">{err}</span>
+                </div>
+              )}
+
+              <div className="space-y-1.5">
+                <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-500">
+                  Nueva contraseña
+                </label>
                 <input
-                  className="h-11 w-full rounded-xl border border-white/10 bg-black/30 px-3 text-white outline-none placeholder:text-white/30 focus:border-white/20 focus:ring-2 focus:ring-white/10 disabled:opacity-60"
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none placeholder:text-slate-400 transition-all focus:border-[#E42D2C] focus:ring-2 focus:ring-[#E42D2C]/15 disabled:bg-slate-50 disabled:text-slate-400"
                   placeholder="Mínimo 6 caracteres"
                   type="password"
                   value={password}
@@ -327,10 +338,12 @@ export default function ResetPasswordPage() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="block text-sm text-white/70">Repetir contraseña</label>
+              <div className="space-y-1.5">
+                <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-500">
+                  Repetir contraseña
+                </label>
                 <input
-                  className="h-11 w-full rounded-xl border border-white/10 bg-black/30 px-3 text-white outline-none placeholder:text-white/30 focus:border-white/20 focus:ring-2 focus:ring-white/10 disabled:opacity-60"
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none placeholder:text-slate-400 transition-all focus:border-[#E42D2C] focus:ring-2 focus:ring-[#E42D2C]/15 disabled:bg-slate-50 disabled:text-slate-400"
                   placeholder="Repetí la contraseña"
                   type="password"
                   value={password2}
@@ -344,32 +357,41 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={loading || !hasSession}
-                className="h-11 w-full rounded-xl bg-white text-sm font-semibold text-black transition hover:bg-white/90 disabled:opacity-60"
+                className="mt-2 h-12 w-full rounded-full bg-[#E42D2C] text-sm font-bold text-white transition-all hover:bg-[#c42423] hover:shadow-[0_8px_24px_rgba(228,45,44,0.30)] disabled:opacity-50 active:scale-[0.98]"
               >
-                {loading ? "Actualizando…" : "Actualizar contraseña"}
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                    Actualizando…
+                  </span>
+                ) : (
+                  "Actualizar contraseña"
+                )}
               </button>
+            </form>
+          )}
 
-              <div className="flex items-center justify-between pt-1">
-                <Link
-                  href="/login"
-                  className="text-sm text-white/65 underline-offset-4 hover:text-white hover:underline"
-                >
-                  Volver al login
-                </Link>
-                <Link
-                  href="/forgot-password"
-                  className="text-sm text-white/65 underline-offset-4 hover:text-white hover:underline"
-                >
-                  Pedir nuevo link
-                </Link>
-              </div>
-            </div>
-          </form>
-
-          <p className="mt-6 text-center text-xs text-white/35">
-            © {new Date().getFullYear()} GovBidder
-          </p>
+          {/* Footer links */}
+          <div className="mt-7 flex items-center justify-between border-t border-slate-100 pt-4">
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 transition-colors hover:text-[#E42D2C]"
+            >
+              <ArrowLeft className="h-3 w-3" />
+              Volver al login
+            </Link>
+            <Link
+              href="/forgot-password"
+              className="text-[11px] font-medium text-slate-500 transition-colors hover:text-[#E42D2C]"
+            >
+              Pedir nuevo link
+            </Link>
+          </div>
         </div>
+
+        <p className="mt-8 text-center text-[10px] uppercase tracking-[0.22em] text-slate-300">
+          © {new Date().getFullYear()} GovBidder · The Bid That Wins
+        </p>
       </div>
     </div>
   );

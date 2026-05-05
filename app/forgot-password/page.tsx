@@ -1,7 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
+import { Mail, ArrowLeft, AlertCircle, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase";
 
 export default function ForgotPasswordPage() {
@@ -33,123 +35,91 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#080d1e] flex">
+    <div className="min-h-screen bg-white flex items-center justify-center px-6 py-12 relative overflow-hidden">
 
-      {/* ── Left panel ── */}
-      <div className="hidden lg:flex lg:w-[52%] flex-col justify-between p-12 relative overflow-hidden border-r border-white/[0.05]">
-
-        {/* Background glow */}
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute top-0 left-0 h-[500px] w-[500px] rounded-full bg-[#E42D2C]/[0.06] blur-[140px]" />
-          <div className="absolute bottom-0 right-0 h-[400px] w-[400px] rounded-full bg-[#E42D2C]/[0.03] blur-[120px]" />
-        </div>
-
-        {/* Grid overlay */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
-            backgroundSize: "72px 72px",
-          }}
-        />
-
-        {/* Top: Logo */}
-        <div className="relative flex items-center gap-3">
-          <span className="text-white text-sm font-bold tracking-[0.22em]">GOV</span>
-          <span className="rounded-md bg-[#E42D2C] px-2.5 py-1 text-xs font-bold tracking-wide text-white">
-            BIDDER
-          </span>
-        </div>
-
-        {/* Center: Hero text */}
-        <div className="relative space-y-6">
-          <div className="flex items-center gap-2.5">
-            <span className="h-[3px] w-8 rounded-full bg-[#E42D2C]" />
-            <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#E42D2C]/70">Recuperar acceso</span>
-          </div>
-
-          <h2 className="text-4xl font-bold leading-[1.15] tracking-tight text-white">
-            ¿Olvidaste<br />
-            tu contraseña?<br />
-            <span className="text-[#E42D2C]">Te ayudamos.</span>
-          </h2>
-
-          <p className="max-w-sm text-sm leading-relaxed text-white/35">
-            Ingresá tu email y te enviamos un link para que puedas elegir una nueva contraseña en segundos.
-          </p>
-        </div>
-
-        {/* Bottom: Version */}
-        <div className="relative">
-          <p className="text-[10px] uppercase tracking-widest text-white/15">
-            © {new Date().getFullYear()} GovBidder
-          </p>
-        </div>
+      {/* Subtle ambient backdrop */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-[#E42D2C]/[0.05] blur-[160px]" />
+        <div className="absolute bottom-0 left-1/4 h-[400px] w-[400px] rounded-full bg-[#1e3a8a]/[0.04] blur-[140px]" />
       </div>
 
-      {/* ── Right panel: Form ── */}
-      <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 relative">
+      <div className="relative w-full max-w-[420px]">
 
-        {/* Mobile logo */}
-        <div className="mb-10 flex items-center gap-3 lg:hidden">
-          <span className="text-white text-sm font-bold tracking-[0.22em]">GOV</span>
-          <span className="rounded-md bg-[#E42D2C] px-2.5 py-1 text-xs font-bold tracking-wide text-white">
-            BIDDER
-          </span>
+        {/* Logo */}
+        <div className="mb-8 flex justify-center">
+          <Image
+            src="/icon.png"
+            alt="GovBidder · The Bid That Wins"
+            width={260}
+            height={200}
+            className="h-auto w-[200px] object-contain"
+            priority
+          />
         </div>
 
-        <div className="w-full max-w-[360px]">
+        {/* Card */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
 
-          {/* Heading */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold tracking-tight text-white">Recuperar contraseña</h1>
-            <p className="mt-1.5 text-sm text-white/35">
+          <div className="mb-7 text-center">
+            <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#E42D2C]/10 to-[#1e3a8a]/10 ring-1 ring-[#1e3a8a]/15">
+              <Mail className="h-5 w-5 text-[#1e3a8a]" />
+            </div>
+            <h1 className="text-[22px] font-bold tracking-tight text-slate-900">
+              Recuperar contraseña
+            </h1>
+            <p className="mt-1.5 text-[13px] text-slate-500 leading-relaxed">
               Te enviamos un link a tu email para que puedas resetearla.
             </p>
           </div>
 
           {msg ? (
-            <div className="rounded-xl border border-green-500/20 bg-green-500/10 px-4 py-4 text-sm leading-relaxed text-green-300">
-              {msg}
-              <div className="mt-4">
-                <Link href="/login" className="text-xs text-white/40 hover:text-[#E42D2C] transition">
-                  ← Volver al login
-                </Link>
+            <div className="space-y-4">
+              <div className="flex items-start gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-[12px] leading-relaxed text-emerald-800">
+                <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-emerald-600" />
+                <span>{msg}</span>
               </div>
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-1 text-[12px] font-medium text-slate-500 transition-colors hover:text-[#E42D2C]"
+              >
+                <ArrowLeft className="h-3 w-3" />
+                Volver al login
+              </Link>
             </div>
           ) : (
             <form onSubmit={onSubmit} className="space-y-4">
 
               <div className="space-y-1.5">
-                <label className="block text-[11px] font-semibold uppercase tracking-widest text-white/30">
+                <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-500">
                   Email
                 </label>
                 <input
-                  className="h-12 w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 text-sm text-white outline-none placeholder:text-white/20 transition-all focus:border-[#E42D2C]/50 focus:bg-white/[0.06] focus:ring-2 focus:ring-[#E42D2C]/10"
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none placeholder:text-slate-400 transition-all focus:border-[#E42D2C] focus:ring-2 focus:ring-[#E42D2C]/15"
                   placeholder="tu@email.com"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="email"
+                  autoFocus
                 />
               </div>
 
               {err && (
-                <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-xs leading-relaxed text-red-300">
-                  {err}
+                <div className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[12px] leading-relaxed text-red-700">
+                  <AlertCircle className="h-4 w-4 mt-0.5 shrink-0 text-red-500" />
+                  <span>{err}</span>
                 </div>
               )}
 
               <button
                 type="submit"
                 disabled={loading}
-                className="mt-2 h-12 w-full rounded-xl bg-[#E42D2C] text-sm font-bold text-white transition-all hover:bg-[#c42423] hover:shadow-lg hover:shadow-[#E42D2C]/20 disabled:opacity-50 active:scale-[0.98]"
+                className="mt-2 h-12 w-full rounded-full bg-[#E42D2C] text-sm font-bold text-white transition-all hover:bg-[#c42423] hover:shadow-[0_8px_24px_rgba(228,45,44,0.30)] disabled:opacity-50 active:scale-[0.98]"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-black/20 border-t-black" />
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
                     Enviando…
                   </span>
                 ) : (
@@ -158,13 +128,21 @@ export default function ForgotPasswordPage() {
               </button>
 
               <div className="pt-1 text-center">
-                <Link href="/login" className="text-[11px] text-white/30 hover:text-[#E42D2C] transition">
-                  ← Volver al login
+                <Link
+                  href="/login"
+                  className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 transition-colors hover:text-[#E42D2C]"
+                >
+                  <ArrowLeft className="h-3 w-3" />
+                  Volver al login
                 </Link>
               </div>
             </form>
           )}
         </div>
+
+        <p className="mt-8 text-center text-[10px] uppercase tracking-[0.22em] text-slate-300">
+          © {new Date().getFullYear()} GovBidder · The Bid That Wins
+        </p>
       </div>
     </div>
   );
