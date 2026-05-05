@@ -174,58 +174,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         onClose={() => setPaletteOpen(false)}
         onSignOut={handleSignOut}
       />
-
-      {/* Floating Cmd+K hint (only on first visit) */}
-      <FloatingHint />
-    </div>
-  )
-}
-
-// ─── First-time hint ──────────────────────────────────────────────────────────
-
-function FloatingHint() {
-  const [show, setShow] = useState(false)
-
-  useEffect(() => {
-    if (typeof window === "undefined") return
-    const seen = window.localStorage.getItem("cmdk-hint-seen")
-    if (!seen) {
-      const t = setTimeout(() => setShow(true), 1500)
-      return () => clearTimeout(t)
-    }
-  }, [])
-
-  const dismiss = () => {
-    setShow(false)
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("cmdk-hint-seen", "1")
-    }
-  }
-
-  if (!show) return null
-
-  return (
-    <div className="fixed bottom-6 right-6 z-40 max-w-sm">
-      <div
-        className="flex items-start gap-3 rounded-2xl border border-white/[0.10] bg-[#0d1745]/95 backdrop-blur-xl px-4 py-3 shadow-2xl page-enter"
-      >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E42D2C]/15 ring-1 ring-[#E42D2C]/30">
-          <span className="text-[15px]">⌘</span>
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-[13px] font-semibold text-white">Navegá con ⌘K</p>
-          <p className="mt-0.5 text-[11px] text-white/55 leading-relaxed">
-            Apretá <kbd className="rounded border border-white/[0.10] bg-white/[0.05] px-1 text-[10px] font-semibold">⌘K</kbd> (o <kbd className="rounded border border-white/[0.10] bg-white/[0.05] px-1 text-[10px] font-semibold">Ctrl K</kbd>) en cualquier momento para saltar a cualquier página o ejecutar una acción.
-          </p>
-        </div>
-        <button
-          onClick={dismiss}
-          className="text-white/30 hover:text-white/70 transition-colors text-[18px] leading-none"
-          aria-label="Cerrar"
-        >
-          ×
-        </button>
-      </div>
     </div>
   )
 }

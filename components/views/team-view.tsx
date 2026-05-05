@@ -56,8 +56,8 @@ function DetailDrawer({
 
   return (
     <>
-      <div className="fixed inset-0 z-40 bg-black/30" onClick={onClose} />
-      <div className="fixed right-0 top-0 bottom-0 z-50 flex w-full max-w-[460px] flex-col border-l border-white/[0.08] shadow-2xl" style={{ backgroundColor: "#0d1745" }}>
+      <div className="fixed inset-0 z-[100] bg-black/40" onClick={onClose} />
+      <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[460px] flex-col border-l border-white/[0.08] shadow-2xl" style={{ backgroundColor: "#0d1745" }}>
 
         <div className="flex items-start justify-between gap-4 border-b border-white/[0.06] px-6 py-5">
           <div className="flex items-center gap-3 min-w-0 flex-1">
