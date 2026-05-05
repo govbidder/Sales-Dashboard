@@ -302,7 +302,7 @@ function CommentsSection({ taskId }: { taskId: string }) {
           value={draft}
           onChange={e => setDraft(e.target.value)}
           placeholder="Escribir comentario..."
-          className="h-9 flex-1 rounded-lg border border-white/[0.08] bg-[#1a1a1d] px-3 text-[13px] text-white placeholder:text-white/30 outline-none focus:border-white/20"
+          className="h-9 flex-1 rounded-lg border border-white/[0.08] bg-[#141417] px-3 text-[13px] text-white placeholder:text-white/30 outline-none focus:border-white/20"
         />
         <button
           type="submit"
@@ -938,7 +938,7 @@ export function TasksView() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar tareas, tags, asignados..."
-            className="h-9 rounded-xl border border-white/[0.08] bg-[#1c1c1f] px-4 text-sm text-white placeholder:text-white/25 focus:border-white/20 focus:outline-none flex-1 min-w-[220px] max-w-sm"
+            className="h-9 rounded-xl border border-white/[0.08] bg-[#141417] px-4 text-sm text-white placeholder:text-white/25 focus:border-white/20 focus:outline-none flex-1 min-w-[220px] max-w-sm"
           />
           {allAssignees.length > 0 && (
             <select

@@ -140,7 +140,7 @@ export function Profitability() {
           {[
             { key: "ad", label: "Publicidad",     icon: Megaphone, color: "#fb923c" },
             { key: "sw", label: "Software",       icon: Cpu,       color: "#60a5fa" },
-            { key: "vc", label: "Variables",      icon: Wallet,    color: "#a78bfa" },
+            { key: "vc", label: "Variables",      icon: Wallet,    color: "#ff6b6a" },
           ].map(c => {
             const v = (cur as any)[c.key] as number
             const pct = cur.totalCosts > 0 ? (v / cur.totalCosts) * 100 : 0

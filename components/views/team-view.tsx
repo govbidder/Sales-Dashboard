@@ -466,7 +466,7 @@ export function TeamView() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar por nombre, email, posición..."
-            className="h-9 rounded-xl border border-white/[0.08] bg-[#1c1c1f] px-4 text-sm text-white placeholder:text-white/25 focus:border-white/20 focus:outline-none flex-1 min-w-[220px] max-w-sm"
+            className="h-9 rounded-xl border border-white/[0.08] bg-[#141417] px-4 text-sm text-white placeholder:text-white/25 focus:border-white/20 focus:outline-none flex-1 min-w-[220px] max-w-sm"
           />
           <div className="flex items-center gap-1.5">
             {(["todos", "activo", "inactivo"] as const).map(s => (

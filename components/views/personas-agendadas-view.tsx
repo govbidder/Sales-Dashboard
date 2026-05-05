@@ -320,7 +320,7 @@ function DetailDrawer({
                 <select
                   value={newSegType}
                   onChange={e => setNewSegType(e.target.value as SegType)}
-                  className="h-8 rounded-lg border border-white/[0.08] bg-[#1a1a1d] px-2 text-[12px] text-white outline-none capitalize"
+                  className="h-8 rounded-lg border border-white/[0.08] bg-[#141417] px-2 text-[12px] text-white outline-none capitalize"
                 >
                   {SEGUIMIENTO_TYPES.map(t => <option key={t} value={t} className="bg-[#0d1745]">{t}</option>)}
                 </select>
@@ -329,7 +329,7 @@ function DetailDrawer({
                   value={newSegDue}
                   onChange={e => setNewSegDue(e.target.value)}
                   placeholder="Vence el..."
-                  className="h-8 flex-1 rounded-lg border border-white/[0.08] bg-[#1a1a1d] px-2 text-[12px] text-white/80 outline-none"
+                  className="h-8 flex-1 rounded-lg border border-white/[0.08] bg-[#141417] px-2 text-[12px] text-white/80 outline-none"
                 />
               </div>
               <div className="flex gap-2">
@@ -337,7 +337,7 @@ function DetailDrawer({
                   value={newSegContent}
                   onChange={e => setNewSegContent(e.target.value)}
                   placeholder="¿Qué hay que hacer / qué pasó?"
-                  className="h-9 flex-1 rounded-lg border border-white/[0.08] bg-[#1a1a1d] px-3 text-[13px] text-white placeholder:text-white/30 outline-none"
+                  className="h-9 flex-1 rounded-lg border border-white/[0.08] bg-[#141417] px-3 text-[13px] text-white placeholder:text-white/30 outline-none"
                 />
                 <button
                   type="submit"
@@ -717,7 +717,7 @@ export function PersonasAgendadasView() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar por nombre, email, instagram, owner..."
-            className="h-9 rounded-xl border border-white/[0.08] bg-[#1c1c1f] px-4 text-sm text-white placeholder:text-white/25 focus:border-white/20 focus:outline-none flex-1 min-w-[220px] max-w-sm"
+            className="h-9 rounded-xl border border-white/[0.08] bg-[#141417] px-4 text-sm text-white placeholder:text-white/25 focus:border-white/20 focus:outline-none flex-1 min-w-[220px] max-w-sm"
           />
           <div className="flex items-center gap-1.5 flex-wrap">
             <button
