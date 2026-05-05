@@ -192,10 +192,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   // Loading state
   if (!authChecked) {
     return (
-      <div className="flex h-screen items-center justify-center" style={{ backgroundColor: "#080d1e" }}>
+      <div className="flex h-screen items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/10 border-t-[#E42D2C]" />
-          <p className="text-xs text-white/30 tracking-widest uppercase">Cargando...</p>
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-[#E42D2C]" />
+          <p className="text-xs text-slate-500 tracking-widest uppercase">Cargando...</p>
         </div>
       </div>
     )
@@ -203,7 +203,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <ToastProvider>
-    <div className="dark min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
       <NavigationProgress />
 
       <TopBar

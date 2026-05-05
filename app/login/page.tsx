@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 
@@ -32,43 +33,34 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#080d1e] flex items-center justify-center px-6 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-white flex items-center justify-center px-6 py-12 relative overflow-hidden">
 
-      {/* Ambient background glow */}
+      {/* Subtle ambient backdrop */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[600px] w-[600px] rounded-full bg-[#E42D2C]/[0.08] blur-[160px]" />
-        <div className="absolute bottom-0 left-1/4 h-[400px] w-[400px] rounded-full bg-[#152978]/30 blur-[140px]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-[#E42D2C]/[0.05] blur-[160px]" />
+        <div className="absolute bottom-0 left-1/4 h-[400px] w-[400px] rounded-full bg-[#1e3a8a]/[0.04] blur-[140px]" />
       </div>
-
-      {/* Subtle grid */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.025]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
-          backgroundSize: "72px 72px",
-        }}
-      />
 
       <div className="relative w-full max-w-[400px]">
 
         {/* Logo */}
-        <div className="mb-10 flex items-center justify-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#ff6b6a] to-[#c42423] shadow-[0_0_24px_rgba(228,45,44,0.45)]">
-            <span className="text-[13px] font-black text-white tracking-tight">GB</span>
-          </div>
-          <div className="flex flex-col leading-none">
-            <span className="text-[16px] font-bold tracking-tight text-white">GovBidder</span>
-            <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/40 mt-1">Portal Interno</span>
-          </div>
+        <div className="mb-8 flex justify-center">
+          <Image
+            src="/govbidder-logo.png"
+            alt="GovBidder · The Bid That Wins"
+            width={220}
+            height={140}
+            className="h-auto w-[180px] object-contain"
+            priority
+          />
         </div>
 
         {/* Card */}
-        <div className="rounded-2xl border border-white/[0.06] bg-[#0d1745]/60 backdrop-blur-xl p-8 shadow-[0_30px_80px_rgba(0,0,0,0.5)]">
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
 
-          <div className="mb-7">
-            <h1 className="text-[22px] font-bold tracking-tight text-white">Iniciar sesión</h1>
-            <p className="mt-1.5 text-[13px] text-white/40">
+          <div className="mb-7 text-center">
+            <h1 className="text-[22px] font-bold tracking-tight text-slate-900">Iniciar sesión</h1>
+            <p className="mt-1.5 text-[13px] text-slate-500">
               Ingresá con tus credenciales para acceder.
             </p>
           </div>
@@ -76,11 +68,11 @@ export default function LoginPage() {
           <form onSubmit={onSubmit} className="space-y-4">
 
             <div className="space-y-1.5">
-              <label className="block text-[11px] font-semibold uppercase tracking-widest text-white/35">
+              <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-500">
                 Email
               </label>
               <input
-                className="h-12 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-sm text-white outline-none placeholder:text-white/25 transition-all focus:border-[#E42D2C]/50 focus:bg-white/[0.05] focus:ring-2 focus:ring-[#E42D2C]/10"
+                className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none placeholder:text-slate-400 transition-all focus:border-[#E42D2C] focus:ring-2 focus:ring-[#E42D2C]/15"
                 placeholder="tu@email.com"
                 type="email"
                 value={email}
@@ -93,18 +85,18 @@ export default function LoginPage() {
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="block text-[11px] font-semibold uppercase tracking-widest text-white/35">
+                <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-500">
                   Contraseña
                 </label>
                 <a
                   href="/forgot-password"
-                  className="text-[11px] text-white/35 transition-colors hover:text-[#E42D2C]"
+                  className="text-[11px] text-slate-500 transition-colors hover:text-[#E42D2C]"
                 >
                   ¿La olvidaste?
                 </a>
               </div>
               <input
-                className="h-12 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-sm text-white outline-none placeholder:text-white/25 transition-all focus:border-[#E42D2C]/50 focus:bg-white/[0.05] focus:ring-2 focus:ring-[#E42D2C]/10"
+                className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none placeholder:text-slate-400 transition-all focus:border-[#E42D2C] focus:ring-2 focus:ring-[#E42D2C]/15"
                 placeholder="••••••••"
                 type="password"
                 value={password}
@@ -115,7 +107,7 @@ export default function LoginPage() {
             </div>
 
             {errorMsg && (
-              <div className="rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-[12px] leading-relaxed text-red-300">
+              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[12px] leading-relaxed text-red-700">
                 {errorMsg}
               </div>
             )}
@@ -123,11 +115,11 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="mt-2 h-12 w-full rounded-xl bg-[#E42D2C] text-sm font-bold text-white transition-all hover:bg-[#c42423] hover:shadow-[0_8px_24px_rgba(228,45,44,0.30)] disabled:opacity-50 active:scale-[0.98]"
+              className="mt-2 h-12 w-full rounded-full bg-[#E42D2C] text-sm font-bold text-white transition-all hover:bg-[#c42423] hover:shadow-[0_8px_24px_rgba(228,45,44,0.30)] disabled:opacity-50 active:scale-[0.98]"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
                   Entrando…
                 </span>
               ) : (
@@ -136,14 +128,13 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="mt-7 text-center text-[11px] leading-relaxed text-white/25">
+          <p className="mt-7 text-center text-[11px] leading-relaxed text-slate-400">
             Si tu cuenta requiere verificación, revisá tu inbox antes de entrar.
           </p>
         </div>
 
-        {/* Footer */}
-        <p className="mt-8 text-center text-[10px] uppercase tracking-[0.22em] text-white/15">
-          © {new Date().getFullYear()} GovBidder · Interno
+        <p className="mt-8 text-center text-[10px] uppercase tracking-[0.22em] text-slate-300">
+          © {new Date().getFullYear()} GovBidder · The Bid That Wins
         </p>
       </div>
     </div>
