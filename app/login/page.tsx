@@ -15,7 +15,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) router.replace("/dashboard");
+      if (data.session) router.replace("/inicio");
     });
   }, [router, supabase]);
 
@@ -27,7 +27,7 @@ export default function LoginPage() {
     setLoading(false);
     if (error) { setErrorMsg(error.message); return; }
     const { data } = await supabase.auth.getSession();
-    if (data.session) router.replace("/dashboard");
+    if (data.session) router.replace("/inicio");
     else setErrorMsg("No se pudo obtener la sesión. Intenta nuevamente.");
   }
 

@@ -1,12 +1,10 @@
-"use client"
-
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
-import { AuditView } from "@/components/views/audit-view"
+import { InicioView } from "@/components/views/inicio-view"
 
-export default function AuditPage() {
+export default function InicioPage() {
   return (
     <DashboardLayout>
-      <AuditView />
+      <InicioView />
     </DashboardLayout>
   )
 }

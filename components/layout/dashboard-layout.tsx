@@ -17,11 +17,11 @@ type CurrentUser = {
 }
 
 const PAGE_TITLES: Record<string, string> = {
+  "/inicio":                      "Página Principal",
   "/dashboard":                   "Panel",
   "/sales":                       "Ingresos",
   "/reflection":                  "Reflexión",
   "/metrics":                     "Métricas",
-  "/audit":                       "Auditoría",
   "/tools":                       "Herramientas",
   "/calendar":                    "Agenda",
   "/recursos":                    "Recursos",

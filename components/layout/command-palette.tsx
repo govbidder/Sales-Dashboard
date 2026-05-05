@@ -4,8 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import {
   Search, ArrowRight, Command, BarChart3, DollarSign, FileSearch, LayoutGrid,
-  FileBarChart, Users2, ListTodo, Users, Layers, ClipboardList, Wrench, BookOpen,
-  CalendarDays, Plus, LogOut,
+  FileBarChart, Users2, ListTodo, Users, Layers, Wrench, BookOpen,
+  CalendarDays, Plus, LogOut, Activity,
 } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -28,6 +28,9 @@ interface Item {
 // ─── Item registry ────────────────────────────────────────────────────────────
 
 const PAGES: Item[] = [
+  // Inicio (smart home)
+  { id: "p:inicio",    kind: "page", title: "Página Principal", subtitle: "Estado del dashboard · qué requiere atención", icon: Activity, href: "/inicio", group: "Inicio", keywords: ["home","inicio","auditoria","estado","health"] },
+
   // General
   { id: "p:dashboard", kind: "page", title: "Panel",           subtitle: "KPIs, rentabilidad, proyecciones", icon: BarChart3,    href: "/dashboard",       group: "General", keywords: ["dashboard","home","kpi","resumen"] },
   { id: "p:revenue",   kind: "page", title: "Ingresos",        subtitle: "Embudo de ventas",                icon: DollarSign,   href: "/sales",           group: "General", keywords: ["sales","ventas","revenue","funnel"] },
@@ -42,7 +45,6 @@ const PAGES: Item[] = [
   { id: "p:ops",      kind: "page", title: "Centro Operativo",   subtitle: "Wiki interna · SOPs",          icon: Layers,   href: "/admin/centro-operativo", group: "Operación", keywords: ["sop","wiki","procedimientos","operations"] },
 
   // Programa
-  { id: "p:audit",    kind: "page", title: "Auditoría",   subtitle: "Diagnóstico estratégico", icon: ClipboardList, href: "/audit",    group: "Programa", keywords: ["compliance","auditoria"] },
   { id: "p:tools",    kind: "page", title: "Herramientas",subtitle: "Tools internos",          icon: Wrench,        href: "/tools",    group: "Programa", keywords: ["tools","links","apps"] },
   { id: "p:resources",kind: "page", title: "Recursos",    subtitle: "Biblioteca interna",      icon: BookOpen,      href: "/recursos", group: "Programa", keywords: ["resources","biblioteca","docs"] },
   { id: "p:schedule", kind: "page", title: "Agenda",      subtitle: "Calendario del equipo",   icon: CalendarDays,  href: "/calendar", group: "Programa", keywords: ["schedule","calendario","calendar"] },

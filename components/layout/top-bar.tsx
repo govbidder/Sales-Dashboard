@@ -18,6 +18,7 @@ interface TopBarProps {
 }
 
 const CRUMB_GROUPS: Record<string, string> = {
+  "/inicio":                "Inicio",
   "/dashboard":             "General",
   "/sales":                 "General",
   "/reflection":            "General",
@@ -27,7 +28,6 @@ const CRUMB_GROUPS: Record<string, string> = {
   "/admin/tasks":           "Operación",
   "/admin/team":            "Operación",
   "/admin/centro-operativo":"Operación",
-  "/audit":                 "Programa",
   "/tools":                 "Programa",
   "/recursos":              "Programa",
   "/calendar":              "Programa",
@@ -87,7 +87,7 @@ export function TopBar({
       <div className="grid h-14 items-center px-4 lg:px-6 grid-cols-[auto_1fr_auto] gap-3">
 
         {/* Left: Brand */}
-        <Link href="/dashboard" className="group flex items-center gap-2 shrink-0">
+        <Link href="/inicio" className="group flex items-center gap-2 shrink-0">
           <div className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#ff6b6a] to-[#c42423] shadow-[0_0_16px_rgba(228,45,44,0.40)]">
             <span className="text-[11px] font-black text-white tracking-tight">GB</span>
           </div>
