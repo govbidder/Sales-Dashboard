@@ -1,10 +1,8 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import Image from "next/image"
-import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ChevronDown, LogOut } from "lucide-react"
+import { ChevronDown, LogOut, Menu, Search, Command } from "lucide-react"
 import { MonthSelector } from "@/components/layout/month-selector"
 
 interface TopBarProps {
@@ -13,6 +11,7 @@ interface TopBarProps {
   selectedMonth:    string
   onMonthChange:    (m: string) => void
   onOpenPalette:    () => void
+  onOpenSidebar:    () => void
   onSignOut:        () => void
 }
 
@@ -32,7 +31,8 @@ const CRUMB_GROUPS: Record<string, string> = {
 }
 
 export function TopBar({
-  pageTitle, user, selectedMonth, onMonthChange, onOpenPalette, onSignOut,
+  pageTitle, user, selectedMonth, onMonthChange,
+  onOpenPalette, onOpenSidebar, onSignOut,
 }: TopBarProps) {
   const pathname = usePathname()
   const [profileOpen, setProfileOpen] = useState(false)
@@ -71,104 +71,98 @@ export function TopBar({
   const crumb = CRUMB_GROUPS[pathname] ?? null
 
   return (
-    <header
-      className="sticky top-0 z-10 border-b-2 border-[#1e3a8a]/15 bg-white/85 backdrop-blur-xl"
-    >
-      <div className="grid h-16 items-center px-4 lg:px-6 grid-cols-[auto_1fr_auto] gap-3">
+    <header className="sticky top-0 z-10 border-b-2 border-[#1e3a8a]/10 bg-white/85 backdrop-blur-xl">
+      <div className="flex h-16 items-center gap-3 px-4 lg:px-6">
 
-        {/* Left: Brand */}
-        <Link
-          href="/inicio"
-          className="group shrink-0 hover:opacity-90 transition-opacity flex items-center h-16 overflow-hidden"
+        {/* Mobile sidebar trigger */}
+        <button
+          onClick={onOpenSidebar}
+          className="lg:hidden flex h-10 w-10 items-center justify-center rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+          aria-label="Abrir menú"
         >
-          <Image
-            src="/LogoSuperior.png"
-            alt="GovBidder · The Bid That Wins"
-            width={400}
-            height={112}
-            className="h-28 w-auto object-contain object-left -ml-2 mix-blend-multiply"
-            priority
-          />
-        </Link>
+          <Menu className="h-5 w-5" />
+        </button>
 
-        {/* Center: Page switcher pill */}
-        <div className="flex items-center justify-center min-w-0">
-          <button
-            onClick={onOpenPalette}
-            className="group flex items-center gap-2 h-10 rounded-full border border-slate-200 bg-white px-4 transition-all hover:border-[#1e3a8a]/30 hover:shadow-[0_2px_12px_rgba(30,58,138,0.10)] max-w-full"
-            title="Cambiar de página · ⌘K"
-          >
-            {crumb && (
-              <>
-                <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a] group-hover:text-[#1e40af] transition-colors">
-                  {crumb}
-                </span>
-                <span className="hidden sm:inline text-slate-300">/</span>
-              </>
-            )}
-            <span className="text-[14px] sm:text-[15px] font-semibold text-slate-900 truncate">
-              {pageTitle}
+        {/* Page title with breadcrumb */}
+        <div className="flex flex-col min-w-0">
+          {crumb && (
+            <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]/70 leading-none">
+              {crumb}
             </span>
-            <ChevronDown className="h-3.5 w-3.5 text-slate-400 group-hover:text-slate-600 transition-colors shrink-0" />
-            <kbd className="hidden md:inline-flex items-center gap-0.5 rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[9px] font-semibold text-slate-500 shrink-0 ml-1">
-              {isMac ? "⌘" : "Ctrl"}K
-            </kbd>
-          </button>
+          )}
+          <h1 className="text-[16px] sm:text-[18px] font-bold tracking-tight text-[#1e3a8a] mt-0.5 leading-none truncate">
+            {pageTitle}
+          </h1>
         </div>
 
-        {/* Right: Month + Profile */}
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="hidden md:block">
-            <MonthSelector
-              value={selectedMonth}
-              onChange={onMonthChange}
-              enabledMonths={[]}
-            />
-          </div>
+        {/* Spacer */}
+        <div className="flex-1" />
 
-          <div className="relative" ref={profileRef}>
-            <button
-              className="group flex items-center h-10 rounded-full pl-1 pr-1 transition-all hover:bg-slate-100"
-              onClick={() => setProfileOpen(v => !v)}
+        {/* Search palette trigger */}
+        <button
+          onClick={onOpenPalette}
+          className="hidden md:flex items-center gap-2 h-9 rounded-lg border border-slate-200 bg-white px-3 text-[12px] text-slate-500 hover:border-[#1e3a8a]/30 hover:text-slate-700 transition-all"
+          title="Buscar · ⌘K"
+        >
+          <Search className="h-3.5 w-3.5" />
+          <span>Buscar</span>
+          <kbd className="inline-flex items-center gap-0.5 rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[9px] font-semibold text-slate-500 ml-2">
+            {isMac ? "⌘" : "Ctrl"}K
+          </kbd>
+        </button>
+
+        {/* Month selector */}
+        <div className="hidden md:block">
+          <MonthSelector
+            value={selectedMonth}
+            onChange={onMonthChange}
+            enabledMonths={[]}
+          />
+        </div>
+
+        {/* Profile */}
+        <div className="relative" ref={profileRef}>
+          <button
+            className="group flex items-center h-10 rounded-full pl-1 pr-1 transition-all hover:bg-slate-100"
+            onClick={() => setProfileOpen(v => !v)}
+          >
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] text-[11px] font-bold text-white shadow-sm ring-2 ring-white">
+              {initials}
+            </span>
+          </button>
+
+          {profileOpen && (
+            <div
+              role="menu"
+              className="absolute right-0 mt-2 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_20px_40px_rgba(15,23,42,0.10)] page-enter"
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] text-[11px] font-bold text-white shadow-sm ring-2 ring-white">
-                {initials}
-              </span>
-            </button>
-
-            {profileOpen && (
-              <div
-                role="menu"
-                className="absolute right-0 mt-2 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_20px_40px_rgba(15,23,42,0.10)] page-enter"
-              >
-                <div className="px-4 py-3.5 border-b border-slate-100">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#E42D2C] text-sm font-bold text-white">
-                      {initials}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-slate-900 truncate">{user?.name}</p>
-                      <p className="text-[11px] text-slate-500 truncate">{user?.email}</p>
-                    </div>
+              <div className="px-4 py-3.5 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] text-sm font-bold text-white">
+                    {initials}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-slate-900 truncate">{user?.name}</p>
+                    <p className="text-[11px] text-slate-500 truncate">{user?.email}</p>
                   </div>
-                  {user?.role === "admin" && (
-                    <span className="mt-2.5 inline-flex items-center gap-1 rounded-full border border-[#E42D2C]/20 bg-[#E42D2C]/[0.06] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#E42D2C]">
-                      ★ Admin
-                    </span>
-                  )}
                 </div>
-                <button
-                  type="button"
-                  role="menuitem"
-                  className="flex w-full items-center gap-2.5 px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50 transition-colors"
-                  onClick={() => { setProfileOpen(false); onSignOut() }}
-                >
-                  <LogOut className="h-4 w-4 text-slate-400" />
-                  Cerrar sesión
-                </button>
+                {user?.role === "admin" && (
+                  <span className="mt-2.5 inline-flex items-center gap-1 rounded-full border border-[#1e3a8a]/20 bg-[#1e3a8a]/[0.06] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#1e3a8a]">
+                    ★ Admin
+                  </span>
+                )}
               </div>
-            )}
-          </div>
+              <button
+                type="button"
+                role="menuitem"
+                className="flex w-full items-center gap-2.5 px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                onClick={() => { setProfileOpen(false); onSignOut() }}
+              >
+                <LogOut className="h-4 w-4 text-slate-400" />
+                Cerrar sesión
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

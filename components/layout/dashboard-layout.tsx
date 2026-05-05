@@ -4,6 +4,7 @@ import type React from "react"
 import { createContext, useContext, useEffect, useMemo, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { TopBar } from "@/components/layout/top-bar"
+import { Sidebar } from "@/components/layout/sidebar"
 import { CommandPalette } from "@/components/layout/command-palette"
 import { AnnualMetricsProvider } from "@/contexts/annual-metrics-context"
 import { NavigationProgress } from "@/components/ui/navigation-progress"
@@ -44,11 +45,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const supabase = useMemo(() => createClient(), [])
 
-  const [authChecked,    setAuthChecked]    = useState(false)
-  const [currentUser,    setCurrentUser]    = useState<CurrentUser | null>(null)
-  const [activeClientId, setActiveClientId] = useState<string | null>(null)
-  const [selectedMonth,  setSelectedMonth]  = useState<string>("2025-12")
-  const [paletteOpen,    setPaletteOpen]    = useState(false)
+  const [authChecked,       setAuthChecked]       = useState(false)
+  const [currentUser,       setCurrentUser]       = useState<CurrentUser | null>(null)
+  const [activeClientId,    setActiveClientId]    = useState<string | null>(null)
+  const [selectedMonth,     setSelectedMonth]     = useState<string>("2025-12")
+  const [paletteOpen,       setPaletteOpen]       = useState(false)
+  const [sidebarOpen,       setSidebarOpen]       = useState(false)
+  const [sidebarCollapsed,  setSidebarCollapsed]  = useState(false)
 
   const pageTitle = PAGE_TITLES[pathname] ?? "GovBidder"
 
@@ -108,6 +111,27 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     const stored = window.localStorage.getItem("selectedMonth")
     if (stored) setSelectedMonth(stored)
   }, [])
+
+  // Restore persisted sidebar collapsed state
+  useEffect(() => {
+    const stored = window.localStorage.getItem("sidebarCollapsed")
+    if (stored === "1") setSidebarCollapsed(true)
+  }, [])
+
+  // Close mobile sidebar when route changes
+  useEffect(() => {
+    setSidebarOpen(false)
+  }, [pathname])
+
+  const handleToggleCollapse = () => {
+    setSidebarCollapsed(v => {
+      const next = !v
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("sidebarCollapsed", next ? "1" : "0")
+      }
+      return next
+    })
+  }
 
   // Global keyboard shortcuts
   useEffect(() => {
@@ -203,29 +227,44 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <ToastProvider>
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen bg-background">
       <NavigationProgress />
 
-      <TopBar
-        pageTitle={pageTitle}
-        user={currentUser}
-        selectedMonth={selectedMonth}
-        onMonthChange={handleMonthChange}
-        onOpenPalette={() => setPaletteOpen(true)}
-        onSignOut={handleSignOut}
+      <Sidebar
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={handleToggleCollapse}
       />
 
-      <ActiveClientContext.Provider value={activeClientId}>
-        <AnnualMetricsProvider>
-          <SelectedMonthContext.Provider value={selectedMonth}>
-            <main className="flex-1 ambient-bg">
-              <div className="p-4 lg:p-8 max-w-[1600px] mx-auto page-enter">
-                {children}
-              </div>
-            </main>
-          </SelectedMonthContext.Provider>
-        </AnnualMetricsProvider>
-      </ActiveClientContext.Provider>
+      <div
+        className={
+          "flex min-h-screen flex-col transition-[margin] duration-300 ease-out " +
+          (sidebarCollapsed ? "lg:ml-[72px]" : "lg:ml-[240px]")
+        }
+      >
+        <TopBar
+          pageTitle={pageTitle}
+          user={currentUser}
+          selectedMonth={selectedMonth}
+          onMonthChange={handleMonthChange}
+          onOpenPalette={() => setPaletteOpen(true)}
+          onOpenSidebar={() => setSidebarOpen(true)}
+          onSignOut={handleSignOut}
+        />
+
+        <ActiveClientContext.Provider value={activeClientId}>
+          <AnnualMetricsProvider>
+            <SelectedMonthContext.Provider value={selectedMonth}>
+              <main className="flex-1 ambient-bg">
+                <div className="p-4 lg:p-8 max-w-[1600px] mx-auto page-enter">
+                  {children}
+                </div>
+              </main>
+            </SelectedMonthContext.Provider>
+          </AnnualMetricsProvider>
+        </ActiveClientContext.Provider>
+      </div>
 
       <CommandPalette
         open={paletteOpen}
