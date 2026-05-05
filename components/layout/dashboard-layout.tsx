@@ -8,6 +8,7 @@ import { CommandPalette } from "@/components/layout/command-palette"
 import { AnnualMetricsProvider } from "@/contexts/annual-metrics-context"
 import { NavigationProgress } from "@/components/ui/navigation-progress"
 import { ToastProvider } from "@/components/ui/toast"
+import { AIAssistant } from "@/components/ai/ai-assistant"
 import { createClient } from "@/lib/supabase"
 
 type CurrentUser = {
@@ -231,6 +232,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         onClose={() => setPaletteOpen(false)}
         onSignOut={handleSignOut}
       />
+
+      <AIAssistant selectedMonth={selectedMonth} />
     </div>
     </ToastProvider>
   )
