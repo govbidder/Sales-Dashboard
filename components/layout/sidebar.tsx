@@ -1,7 +1,7 @@
 "use client"
 
 import {
-  X, BarChart3, Radio, DollarSign, FileSearch, Wrench,
+  X, BarChart3, DollarSign, FileSearch, Wrench,
   CalendarDays, LayoutGrid, ClipboardList,
   Zap, ChevronDown, Users2, BookOpen, Layers, Lock, ListTodo,
 } from "lucide-react"
@@ -20,7 +20,6 @@ const NAV_GROUPS = [
     label: "Overview",
     items: [
       { name: "Bid Dashboard",  href: "/dashboard",  icon: BarChart3 },
-      { name: "Bid Sources",    href: "/channels",   icon: Radio },
       { name: "Revenue",        href: "/sales",      icon: DollarSign },
       { name: "Review",         href: "/reflection", icon: FileSearch },
       { name: "All Metrics",    href: "/metrics",    icon: LayoutGrid },

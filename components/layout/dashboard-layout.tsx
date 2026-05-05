@@ -20,7 +20,6 @@ type CurrentUser = {
 
 const PAGE_TITLES: Record<string, string> = {
   "/dashboard":                   "Bid Dashboard",
-  "/channels":                    "Bid Sources",
   "/sales":                       "Revenue",
   "/reflection":                  "Review",
   "/metrics":                     "All Metrics",
