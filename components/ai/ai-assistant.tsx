@@ -155,7 +155,7 @@ export function AIAssistant({ selectedMonth }: { selectedMonth?: string | null }
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="group fixed bottom-5 right-5 z-[90] flex items-center gap-2 h-12 rounded-full bg-gradient-to-br from-[#ff6b6a] to-[#c42423] pl-3.5 pr-4 text-[13px] font-bold text-white shadow-[0_8px_24px_rgba(228,45,44,0.40)] hover:shadow-[0_12px_32px_rgba(228,45,44,0.55)] hover:scale-[1.02] transition-all"
+          className="group fixed bottom-5 right-5 z-[90] flex items-center gap-2 h-12 rounded-full bg-gradient-to-br from-[#E42D2C] via-[#c42423] to-[#1e3a8a] pl-3.5 pr-4 text-[13px] font-bold text-white shadow-[0_8px_24px_rgba(30,58,138,0.35)] hover:shadow-[0_12px_32px_rgba(30,58,138,0.50)] hover:scale-[1.02] transition-all"
           aria-label="Abrir asistente"
         >
           <span className="relative flex h-6 w-6 items-center justify-center">

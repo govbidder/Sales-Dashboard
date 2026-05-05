@@ -300,7 +300,7 @@ export function TrendCharts() {
   return (
     <section className="space-y-5">
       <div className="flex items-center gap-2.5">
-        <span className="h-4 w-[3px] rounded-full bg-[#E42D2C]" />
+        <span className="h-4 w-[3px] rounded-full bg-[#1e3a8a]" />
         <h2 className="text-sm font-bold uppercase tracking-widest text-slate-700">Analytics</h2>
         <span className="ml-auto text-xs text-slate-400 tabular-nums">{rows.length} meses</span>
       </div>

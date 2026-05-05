@@ -591,11 +591,11 @@ export function InicioView() {
       {/* QUICK NAV ────────────────────────────────────────────────────────── */}
       <div className="space-y-2">
         <div className="flex items-center gap-2 px-1">
-          <Activity className="h-3.5 w-3.5 text-slate-500" />
-          <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-600">
+          <Activity className="h-3.5 w-3.5 text-[#1e3a8a]" />
+          <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]">
             Atajos rápidos
           </h2>
-          <div className="flex-1 h-px bg-gradient-to-r from-white/[0.08] to-transparent" />
+          <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent" />
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -610,15 +610,15 @@ export function InicioView() {
               <Link
                 key={s.href}
                 href={s.href}
-                className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-[#E42D2C]/30 hover:shadow-[0_4px_20px_rgba(228,45,44,0.10)] transition-all p-4"
+                className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-[#1e3a8a]/30 hover:shadow-[0_4px_20px_rgba(30,58,138,0.10)] transition-all p-4"
               >
-                <div className="pointer-events-none absolute -top-12 -right-12 h-24 w-24 rounded-full bg-[#E42D2C]/[0.08] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="pointer-events-none absolute -top-12 -right-12 h-24 w-24 rounded-full bg-[#1e3a8a]/[0.08] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
 
                 <div className="relative flex items-start justify-between gap-3 mb-3">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-50 ring-1 ring-slate-200 group-hover:bg-[#E42D2C]/10 group-hover:ring-[#E42D2C]/25 transition-colors">
-                    <Icon className="h-4 w-4 text-slate-500 group-hover:text-[#ff6b6a] transition-colors" />
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-50 ring-1 ring-slate-200 group-hover:bg-[#1e3a8a]/10 group-hover:ring-[#1e3a8a]/25 transition-colors">
+                    <Icon className="h-4 w-4 text-slate-500 group-hover:text-[#1e3a8a] transition-colors" />
                   </span>
-                  <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-[#ff6b6a] group-hover:translate-x-0.5 transition-all" />
+                  <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all" />
                 </div>
 
                 <p className="relative text-[13px] font-bold text-slate-900">{s.label}</p>

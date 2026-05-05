@@ -236,7 +236,7 @@ export function ResourcesView() {
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <div className="flex items-center gap-2.5 mb-1">
-            <span className="h-4 w-[3px] rounded-full bg-[#E42D2C]" />
+            <span className="h-4 w-[3px] rounded-full bg-[#1e3a8a]" />
             <h1 className="text-sm font-semibold uppercase tracking-widest text-slate-600">Biblioteca</h1>
           </div>
           <p className="text-xs text-slate-400 ml-[18px]">Links, docs y recursos guardados</p>
