@@ -102,10 +102,10 @@ export function Sidebar({ open, onClose, collapsed, onToggleCollapse }: SidebarP
           open ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         )}
       >
-        {/* Brand */}
+        {/* Brand — height matches TopBar (h-16 = 64px) so the bottom borders align */}
         <div className={cn(
           "relative flex flex-shrink-0 items-center border-b-2 border-[#1e3a8a]/10",
-          showLabels ? "h-20 px-4" : "h-20 px-3 justify-center",
+          showLabels ? "h-16 px-4" : "h-16 px-2 justify-center",
         )}>
           <Link href="/inicio" className="flex items-center justify-center hover:opacity-90 transition-opacity overflow-hidden">
             {showLabels ? (
@@ -114,18 +114,18 @@ export function Sidebar({ open, onClose, collapsed, onToggleCollapse }: SidebarP
                 alt="GovBidder"
                 width={200}
                 height={150}
-                className="h-16 w-auto object-contain mix-blend-multiply"
+                className="h-12 w-auto object-contain"
                 priority
               />
             ) : (
               // Collapsed: show only top portion of the logo (the eagle)
-              <div className="h-12 w-12 overflow-hidden flex items-center justify-center">
+              <div className="h-10 w-10 overflow-hidden flex items-center justify-center">
                 <Image
                   src="/icon.png"
                   alt="GovBidder"
                   width={120}
                   height={120}
-                  className="h-20 w-auto object-cover object-top mix-blend-multiply"
+                  className="h-16 w-auto object-cover object-top"
                   priority
                 />
               </div>
