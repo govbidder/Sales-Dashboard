@@ -4,10 +4,11 @@ import { useEffect, useState, useCallback } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { createClient } from "@/lib/supabase"
 import { Portal } from "@/components/ui/portal"
+import { useToast } from "@/components/ui/toast"
 import {
   Loader2, Trash2, RefreshCw, Download, X, Star, Plus,
   Instagram, ExternalLink, ChevronRight, Phone, Mail, Calendar as CalIcon,
-  CheckCircle2, Circle,
+  CheckCircle2, Circle, MessageCircle, Copy,
 } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -112,6 +113,98 @@ function StarRating({
   )
 }
 
+// ─── Contact Actions ──────────────────────────────────────────────────────────
+
+function normalizePhone(phone: string) {
+  // Strip everything that isn't a digit or +. wa.me wants digits only.
+  return phone.replace(/[^\d+]/g, "").replace(/^\+/, "")
+}
+
+function ContactActions({ persona }: { persona: Persona }) {
+  const toast = useToast()
+  const ig    = persona.instagram?.replace("@", "")
+  const phone = persona.phone ? normalizePhone(persona.phone) : null
+
+  const waText = encodeURIComponent(
+    `Hola ${persona.name?.split(" ")[0] ?? ""}, te escribo de GovBidder por la llamada agendada.`
+  )
+  const mailSubject = encodeURIComponent(`Seguimiento — ${persona.name ?? ""}`)
+  const mailBody    = encodeURIComponent(
+    `Hola ${persona.name?.split(" ")[0] ?? ""},\n\nTe escribo para hacer seguimiento.\n\nSaludos.`
+  )
+
+  const copy = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      toast.success(`${label} copiado`)
+    } catch {
+      toast.error("No se pudo copiar")
+    }
+  }
+
+  const hasAny = phone || persona.email || ig
+  if (!hasAny) return null
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {phone && (
+        <>
+          <a
+            href={`https://wa.me/${phone}?text=${waText}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center gap-1.5 h-8 rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-3 text-[12px] font-semibold text-emerald-300 hover:bg-emerald-500/20 transition-colors"
+            title="Mandar WhatsApp"
+          >
+            <MessageCircle className="h-3.5 w-3.5" />
+            WhatsApp
+          </a>
+          <button
+            onClick={() => copy(persona.phone!, "Teléfono")}
+            className="flex items-center gap-1.5 h-8 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 text-[12px] font-semibold text-white/65 hover:bg-white/[0.07] hover:text-white transition-colors"
+            title="Copiar teléfono"
+          >
+            <Phone className="h-3.5 w-3.5" />
+            Copiar tel
+          </button>
+        </>
+      )}
+      {persona.email && (
+        <>
+          <a
+            href={`mailto:${persona.email}?subject=${mailSubject}&body=${mailBody}`}
+            className="flex items-center gap-1.5 h-8 rounded-lg border border-blue-500/25 bg-blue-500/10 px-3 text-[12px] font-semibold text-blue-300 hover:bg-blue-500/20 transition-colors"
+            title="Mandar email"
+          >
+            <Mail className="h-3.5 w-3.5" />
+            Mail
+          </a>
+          <button
+            onClick={() => copy(persona.email!, "Email")}
+            className="flex items-center gap-1.5 h-8 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 text-[12px] font-semibold text-white/65 hover:bg-white/[0.07] hover:text-white transition-colors"
+            title="Copiar email"
+          >
+            <Copy className="h-3.5 w-3.5" />
+            Copiar
+          </button>
+        </>
+      )}
+      {ig && (
+        <a
+          href={`https://instagram.com/${ig}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 h-8 rounded-lg border border-pink-500/25 bg-pink-500/10 px-3 text-[12px] font-semibold text-pink-300 hover:bg-pink-500/20 transition-colors"
+          title="Ver Instagram"
+        >
+          <Instagram className="h-3.5 w-3.5" />
+          @{ig}
+        </a>
+      )}
+    </div>
+  )
+}
+
 // ─── Detail Drawer ────────────────────────────────────────────────────────────
 
 function DetailDrawer({
@@ -204,26 +297,8 @@ function DetailDrawer({
               </select>
             </div>
 
-            {/* Quick contact row */}
-            <div className="space-y-1.5 pt-1">
-              {persona.email && (
-                <a href={`mailto:${persona.email}`} className="flex items-center gap-2 text-[13px] text-white/60 hover:text-white transition-colors">
-                  <Mail className="h-3.5 w-3.5 shrink-0 text-white/30" /> {persona.email}
-                </a>
-              )}
-              {persona.phone && (
-                <a href={`tel:${persona.phone}`} className="flex items-center gap-2 text-[13px] text-white/60 hover:text-white transition-colors">
-                  <Phone className="h-3.5 w-3.5 shrink-0 text-white/30" /> {persona.phone}
-                </a>
-              )}
-              {ig && (
-                <a href={`https://instagram.com/${ig}`} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-[13px] text-pink-300/70 hover:text-pink-300 transition-colors">
-                  <Instagram className="h-3.5 w-3.5 shrink-0" /> @{ig}
-                  <ExternalLink className="h-3 w-3 opacity-50" />
-                </a>
-              )}
-            </div>
+            {/* Quick contact actions */}
+            <ContactActions persona={persona} />
           </div>
 
           {/* Editable fields */}
@@ -526,6 +601,7 @@ export function PersonasAgendadasView() {
   const router       = useRouter()
   const pathname     = usePathname()
   const searchParams = useSearchParams()
+  const toast        = useToast()
 
   // Quick-action: open "Nueva persona" modal when ?new=1 is present, then strip the param.
   useEffect(() => {
@@ -578,6 +654,9 @@ export function PersonasAgendadasView() {
       if (res.ok && json.persona) {
         setPersonas(prev => [json.persona, ...prev])
         setShowNewForm(false)
+        toast.success("Persona creada")
+      } else {
+        toast.error(json?.error ?? "No se pudo crear la persona")
       }
     } finally { setCreating(false) }
   }
@@ -598,14 +677,19 @@ export function PersonasAgendadasView() {
     setDeletingId(id)
     const session = await getSession()
     if (!session) return
-    await fetch("/api/admin/personas", {
+    const res = await fetch("/api/admin/personas", {
       method:  "DELETE",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body:    JSON.stringify({ id }),
     })
-    setPersonas(prev => prev.filter(p => p.id !== id))
-    setSeguimientos(prev => prev.filter(s => s.persona_id !== id))
-    if (selected?.id === id) setSelected(null)
+    if (res.ok) {
+      setPersonas(prev => prev.filter(p => p.id !== id))
+      setSeguimientos(prev => prev.filter(s => s.persona_id !== id))
+      if (selected?.id === id) setSelected(null)
+      toast.success("Persona eliminada")
+    } else {
+      toast.error("No se pudo eliminar")
+    }
     setDeletingId(null)
   }
 

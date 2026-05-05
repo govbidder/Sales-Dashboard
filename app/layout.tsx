@@ -11,7 +11,10 @@ const raleway = Raleway({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://govbidder.com"),
-  title: "GovBidder Sales Dashboard",
+  title: {
+    default:  "GovBidder",
+    template: "%s · GovBidder",
+  },
   description: "Government Contracts Intelligence Platform",
   icons: {
     icon: [

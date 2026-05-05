@@ -6,6 +6,8 @@ import { Projections }       from "@/components/sections/projections"
 import { CorrelationChart }  from "@/components/sections/correlation-chart"
 import { TrendCharts }       from "@/components/sections/trend-charts"
 
+export const metadata = { title: "Panel" }
+
 export default function DashboardPage() {
   return (
     <DashboardLayout>

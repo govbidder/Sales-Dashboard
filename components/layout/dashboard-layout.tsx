@@ -7,6 +7,7 @@ import { TopBar } from "@/components/layout/top-bar"
 import { CommandPalette } from "@/components/layout/command-palette"
 import { AnnualMetricsProvider } from "@/contexts/annual-metrics-context"
 import { NavigationProgress } from "@/components/ui/navigation-progress"
+import { ToastProvider } from "@/components/ui/toast"
 import { createClient } from "@/lib/supabase"
 
 type CurrentUser = {
@@ -107,19 +108,75 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     if (stored) setSelectedMonth(stored)
   }, [])
 
-  // Cmd+K / Ctrl+K to open palette
+  // Global keyboard shortcuts
   useEffect(() => {
+    let leaderTimer: ReturnType<typeof setTimeout> | null = null
+    let waitingForLeader = false
+
+    function isInsideEditable(target: EventTarget | null) {
+      if (!(target instanceof HTMLElement)) return false
+      const tag = target.tagName.toLowerCase()
+      return tag === "input" || tag === "textarea" || tag === "select" || target.isContentEditable
+    }
+
     function onKey(e: KeyboardEvent) {
-      const isPaletteShortcut =
-        (e.key === "k" || e.key === "K") && (e.metaKey || e.ctrlKey)
-      if (isPaletteShortcut) {
+      // Cmd+K / Ctrl+K — open palette
+      if ((e.key === "k" || e.key === "K") && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
         setPaletteOpen(true)
+        return
+      }
+
+      // Skip single-letter shortcuts when typing in inputs
+      if (isInsideEditable(e.target)) return
+      if (e.metaKey || e.ctrlKey || e.altKey) return
+
+      // Single-letter create shortcuts
+      if (e.key === "n") {
+        e.preventDefault()
+        router.push("/admin/tasks?new=1")
+        return
+      }
+      if (e.key === "p") {
+        e.preventDefault()
+        router.push("/admin/personas?new=1")
+        return
+      }
+
+      // "g X" leader sequence — go to <X>
+      if (waitingForLeader) {
+        if (leaderTimer) clearTimeout(leaderTimer)
+        waitingForLeader = false
+        const k = e.key.toLowerCase()
+        const map: Record<string, string> = {
+          i: "/inicio",
+          d: "/dashboard",
+          s: "/sales",
+          m: "/metrics",
+          r: "/admin/reports",
+          a: "/admin/personas",  // a for "agendadas"
+          t: "/admin/tasks",
+          e: "/admin/team",      // e for "equipo"
+          o: "/admin/centro-operativo",  // o for "operativo"
+        }
+        if (map[k]) {
+          e.preventDefault()
+          router.push(map[k])
+        }
+        return
+      }
+      if (e.key === "g") {
+        e.preventDefault()
+        waitingForLeader = true
+        leaderTimer = setTimeout(() => { waitingForLeader = false }, 1000)
       }
     }
     document.addEventListener("keydown", onKey)
-    return () => document.removeEventListener("keydown", onKey)
-  }, [])
+    return () => {
+      document.removeEventListener("keydown", onKey)
+      if (leaderTimer) clearTimeout(leaderTimer)
+    }
+  }, [router])
 
   async function handleSignOut() {
     await supabase.auth.signOut()
@@ -144,6 +201,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
+    <ToastProvider>
     <div className="dark min-h-screen flex flex-col bg-background">
       <NavigationProgress />
 
@@ -174,5 +232,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         onSignOut={handleSignOut}
       />
     </div>
+    </ToastProvider>
   )
 }

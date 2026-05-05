@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
+import { createClient } from "@/lib/supabase"
 import {
   Search, ArrowRight, Command, BarChart3, DollarSign, LayoutGrid,
   FileBarChart, Users2, ListTodo, Users, Layers, Wrench, BookOpen,
-  CalendarDays, Plus, LogOut, Activity,
+  CalendarDays, Plus, LogOut, Activity, User as UserIcon, CheckSquare,
 } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -108,14 +109,64 @@ export function CommandPalette({ open, onClose, onSignOut }: CommandPaletteProps
   const inputRef = useRef<HTMLInputElement>(null)
   const [query, setQuery]     = useState("")
   const [activeIdx, setActiveIdx] = useState(0)
+  const [dataItems, setDataItems] = useState<Item[]>([])
+
+  // Lazy-load personas + tasks once when palette opens, for content search.
+  useEffect(() => {
+    if (!open || dataItems.length > 0) return
+    let aborted = false
+    async function load() {
+      try {
+        const supabase = createClient()
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session) return
+        const headers = { Authorization: `Bearer ${session.access_token}` }
+        const [personasRes, tasksRes] = await Promise.all([
+          fetch("/api/admin/personas", { headers }),
+          fetch("/api/admin/tasks?include_subtasks=true", { headers }),
+        ])
+        const personas = personasRes.ok ? (await personasRes.json()).personas ?? [] : []
+        const tasks    = tasksRes.ok    ? (await tasksRes.json()).tasks ?? []        : []
+        if (aborted) return
+        const items: Item[] = [
+          ...personas.map((p: any) => ({
+            id:       `data:persona:${p.id}`,
+            kind:     "page" as const,
+            title:    p.name,
+            subtitle: [p.email, p.phone].filter(Boolean).join(" · ") || "Persona agendada",
+            icon:     UserIcon,
+            href:     "/admin/personas",
+            group:    "Personas",
+            keywords: [p.email, p.phone, p.owner].filter(Boolean) as string[],
+          })),
+          ...tasks.map((t: any) => ({
+            id:       `data:task:${t.id}`,
+            kind:     "page" as const,
+            title:    t.title,
+            subtitle: t.description?.slice(0, 60) ?? `Tarea · ${t.status}`,
+            icon:     CheckSquare,
+            href:     "/admin/tasks",
+            group:    "Tareas",
+            keywords: (t.tags ?? []).concat(t.assignees ?? []) as string[],
+          })),
+        ]
+        setDataItems(items)
+      } catch { /* fail silently */ }
+    }
+    load()
+    return () => { aborted = true }
+  }, [open, dataItems.length])
 
   const all: Item[] = useMemo(() => {
     const actions = QUICK_ACTIONS(router)
-    return [...PAGES, ...actions]
-  }, [router])
+    return [...PAGES, ...actions, ...dataItems]
+  }, [router, dataItems])
 
   const filtered: Item[] = useMemo(() => {
-    if (!query.trim()) return all
+    if (!query.trim()) {
+      // Don't show data items when palette opens with no query (would flood)
+      return all.filter(i => !i.id.startsWith("data:"))
+    }
     return all
       .map(i => ({ item: i, s: score(i, query) }))
       .filter(x => x.s > 0)
