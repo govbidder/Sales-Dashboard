@@ -784,7 +784,7 @@ export function PersonasAgendadasView() {
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Personas Agendadas</h1>
+            <h1 className="text-2xl font-bold text-[#1e3a8a] tracking-tight">Personas Agendadas</h1>
             <p className="text-sm text-slate-400 mt-0.5">
               {personas.length} {personas.length === 1 ? "persona" : "personas"} en pipeline
             </p>

@@ -1,11 +1,11 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { ChevronDown, LogOut } from "lucide-react"
 import { MonthSelector } from "@/components/layout/month-selector"
-import { GovBidderLogo } from "@/components/ui/govbidder-logo"
 
 interface TopBarProps {
   pageTitle:        string
@@ -78,7 +78,14 @@ export function TopBar({
 
         {/* Left: Brand */}
         <Link href="/inicio" className="group shrink-0 hover:opacity-90 transition-opacity">
-          <GovBidderLogo variant="horizontal" />
+          <Image
+            src="/LogoSuperior.png"
+            alt="GovBidder · The Bid That Wins"
+            width={200}
+            height={56}
+            className="h-12 w-auto object-contain"
+            priority
+          />
         </Link>
 
         {/* Center: Page switcher pill */}

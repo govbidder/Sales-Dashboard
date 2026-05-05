@@ -444,7 +444,7 @@ export function ReportsInputView() {
       {/* Header + tabs */}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Métricas Mensuales</h1>
+          <h1 className="text-2xl font-bold text-[#1e3a8a] tracking-tight">Métricas Mensuales</h1>
           <p className="text-sm text-slate-400 mt-0.5">
             Cargá los KPIs del mes para ver el dashboard alimentado.
           </p>

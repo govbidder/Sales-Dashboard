@@ -413,7 +413,7 @@ export function InicioView() {
         <div className="space-y-2">
           <div className="flex items-center gap-2 px-1">
             <AlertCircle className="h-3.5 w-3.5 text-red-700/80" />
-            <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-600">
+            <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]">
               Requieren Atención
             </h2>
             <div className="flex-1 h-px bg-gradient-to-r from-white/[0.08] to-transparent" />
@@ -560,7 +560,7 @@ export function InicioView() {
         <div className="space-y-2">
           <div className="flex items-center gap-2 px-1">
             <Sparkles className="h-3.5 w-3.5 text-emerald-700/80" />
-            <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-600">
+            <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]">
               Lo que está mejorando
             </h2>
             <div className="flex-1 h-px bg-gradient-to-r from-white/[0.08] to-transparent" />

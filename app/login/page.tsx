@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
-import { GovBidderLogo } from "@/components/ui/govbidder-logo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -45,7 +45,14 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div className="mb-8 flex justify-center">
-          <GovBidderLogo variant="stack" />
+          <Image
+            src="/govbidder-logo.png"
+            alt="GovBidder · The Bid That Wins"
+            width={260}
+            height={200}
+            className="h-auto w-[200px] object-contain"
+            priority
+          />
         </div>
 
         {/* Card */}

@@ -903,7 +903,7 @@ export function TasksView() {
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Tareas</h1>
+            <h1 className="text-2xl font-bold text-[#1e3a8a] tracking-tight">Tareas</h1>
             <p className="text-sm text-slate-400 mt-0.5">
               {topLevel.length} {topLevel.length === 1 ? "tarea" : "tareas"}
               {overdueCount > 0 && (
