@@ -17,9 +17,12 @@ export const metadata: Metadata = {
   },
   description: "Government Contracts Intelligence Platform",
   icons: {
-    icon:     [{ url: "/govbidder-logo.png", type: "image/png" }],
-    apple:    { url: "/govbidder-logo.png" },
-    shortcut: "/govbidder-logo.png",
+    icon: [
+      { url: "/icon.svg",            type: "image/svg+xml" },
+      { url: "/icon-dark-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple:    { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+    shortcut: "/favicon.ico",
   },
   openGraph: {
     title: "GovBidder Sales Dashboard",
