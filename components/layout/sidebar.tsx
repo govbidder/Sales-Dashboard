@@ -110,7 +110,7 @@ export function Sidebar({ open, onClose, collapsed, onToggleCollapse }: SidebarP
           <Link href="/inicio" className="flex items-center justify-center hover:opacity-90 transition-opacity overflow-hidden">
             {showLabels ? (
               <Image
-                src="/govbidder-logo.png"
+                src="/icon.png"
                 alt="GovBidder"
                 width={200}
                 height={150}
@@ -121,7 +121,7 @@ export function Sidebar({ open, onClose, collapsed, onToggleCollapse }: SidebarP
               // Collapsed: show only top portion of the logo (the eagle)
               <div className="h-12 w-12 overflow-hidden flex items-center justify-center">
                 <Image
-                  src="/govbidder-logo.png"
+                  src="/icon.png"
                   alt="GovBidder"
                   width={120}
                   height={120}

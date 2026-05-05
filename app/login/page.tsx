@@ -46,7 +46,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="mb-8 flex justify-center">
           <Image
-            src="/govbidder-logo.png"
+            src="/icon.png"
             alt="GovBidder · The Bid That Wins"
             width={260}
             height={200}
