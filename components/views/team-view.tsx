@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback, useMemo } from "react"
+import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { createClient } from "@/lib/supabase"
 import {
   Loader2, Plus, X, RefreshCw, Mail, Users2, ChevronRight,
@@ -351,6 +352,10 @@ export function TeamView() {
   const [filterStatus,   setFilterStatus]   = useState<"todos" | Status>("todos")
   const [currentRole,    setCurrentRole]    = useState<Role>("user")
 
+  const router       = useRouter()
+  const pathname     = usePathname()
+  const searchParams = useSearchParams()
+
   const getSession = async () => {
     const supabase = createClient()
     const { data: { session } } = await supabase.auth.getSession()
@@ -376,6 +381,15 @@ export function TeamView() {
   }, [])
 
   useEffect(() => { fetchTeam() }, [fetchTeam])
+
+  // Quick-action: open "Invitar al equipo" modal when ?invite=1 and the current user is admin.
+  // We only act once the role has been resolved by fetchTeam — non-admins ignore the param.
+  useEffect(() => {
+    if (searchParams?.get("invite") !== "1") return
+    if (loading) return
+    if (currentRole === "admin") setShowInvite(true)
+    router.replace(pathname, { scroll: false })
+  }, [searchParams, loading, currentRole, router, pathname])
 
   const handleInvite = async (data: { email: string; full_name: string; position: string; role: Role }) => {
     setInviting(true)
@@ -466,7 +480,7 @@ export function TeamView() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar por nombre, email, posición..."
-            className="h-9 rounded-xl border border-white/[0.08] bg-[#141417] px-4 text-sm text-white placeholder:text-white/25 focus:border-white/20 focus:outline-none flex-1 min-w-[220px] max-w-sm"
+            className="h-9 rounded-xl border border-white/[0.08] bg-[#080d1e] px-4 text-sm text-white placeholder:text-white/25 focus:border-white/20 focus:outline-none flex-1 min-w-[220px] max-w-sm"
           />
           <div className="flex items-center gap-1.5">
             {(["todos", "activo", "inactivo"] as const).map(s => (

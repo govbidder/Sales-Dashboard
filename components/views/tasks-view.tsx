@@ -1,11 +1,12 @@
 "use client"
 
 import { useEffect, useState, useCallback, useMemo } from "react"
+import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { createClient } from "@/lib/supabase"
 import {
   Loader2, Trash2, RefreshCw, Plus, X, Calendar as CalIcon,
-  Flag, ChevronRight, AlertCircle, MessageSquare, Tag as TagIcon,
-  ChevronDown as ChevronDownIcon, LayoutGrid, List, GitBranch, Send,
+  Flag, ChevronRight, AlertCircle, Tag as TagIcon,
+  LayoutGrid, List, GitBranch, Send,
 } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -302,7 +303,7 @@ function CommentsSection({ taskId }: { taskId: string }) {
           value={draft}
           onChange={e => setDraft(e.target.value)}
           placeholder="Escribir comentario..."
-          className="h-9 flex-1 rounded-lg border border-white/[0.08] bg-[#141417] px-3 text-[13px] text-white placeholder:text-white/30 outline-none focus:border-white/20"
+          className="h-9 flex-1 rounded-lg border border-white/[0.08] bg-[#080d1e] px-3 text-[13px] text-white placeholder:text-white/30 outline-none focus:border-white/20"
         />
         <button
           type="submit"
@@ -732,6 +733,18 @@ export function TasksView() {
   const [creating,      setCreating]      = useState(false)
   const [view,          setView]          = useState<"board" | "list">("board")
 
+  const router       = useRouter()
+  const pathname     = usePathname()
+  const searchParams = useSearchParams()
+
+  // Quick-action: open "Nueva tarea" modal when ?new=1 is present, then strip the param.
+  useEffect(() => {
+    if (searchParams?.get("new") === "1") {
+      setShowNewForm(true)
+      router.replace(pathname, { scroll: false })
+    }
+  }, [searchParams, router, pathname])
+
   const getSession = async () => {
     const supabase = createClient()
     const { data: { session } } = await supabase.auth.getSession()
@@ -938,7 +951,7 @@ export function TasksView() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar tareas, tags, asignados..."
-            className="h-9 rounded-xl border border-white/[0.08] bg-[#141417] px-4 text-sm text-white placeholder:text-white/25 focus:border-white/20 focus:outline-none flex-1 min-w-[220px] max-w-sm"
+            className="h-9 rounded-xl border border-white/[0.08] bg-[#080d1e] px-4 text-sm text-white placeholder:text-white/25 focus:border-white/20 focus:outline-none flex-1 min-w-[220px] max-w-sm"
           />
           {allAssignees.length > 0 && (
             <select
