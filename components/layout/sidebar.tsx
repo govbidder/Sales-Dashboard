@@ -96,7 +96,7 @@ export function Sidebar({ open, onClose, collapsed, onToggleCollapse }: SidebarP
           "fixed left-0 top-0 z-50 h-full transition-all duration-300 ease-out",
           "flex flex-col bg-white border-r-2 border-[#1e3a8a]/10",
           // Width transitions
-          collapsed && !isMobile ? "lg:w-[72px]" : "lg:w-[240px]",
+          collapsed && !isMobile ? "lg:w-[80px]" : "lg:w-[240px]",
           "w-[240px]",
           // Mobile: slide in/out
           open ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
@@ -107,29 +107,18 @@ export function Sidebar({ open, onClose, collapsed, onToggleCollapse }: SidebarP
           "relative flex flex-shrink-0 items-center border-b-2 border-[#1e3a8a]/10",
           showLabels ? "h-16 px-4" : "h-16 px-2 justify-center",
         )}>
-          <Link href="/inicio" className="flex items-center justify-center hover:opacity-90 transition-opacity overflow-hidden">
-            {showLabels ? (
-              <Image
-                src="/icon.png"
-                alt="GovBidder"
-                width={200}
-                height={150}
-                className="h-12 w-auto object-contain"
-                priority
-              />
-            ) : (
-              // Collapsed: show only top portion of the logo (the eagle)
-              <div className="h-10 w-10 overflow-hidden flex items-center justify-center">
-                <Image
-                  src="/icon.png"
-                  alt="GovBidder"
-                  width={120}
-                  height={120}
-                  className="h-16 w-auto object-cover object-top"
-                  priority
-                />
-              </div>
-            )}
+          <Link href="/inicio" className="flex items-center justify-center hover:opacity-90 transition-opacity">
+            <Image
+              src="/icon.png"
+              alt="GovBidder"
+              width={200}
+              height={150}
+              className={cn(
+                "w-auto object-contain",
+                showLabels ? "h-12" : "h-9",
+              )}
+              priority
+            />
           </Link>
 
           {/* Mobile close button */}

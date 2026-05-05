@@ -240,7 +240,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       <div
         className={
           "flex min-h-screen flex-col transition-[margin] duration-300 ease-out " +
-          (sidebarCollapsed ? "lg:ml-[72px]" : "lg:ml-[240px]")
+          (sidebarCollapsed ? "lg:ml-[80px]" : "lg:ml-[240px]")
         }
       >
         <TopBar
