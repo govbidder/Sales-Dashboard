@@ -3,7 +3,7 @@
 import {
   X, BarChart3, DollarSign, FileSearch, Wrench,
   CalendarDays, LayoutGrid, ClipboardList,
-  Zap, ChevronDown, Users2, BookOpen, Layers, Lock, ListTodo, Users, FileBarChart,
+  ChevronDown, Users2, BookOpen, Layers, Lock, ListTodo, Users, FileBarChart,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
@@ -39,7 +39,6 @@ const NAV_GROUPS = [
     label: "Program",
     items: [
       { name: "Compliance Audit",  href: "/audit",             icon: ClipboardList },
-      { name: "Implementation",    href: "/program-checklist", icon: Zap           },
       { name: "Tools",             href: "/tools",             icon: Wrench        },
       { name: "Resources",         href: "/recursos",          icon: BookOpen      },
       { name: "Schedule",          href: "/calendar",          icon: CalendarDays  },

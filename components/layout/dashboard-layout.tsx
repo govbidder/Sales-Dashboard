@@ -24,7 +24,6 @@ const PAGE_TITLES: Record<string, string> = {
   "/reflection":                  "Review",
   "/metrics":                     "All Metrics",
   "/audit":                       "Compliance Audit",
-  "/program-checklist":           "Implementation",
   "/tools":                       "Tools",
   "/calendar":                    "Schedule",
   "/recursos":                    "Resources",
