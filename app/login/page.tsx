@@ -50,7 +50,7 @@ export default function LoginPage() {
             alt="GovBidder · The Bid That Wins"
             width={260}
             height={200}
-            className="h-auto w-[200px] object-contain"
+            className="h-auto w-[220px] object-contain mix-blend-multiply"
             priority
           />
         </div>

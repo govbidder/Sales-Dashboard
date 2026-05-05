@@ -86,7 +86,7 @@ export function TopBar({
             alt="GovBidder · The Bid That Wins"
             width={400}
             height={112}
-            className="h-28 w-auto object-contain object-left -ml-2"
+            className="h-28 w-auto object-contain object-left -ml-2 mix-blend-multiply"
             priority
           />
         </Link>
