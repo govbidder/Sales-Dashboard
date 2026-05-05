@@ -8,7 +8,7 @@ export function AuditView() {
       <div>
         <div className="flex items-center gap-2.5 mb-1">
           <span className="h-4 w-[3px] rounded-full bg-[#E42D2C]" />
-          <h1 className="text-sm font-semibold uppercase tracking-widest text-white/70">Compliance Audit</h1>
+          <h1 className="text-sm font-semibold uppercase tracking-widest text-white/70">Auditoría</h1>
         </div>
         <p className="text-xs text-white/30 ml-[18px]">
           Diagnóstico de capacidad para licitaciones de gobierno

@@ -55,11 +55,11 @@ function fmtNumber(v: any) {
 // ─── KPI definitions ──────────────────────────────────────────────────────────
 
 const KPI_DEFS = [
-  { key: "cash_collected",  label: "Cash Collected",      money: true,  icon: Wallet,     color: "#E42D2C" },
-  { key: "total_revenue",   label: "Total Revenue",        money: true,  icon: DollarSign, color: "#fb923c" },
+  { key: "cash_collected",  label: "Cobrado",      money: true,  icon: Wallet,     color: "#E42D2C" },
+  { key: "total_revenue",   label: "Ingresos Totales",        money: true,  icon: DollarSign, color: "#fb923c" },
   { key: "mrr",             label: "MRR",                  money: true,  icon: Repeat,     color: "#60a5fa" },
-  { key: "ad_spend",        label: "Ad Spend",             money: true,  icon: Megaphone,  color: "#ef4444" },
-  { key: "attended_calls",  label: "Calls Atendidas",      money: false, icon: Phone,      color: "#818cf8" },
+  { key: "ad_spend",        label: "Gasto en Ads",             money: true,  icon: Megaphone,  color: "#ef4444" },
+  { key: "attended_calls",  label: "Llamadas Atendidas",      money: false, icon: Phone,      color: "#818cf8" },
   { key: "new_clients",     label: "Nuevos Clientes",      money: false, icon: UserPlus,   color: "#4ade80" },
 ]
 
@@ -127,7 +127,7 @@ export function BusinessKPIs({ selectedMonth: propMonth }: { selectedMonth?: str
       <div className="mb-6 flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-xl font-bold text-white">Performance</h2>
-          <p className="text-[13px] text-white/40 mt-0.5">Key metrics for the selected month</p>
+          <p className="text-[13px] text-white/40 mt-0.5">Métricas clave del mes seleccionado</p>
         </div>
         {current && previous && (
           <div className="flex items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3.5 py-2">

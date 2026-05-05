@@ -17,19 +17,19 @@ type CurrentUser = {
 }
 
 const PAGE_TITLES: Record<string, string> = {
-  "/dashboard":                   "Bid Dashboard",
-  "/sales":                       "Revenue",
-  "/reflection":                  "Review",
-  "/metrics":                     "All Metrics",
-  "/audit":                       "Compliance Audit",
-  "/tools":                       "Tools",
-  "/calendar":                    "Schedule",
-  "/recursos":                    "Resources",
+  "/dashboard":                   "Panel",
+  "/sales":                       "Ingresos",
+  "/reflection":                  "Reflexión",
+  "/metrics":                     "Métricas",
+  "/audit":                       "Auditoría",
+  "/tools":                       "Herramientas",
+  "/calendar":                    "Agenda",
+  "/recursos":                    "Recursos",
   "/admin/personas":              "Personas Agendadas",
   "/admin/tasks":                 "Tareas",
   "/admin/team":                  "Equipo",
   "/admin/reports":               "Cargar Métricas",
-  "/admin/centro-operativo":      "Operations Center",
+  "/admin/centro-operativo":      "Centro Operativo",
 }
 
 const SelectedMonthContext = createContext<string | null>(null)

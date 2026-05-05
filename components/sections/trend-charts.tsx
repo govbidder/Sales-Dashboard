@@ -36,8 +36,8 @@ function fmtNum(v: number) {
 const CHARTS = [
   {
     key:      "cash_collected",
-    label:    "Cash Collected",
-    subtitle: "Total cash collected over time",
+    label:    "Cobrado",
+    subtitle: "Caja recibida total en el tiempo",
     type:     "bar"  as const,
     format:   "money" as const,
     color:    "#E42D2C",
@@ -45,8 +45,8 @@ const CHARTS = [
   },
   {
     key:      "mrr",
-    label:    "MRR Growth",
-    subtitle: "Monthly recurring revenue",
+    label:    "Crecimiento de MRR",
+    subtitle: "Ingreso recurrente mensual",
     type:     "area" as const,
     format:   "money" as const,
     color:    "#60a5fa",
@@ -54,8 +54,8 @@ const CHARTS = [
   },
   {
     key:      "new_clients",
-    label:    "New Clients Signed",
-    subtitle: "Clients signed per month",
+    label:    "Nuevos Clientes Cerrados",
+    subtitle: "Clientes cerrados por mes",
     type:     "bar"  as const,
     format:   "number" as const,
     color:    "#4ade80",
@@ -63,8 +63,8 @@ const CHARTS = [
   },
   {
     key:      "short_followers",
-    label:    "Instagram Followers",
-    subtitle: "Follower count over time",
+    label:    "Seguidores IG",
+    subtitle: "Seguidores en el tiempo",
     type:     "area" as const,
     format:   "number" as const,
     color:    "#818cf8",

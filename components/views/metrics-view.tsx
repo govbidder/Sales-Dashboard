@@ -59,8 +59,8 @@ function HealthRadar({ reports }: { reports: any[] }) {
   }
 
   const data = [
-    { subject: "Cash",      A: norm("cash_collected"),  fullMark: 100 },
-    { subject: "Revenue",   A: norm("total_revenue"),   fullMark: 100 },
+    { subject: "Caja",      A: norm("cash_collected"),  fullMark: 100 },
+    { subject: "Ingresos",  A: norm("total_revenue"),   fullMark: 100 },
     { subject: "MRR",       A: norm("mrr"),             fullMark: 100 },
     { subject: "Clientes",  A: norm("new_clients"),     fullMark: 100 },
     { subject: "Instagram", A: norm("short_followers"), fullMark: 100 },
@@ -69,7 +69,7 @@ function HealthRadar({ reports }: { reports: any[] }) {
 
   return (
     <div className="rounded-2xl border border-white/[0.07] bg-[#0d1745] p-6">
-      <h3 className="text-[16px] font-bold text-white mb-1">Health Score</h3>
+      <h3 className="text-[16px] font-bold text-white mb-1">Índice de Salud</h3>
       <p className="text-xs text-white/35 mb-4">
         Cada eje muestra qué tan cerca estás de tu mejor mes histórico (100 = tu máximo)
       </p>
@@ -97,12 +97,12 @@ function HealthRadar({ reports }: { reports: any[] }) {
 // ─── Summary KPI strip ────────────────────────────────────────────────────────
 
 const SUMMARY_KPIS = [
-  { key: "cash_collected",  label: "Cash Collected",  money: true,  color: "#E42D2C" },
-  { key: "total_revenue",   label: "Total Revenue",    money: true,  color: "#fb923c" },
+  { key: "cash_collected",  label: "Cobrado",  money: true,  color: "#E42D2C" },
+  { key: "total_revenue",   label: "Ingresos Totales",    money: true,  color: "#fb923c" },
   { key: "mrr",             label: "MRR",              money: true,  color: "#60a5fa" },
   { key: "new_clients",     label: "Nuevos Clientes",  money: false, color: "#4ade80" },
-  { key: "short_followers", label: "IG Seguidores",    money: false, color: "#818cf8" },
-  { key: "ad_spend",        label: "Ad Spend",         money: true,  color: "#ef4444" },
+  { key: "short_followers", label: "Seguidores IG",    money: false, color: "#818cf8" },
+  { key: "ad_spend",        label: "Gasto en Ads",         money: true,  color: "#ef4444" },
 ]
 
 function SummaryStrip({ current, previous }: { current: any; previous: any }) {
@@ -159,11 +159,11 @@ function RollingTrend({ reports }: { reports: any[] }) {
   return (
     <div className="rounded-2xl border border-white/[0.07] bg-[#0d1745] p-6">
       <h3 className="text-[16px] font-bold text-white mb-1">Evolución financiera — 12 meses</h3>
-      <p className="text-xs text-white/35 mb-5">Cash Collected, Total Revenue y MRR en el tiempo</p>
+      <p className="text-xs text-white/35 mb-5">Cobrado, Ingresos Totales y MRR en el tiempo</p>
       <div className="flex flex-wrap gap-5 mb-4">
         {[
-          { label: "Cash Collected", color: "#E42D2C" },
-          { label: "Total Revenue",  color: "#fb923c" },
+          { label: "Cobrado", color: "#E42D2C" },
+          { label: "Ingresos Totales",  color: "#fb923c" },
           { label: "MRR",            color: "#60a5fa" },
         ].map(l => (
           <div key={l.label} className="flex items-center gap-1.5">
@@ -187,8 +187,8 @@ function RollingTrend({ reports }: { reports: any[] }) {
           <YAxis stroke="transparent" tick={{ fill: "rgba(255,255,255,0.30)", fontSize: 10 }} tickLine={false} axisLine={false}
             tickFormatter={v => v >= 1000 ? `$${(v/1000).toFixed(0)}K` : `$${v}`} width={48} />
           <Tooltip {...tooltipStyle} formatter={(v: number, name: string) => [fmtVal(v, true), name]} />
-          <Area type="monotone" dataKey="cash"    name="Cash Collected" stroke="#E42D2C" strokeWidth={2} fill="url(#grad_all_cash)"    dot={false} />
-          <Area type="monotone" dataKey="revenue" name="Total Revenue"  stroke="#fb923c" strokeWidth={2} fill="url(#grad_all_revenue)" dot={false} />
+          <Area type="monotone" dataKey="cash"    name="Cobrado" stroke="#E42D2C" strokeWidth={2} fill="url(#grad_all_cash)"    dot={false} />
+          <Area type="monotone" dataKey="revenue" name="Ingresos Totales"  stroke="#fb923c" strokeWidth={2} fill="url(#grad_all_revenue)" dot={false} />
           <Area type="monotone" dataKey="mrr"     name="MRR"           stroke="#60a5fa" strokeWidth={2} fill="url(#grad_all_mrr)"     dot={false} />
         </AreaChart>
       </ResponsiveContainer>
@@ -308,7 +308,7 @@ export function MetricsView() {
     <div className="space-y-12">
       {/* Header */}
       <div>
-        <h2 className="text-xl font-bold text-white">All Metrics</h2>
+        <h2 className="text-xl font-bold text-white">Todas las Métricas</h2>
         <p suppressHydrationWarning className="text-[13px] text-white/40 mt-0.5">
           {selectedMonth} · {annualRange ? `Últimos 12 meses: ${annualRange.label}` : "—"}
         </p>

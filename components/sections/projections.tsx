@@ -258,7 +258,7 @@ export function Projections() {
                 stroke="#E42D2C"
                 strokeWidth={2}
                 fill="url(#g_rev)"
-                name="Revenue"
+                name="Ingresos"
                 dot={{ r: 3 }}
               />
               <Line
@@ -266,7 +266,7 @@ export function Projections() {
                 dataKey="cash"
                 stroke="#fb923c"
                 strokeWidth={1.8}
-                name="Cash Collected"
+                name="Cobrado"
                 dot={{ r: 2.5 }}
               />
               <Line

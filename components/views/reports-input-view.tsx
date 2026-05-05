@@ -18,10 +18,10 @@ const SECTIONS: Section[] = [
     title: "Revenue & Costos",
     icon: DollarSign,
     fields: [
-      { key: "cash_collected", label: "Cash Collected",  type: "money" },
-      { key: "total_revenue",  label: "Total Revenue",   type: "money" },
+      { key: "cash_collected", label: "Cobrado",  type: "money" },
+      { key: "total_revenue",  label: "Ingresos Totales",   type: "money" },
       { key: "mrr",            label: "MRR",             type: "money" },
-      { key: "ad_spend",       label: "Ad Spend",        type: "money" },
+      { key: "ad_spend",       label: "Gasto en Ads",        type: "money" },
       { key: "software_costs", label: "Software Costs",  type: "money" },
       { key: "variable_costs", label: "Variable Costs",  type: "money" },
     ],
@@ -32,7 +32,7 @@ const SECTIONS: Section[] = [
     icon: TrendingUp,
     fields: [
       { key: "scheduled_calls",      label: "Calls Agendadas",      type: "number" },
-      { key: "attended_calls",       label: "Calls Atendidas",      type: "number" },
+      { key: "attended_calls",       label: "Llamadas Atendidas",      type: "number" },
       { key: "qualified_calls",      label: "Calls Calificadas",    type: "number" },
       { key: "no_show",              label: "No Shows",             type: "number" },
       { key: "aplications",          label: "Aplicaciones",         type: "number" },
@@ -331,7 +331,7 @@ function HistoryView({ reports, onPick, onDelete, deletingId }: {
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-white/[0.06] bg-white/[0.02]">
-              {["Mes","Cash Collected","Revenue","MRR","Cierres","NPS","Última edición",""].map(h => (
+              {["Mes","Cobrado","Revenue","MRR","Cierres","NPS","Última edición",""].map(h => (
                 <th key={h} className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.12em] text-white/40 whitespace-nowrap">{h}</th>
               ))}
             </tr>

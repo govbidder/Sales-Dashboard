@@ -28,24 +28,24 @@ interface Item {
 // ─── Item registry ────────────────────────────────────────────────────────────
 
 const PAGES: Item[] = [
-  // Overview
-  { id: "p:dashboard", kind: "page", title: "Bid Dashboard",   subtitle: "KPIs, profit, forecast, trends", icon: BarChart3,    href: "/dashboard",       group: "Overview", keywords: ["home","kpi","performance"] },
-  { id: "p:revenue",   kind: "page", title: "Revenue",         subtitle: "Embudo de ventas",               icon: DollarSign,   href: "/sales",           group: "Overview", keywords: ["sales","ventas","funnel"] },
-  { id: "p:review",    kind: "page", title: "Review",          subtitle: "Reflexión estratégica",          icon: FileSearch,   href: "/reflection",      group: "Overview", keywords: ["reflexion","resumen"] },
-  { id: "p:metrics",   kind: "page", title: "All Metrics",     subtitle: "Tabla completa de KPIs",         icon: LayoutGrid,   href: "/metrics",         group: "Overview", keywords: ["todas","tabla"] },
-  { id: "p:reports",   kind: "page", title: "Cargar Métricas", subtitle: "Form mensual",                   icon: FileBarChart, href: "/admin/reports",   group: "Overview", keywords: ["input","form","mes","cargar"] },
+  // General
+  { id: "p:dashboard", kind: "page", title: "Panel",           subtitle: "KPIs, rentabilidad, proyecciones", icon: BarChart3,    href: "/dashboard",       group: "General", keywords: ["dashboard","home","kpi","resumen"] },
+  { id: "p:revenue",   kind: "page", title: "Ingresos",        subtitle: "Embudo de ventas",                icon: DollarSign,   href: "/sales",           group: "General", keywords: ["sales","ventas","revenue","funnel"] },
+  { id: "p:review",    kind: "page", title: "Reflexión",       subtitle: "Insights del mes",                icon: FileSearch,   href: "/reflection",      group: "General", keywords: ["review","resumen","reflexion"] },
+  { id: "p:metrics",   kind: "page", title: "Métricas",        subtitle: "Tabla completa de KPIs",          icon: LayoutGrid,   href: "/metrics",         group: "General", keywords: ["todas","tabla","numbers"] },
+  { id: "p:reports",   kind: "page", title: "Cargar Métricas", subtitle: "Form mensual de KPIs",            icon: FileBarChart, href: "/admin/reports",   group: "General", keywords: ["input","form","mes","cargar","reports"] },
 
-  // Pipeline
-  { id: "p:personas", kind: "page", title: "Personas Agendadas", subtitle: "Pipeline de prospectos",       icon: Users2,   href: "/admin/personas",         group: "Pipeline", keywords: ["leads","prospectos","calls"] },
-  { id: "p:tasks",    kind: "page", title: "Tareas",             subtitle: "ClickUp interno",              icon: ListTodo, href: "/admin/tasks",            group: "Pipeline", keywords: ["todo","kanban","trabajo"] },
-  { id: "p:team",     kind: "page", title: "Equipo",             subtitle: "Miembros del equipo",          icon: Users,    href: "/admin/team",             group: "Pipeline", keywords: ["staff","gente","empleados"] },
-  { id: "p:ops",      kind: "page", title: "Operations Center",  subtitle: "Wiki interna · SOPs",          icon: Layers,   href: "/admin/centro-operativo", group: "Pipeline", keywords: ["sop","wiki","procedimientos"] },
+  // Operación
+  { id: "p:personas", kind: "page", title: "Personas Agendadas", subtitle: "Pipeline de prospectos",       icon: Users2,   href: "/admin/personas",         group: "Operación", keywords: ["leads","prospectos","calls"] },
+  { id: "p:tasks",    kind: "page", title: "Tareas",             subtitle: "Gestión de pendientes",        icon: ListTodo, href: "/admin/tasks",            group: "Operación", keywords: ["todo","kanban","trabajo","tasks"] },
+  { id: "p:team",     kind: "page", title: "Equipo",             subtitle: "Miembros del equipo",          icon: Users,    href: "/admin/team",             group: "Operación", keywords: ["staff","gente","empleados","team"] },
+  { id: "p:ops",      kind: "page", title: "Centro Operativo",   subtitle: "Wiki interna · SOPs",          icon: Layers,   href: "/admin/centro-operativo", group: "Operación", keywords: ["sop","wiki","procedimientos","operations"] },
 
-  // Program
-  { id: "p:audit",    kind: "page", title: "Compliance Audit", subtitle: "Diagnóstico estratégico", icon: ClipboardList, href: "/audit",    group: "Program", keywords: ["compliance"] },
-  { id: "p:tools",    kind: "page", title: "Tools",            subtitle: "Herramientas internas",   icon: Wrench,        href: "/tools",    group: "Program", keywords: ["herramientas","links"] },
-  { id: "p:resources",kind: "page", title: "Resources",        subtitle: "Biblioteca de recursos",  icon: BookOpen,      href: "/recursos", group: "Program", keywords: ["biblioteca","docs"] },
-  { id: "p:schedule", kind: "page", title: "Schedule",         subtitle: "Agenda del equipo",       icon: CalendarDays,  href: "/calendar", group: "Program", keywords: ["calendario","agenda"] },
+  // Programa
+  { id: "p:audit",    kind: "page", title: "Auditoría",   subtitle: "Diagnóstico estratégico", icon: ClipboardList, href: "/audit",    group: "Programa", keywords: ["compliance","auditoria"] },
+  { id: "p:tools",    kind: "page", title: "Herramientas",subtitle: "Tools internos",          icon: Wrench,        href: "/tools",    group: "Programa", keywords: ["tools","links","apps"] },
+  { id: "p:resources",kind: "page", title: "Recursos",    subtitle: "Biblioteca interna",      icon: BookOpen,      href: "/recursos", group: "Programa", keywords: ["resources","biblioteca","docs"] },
+  { id: "p:schedule", kind: "page", title: "Agenda",      subtitle: "Calendario del equipo",   icon: CalendarDays,  href: "/calendar", group: "Programa", keywords: ["schedule","calendario","calendar"] },
 ]
 
 const QUICK_ACTIONS = (router: ReturnType<typeof useRouter>): Item[] => [

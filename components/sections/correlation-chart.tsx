@@ -219,7 +219,7 @@ export function CorrelationChart() {
           title="Cash vs Cierres"
           insight="¿Cada cliente que cerraste se refleja en el cash? Si los cierres suben pero el cash no, hay un problema de pricing o de condiciones."
           data={data}
-          barKey="cash"    barLabel="Cash Collected" barColor="#E42D2C"
+          barKey="cash"    barLabel="Cobrado" barColor="#E42D2C"
           lineKey="clients" lineLabel="Nuevos Clientes" lineColor="#4ade80"
           fmtBar={fmtMoney}
           fmtLine={(v) => String(v)}
@@ -230,7 +230,7 @@ export function CorrelationChart() {
           title="Cash vs Instagram"
           insight="¿El crecimiento en seguidores precede al cash? Normalmente hay un lag de 1-3 meses entre la audiencia y los ingresos."
           data={data}
-          barKey="cash"  barLabel="Cash Collected"      barColor="#E42D2C"
+          barKey="cash"  barLabel="Cobrado"      barColor="#E42D2C"
           lineKey="ig"   lineLabel="Seguidores IG"       lineColor="#818cf8"
           fmtBar={fmtMoney}
           fmtLine={fmtNum}
@@ -241,7 +241,7 @@ export function CorrelationChart() {
           title="Revenue vs Gasto en Ads"
           insight="¿El dinero invertido en ads se transforma en revenue? Si el gasto sube y el revenue no, revisá la eficiencia de las campañas."
           data={data}
-          barKey="revenue"  barLabel="Total Revenue"      barColor="#fb923c"
+          barKey="revenue"  barLabel="Ingresos Totales"      barColor="#fb923c"
           lineKey="adspend" lineLabel="Gasto en Ads"       lineColor="#ef4444"
           fmtBar={fmtMoney}
           fmtLine={fmtMoney}
@@ -252,7 +252,7 @@ export function CorrelationChart() {
           title="MRR vs Revenue Total"
           insight="¿Cuánto del revenue es recurrente? Un MRR alto y estable es la base de un negocio escalable. Si el total sube pero el MRR no, dependés de cierres únicos."
           data={data}
-          barKey="revenue" barLabel="Total Revenue"  barColor="#fb923c"
+          barKey="revenue" barLabel="Ingresos Totales"  barColor="#fb923c"
           lineKey="mrr"    lineLabel="MRR"            lineColor="#60a5fa"
           fmtBar={fmtMoney}
           fmtLine={fmtMoney}

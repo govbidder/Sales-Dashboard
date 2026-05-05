@@ -55,9 +55,9 @@ function guessCategory(key: string): string {
 }
 
 const FIELD_LABELS: Record<string, string> = {
-  total_revenue: "Revenue",
+  total_revenue: "Ingresos Totales",
   mrr: "MRR",
-  cash_collected: "Cash Collected",
+  cash_collected: "Cobrado",
   software_costs: "Costos de Software",
   variable_costs: "Costos Variables",
   ad_spend: "Inversión en Ads",
@@ -102,8 +102,8 @@ function getFieldLabel(key: string) {
 }
 
 export function MetricsSection({
-  title = "All Metrics",
-  subtitle = "Full monthly report snapshot",
+  title = "Todas las Métricas",
+  subtitle = "Snapshot completo del reporte mensual",
   metrics,
   annualMetrics,
   loading,

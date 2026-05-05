@@ -18,19 +18,19 @@ interface TopBarProps {
 }
 
 const CRUMB_GROUPS: Record<string, string> = {
-  "/dashboard":             "Overview",
-  "/sales":                 "Overview",
-  "/reflection":            "Overview",
-  "/metrics":               "Overview",
-  "/admin/reports":         "Overview",
-  "/admin/personas":        "Pipeline",
-  "/admin/tasks":           "Pipeline",
-  "/admin/team":            "Pipeline",
-  "/admin/centro-operativo":"Pipeline",
-  "/audit":                 "Program",
-  "/tools":                 "Program",
-  "/recursos":              "Program",
-  "/calendar":              "Program",
+  "/dashboard":             "General",
+  "/sales":                 "General",
+  "/reflection":            "General",
+  "/metrics":               "General",
+  "/admin/reports":         "General",
+  "/admin/personas":        "Operación",
+  "/admin/tasks":           "Operación",
+  "/admin/team":            "Operación",
+  "/admin/centro-operativo":"Operación",
+  "/audit":                 "Programa",
+  "/tools":                 "Programa",
+  "/recursos":              "Programa",
+  "/calendar":              "Programa",
 }
 
 export function TopBar({

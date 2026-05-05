@@ -29,8 +29,8 @@ function fmtNum(v: number) {
 // ─── Metric definitions ───────────────────────────────────────────────────────
 
 const METRICS = [
-  { key: "cash_collected",  label: "Cash Collected",      format: "money"  as const, color: "#E42D2C", weight: 3 },
-  { key: "total_revenue",   label: "Total Revenue",        format: "money"  as const, color: "#fb923c", weight: 2 },
+  { key: "cash_collected",  label: "Cobrado",      format: "money"  as const, color: "#E42D2C", weight: 3 },
+  { key: "total_revenue",   label: "Ingresos Totales",        format: "money"  as const, color: "#fb923c", weight: 2 },
   { key: "mrr",             label: "MRR",                  format: "money"  as const, color: "#60a5fa", weight: 2 },
   { key: "new_clients",     label: "Nuevos Clientes",      format: "number" as const, color: "#4ade80", weight: 2 },
   { key: "short_followers", label: "Seguidores Instagram", format: "number" as const, color: "#818cf8", weight: 1 },
