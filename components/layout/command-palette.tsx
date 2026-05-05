@@ -109,16 +109,6 @@ export function CommandPalette({ open, onClose, onSignOut }: CommandPaletteProps
   const inputRef = useRef<HTMLInputElement>(null)
   const [query, setQuery]     = useState("")
   const [activeIdx, setActiveIdx] = useState(0)
-  const [recent, setRecent]   = useState<string[]>([])
-
-  // Load recent from localStorage
-  useEffect(() => {
-    if (typeof window === "undefined") return
-    const stored = window.localStorage.getItem("cmd-recent")
-    if (stored) {
-      try { setRecent(JSON.parse(stored)) } catch {}
-    }
-  }, [])
 
   const all: Item[] = useMemo(() => {
     const actions = QUICK_ACTIONS(router)
@@ -126,24 +116,13 @@ export function CommandPalette({ open, onClose, onSignOut }: CommandPaletteProps
   }, [router])
 
   const filtered: Item[] = useMemo(() => {
-    if (!query.trim()) {
-      // Show recents first if nothing typed
-      const recentItems = recent
-        .map(id => all.find(i => i.id === id))
-        .filter(Boolean) as Item[]
-      const recentSet = new Set(recentItems.map(i => i.id))
-      const rest = all.filter(i => !recentSet.has(i.id))
-      return [
-        ...recentItems.map(i => ({ ...i, group: "Recientes" })),
-        ...rest,
-      ]
-    }
+    if (!query.trim()) return all
     return all
       .map(i => ({ item: i, s: score(i, query) }))
       .filter(x => x.s > 0)
       .sort((a, b) => b.s - a.s)
       .map(x => x.item)
-  }, [all, query, recent])
+  }, [all, query])
 
   // Add sign out as last result if matched
   const finalResults: Item[] = useMemo(() => {
@@ -160,12 +139,6 @@ export function CommandPalette({ open, onClose, onSignOut }: CommandPaletteProps
   }, [filtered, query, onSignOut])
 
   const trigger = (item: Item) => {
-    // Save recent (only pages and item-type actions)
-    if (typeof window !== "undefined") {
-      const next = [item.id, ...recent.filter(r => r !== item.id)].slice(0, 6)
-      setRecent(next)
-      window.localStorage.setItem("cmd-recent", JSON.stringify(next))
-    }
     if (item.action) item.action()
     else if (item.href) router.push(item.href)
     onClose()

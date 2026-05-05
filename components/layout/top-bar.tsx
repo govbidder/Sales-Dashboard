@@ -78,7 +78,7 @@ export function TopBar({
 
   return (
     <header
-      className="sticky top-0 z-30 border-b backdrop-blur-xl"
+      className="sticky top-0 z-10 border-b backdrop-blur-xl"
       style={{
         backgroundColor: "rgba(8,13,30,0.72)",
         borderBottomColor: "rgba(255,255,255,0.05)",
