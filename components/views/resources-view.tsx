@@ -136,7 +136,7 @@ function AddResourceForm({ onAdd, onClose }: { onAdd: (r: Resource) => void; onC
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 rounded-xl bg-[#E42D2C] px-4 py-2 text-sm font-semibold text-black hover:bg-[#E42D2C]/90 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 rounded-xl bg-[#E42D2C] px-4 py-2 text-sm font-semibold text-white hover:bg-[#E42D2C]/90 transition-colors disabled:opacity-50"
           >
             {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
             Guardar
@@ -243,7 +243,7 @@ export function ResourcesView() {
         </div>
         <button
           onClick={() => setShowForm(v => !v)}
-          className="flex items-center gap-2 rounded-xl bg-[#E42D2C] px-4 py-2 text-sm font-semibold text-black hover:bg-[#E42D2C]/90 transition-colors"
+          className="flex items-center gap-2 rounded-xl bg-[#E42D2C] px-4 py-2 text-sm font-semibold text-white hover:bg-[#E42D2C]/90 transition-colors"
         >
           <Plus className="h-4 w-4" />
           Agregar

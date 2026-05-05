@@ -612,7 +612,7 @@ function SOPModal({
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="flex items-center gap-1.5 rounded-xl bg-[#E42D2C] px-4 py-1.5 text-xs font-semibold text-black hover:bg-[#E42D2C]/90 transition-colors disabled:opacity-50"
+                  className="flex items-center gap-1.5 rounded-xl bg-[#E42D2C] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#E42D2C]/90 transition-colors disabled:opacity-50"
                 >
                   {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
                   Guardar
@@ -739,7 +739,7 @@ function AddItemForm({
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 rounded-xl bg-[#E42D2C] px-4 py-2 text-sm font-semibold text-black hover:bg-[#E42D2C]/90 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 rounded-xl bg-[#E42D2C] px-4 py-2 text-sm font-semibold text-white hover:bg-[#E42D2C]/90 transition-colors disabled:opacity-50"
           >
             {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
             Crear
@@ -860,7 +860,7 @@ function SectionPanel({
         </div>
         <button
           onClick={() => setShowForm(v => !v)}
-          className="flex items-center gap-1.5 rounded-xl bg-[#E42D2C] px-3.5 py-2 text-sm font-semibold text-black hover:bg-[#E42D2C]/90 transition-colors whitespace-nowrap"
+          className="flex items-center gap-1.5 rounded-xl bg-[#E42D2C] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#E42D2C]/90 transition-colors whitespace-nowrap"
         >
           <Plus className="h-3.5 w-3.5" />
           Agregar

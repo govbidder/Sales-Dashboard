@@ -157,6 +157,18 @@ export function CommandPalette({ open, onClose, onSignOut }: CommandPaletteProps
     return filtered
   }, [filtered, query, onSignOut])
 
+  const trigger = (item: Item) => {
+    // Save recent (only pages and item-type actions)
+    if (typeof window !== "undefined") {
+      const next = [item.id, ...recent.filter(r => r !== item.id)].slice(0, 6)
+      setRecent(next)
+      window.localStorage.setItem("cmd-recent", JSON.stringify(next))
+    }
+    if (item.action) item.action()
+    else if (item.href) router.push(item.href)
+    onClose()
+  }
+
   // Reset state on open
   useEffect(() => {
     if (open) {
@@ -186,18 +198,6 @@ export function CommandPalette({ open, onClose, onSignOut }: CommandPaletteProps
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
   }, [open, activeIdx, finalResults]) // eslint-disable-line
-
-  const trigger = (item: Item) => {
-    // Save recent (only pages and item-type actions)
-    if (typeof window !== "undefined") {
-      const next = [item.id, ...recent.filter(r => r !== item.id)].slice(0, 6)
-      setRecent(next)
-      window.localStorage.setItem("cmd-recent", JSON.stringify(next))
-    }
-    if (item.action) item.action()
-    else if (item.href) router.push(item.href)
-    onClose()
-  }
 
   // Group results in display order, preserving rank
   const grouped: { group: string; items: Item[] }[] = useMemo(() => {
