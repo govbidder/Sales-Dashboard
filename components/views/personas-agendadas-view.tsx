@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/toast"
 import {
   Loader2, Trash2, RefreshCw, Download, X, Star, Plus,
   Instagram, ExternalLink, ChevronRight, Phone, Mail, Calendar as CalIcon,
-  CheckCircle2, Circle, MessageCircle, Copy,
+  CheckCircle2, Circle, MessageCircle, Copy, Users2,
 } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -848,6 +848,29 @@ export function PersonasAgendadasView() {
             <div className="flex items-center justify-center py-20">
               <Loader2 className="h-6 w-6 animate-spin text-[#E42D2C]/40" />
             </div>
+          ) : !filtered.length ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center px-6">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50 ring-1 ring-slate-200 mb-4">
+                <Users2 className="h-6 w-6 text-slate-400" />
+              </div>
+              <p className="text-[15px] font-semibold text-slate-700">
+                {personas.length ? "Sin coincidencias" : "Todavía no hay personas"}
+              </p>
+              <p className="text-[13px] text-slate-400 mt-1 max-w-sm">
+                {personas.length
+                  ? "Probá ajustar los filtros o limpiar la búsqueda."
+                  : "Las personas agendadas son tus prospectos: leads que viste en demos, llamadas, etc. Empezá creando la primera."}
+              </p>
+              {!personas.length && (
+                <button
+                  onClick={() => setShowNewForm(true)}
+                  className="mt-4 inline-flex items-center gap-1.5 h-9 rounded-xl bg-[#E42D2C] px-4 text-[12px] font-bold text-white hover:bg-[#c42423] transition-all"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Nueva persona agendada
+                </button>
+              )}
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
@@ -859,11 +882,7 @@ export function PersonasAgendadasView() {
                   </tr>
                 </thead>
                 <tbody>
-                  {!filtered.length ? (
-                    <tr><td colSpan={9} className="py-16 text-center text-sm text-slate-300">
-                      {personas.length ? "No hay coincidencias." : "Todavía no hay personas agendadas. Crea la primera."}
-                    </td></tr>
-                  ) : filtered.map(p => (
+                  {filtered.map(p => (
                     <tr key={p.id}
                       onClick={() => setSelected(p)}
                       className="border-b border-slate-100 cursor-pointer transition-colors group hover:bg-slate-50">
