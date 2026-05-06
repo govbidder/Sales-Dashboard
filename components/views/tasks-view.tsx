@@ -1,13 +1,16 @@
 "use client"
 
-import { useEffect, useState, useCallback, useMemo } from "react"
+import { useEffect, useState, useCallback, useMemo, useRef } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { createClient } from "@/lib/supabase"
 import { Portal } from "@/components/ui/portal"
+import { CalendarView } from "@/components/views/tasks/calendar-view"
 import {
   Loader2, Trash2, RefreshCw, Plus, X, Calendar as CalIcon,
   Flag, ChevronRight, AlertCircle, Tag as TagIcon,
-  LayoutGrid, List, GitBranch, Send,
+  LayoutGrid, List, GitBranch, Send, CalendarDays,
+  CheckCircle2, Circle, Clock, User, Search, Keyboard,
+  ArrowDownUp, ChevronDown, Inbox, CheckSquare, Square,
 } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -17,6 +20,9 @@ const PRIORITY_OPTIONS  = ["baja", "media", "alta", "urgente"] as const
 
 type Status   = typeof STATUS_OPTIONS[number]
 type Priority = typeof PRIORITY_OPTIONS[number]
+type ViewMode = "board" | "list" | "calendar"
+type GroupBy  = "status" | "assignee" | "priority" | "tag" | "none"
+type SortBy   = "due_at" | "priority" | "created_at" | "title"
 
 interface Task {
   id:           string
@@ -76,33 +82,41 @@ function isOverdue(t: Task) {
   if (t.status === "completada" || t.status === "cancelada") return false
   return new Date(t.due_at).getTime() < Date.now()
 }
+function isDueThisWeek(t: Task) {
+  if (!t.due_at) return false
+  if (t.status === "completada" || t.status === "cancelada") return false
+  const d = new Date(t.due_at).getTime()
+  const now = Date.now()
+  const in7 = now + 7 * 24 * 3600_000
+  return d >= now && d <= in7
+}
 function initials(s: string) {
   return s.split(/[\s@]/).map(p => p[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()
 }
 
-const STATUS_COLUMNS: { key: Status; label: string; accent: string }[] = [
-  { key: "pendiente",   label: "Pendiente",   accent: "bg-slate-100 border-white/15"          },
-  { key: "en_progreso", label: "En progreso", accent: "bg-blue-500/10  border-blue-500/30"       },
-  { key: "completada",  label: "Completadas", accent: "bg-emerald-500/10 border-emerald-500/30"  },
-  { key: "cancelada",   label: "Canceladas",  accent: "bg-zinc-500/10  border-zinc-500/30"       },
+const STATUS_COLUMNS: { key: Status; label: string; dot: string; headerBg: string }[] = [
+  { key: "pendiente",   label: "Pendiente",   dot: "bg-slate-400",   headerBg: "bg-slate-100" },
+  { key: "en_progreso", label: "En progreso", dot: "bg-[#1e3a8a]",   headerBg: "bg-[#1e3a8a]/[0.06]" },
+  { key: "completada",  label: "Completadas", dot: "bg-emerald-500", headerBg: "bg-emerald-500/[0.06]" },
+  { key: "cancelada",   label: "Canceladas",  dot: "bg-zinc-400",    headerBg: "bg-zinc-500/[0.04]" },
 ]
 
-const PRIORITY_STYLE: Record<Priority, { flag: string; pill: string }> = {
-  baja:    { flag: "text-zinc-600",   pill: "text-zinc-700  border-zinc-400/25  bg-zinc-400/10"   },
-  media:   { flag: "text-amber-700",  pill: "text-amber-700 border-amber-400/25 bg-amber-400/10"  },
-  alta:    { flag: "text-orange-700", pill: "text-orange-700 border-orange-400/25 bg-orange-400/10"},
-  urgente: { flag: "text-red-700",    pill: "text-red-700   border-red-500/25   bg-red-500/10"   },
+const PRIORITY_STYLE: Record<Priority, { flag: string; pill: string; weight: number }> = {
+  baja:    { flag: "text-zinc-500",   pill: "text-zinc-700  border-zinc-300  bg-zinc-50",   weight: 1 },
+  media:   { flag: "text-amber-600",  pill: "text-amber-800 border-amber-300 bg-amber-50",  weight: 2 },
+  alta:    { flag: "text-orange-600", pill: "text-orange-800 border-orange-300 bg-orange-50", weight: 3 },
+  urgente: { flag: "text-[#E42D2C]",  pill: "text-[#E42D2C] border-red-300   bg-red-50",   weight: 4 },
 }
 
 const STATUS_STYLE: Record<Status, string> = {
-  pendiente:   "text-slate-600    border-white/15        bg-slate-50",
-  en_progreso: "text-blue-700    border-blue-500/30     bg-blue-500/10",
-  completada:  "text-emerald-700 border-emerald-500/30  bg-emerald-500/10",
-  cancelada:   "text-zinc-600    border-zinc-500/30     bg-zinc-500/10",
+  pendiente:   "text-slate-700   border-slate-300       bg-slate-50",
+  en_progreso: "text-[#1e3a8a]   border-[#1e3a8a]/30    bg-[#1e3a8a]/[0.06]",
+  completada:  "text-emerald-700 border-emerald-300     bg-emerald-50",
+  cancelada:   "text-zinc-600    border-zinc-300        bg-zinc-50",
 }
 
 // ─── Reusable input class ─────────────────────────────────────────────────────
-const inputCls = "w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none transition-all"
+const inputCls = "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/10 transition-all"
 
 // ─── Avatar Stack ─────────────────────────────────────────────────────────────
 
@@ -115,12 +129,12 @@ function AvatarStack({ users, size = "sm" }: { users: string[]; size?: "sm" | "m
     <div className="flex -space-x-1.5">
       {visible.map((u, i) => (
         <div key={i} title={u}
-          className={`${dim} flex items-center justify-center rounded-full border border-slate-200 bg-gradient-to-br from-[#E42D2C]/40 to-[#152978] font-bold text-white`}>
+          className={`${dim} flex items-center justify-center rounded-full ring-2 ring-white bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] font-bold text-white`}>
           {initials(u)}
         </div>
       ))}
       {extra > 0 && (
-        <div className={`${dim} flex items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-700 font-bold`}>
+        <div className={`${dim} flex items-center justify-center rounded-full ring-2 ring-white bg-slate-100 text-slate-700 font-bold`}>
           +{extra}
         </div>
       )}
@@ -158,7 +172,7 @@ function TagsEditor({ value, onChange }: { value: string[]; onChange: (v: string
         onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); add() } }}
         onBlur={add}
         placeholder="Agregar tag y Enter"
-        className="h-7 w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none"
+        className="h-7 w-full rounded-lg border border-slate-200 bg-white px-2.5 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none"
       />
     </div>
   )
@@ -179,7 +193,7 @@ function AssigneesEditor({ value, onChange }: { value: string[]; onChange: (v: s
       <div className="flex flex-wrap gap-1.5 min-h-[24px]">
         {value.map(a => (
           <span key={a} className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-100 pl-1 pr-2 py-0.5 text-[11px] text-slate-700">
-            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-br from-[#E42D2C]/40 to-[#152978] text-[8px] font-bold text-white">
+            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] text-[8px] font-bold text-white">
               {initials(a)}
             </span>
             {a}
@@ -196,7 +210,7 @@ function AssigneesEditor({ value, onChange }: { value: string[]; onChange: (v: s
         onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); add() } }}
         onBlur={add}
         placeholder="email o nombre + Enter"
-        className="h-7 w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none"
+        className="h-7 w-full rounded-lg border border-slate-200 bg-white px-2.5 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none"
       />
     </div>
   )
@@ -271,9 +285,9 @@ function CommentsSection({ taskId }: { taskId: string }) {
           {comments.map(c => (
             <div key={c.id} className={`flex items-start gap-2 rounded-xl px-3 py-2 ${c.kind === "system" ? "" : "border border-slate-200 bg-slate-50"}`}>
               {c.kind === "system" ? (
-                <span className="h-1 w-1 mt-2 rounded-full bg-white/30 shrink-0" />
+                <span className="h-1 w-1 mt-2 rounded-full bg-slate-300 shrink-0" />
               ) : (
-                <span className="flex h-6 w-6 mt-0.5 items-center justify-center rounded-full bg-gradient-to-br from-[#E42D2C]/40 to-[#152978] text-[9px] font-bold text-white shrink-0">
+                <span className="flex h-6 w-6 mt-0.5 items-center justify-center rounded-full bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] text-[9px] font-bold text-white shrink-0">
                   {initials(c.author ?? "?")}
                 </span>
               )}
@@ -304,7 +318,7 @@ function CommentsSection({ taskId }: { taskId: string }) {
           value={draft}
           onChange={e => setDraft(e.target.value)}
           placeholder="Escribir comentario..."
-          className="h-9 flex-1 rounded-lg border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#1e3a8a]/40"
+          className="h-9 flex-1 rounded-lg border border-slate-200 bg-white px-3 text-[13px] text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#1e3a8a]/40"
         />
         <button
           type="submit"
@@ -348,8 +362,8 @@ function DetailDrawer({
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-[100] bg-slate-900/30" onClick={onClose} />
-      <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[520px] flex-col border-l border-slate-200 shadow-2xl" style={{ backgroundColor: "#ffffff" }}>
+      <div className="fixed inset-0 z-[100] bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[560px] flex-col border-l border-slate-200 shadow-2xl bg-white">
 
         {/* Header */}
         <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5">
@@ -366,11 +380,15 @@ function DetailDrawer({
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button onClick={() => onDelete(task.id)} disabled={deleting}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-300 hover:text-red-600 hover:bg-red-500/10 transition-all disabled:opacity-40">
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-300 hover:text-red-600 hover:bg-red-50 transition-all disabled:opacity-40"
+              title="Borrar (⌫)"
+            >
               {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             </button>
             <button onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all"
+              title="Cerrar (Esc)"
+            >
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -379,7 +397,7 @@ function DetailDrawer({
         {/* Tabs */}
         <div className="flex border-b border-slate-200 px-6">
           {[
-            { k: "detail" as const, l: "Detalle" },
+            { k: "detail" as const,   l: "Detalle" },
             { k: "comments" as const, l: "Actividad" },
           ].map(t => (
             <button
@@ -408,7 +426,7 @@ function DetailDrawer({
                     className={inputCls + " capitalize"}
                   >
                     {STATUS_OPTIONS.map(s => (
-                      <option key={s} value={s} className="bg-white text-slate-900 capitalize">{s.replace("_", " ")}</option>
+                      <option key={s} value={s} className="capitalize">{s.replace("_", " ")}</option>
                     ))}
                   </select>
                 </div>
@@ -420,13 +438,12 @@ function DetailDrawer({
                     className={inputCls + " capitalize"}
                   >
                     {PRIORITY_OPTIONS.map(p => (
-                      <option key={p} value={p} className="bg-white text-slate-900 capitalize">{p}</option>
+                      <option key={p} value={p} className="capitalize">{p}</option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              {/* Due date */}
               <div className="space-y-1.5">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Vence</p>
                 <input
@@ -437,19 +454,16 @@ function DetailDrawer({
                 />
               </div>
 
-              {/* Assignees */}
               <div className="space-y-1.5">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Asignados</p>
                 <AssigneesEditor value={task.assignees ?? []} onChange={v => onPatch(task.id, { assignees: v })} />
               </div>
 
-              {/* Tags */}
               <div className="space-y-1.5">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Tags</p>
                 <TagsEditor value={task.tags ?? []} onChange={v => onPatch(task.id, { tags: v })} />
               </div>
 
-              {/* Linked persona */}
               <div className="space-y-1.5">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Vinculada a persona agendada</p>
                 <select
@@ -457,14 +471,13 @@ function DetailDrawer({
                   onChange={e => onPatch(task.id, { persona_id: e.target.value || null })}
                   className={inputCls}
                 >
-                  <option value="" className="bg-white text-slate-900">— Ninguna —</option>
+                  <option value="">— Ninguna —</option>
                   {personas.map(p => (
-                    <option key={p.id} value={p.id} className="bg-white text-slate-900">{p.name}</option>
+                    <option key={p.id} value={p.id}>{p.name}</option>
                   ))}
                 </select>
               </div>
 
-              {/* Description */}
               <div className="space-y-1.5">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Descripción</p>
                 <textarea
@@ -491,7 +504,7 @@ function DetailDrawer({
                         <button
                           onClick={() => onPatch(s.id, { status: s.status === "completada" ? "pendiente" : "completada" })}
                           className={`shrink-0 h-3 w-3 rounded-full border-2 transition-all ${
-                            s.status === "completada" ? "bg-emerald-400 border-emerald-400" : "border-white/30 hover:border-white/60"
+                            s.status === "completada" ? "bg-emerald-500 border-emerald-500" : "border-slate-300 hover:border-slate-500"
                           }`}
                         />
                         <span className={`flex-1 text-[12px] ${s.status === "completada" ? "text-slate-400 line-through" : "text-slate-800"}`}>
@@ -510,12 +523,12 @@ function DetailDrawer({
                     value={newSub}
                     onChange={e => setNewSub(e.target.value)}
                     placeholder="Sumar subtarea..."
-                    className="h-8 flex-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 text-[12px] text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#1e3a8a]/40"
+                    className="h-8 flex-1 rounded-lg border border-slate-200 bg-white px-2.5 text-[12px] text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#1e3a8a]/40"
                   />
                   <button
                     type="submit"
                     disabled={!newSub.trim() || savingSub}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-30 transition-all"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 disabled:opacity-30 transition-all"
                   >
                     {savingSub ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
                   </button>
@@ -534,19 +547,20 @@ function DetailDrawer({
 // ─── New Task Modal ───────────────────────────────────────────────────────────
 
 function NewTaskModal({
-  personas, onClose, onCreate, creating,
+  personas, onClose, onCreate, creating, prefillDueAt,
 }: {
-  personas: PersonaLite[]
-  onClose:  () => void
-  onCreate: (data: Partial<Task>) => Promise<void>
-  creating: boolean
+  personas:     PersonaLite[]
+  onClose:      () => void
+  onCreate:     (data: Partial<Task>) => Promise<void>
+  creating:     boolean
+  prefillDueAt?: string | null
 }) {
   const [title,       setTitle]       = useState("")
   const [description, setDescription] = useState("")
   const [priority,    setPriority]    = useState<Priority>("media")
   const [assignees,   setAssignees]   = useState<string[]>([])
   const [tags,        setTags]        = useState<string[]>([])
-  const [dueAt,       setDueAt]       = useState("")
+  const [dueAt,       setDueAt]       = useState(prefillDueAt ? toLocalInputValue(prefillDueAt) : "")
   const [personaId,   setPersonaId]   = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -565,12 +579,11 @@ function NewTaskModal({
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-[100] bg-slate-900/30" onClick={onClose} />
+      <div className="fixed inset-0 z-[100] bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
       <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-md rounded-2xl border border-slate-200 shadow-2xl p-6 space-y-3.5 max-h-[90vh] overflow-y-auto"
-          style={{ backgroundColor: "#ffffff" }}
+          className="w-full max-w-md rounded-2xl border border-slate-200 shadow-2xl p-6 space-y-3.5 max-h-[90vh] overflow-y-auto bg-white"
         >
           <div className="flex items-center justify-between mb-1">
             <h3 className="text-base font-bold text-slate-900">Nueva tarea</h3>
@@ -594,7 +607,7 @@ function NewTaskModal({
             <div className="space-y-1.5">
               <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Prioridad</p>
               <select value={priority} onChange={e => setPriority(e.target.value as Priority)} className={inputCls + " capitalize"}>
-                {PRIORITY_OPTIONS.map(p => <option key={p} value={p} className="bg-white capitalize">{p}</option>)}
+                {PRIORITY_OPTIONS.map(p => <option key={p} value={p} className="capitalize">{p}</option>)}
               </select>
             </div>
             <div className="space-y-1.5">
@@ -617,8 +630,8 @@ function NewTaskModal({
             <div className="space-y-1.5">
               <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Vincular a persona agendada</p>
               <select value={personaId} onChange={e => setPersonaId(e.target.value)} className={inputCls}>
-                <option value="" className="bg-white">— Ninguna —</option>
-                {personas.map(p => <option key={p.id} value={p.id} className="bg-white">{p.name}</option>)}
+                <option value="">— Ninguna —</option>
+                {personas.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>
             </div>
           )}
@@ -626,7 +639,7 @@ function NewTaskModal({
           <button
             type="submit"
             disabled={!title.trim() || creating}
-            className="w-full h-10 rounded-xl bg-[#E42D2C] text-white text-[13px] font-bold hover:bg-[#c42423] transition-all disabled:opacity-40 flex items-center justify-center gap-2"
+            className="w-full h-10 rounded-xl bg-[#E42D2C] text-white text-[13px] font-bold hover:bg-[#c42423] hover:shadow-[0_8px_24px_rgba(228,45,44,0.25)] transition-all disabled:opacity-40 flex items-center justify-center gap-2"
           >
             {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             Crear tarea
@@ -637,10 +650,66 @@ function NewTaskModal({
   )
 }
 
+// ─── Quick Add Row (board column inline create) ──────────────────────────────
+
+function QuickAddRow({
+  status, onCreate,
+}: {
+  status:   Status
+  onCreate: (title: string, status: Status) => Promise<void>
+}) {
+  const [open, setOpen] = useState(false)
+  const [title, setTitle] = useState("")
+  const [busy, setBusy] = useState(false)
+  const inputRef = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => { if (open) inputRef.current?.focus() }, [open])
+
+  const submit = async () => {
+    const v = title.trim()
+    if (!v) { setOpen(false); return }
+    setBusy(true)
+    await onCreate(v, status)
+    setBusy(false)
+    setTitle("")
+  }
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="group flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-[12px] text-slate-400 hover:bg-white hover:text-[#1e3a8a] transition-colors"
+      >
+        <Plus className="h-3.5 w-3.5" />
+        <span className="font-medium">Agregar tarea</span>
+      </button>
+    )
+  }
+
+  return (
+    <div className="rounded-lg border border-[#1e3a8a]/30 bg-white p-2 shadow-sm">
+      <input
+        ref={inputRef}
+        value={title}
+        onChange={e => setTitle(e.target.value)}
+        onKeyDown={e => {
+          if (e.key === "Enter") { e.preventDefault(); submit() }
+          if (e.key === "Escape") { setTitle(""); setOpen(false) }
+        }}
+        onBlur={() => { if (!busy && !title.trim()) setOpen(false); else if (!busy) submit() }}
+        placeholder="Título..."
+        className="w-full text-[13px] text-slate-900 placeholder:text-slate-400 outline-none bg-transparent"
+        disabled={busy}
+      />
+    </div>
+  )
+}
+
 // ─── Task Card (kanban) ───────────────────────────────────────────────────────
 
 function TaskCard({
   task, persona, subtaskCount, completedSubs, onClick, onToggleStatus,
+  selected, onToggleSelect, selectionMode,
 }: {
   task: Task
   persona: PersonaLite | null
@@ -648,6 +717,9 @@ function TaskCard({
   completedSubs: number
   onClick: () => void
   onToggleStatus: (next: Status) => void
+  selected: boolean
+  onToggleSelect: (e: React.MouseEvent) => void
+  selectionMode: boolean
 }) {
   const overdue = isOverdue(task)
   const due = fmtDateTime(task.due_at)
@@ -661,19 +733,38 @@ function TaskCard({
   return (
     <div
       onClick={onClick}
-      className="group cursor-pointer rounded-xl border border-slate-200 bg-white hover:border-slate-300 hover:shadow-[0_0_24px_rgba(228,45,44,0.05)] transition-all p-3 space-y-2"
+      className={`group cursor-pointer rounded-xl border bg-white transition-all p-3 space-y-2 ${
+        selected
+          ? "border-[#1e3a8a]/40 shadow-[0_0_0_3px_rgba(30,58,138,0.10)]"
+          : "border-slate-200 hover:border-[#1e3a8a]/20 hover:shadow-[0_4px_14px_rgba(15,23,42,0.06)]"
+      }`}
     >
       <div className="flex items-start gap-2">
+        {/* Checkbox visible on hover OR if selectionMode active */}
+        <button
+          onClick={onToggleSelect}
+          className={`shrink-0 mt-0.5 transition-opacity ${
+            selectionMode || selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+          }`}
+          aria-label="Seleccionar"
+        >
+          {selected
+            ? <CheckSquare className="h-3.5 w-3.5 text-[#1e3a8a]" />
+            : <Square      className="h-3.5 w-3.5 text-slate-400 hover:text-[#1e3a8a]" />}
+        </button>
+
         <button
           onClick={e => { e.stopPropagation(); onToggleStatus(nextStatus) }}
           className={`shrink-0 mt-1 h-3 w-3 rounded-full border-2 transition-all ${
-            task.status === "completada" ? "bg-emerald-400 border-emerald-400" :
-            task.status === "en_progreso" ? "border-blue-400" :
-            task.status === "cancelada"   ? "border-zinc-500" :
-                                            "border-white/30 hover:border-white/60"
+            task.status === "completada"  ? "bg-emerald-500 border-emerald-500" :
+            task.status === "en_progreso" ? "border-[#1e3a8a]" :
+            task.status === "cancelada"   ? "border-zinc-400" :
+                                            "border-slate-300 hover:border-slate-500"
           }`}
         />
-        <p className={`flex-1 text-[13px] font-medium leading-snug ${task.status === "completada" || task.status === "cancelada" ? "text-slate-400 line-through" : "text-slate-900"}`}>
+        <p className={`flex-1 text-[13px] font-medium leading-snug ${
+          task.status === "completada" || task.status === "cancelada" ? "text-slate-400 line-through" : "text-slate-900"
+        }`}>
           {task.title}
         </p>
         <Flag className={`shrink-0 h-3 w-3 ${PRIORITY_STYLE[task.priority].flag}`} />
@@ -681,7 +772,7 @@ function TaskCard({
 
       {/* Tags */}
       {task.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1 pl-5">
+        <div className="flex flex-wrap gap-1 pl-9">
           {task.tags.slice(0, 4).map(t => (
             <span key={t} className="rounded-full border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] text-slate-600">{t}</span>
           ))}
@@ -690,7 +781,7 @@ function TaskCard({
       )}
 
       {/* Metadata row */}
-      <div className="flex items-center justify-between gap-2 pl-5">
+      <div className="flex items-center justify-between gap-2 pl-9">
         <div className="flex items-center gap-2.5 text-[11px] text-slate-400">
           {subtaskCount > 0 && (
             <span className="flex items-center gap-1" title="Subtareas">
@@ -699,7 +790,7 @@ function TaskCard({
             </span>
           )}
           {due && (
-            <span className={`flex items-center gap-1 ${overdue ? "text-red-700" : ""}`}>
+            <span className={`flex items-center gap-1 ${overdue ? "text-[#E42D2C] font-semibold" : ""}`}>
               {overdue ? <AlertCircle className="h-3 w-3" /> : <CalIcon className="h-3 w-3" />}
               {due}
             </span>
@@ -709,13 +800,183 @@ function TaskCard({
       </div>
 
       {persona && (
-        <div className="pl-5">
+        <div className="pl-9">
           <span className="inline-block rounded-md bg-slate-50 px-2 py-0.5 text-[10px] text-slate-500">
             ↳ {persona.name}
           </span>
         </div>
       )}
     </div>
+  )
+}
+
+// ─── Multi-select bottom bar ─────────────────────────────────────────────────
+
+function BulkBar({
+  count, onClear, onSetStatus, onDelete, onSetPriority,
+}: {
+  count:         number
+  onClear:       () => void
+  onSetStatus:   (s: Status) => void
+  onSetPriority: (p: Priority) => void
+  onDelete:      () => void
+}) {
+  return (
+    <Portal>
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[120] animate-in slide-in-from-bottom-4">
+        <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-[0_20px_40px_rgba(15,23,42,0.15)]">
+          <div className="flex items-center gap-2 pr-2 border-r border-slate-200">
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#1e3a8a] text-[12px] font-bold text-white">
+              {count}
+            </span>
+            <span className="text-[12px] font-medium text-slate-700">seleccionadas</span>
+          </div>
+
+          {/* Status selector */}
+          <div className="relative group">
+            <button className="flex items-center gap-1.5 h-8 rounded-lg border border-slate-200 bg-white px-2.5 text-[12px] font-medium text-slate-700 hover:border-[#1e3a8a]/30 transition-colors">
+              <Circle className="h-3 w-3" /> Estado <ChevronDown className="h-3 w-3" />
+            </button>
+            <div className="absolute bottom-full mb-1 left-0 hidden group-hover:block min-w-[160px] rounded-lg border border-slate-200 bg-white shadow-lg overflow-hidden">
+              {STATUS_OPTIONS.map(s => (
+                <button
+                  key={s}
+                  onClick={() => onSetStatus(s)}
+                  className="block w-full text-left px-3 py-2 text-[12px] text-slate-700 capitalize hover:bg-slate-50"
+                >
+                  {s.replace("_", " ")}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Priority selector */}
+          <div className="relative group">
+            <button className="flex items-center gap-1.5 h-8 rounded-lg border border-slate-200 bg-white px-2.5 text-[12px] font-medium text-slate-700 hover:border-[#1e3a8a]/30 transition-colors">
+              <Flag className="h-3 w-3" /> Prioridad <ChevronDown className="h-3 w-3" />
+            </button>
+            <div className="absolute bottom-full mb-1 left-0 hidden group-hover:block min-w-[120px] rounded-lg border border-slate-200 bg-white shadow-lg overflow-hidden">
+              {PRIORITY_OPTIONS.map(p => (
+                <button
+                  key={p}
+                  onClick={() => onSetPriority(p)}
+                  className="block w-full text-left px-3 py-2 text-[12px] capitalize hover:bg-slate-50 flex items-center gap-2"
+                >
+                  <Flag className={`h-3 w-3 ${PRIORITY_STYLE[p].flag}`} /> {p}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={onDelete}
+            className="flex items-center gap-1.5 h-8 rounded-lg border border-red-200 bg-red-50 px-2.5 text-[12px] font-medium text-red-700 hover:bg-red-100 transition-colors"
+          >
+            <Trash2 className="h-3 w-3" /> Borrar
+          </button>
+
+          <div className="border-l border-slate-200 pl-2">
+            <button
+              onClick={onClear}
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+              title="Cancelar (Esc)"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </Portal>
+  )
+}
+
+// ─── Keyboard shortcuts help modal ───────────────────────────────────────────
+
+function ShortcutsModal({ onClose }: { onClose: () => void }) {
+  const shortcuts: { keys: string[]; label: string }[] = [
+    { keys: ["Q"],         label: "Nueva tarea" },
+    { keys: ["J"],         label: "Siguiente tarea" },
+    { keys: ["K"],         label: "Tarea anterior" },
+    { keys: ["Enter"],     label: "Abrir detalle" },
+    { keys: ["E"],         label: "Editar (abrir detalle)" },
+    { keys: ["X"],         label: "Marcar completada" },
+    { keys: ["⌫"],         label: "Borrar tarea seleccionada" },
+    { keys: ["1"],         label: "Vista Board" },
+    { keys: ["2"],         label: "Vista Lista" },
+    { keys: ["3"],         label: "Vista Calendario" },
+    { keys: ["/"],         label: "Buscar" },
+    { keys: ["Esc"],       label: "Cerrar" },
+    { keys: ["?"],         label: "Mostrar atajos" },
+  ]
+
+  return (
+    <Portal>
+      <div className="fixed inset-0 z-[100] bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+        <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Keyboard className="h-4 w-4 text-[#1e3a8a]" />
+              <h3 className="text-base font-bold text-slate-900">Atajos de teclado</h3>
+            </div>
+            <button onClick={onClose} className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="space-y-1.5">
+            {shortcuts.map(s => (
+              <div key={s.label} className="flex items-center justify-between gap-3 py-1.5">
+                <span className="text-[13px] text-slate-700">{s.label}</span>
+                <div className="flex items-center gap-1">
+                  {s.keys.map(k => (
+                    <kbd key={k} className="inline-flex items-center justify-center min-w-[24px] h-6 rounded-md border border-slate-200 bg-slate-50 px-1.5 text-[11px] font-bold text-slate-700">
+                      {k}
+                    </kbd>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </Portal>
+  )
+}
+
+// ─── Filter Chip ──────────────────────────────────────────────────────────────
+
+function FilterChip({
+  active, onClick, icon: Icon, label, count, accent,
+}: {
+  active:  boolean
+  onClick: () => void
+  icon?:   any
+  label:   string
+  count?:  number
+  accent?: "navy" | "red" | "amber" | "emerald"
+}) {
+  const accentStyle = active ? {
+    navy:    "border-[#1e3a8a]/30 bg-[#1e3a8a]/[0.06] text-[#1e3a8a]",
+    red:     "border-red-300 bg-red-50 text-[#E42D2C]",
+    amber:   "border-amber-300 bg-amber-50 text-amber-800",
+    emerald: "border-emerald-300 bg-emerald-50 text-emerald-700",
+  }[accent ?? "navy"] : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900"
+
+  return (
+    <button
+      onClick={onClick}
+      className={`inline-flex items-center gap-1.5 h-8 rounded-full border px-3 text-[12px] font-medium transition-colors ${accentStyle}`}
+    >
+      {Icon && <Icon className="h-3 w-3" />}
+      {label}
+      {count !== undefined && count > 0 && (
+        <span className={`tabular-nums rounded-full px-1.5 text-[10px] font-bold ${
+          active ? "bg-white/60" : "bg-slate-100"
+        }`}>
+          {count}
+        </span>
+      )}
+    </button>
   )
 }
 
@@ -730,15 +991,24 @@ export function TasksView() {
   const [search,        setSearch]        = useState("")
   const [filterAssignee,setFilterAssignee]= useState<string>("todos")
   const [filterTag,     setFilterTag]     = useState<string>("todos")
+  const [filterPriority,setFilterPriority]= useState<Priority | "todos">("todos")
   const [showNewForm,   setShowNewForm]   = useState(false)
+  const [newPrefillDate,setNewPrefillDate]= useState<string | null>(null)
   const [creating,      setCreating]      = useState(false)
-  const [view,          setView]          = useState<"board" | "list">("board")
+  const [view,          setView]          = useState<ViewMode>("board")
+  const [groupBy,       setGroupBy]       = useState<GroupBy>("status")
+  const [sortBy,        setSortBy]        = useState<SortBy>("due_at")
+  const [quickFilter,   setQuickFilter]   = useState<"all" | "mine" | "overdue" | "this_week" | "unassigned">("all")
+  const [selectedIds,   setSelectedIds]   = useState<Set<string>>(new Set())
+  const [showShortcuts, setShowShortcuts] = useState(false)
+  const [currentEmail,  setCurrentEmail]  = useState<string>("")
 
   const router       = useRouter()
   const pathname     = usePathname()
   const searchParams = useSearchParams()
+  const searchInputRef = useRef<HTMLInputElement | null>(null)
 
-  // Quick-action: open "Nueva tarea" modal when ?new=1 is present, then strip the param.
+  // Quick-action: open "Nueva tarea" modal when ?new=1 is present
   useEffect(() => {
     if (searchParams?.get("new") === "1") {
       setShowNewForm(true)
@@ -757,6 +1027,7 @@ export function TasksView() {
     try {
       const session = await getSession()
       if (!session) return
+      setCurrentEmail(session.user?.email ?? "")
       const headers = { Authorization: `Bearer ${session.access_token}` }
       const [tRes, pRes] = await Promise.all([
         fetch("/api/admin/tasks?include_subtasks=true", { headers }),
@@ -786,8 +1057,21 @@ export function TasksView() {
       if (res.ok && json.task) {
         setTasks(prev => [json.task, ...prev])
         setShowNewForm(false)
+        setNewPrefillDate(null)
       }
     } finally { setCreating(false) }
+  }
+
+  const quickCreate = async (title: string, status: Status) => {
+    const session = await getSession()
+    if (!session) return
+    const res = await fetch("/api/admin/tasks", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+      body:    JSON.stringify({ title, status }),
+    })
+    const json = await res.json()
+    if (res.ok && json.task) setTasks(prev => [json.task, ...prev])
   }
 
   const createSubtask = async (parentId: string, title: string) => {
@@ -802,9 +1086,9 @@ export function TasksView() {
     if (res.ok && json.task) setTasks(prev => [json.task, ...prev])
   }
 
-  const patch = async (id: string, updates: Partial<Task>) => {
+  const patch = useCallback(async (id: string, updates: Partial<Task>) => {
     setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t))
-    if (selected?.id === id) setSelected(prev => prev ? { ...prev, ...updates } : prev)
+    setSelected(prev => prev && prev.id === id ? { ...prev, ...updates } : prev)
     const session = await getSession()
     if (!session) return
     await fetch("/api/admin/tasks", {
@@ -812,9 +1096,9 @@ export function TasksView() {
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body:    JSON.stringify({ id, ...updates }),
     })
-  }
+  }, [])
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = useCallback(async (id: string) => {
     setDeletingId(id)
     const session = await getSession()
     if (!session) return
@@ -824,8 +1108,34 @@ export function TasksView() {
       body:    JSON.stringify({ id }),
     })
     setTasks(prev => prev.filter(t => t.id !== id && t.parent_id !== id))
-    if (selected?.id === id) setSelected(null)
+    setSelected(prev => prev?.id === id ? null : prev)
     setDeletingId(null)
+  }, [])
+
+  // Bulk actions
+  const bulkPatch = async (updates: Partial<Task>) => {
+    const ids = Array.from(selectedIds)
+    setTasks(prev => prev.map(t => ids.includes(t.id) ? { ...t, ...updates } : t))
+    const session = await getSession()
+    if (!session) return
+    await Promise.all(ids.map(id => fetch("/api/admin/tasks", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+      body: JSON.stringify({ id, ...updates }),
+    })))
+  }
+  const bulkDelete = async () => {
+    const ids = Array.from(selectedIds)
+    if (!confirm(`¿Borrar ${ids.length} tarea${ids.length === 1 ? "" : "s"}?`)) return
+    setTasks(prev => prev.filter(t => !ids.includes(t.id) && (t.parent_id ? !ids.includes(t.parent_id) : true)))
+    setSelectedIds(new Set())
+    const session = await getSession()
+    if (!session) return
+    await Promise.all(ids.map(id => fetch("/api/admin/tasks", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+      body: JSON.stringify({ id }),
+    })))
   }
 
   // Top-level tasks only for board / list (subtasks live inside drawer)
@@ -843,14 +1153,57 @@ export function TasksView() {
     return Array.from(set).sort()
   }, [tasks])
 
-  const filtered = useMemo(() => topLevel.filter(t => {
-    if (filterAssignee !== "todos" && !t.assignees?.includes(filterAssignee)) return false
-    if (filterTag !== "todos" && !t.tags?.includes(filterTag)) return false
-    if (!search.trim()) return true
-    const q = search.toLowerCase()
-    return [t.title, t.description, ...(t.assignees ?? []), ...(t.tags ?? [])]
-      .some(v => v?.toLowerCase().includes(q))
-  }), [topLevel, search, filterAssignee, filterTag])
+  // Quick filter counts
+  const counts = useMemo(() => ({
+    all:        topLevel.length,
+    mine:       topLevel.filter(t => currentEmail && t.assignees?.includes(currentEmail)).length,
+    overdue:    topLevel.filter(isOverdue).length,
+    this_week:  topLevel.filter(isDueThisWeek).length,
+    unassigned: topLevel.filter(t => !t.assignees?.length).length,
+  }), [topLevel, currentEmail])
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    return topLevel.filter(t => {
+      // Quick filter
+      if (quickFilter === "mine" && (!currentEmail || !t.assignees?.includes(currentEmail))) return false
+      if (quickFilter === "overdue" && !isOverdue(t)) return false
+      if (quickFilter === "this_week" && !isDueThisWeek(t)) return false
+      if (quickFilter === "unassigned" && t.assignees?.length) return false
+
+      // Dropdown filters
+      if (filterAssignee !== "todos" && !t.assignees?.includes(filterAssignee)) return false
+      if (filterTag !== "todos" && !t.tags?.includes(filterTag)) return false
+      if (filterPriority !== "todos" && t.priority !== filterPriority) return false
+
+      // Free-text search
+      if (!q) return true
+      return [t.title, t.description, ...(t.assignees ?? []), ...(t.tags ?? [])]
+        .some(v => v?.toLowerCase().includes(q))
+    })
+  }, [topLevel, search, filterAssignee, filterTag, filterPriority, quickFilter, currentEmail])
+
+  // Sort
+  const sorted = useMemo(() => {
+    const arr = [...filtered]
+    arr.sort((a, b) => {
+      switch (sortBy) {
+        case "due_at": {
+          const aT = a.due_at ? new Date(a.due_at).getTime() : Infinity
+          const bT = b.due_at ? new Date(b.due_at).getTime() : Infinity
+          return aT - bT
+        }
+        case "priority":
+          return PRIORITY_STYLE[b.priority].weight - PRIORITY_STYLE[a.priority].weight
+        case "title":
+          return a.title.localeCompare(b.title)
+        case "created_at":
+        default:
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      }
+    })
+    return arr
+  }, [filtered, sortBy])
 
   const personasMap = useMemo(() => {
     const m = new Map<string, PersonaLite>()
@@ -873,16 +1226,120 @@ export function TasksView() {
 
   const grouped = useMemo(() => {
     const g: Record<Status, Task[]> = { pendiente: [], en_progreso: [], completada: [], cancelada: [] }
-    filtered.forEach(t => g[t.status].push(t))
+    sorted.forEach(t => g[t.status].push(t))
     return g
-  }, [filtered])
+  }, [sorted])
 
-  const overdueCount = useMemo(() => filtered.filter(isOverdue).length, [filtered])
+  // ─── Selection helpers ────────────────────────────────────────────────────
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id); else next.add(id)
+      return next
+    })
+  }
+  const clearSelection = () => setSelectedIds(new Set())
+  const allSelected = sorted.length > 0 && sorted.every(t => selectedIds.has(t.id))
+  const toggleSelectAll = () => {
+    if (allSelected) clearSelection()
+    else setSelectedIds(new Set(sorted.map(t => t.id)))
+  }
+
+  // ─── Keyboard shortcuts ──────────────────────────────────────────────────
+  useEffect(() => {
+    function isInsideEditable(target: EventTarget | null) {
+      if (!(target instanceof HTMLElement)) return false
+      const tag = target.tagName.toLowerCase()
+      return tag === "input" || tag === "textarea" || tag === "select" || target.isContentEditable
+    }
+
+    function onKey(e: KeyboardEvent) {
+      // Esc: close modal/drawer/clear selection
+      if (e.key === "Escape") {
+        if (showNewForm)        return setShowNewForm(false)
+        if (showShortcuts)      return setShowShortcuts(false)
+        if (selected)           return setSelected(null)
+        if (selectedIds.size)   return clearSelection()
+        return
+      }
+
+      if (isInsideEditable(e.target)) return
+      if (e.metaKey || e.ctrlKey || e.altKey) return
+
+      // ? show shortcuts
+      if (e.key === "?") {
+        e.preventDefault()
+        setShowShortcuts(s => !s)
+        return
+      }
+
+      // / focus search
+      if (e.key === "/") {
+        e.preventDefault()
+        searchInputRef.current?.focus()
+        return
+      }
+
+      // Q new task (only if drawer/modal not open)
+      if ((e.key === "q" || e.key === "Q") && !selected && !showNewForm) {
+        e.preventDefault()
+        setShowNewForm(true)
+        return
+      }
+
+      // 1/2/3 view switch
+      if (e.key === "1") return setView("board")
+      if (e.key === "2") return setView("list")
+      if (e.key === "3") return setView("calendar")
+
+      // Drawer-aware shortcuts (when a task is open)
+      if (selected) {
+        if (e.key === "Backspace" || e.key === "Delete") {
+          e.preventDefault()
+          handleDelete(selected.id)
+          return
+        }
+        if (e.key === "x" || e.key === "X") {
+          e.preventDefault()
+          patch(selected.id, { status: selected.status === "completada" ? "pendiente" : "completada" })
+          return
+        }
+      }
+
+      // J/K navigate within sorted
+      if ((e.key === "j" || e.key === "J" || e.key === "k" || e.key === "K") && sorted.length) {
+        e.preventDefault()
+        const idx = selected ? sorted.findIndex(t => t.id === selected.id) : -1
+        const dir = (e.key === "j" || e.key === "J") ? 1 : -1
+        const nextIdx = idx === -1 ? 0 : Math.max(0, Math.min(sorted.length - 1, idx + dir))
+        setSelected(sorted[nextIdx])
+        return
+      }
+
+      // Enter / E open detail when none open
+      if ((e.key === "Enter" || e.key === "e" || e.key === "E") && !selected && sorted.length) {
+        e.preventDefault()
+        setSelected(sorted[0])
+        return
+      }
+    }
+
+    document.addEventListener("keydown", onKey)
+    return () => document.removeEventListener("keydown", onKey)
+  }, [selected, selectedIds, sorted, showNewForm, showShortcuts, patch, handleDelete])
+
+  // ─── Render ──────────────────────────────────────────────────────────────
 
   return (
     <>
       {showNewForm && (
-        <NewTaskModal personas={personas} onClose={() => setShowNewForm(false)} onCreate={handleCreate} creating={creating} />
+        <NewTaskModal
+          personas={personas}
+          onClose={() => { setShowNewForm(false); setNewPrefillDate(null) }}
+          onCreate={handleCreate}
+          creating={creating}
+          prefillDueAt={newPrefillDate}
+        />
       )}
 
       {selected && (
@@ -898,101 +1355,220 @@ export function TasksView() {
         />
       )}
 
-      <div className="space-y-6">
+      {showShortcuts && <ShortcutsModal onClose={() => setShowShortcuts(false)} />}
 
-        {/* Header */}
+      {selectedIds.size > 0 && (
+        <BulkBar
+          count={selectedIds.size}
+          onClear={clearSelection}
+          onSetStatus={s => bulkPatch({ status: s })}
+          onSetPriority={p => bulkPatch({ priority: p })}
+          onDelete={bulkDelete}
+        />
+      )}
+
+      <div className="space-y-5">
+
+        {/* ─── Header ──────────────────────────────────────────────────── */}
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-[#1e3a8a] tracking-tight">Tareas</h1>
             <p className="text-sm text-slate-400 mt-0.5">
               {topLevel.length} {topLevel.length === 1 ? "tarea" : "tareas"}
-              {overdueCount > 0 && (
-                <span className="ml-2 inline-flex items-center gap-1 text-red-700">
-                  · <AlertCircle className="h-3 w-3" /> {overdueCount} vencidas
+              {counts.overdue > 0 && (
+                <span className="ml-2 inline-flex items-center gap-1 text-[#E42D2C]">
+                  · <AlertCircle className="h-3 w-3" /> {counts.overdue} vencidas
                 </span>
               )}
             </p>
           </div>
           <div className="flex items-center gap-2">
             {/* View toggle */}
-            <div className="inline-flex h-9 rounded-xl border border-slate-200 bg-slate-50 p-0.5">
-              <button
-                onClick={() => setView("board")}
-                className={`flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium transition-all ${
-                  view === "board" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-900"
-                }`}>
-                <LayoutGrid className="h-3.5 w-3.5" /> Board
-              </button>
-              <button
-                onClick={() => setView("list")}
-                className={`flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium transition-all ${
-                  view === "list" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-900"
-                }`}>
-                <List className="h-3.5 w-3.5" /> Lista
-              </button>
+            <div className="inline-flex h-9 rounded-xl border border-slate-200 bg-white p-0.5">
+              {[
+                { k: "board" as ViewMode,    Icon: LayoutGrid,   label: "Board",      shortcut: "1" },
+                { k: "list" as ViewMode,     Icon: List,         label: "Lista",      shortcut: "2" },
+                { k: "calendar" as ViewMode, Icon: CalendarDays, label: "Calendario", shortcut: "3" },
+              ].map(v => (
+                <button
+                  key={v.k}
+                  onClick={() => setView(v.k)}
+                  className={`flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium transition-all ${
+                    view === v.k
+                      ? "bg-[#1e3a8a] text-white shadow-sm"
+                      : "text-slate-500 hover:text-slate-900"
+                  }`}
+                  title={`${v.label} (${v.shortcut})`}
+                >
+                  <v.Icon className="h-3.5 w-3.5" /> {v.label}
+                </button>
+              ))}
             </div>
 
+            <button
+              onClick={() => setShowShortcuts(true)}
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-[#1e3a8a] hover:border-[#1e3a8a]/30 transition-all"
+              title="Atajos (?)"
+            >
+              <Keyboard className="h-4 w-4" />
+            </button>
             <button onClick={fetchAll} disabled={loading}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40">
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40"
+              title="Refrescar"
+            >
               <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             </button>
             <button
               onClick={() => setShowNewForm(true)}
-              className="flex items-center gap-2 h-9 rounded-xl bg-[#E42D2C] px-4 text-sm font-bold text-white hover:bg-[#c42423] transition-all">
+              className="flex items-center gap-2 h-9 rounded-xl bg-[#E42D2C] px-4 text-sm font-bold text-white hover:bg-[#c42423] hover:shadow-[0_4px_14px_rgba(228,45,44,0.25)] transition-all"
+              title="Nueva tarea (Q)"
+            >
               <Plus className="h-3.5 w-3.5" />
               Nueva tarea
+              <kbd className="hidden sm:inline ml-1 rounded bg-white/20 px-1 text-[10px]">Q</kbd>
             </button>
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-wrap items-center gap-3">
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Buscar tareas, tags, asignados..."
-            className="h-9 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 placeholder:text-slate-300 focus:border-[#1e3a8a]/40 focus:outline-none flex-1 min-w-[220px] max-w-sm"
+        {/* ─── Quick filter chips ──────────────────────────────────────── */}
+        <div className="flex flex-wrap items-center gap-2">
+          <FilterChip
+            active={quickFilter === "all"}
+            onClick={() => setQuickFilter("all")}
+            icon={Inbox}
+            label="Todas"
+            count={counts.all}
+            accent="navy"
           />
+          <FilterChip
+            active={quickFilter === "mine"}
+            onClick={() => setQuickFilter("mine")}
+            icon={User}
+            label="Mías"
+            count={counts.mine}
+            accent="navy"
+          />
+          <FilterChip
+            active={quickFilter === "overdue"}
+            onClick={() => setQuickFilter("overdue")}
+            icon={AlertCircle}
+            label="Vencidas"
+            count={counts.overdue}
+            accent="red"
+          />
+          <FilterChip
+            active={quickFilter === "this_week"}
+            onClick={() => setQuickFilter("this_week")}
+            icon={Clock}
+            label="Esta semana"
+            count={counts.this_week}
+            accent="amber"
+          />
+          <FilterChip
+            active={quickFilter === "unassigned"}
+            onClick={() => setQuickFilter("unassigned")}
+            label="Sin asignar"
+            count={counts.unassigned}
+            accent="navy"
+          />
+        </div>
+
+        {/* ─── Toolbar: search + filters + sort ───────────────────────── */}
+        <div className="flex flex-wrap items-center gap-2.5 border-b border-slate-200 pb-4">
+          <div className="relative flex-1 min-w-[220px] max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Buscar tareas, tags, asignados..."
+              className="h-9 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/10"
+            />
+            <kbd className="hidden sm:inline absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-slate-200 bg-slate-50 px-1.5 text-[10px] font-bold text-slate-400">/</kbd>
+          </div>
+
+          <select
+            value={filterPriority}
+            onChange={e => setFilterPriority(e.target.value as any)}
+            className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300">
+            <option value="todos">Todas las prioridades</option>
+            {PRIORITY_OPTIONS.map(p => <option key={p} value={p} className="capitalize">{p}</option>)}
+          </select>
+
           {allAssignees.length > 0 && (
             <select
               value={filterAssignee}
               onChange={e => setFilterAssignee(e.target.value)}
-              className="h-9 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[12px] text-slate-900 outline-none cursor-pointer">
-              <option value="todos" className="bg-white">Todos los asignados</option>
-              {allAssignees.map(a => <option key={a} value={a} className="bg-white">{a}</option>)}
+              className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300">
+              <option value="todos">Todos los asignados</option>
+              {allAssignees.map(a => <option key={a} value={a}>{a}</option>)}
             </select>
           )}
           {allTags.length > 0 && (
             <select
               value={filterTag}
               onChange={e => setFilterTag(e.target.value)}
-              className="h-9 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[12px] text-slate-900 outline-none cursor-pointer">
-              <option value="todos" className="bg-white">Todos los tags</option>
-              {allTags.map(t => <option key={t} value={t} className="bg-white">{t}</option>)}
+              className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300">
+              <option value="todos">Todos los tags</option>
+              {allTags.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           )}
+
+          <div className="ml-auto flex items-center gap-2">
+            <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+              <ArrowDownUp className="h-3 w-3" />
+              <span>Ordenar:</span>
+            </div>
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value as SortBy)}
+              className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300">
+              <option value="due_at">Vencimiento</option>
+              <option value="priority">Prioridad</option>
+              <option value="created_at">Creación</option>
+              <option value="title">Título</option>
+            </select>
+          </div>
         </div>
 
-        {/* Body */}
+        {/* ─── Body ───────────────────────────────────────────────────── */}
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="h-6 w-6 animate-spin text-[#E42D2C]/40" />
+          </div>
+        ) : sorted.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50 ring-1 ring-slate-200 mb-4">
+              <Inbox className="h-6 w-6 text-slate-400" />
+            </div>
+            <p className="text-[15px] font-semibold text-slate-700">No hay tareas que coincidan</p>
+            <p className="text-[13px] text-slate-400 mt-1">Probá ajustar los filtros, o creá una nueva con <kbd className="rounded border border-slate-200 bg-slate-50 px-1 text-[11px] font-bold text-slate-600">Q</kbd>.</p>
+            <button
+              onClick={() => setShowNewForm(true)}
+              className="mt-4 inline-flex items-center gap-1.5 h-9 rounded-xl bg-[#E42D2C] px-4 text-[12px] font-bold text-white hover:bg-[#c42423] transition-all"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Nueva tarea
+            </button>
           </div>
         ) : view === "board" ? (
           <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
             {STATUS_COLUMNS.map(col => {
               const list = grouped[col.key]
               return (
-                <div key={col.key} className="flex flex-col rounded-2xl border border-slate-100 bg-slate-50 min-h-[200px]">
-                  <div className={`flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-3 rounded-t-2xl ${col.accent}`}>
-                    <h3 className="text-[12px] font-bold uppercase tracking-widest text-slate-800">{col.label}</h3>
-                    <span className="text-[11px] font-semibold text-slate-500">{list.length}</span>
+                <div key={col.key} className="flex flex-col rounded-2xl border border-slate-200 bg-slate-50/50 min-h-[200px]">
+                  <div className={`flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-3 rounded-t-2xl ${col.headerBg}`}>
+                    <div className="flex items-center gap-2">
+                      <span className={`h-2 w-2 rounded-full ${col.dot}`} />
+                      <h3 className="text-[12px] font-bold uppercase tracking-widest text-slate-700">{col.label}</h3>
+                    </div>
+                    <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold tabular-nums text-slate-600">
+                      {list.length}
+                    </span>
                   </div>
-                  <div className="flex-1 p-3 space-y-2">
-                    {list.length === 0 ? (
-                      <p className="py-4 text-center text-[12px] text-slate-300">—</p>
-                    ) : list.map(t => {
+                  <div className="flex-1 p-2 space-y-1.5">
+                    {list.map(t => {
                       const stat = subtaskStats.get(t.id)
                       return (
                         <TaskCard
@@ -1003,111 +1579,147 @@ export function TasksView() {
                           completedSubs={stat?.done ?? 0}
                           onClick={() => setSelected(t)}
                           onToggleStatus={ns => patch(t.id, { status: ns })}
+                          selected={selectedIds.has(t.id)}
+                          onToggleSelect={(e) => { e.stopPropagation(); toggleSelect(t.id) }}
+                          selectionMode={selectedIds.size > 0}
                         />
                       )
                     })}
+                    <QuickAddRow status={col.key} onCreate={quickCreate} />
                   </div>
                 </div>
               )
             })}
           </div>
-        ) : (
-          /* LIST VIEW */
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-            {filtered.length === 0 ? (
-              <p className="py-16 text-center text-sm text-slate-300">No hay tareas.</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="border-b border-slate-200 bg-slate-50">
-                      {["", "Título", "Estado", "Prioridad", "Asignados", "Tags", "Vence", "Subtareas", ""].map((h, i) => (
-                        <th key={i} className="px-3 py-3 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400 whitespace-nowrap">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filtered.map(t => {
-                      const overdue = isOverdue(t)
-                      const stat = subtaskStats.get(t.id)
-                      const persona = t.persona_id ? personasMap.get(t.persona_id) : null
-                      return (
-                        <tr key={t.id}
-                          onClick={() => setSelected(t)}
-                          className="border-b border-slate-100 cursor-pointer transition-colors hover:bg-slate-50">
+        ) : view === "list" ? (
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-50">
+                    <th className="px-3 py-3 w-8" onClick={(e) => e.stopPropagation()}>
+                      <button onClick={toggleSelectAll} aria-label="Seleccionar todo" className="flex items-center justify-center">
+                        {allSelected
+                          ? <CheckSquare className="h-3.5 w-3.5 text-[#1e3a8a]" />
+                          : <Square className="h-3.5 w-3.5 text-slate-400" />}
+                      </button>
+                    </th>
+                    <th className="px-3 py-3 w-8" />
+                    {["Título", "Estado", "Prioridad", "Asignados", "Tags", "Vence", "Subtareas", ""].map((h, i) => (
+                      <th key={i} className="px-3 py-3 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 whitespace-nowrap">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {sorted.map(t => {
+                    const overdue = isOverdue(t)
+                    const stat = subtaskStats.get(t.id)
+                    const persona = t.persona_id ? personasMap.get(t.persona_id) : null
+                    const isSelected = selectedIds.has(t.id)
+                    return (
+                      <tr key={t.id}
+                        onClick={() => setSelected(t)}
+                        className={`group border-b border-slate-100 cursor-pointer transition-colors ${
+                          isSelected ? "bg-[#1e3a8a]/[0.04]" : "hover:bg-slate-50"
+                        }`}
+                      >
+                        <td className="px-3 py-3 whitespace-nowrap" onClick={e => e.stopPropagation()}>
+                          <button onClick={() => toggleSelect(t.id)} className="flex items-center justify-center">
+                            {isSelected
+                              ? <CheckSquare className="h-3.5 w-3.5 text-[#1e3a8a]" />
+                              : <Square className="h-3.5 w-3.5 text-slate-300 group-hover:text-slate-500" />}
+                          </button>
+                        </td>
 
-                          <td className="px-3 py-3 whitespace-nowrap" onClick={e => e.stopPropagation()}>
-                            <button
-                              onClick={() => patch(t.id, { status: t.status === "completada" ? "pendiente" : "completada" })}
-                              className={`h-3.5 w-3.5 rounded-full border-2 transition-all ${
-                                t.status === "completada" ? "bg-emerald-400 border-emerald-400" :
-                                t.status === "en_progreso" ? "border-blue-400" :
-                                t.status === "cancelada"   ? "border-zinc-500" :
-                                                              "border-white/30 hover:border-white/60"
-                              }`}
-                            />
-                          </td>
+                        <td className="px-3 py-3 whitespace-nowrap" onClick={e => e.stopPropagation()}>
+                          <button
+                            onClick={() => patch(t.id, { status: t.status === "completada" ? "pendiente" : "completada" })}
+                            className={`h-3.5 w-3.5 rounded-full border-2 transition-all ${
+                              t.status === "completada"  ? "bg-emerald-500 border-emerald-500" :
+                              t.status === "en_progreso" ? "border-[#1e3a8a]" :
+                              t.status === "cancelada"   ? "border-zinc-400" :
+                                                            "border-slate-300 hover:border-slate-500"
+                            }`}
+                          />
+                        </td>
 
-                          <td className="px-3 py-3">
-                            <div className={`text-[13px] font-medium ${t.status === "completada" || t.status === "cancelada" ? "text-slate-400 line-through" : "text-slate-900"}`}>
-                              {t.title}
-                            </div>
-                            {persona && (
-                              <span className="mt-0.5 inline-block rounded-md bg-slate-50 px-1.5 py-0.5 text-[10px] text-slate-400">
-                                ↳ {persona.name}
-                              </span>
-                            )}
-                          </td>
-
-                          <td className="px-3 py-3 whitespace-nowrap">
-                            <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${STATUS_STYLE[t.status]}`}>
-                              {t.status.replace("_", " ")}
+                        <td className="px-3 py-3">
+                          <div className={`text-[13px] font-medium ${
+                            t.status === "completada" || t.status === "cancelada" ? "text-slate-400 line-through" : "text-slate-900"
+                          }`}>
+                            {t.title}
+                          </div>
+                          {persona && (
+                            <span className="mt-0.5 inline-block rounded-md bg-slate-50 px-1.5 py-0.5 text-[10px] text-slate-400">
+                              ↳ {persona.name}
                             </span>
-                          </td>
+                          )}
+                        </td>
 
-                          <td className="px-3 py-3 whitespace-nowrap">
-                            <span className={`flex items-center gap-1 text-[11px] font-bold uppercase tracking-wide ${PRIORITY_STYLE[t.priority].flag}`}>
-                              <Flag className="h-3 w-3" /> {t.priority}
+                        <td className="px-3 py-3 whitespace-nowrap">
+                          <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${STATUS_STYLE[t.status]}`}>
+                            {t.status.replace("_", " ")}
+                          </span>
+                        </td>
+
+                        <td className="px-3 py-3 whitespace-nowrap">
+                          <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${PRIORITY_STYLE[t.priority].pill}`}>
+                            <Flag className="h-2.5 w-2.5" /> {t.priority}
+                          </span>
+                        </td>
+
+                        <td className="px-3 py-3 whitespace-nowrap">
+                          <AvatarStack users={t.assignees} />
+                        </td>
+
+                        <td className="px-3 py-3 whitespace-nowrap max-w-[200px]">
+                          <div className="flex flex-wrap gap-1">
+                            {t.tags.slice(0, 3).map(tag => (
+                              <span key={tag} className="rounded-full border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] text-slate-600">{tag}</span>
+                            ))}
+                            {t.tags.length > 3 && <span className="text-[10px] text-slate-400">+{t.tags.length - 3}</span>}
+                          </div>
+                        </td>
+
+                        <td className="px-3 py-3 whitespace-nowrap">
+                          {t.due_at ? (
+                            <span className={`flex items-center gap-1 text-[11px] ${overdue ? "text-[#E42D2C] font-semibold" : "text-slate-500"}`}>
+                              {overdue ? <AlertCircle className="h-3 w-3" /> : <CalIcon className="h-3 w-3" />}
+                              {fmtDateTime(t.due_at)}
                             </span>
-                          </td>
+                          ) : <span className="text-slate-300 text-[11px]">—</span>}
+                        </td>
 
-                          <td className="px-3 py-3 whitespace-nowrap">
-                            <AvatarStack users={t.assignees} />
-                          </td>
+                        <td className="px-3 py-3 whitespace-nowrap text-[11px] text-slate-500">
+                          {stat ? `${stat.done}/${stat.total}` : "—"}
+                        </td>
 
-                          <td className="px-3 py-3 whitespace-nowrap max-w-[200px]">
-                            <div className="flex flex-wrap gap-1">
-                              {t.tags.slice(0, 3).map(tag => (
-                                <span key={tag} className="rounded-full border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] text-slate-600">{tag}</span>
-                              ))}
-                              {t.tags.length > 3 && <span className="text-[10px] text-slate-400">+{t.tags.length - 3}</span>}
-                            </div>
-                          </td>
-
-                          <td className="px-3 py-3 whitespace-nowrap">
-                            {t.due_at ? (
-                              <span className={`flex items-center gap-1 text-[11px] ${overdue ? "text-red-700" : "text-slate-500"}`}>
-                                {overdue ? <AlertCircle className="h-3 w-3" /> : <CalIcon className="h-3 w-3" />}
-                                {fmtDateTime(t.due_at)}
-                              </span>
-                            ) : <span className="text-slate-300 text-[11px]">—</span>}
-                          </td>
-
-                          <td className="px-3 py-3 whitespace-nowrap text-[11px] text-slate-500">
-                            {stat ? `${stat.done}/${stat.total}` : "—"}
-                          </td>
-
-                          <td className="px-3 py-3 whitespace-nowrap">
-                            <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-slate-600 transition-colors" />
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                        <td className="px-3 py-3 whitespace-nowrap">
+                          <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-[#1e3a8a] transition-colors" />
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
+        ) : (
+          /* CALENDAR VIEW */
+          <CalendarView
+            tasks={sorted.map(t => ({
+              id: t.id, title: t.title, status: t.status, priority: t.priority,
+              due_at: t.due_at, assignees: t.assignees,
+            }))}
+            onTaskClick={id => {
+              const t = tasks.find(x => x.id === id)
+              if (t) setSelected(t)
+            }}
+            onDayClick={iso => {
+              setNewPrefillDate(iso)
+              setShowNewForm(true)
+            }}
+          />
         )}
       </div>
     </>
