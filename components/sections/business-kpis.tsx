@@ -134,7 +134,7 @@ export function BusinessKPIs({ selectedMonth: propMonth }: { selectedMonth?: str
             <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
               <TrendingUp className="h-3.5 w-3.5" />{upCount} up
             </span>
-            <span className="h-3 w-px bg-white/15" />
+            <span className="h-3 w-px bg-slate-200" />
             <span className="flex items-center gap-1.5 text-xs font-semibold text-red-600">
               <TrendingDown className="h-3.5 w-3.5" />{downCount} down
             </span>

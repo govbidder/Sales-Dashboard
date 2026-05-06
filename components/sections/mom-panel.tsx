@@ -163,7 +163,7 @@ export function MoMPanel() {
                 {/* Progress bar showing magnitude */}
                 <div className="w-full h-1 rounded-full bg-slate-100 overflow-hidden">
                   <div
-                    className={`h-full rounded-full ${isUp ? "bg-emerald-400" : isDown ? "bg-red-400" : "bg-white/20"}`}
+                    className={`h-full rounded-full ${isUp ? "bg-emerald-400" : isDown ? "bg-red-400" : "bg-slate-300"}`}
                     style={{ width: `${absPct}%` }}
                   />
                 </div>
