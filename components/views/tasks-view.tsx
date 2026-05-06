@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase"
 import { Portal } from "@/components/ui/portal"
 import { CalendarView } from "@/components/views/tasks/calendar-view"
 import { AiExtractModal } from "@/components/views/tasks/ai-extract-modal"
+import { TemplatesModal } from "@/components/views/tasks/templates-modal"
 import {
   DndContext, DragEndEvent, DragOverlay, DragStartEvent,
   PointerSensor, useDraggable, useDroppable, useSensor, useSensors,
@@ -16,7 +17,7 @@ import {
   LayoutGrid, List, GitBranch, Send, CalendarDays,
   CheckCircle2, Circle, Clock, User, Search, Keyboard,
   ArrowDownUp, ChevronDown, Inbox, CheckSquare, Square,
-  Sparkles,
+  Sparkles, Layers,
 } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -959,6 +960,7 @@ function ShortcutsModal({ onClose }: { onClose: () => void }) {
   const shortcuts: { keys: string[]; label: string }[] = [
     { keys: ["Q"],         label: "Nueva tarea" },
     { keys: ["I"],         label: "Crear tareas desde texto con IA" },
+    { keys: ["T"],         label: "Aplicar template" },
     { keys: ["J"],         label: "Siguiente tarea" },
     { keys: ["K"],         label: "Tarea anterior" },
     { keys: ["Enter"],     label: "Abrir detalle" },
@@ -1066,6 +1068,7 @@ export function TasksView() {
   const [selectedIds,   setSelectedIds]   = useState<Set<string>>(new Set())
   const [showShortcuts, setShowShortcuts] = useState(false)
   const [showAiExtract, setShowAiExtract] = useState(false)
+  const [showTemplates, setShowTemplates] = useState(false)
   const [currentEmail,  setCurrentEmail]  = useState<string>("")
   const [draggingId,    setDraggingId]    = useState<string | null>(null)
   const [overColumn,    setOverColumn]    = useState<Status | null>(null)
@@ -1366,6 +1369,13 @@ export function TasksView() {
         return
       }
 
+      // T Templates
+      if ((e.key === "t" || e.key === "T") && !selected && !showTemplates) {
+        e.preventDefault()
+        setShowTemplates(true)
+        return
+      }
+
       // 1/2/3 view switch
       if (e.key === "1") return setView("board")
       if (e.key === "2") return setView("list")
@@ -1405,7 +1415,7 @@ export function TasksView() {
 
     document.addEventListener("keydown", onKey)
     return () => document.removeEventListener("keydown", onKey)
-  }, [selected, selectedIds, sorted, showNewForm, showShortcuts, showAiExtract, patch, handleDelete])
+  }, [selected, selectedIds, sorted, showNewForm, showShortcuts, showAiExtract, showTemplates, patch, handleDelete])
 
   // ─── Render ──────────────────────────────────────────────────────────────
 
@@ -1440,6 +1450,13 @@ export function TasksView() {
         <AiExtractModal
           onClose={() => setShowAiExtract(false)}
           onApplied={(created) => setTasks(prev => [...created, ...prev])}
+        />
+      )}
+
+      {showTemplates && (
+        <TemplatesModal
+          onClose={() => setShowTemplates(false)}
+          onApplied={(created) => { setTasks(prev => [created, ...prev]); fetchAll() }}
         />
       )}
 
@@ -1492,9 +1509,17 @@ export function TasksView() {
             </div>
 
             <button
+              onClick={() => setShowTemplates(true)}
+              className="hidden sm:flex items-center gap-1.5 h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] font-semibold text-slate-600 hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-all"
+              title="Aplicar template (T)"
+            >
+              <Layers className="h-3.5 w-3.5" />
+              Templates
+            </button>
+            <button
               onClick={() => setShowAiExtract(true)}
               className="hidden sm:flex items-center gap-1.5 h-9 rounded-xl border border-[#1e3a8a]/25 bg-gradient-to-br from-[#E42D2C]/[0.05] to-[#1e3a8a]/[0.05] px-3 text-[12px] font-semibold text-[#1e3a8a] hover:border-[#1e3a8a]/40 hover:from-[#E42D2C]/[0.08] hover:to-[#1e3a8a]/[0.08] transition-all"
-              title="Crear tareas desde texto con IA"
+              title="Crear tareas desde texto con IA (I)"
             >
               <Sparkles className="h-3.5 w-3.5" />
               IA Extract
