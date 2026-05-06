@@ -5,12 +5,18 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { createClient } from "@/lib/supabase"
 import { Portal } from "@/components/ui/portal"
 import { CalendarView } from "@/components/views/tasks/calendar-view"
+import { AiExtractModal } from "@/components/views/tasks/ai-extract-modal"
+import {
+  DndContext, DragEndEvent, DragOverlay, DragStartEvent,
+  PointerSensor, useDraggable, useDroppable, useSensor, useSensors,
+} from "@dnd-kit/core"
 import {
   Loader2, Trash2, RefreshCw, Plus, X, Calendar as CalIcon,
   Flag, ChevronRight, AlertCircle, Tag as TagIcon,
   LayoutGrid, List, GitBranch, Send, CalendarDays,
   CheckCircle2, Circle, Clock, User, Search, Keyboard,
   ArrowDownUp, ChevronDown, Inbox, CheckSquare, Square,
+  Sparkles,
 } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -650,6 +656,44 @@ function NewTaskModal({
   )
 }
 
+// ─── Board Column (droppable wrapper) ────────────────────────────────────────
+
+function BoardColumn({
+  status, label, dot, headerBg, count, isOver, children,
+}: {
+  status:   Status
+  label:    string
+  dot:      string
+  headerBg: string
+  count:    number
+  isOver?:  boolean
+  children: React.ReactNode
+}) {
+  const { setNodeRef } = useDroppable({ id: `col-${status}` })
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`flex flex-col rounded-2xl border bg-slate-50/50 min-h-[200px] transition-all ${
+        isOver ? "border-[#1e3a8a]/40 bg-[#1e3a8a]/[0.04] shadow-[0_0_0_3px_rgba(30,58,138,0.10)]" : "border-slate-200"
+      }`}
+    >
+      <div className={`flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-3 rounded-t-2xl ${headerBg}`}>
+        <div className="flex items-center gap-2">
+          <span className={`h-2 w-2 rounded-full ${dot}`} />
+          <h3 className="text-[12px] font-bold uppercase tracking-widest text-slate-700">{label}</h3>
+        </div>
+        <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold tabular-nums text-slate-600">
+          {count}
+        </span>
+      </div>
+      <div className="flex-1 p-2 space-y-1.5">
+        {children}
+      </div>
+    </div>
+  )
+}
+
 // ─── Quick Add Row (board column inline create) ──────────────────────────────
 
 function QuickAddRow({
@@ -709,7 +753,7 @@ function QuickAddRow({
 
 function TaskCard({
   task, persona, subtaskCount, completedSubs, onClick, onToggleStatus,
-  selected, onToggleSelect, selectionMode,
+  selected, onToggleSelect, selectionMode, draggable = false, ghost = false,
 }: {
   task: Task
   persona: PersonaLite | null
@@ -720,9 +764,20 @@ function TaskCard({
   selected: boolean
   onToggleSelect: (e: React.MouseEvent) => void
   selectionMode: boolean
+  draggable?: boolean
+  ghost?: boolean
 }) {
   const overdue = isOverdue(task)
   const due = fmtDateTime(task.due_at)
+
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: task.id,
+    disabled: !draggable,
+  })
+
+  const dragStyle = transform && draggable
+    ? { transform: `translate(${transform.x}px, ${transform.y}px)` }
+    : undefined
 
   const nextStatus: Status =
     task.status === "pendiente"   ? "en_progreso" :
@@ -732,12 +787,20 @@ function TaskCard({
 
   return (
     <div
+      ref={draggable ? setNodeRef : undefined}
+      style={dragStyle}
+      {...(draggable ? listeners : {})}
+      {...(draggable ? attributes : {})}
       onClick={onClick}
-      className={`group cursor-pointer rounded-xl border bg-white transition-all p-3 space-y-2 ${
-        selected
-          ? "border-[#1e3a8a]/40 shadow-[0_0_0_3px_rgba(30,58,138,0.10)]"
-          : "border-slate-200 hover:border-[#1e3a8a]/20 hover:shadow-[0_4px_14px_rgba(15,23,42,0.06)]"
-      }`}
+      className={`group rounded-xl border bg-white transition-all p-3 space-y-2 ${
+        ghost
+          ? "opacity-50 border-slate-200"
+          : isDragging
+            ? "opacity-30 border-slate-200"
+            : selected
+              ? "cursor-pointer border-[#1e3a8a]/40 shadow-[0_0_0_3px_rgba(30,58,138,0.10)]"
+              : "cursor-pointer border-slate-200 hover:border-[#1e3a8a]/20 hover:shadow-[0_4px_14px_rgba(15,23,42,0.06)]"
+      } ${draggable && !ghost ? "active:cursor-grabbing" : ""}`}
     >
       <div className="flex items-start gap-2">
         {/* Checkbox visible on hover OR if selectionMode active */}
@@ -895,6 +958,7 @@ function BulkBar({
 function ShortcutsModal({ onClose }: { onClose: () => void }) {
   const shortcuts: { keys: string[]; label: string }[] = [
     { keys: ["Q"],         label: "Nueva tarea" },
+    { keys: ["I"],         label: "Crear tareas desde texto con IA" },
     { keys: ["J"],         label: "Siguiente tarea" },
     { keys: ["K"],         label: "Tarea anterior" },
     { keys: ["Enter"],     label: "Abrir detalle" },
@@ -1001,7 +1065,15 @@ export function TasksView() {
   const [quickFilter,   setQuickFilter]   = useState<"all" | "mine" | "overdue" | "this_week" | "unassigned">("all")
   const [selectedIds,   setSelectedIds]   = useState<Set<string>>(new Set())
   const [showShortcuts, setShowShortcuts] = useState(false)
+  const [showAiExtract, setShowAiExtract] = useState(false)
   const [currentEmail,  setCurrentEmail]  = useState<string>("")
+  const [draggingId,    setDraggingId]    = useState<string | null>(null)
+  const [overColumn,    setOverColumn]    = useState<Status | null>(null)
+
+  // dnd-kit sensor with a small drag-activation distance so clicks still work
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
+  )
 
   const router       = useRouter()
   const pathname     = usePathname()
@@ -1287,6 +1359,13 @@ export function TasksView() {
         return
       }
 
+      // I AI Extract from text
+      if ((e.key === "i" || e.key === "I") && !selected && !showAiExtract) {
+        e.preventDefault()
+        setShowAiExtract(true)
+        return
+      }
+
       // 1/2/3 view switch
       if (e.key === "1") return setView("board")
       if (e.key === "2") return setView("list")
@@ -1326,7 +1405,7 @@ export function TasksView() {
 
     document.addEventListener("keydown", onKey)
     return () => document.removeEventListener("keydown", onKey)
-  }, [selected, selectedIds, sorted, showNewForm, showShortcuts, patch, handleDelete])
+  }, [selected, selectedIds, sorted, showNewForm, showShortcuts, showAiExtract, patch, handleDelete])
 
   // ─── Render ──────────────────────────────────────────────────────────────
 
@@ -1356,6 +1435,13 @@ export function TasksView() {
       )}
 
       {showShortcuts && <ShortcutsModal onClose={() => setShowShortcuts(false)} />}
+
+      {showAiExtract && (
+        <AiExtractModal
+          onClose={() => setShowAiExtract(false)}
+          onApplied={(created) => setTasks(prev => [...created, ...prev])}
+        />
+      )}
 
       {selectedIds.size > 0 && (
         <BulkBar
@@ -1405,6 +1491,14 @@ export function TasksView() {
               ))}
             </div>
 
+            <button
+              onClick={() => setShowAiExtract(true)}
+              className="hidden sm:flex items-center gap-1.5 h-9 rounded-xl border border-[#1e3a8a]/25 bg-gradient-to-br from-[#E42D2C]/[0.05] to-[#1e3a8a]/[0.05] px-3 text-[12px] font-semibold text-[#1e3a8a] hover:border-[#1e3a8a]/40 hover:from-[#E42D2C]/[0.08] hover:to-[#1e3a8a]/[0.08] transition-all"
+              title="Crear tareas desde texto con IA"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              IA Extract
+            </button>
             <button
               onClick={() => setShowShortcuts(true)}
               className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-[#1e3a8a] hover:border-[#1e3a8a]/30 transition-all"
@@ -1553,21 +1647,46 @@ export function TasksView() {
             </button>
           </div>
         ) : view === "board" ? (
-          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
-            {STATUS_COLUMNS.map(col => {
-              const list = grouped[col.key]
-              return (
-                <div key={col.key} className="flex flex-col rounded-2xl border border-slate-200 bg-slate-50/50 min-h-[200px]">
-                  <div className={`flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-3 rounded-t-2xl ${col.headerBg}`}>
-                    <div className="flex items-center gap-2">
-                      <span className={`h-2 w-2 rounded-full ${col.dot}`} />
-                      <h3 className="text-[12px] font-bold uppercase tracking-widest text-slate-700">{col.label}</h3>
-                    </div>
-                    <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold tabular-nums text-slate-600">
-                      {list.length}
-                    </span>
-                  </div>
-                  <div className="flex-1 p-2 space-y-1.5">
+          <DndContext
+            sensors={sensors}
+            onDragStart={(e: DragStartEvent) => {
+              setDraggingId(String(e.active.id))
+              setOverColumn(null)
+            }}
+            onDragOver={(e) => {
+              const overId = e.over?.id ? String(e.over.id) : null
+              if (overId?.startsWith("col-")) {
+                setOverColumn(overId.slice(4) as Status)
+              } else {
+                setOverColumn(null)
+              }
+            }}
+            onDragEnd={(e: DragEndEvent) => {
+              const taskId = String(e.active.id)
+              const overId = e.over?.id ? String(e.over.id) : null
+              setDraggingId(null)
+              setOverColumn(null)
+              if (!overId?.startsWith("col-")) return
+              const newStatus = overId.slice(4) as Status
+              const t = tasks.find(x => x.id === taskId)
+              if (t && t.status !== newStatus) {
+                patch(taskId, { status: newStatus })
+              }
+            }}
+          >
+            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
+              {STATUS_COLUMNS.map(col => {
+                const list = grouped[col.key]
+                return (
+                  <BoardColumn
+                    key={col.key}
+                    status={col.key}
+                    label={col.label}
+                    dot={col.dot}
+                    headerBg={col.headerBg}
+                    count={list.length}
+                    isOver={overColumn === col.key}
+                  >
                     {list.map(t => {
                       const stat = subtaskStats.get(t.id)
                       return (
@@ -1577,20 +1696,45 @@ export function TasksView() {
                           persona={t.persona_id ? personasMap.get(t.persona_id) ?? null : null}
                           subtaskCount={stat?.total ?? 0}
                           completedSubs={stat?.done ?? 0}
-                          onClick={() => setSelected(t)}
+                          onClick={() => { if (!draggingId) setSelected(t) }}
                           onToggleStatus={ns => patch(t.id, { status: ns })}
                           selected={selectedIds.has(t.id)}
                           onToggleSelect={(e) => { e.stopPropagation(); toggleSelect(t.id) }}
                           selectionMode={selectedIds.size > 0}
+                          draggable
                         />
                       )
                     })}
                     <QuickAddRow status={col.key} onCreate={quickCreate} />
+                  </BoardColumn>
+                )
+              })}
+            </div>
+
+            {/* Drag overlay — visual feedback while dragging */}
+            <DragOverlay dropAnimation={null}>
+              {draggingId ? (() => {
+                const t = tasks.find(x => x.id === draggingId)
+                if (!t) return null
+                const stat = subtaskStats.get(t.id)
+                return (
+                  <div className="rotate-1 scale-[1.02] shadow-[0_20px_40px_rgba(15,23,42,0.20)]">
+                    <TaskCard
+                      task={t}
+                      persona={t.persona_id ? personasMap.get(t.persona_id) ?? null : null}
+                      subtaskCount={stat?.total ?? 0}
+                      completedSubs={stat?.done ?? 0}
+                      onClick={() => {}}
+                      onToggleStatus={() => {}}
+                      selected={false}
+                      onToggleSelect={() => {}}
+                      selectionMode={false}
+                    />
                   </div>
-                </div>
-              )
-            })}
-          </div>
+                )
+              })() : null}
+            </DragOverlay>
+          </DndContext>
         ) : view === "list" ? (
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
             <div className="overflow-x-auto">
