@@ -22,11 +22,29 @@ import {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-const STATUS_OPTIONS    = ["pendiente", "en_progreso", "completada", "cancelada"] as const
 const PRIORITY_OPTIONS  = ["baja", "media", "alta", "urgente"] as const
 
-type Status   = typeof STATUS_OPTIONS[number]
+// Status is now dynamic — driven by the active TaskStatusSet from the API.
+// We keep these as a fallback when the migration hasn't been applied yet.
+const FALLBACK_STATUSES = ["pendiente", "en_progreso", "completada", "cancelada"] as const
+
+type Status   = string
 type Priority = typeof PRIORITY_OPTIONS[number]
+
+interface StatusDef {
+  key:      string
+  label:    string
+  color:    string
+  terminal: boolean
+}
+
+interface StatusSet {
+  id:          string
+  name:        string
+  description: string | null
+  is_default:  boolean
+  statuses:    StatusDef[]
+}
 type ViewMode = "board" | "list" | "calendar"
 type GroupBy  = "status" | "assignee" | "priority" | "tag" | "none"
 type SortBy   = "due_at" | "priority" | "created_at" | "title"
@@ -84,14 +102,20 @@ function toLocalInputValue(iso: string | null) {
   const off = d.getTimezoneOffset() * 60_000
   return new Date(d.getTime() - off).toISOString().slice(0, 16)
 }
-function isOverdue(t: Task) {
+// Default terminal-status keys for fallback (when activeSet is the local default).
+// The actual terminal logic uses the active set's `terminal: true` flag.
+const FALLBACK_TERMINAL = new Set(["completada", "cancelada"])
+function isTerminal(status: string, terminalKeys: Set<string> = FALLBACK_TERMINAL) {
+  return terminalKeys.has(status)
+}
+function isOverdue(t: Task, terminalKeys: Set<string> = FALLBACK_TERMINAL) {
   if (!t.due_at) return false
-  if (t.status === "completada" || t.status === "cancelada") return false
+  if (isTerminal(t.status, terminalKeys)) return false
   return new Date(t.due_at).getTime() < Date.now()
 }
-function isDueThisWeek(t: Task) {
+function isDueThisWeek(t: Task, terminalKeys: Set<string> = FALLBACK_TERMINAL) {
   if (!t.due_at) return false
-  if (t.status === "completada" || t.status === "cancelada") return false
+  if (isTerminal(t.status, terminalKeys)) return false
   const d = new Date(t.due_at).getTime()
   const now = Date.now()
   const in7 = now + 7 * 24 * 3600_000
@@ -101,12 +125,19 @@ function initials(s: string) {
   return s.split(/[\s@]/).map(p => p[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()
 }
 
-const STATUS_COLUMNS: { key: Status; label: string; dot: string; headerBg: string }[] = [
-  { key: "pendiente",   label: "Pendiente",   dot: "bg-slate-400",   headerBg: "bg-slate-100" },
-  { key: "en_progreso", label: "En progreso", dot: "bg-[#1e3a8a]",   headerBg: "bg-[#1e3a8a]/[0.06]" },
-  { key: "completada",  label: "Completadas", dot: "bg-emerald-500", headerBg: "bg-emerald-500/[0.06]" },
-  { key: "cancelada",   label: "Canceladas",  dot: "bg-zinc-400",    headerBg: "bg-zinc-500/[0.04]" },
-]
+// Default fallback set used until the API responds (avoids flash of empty board)
+const DEFAULT_STATUS_SET: StatusSet = {
+  id:          "_default_local",
+  name:        "Default",
+  description: null,
+  is_default:  true,
+  statuses: [
+    { key: "pendiente",   label: "Pendiente",   color: "#94a3b8", terminal: false },
+    { key: "en_progreso", label: "En progreso", color: "#1e3a8a", terminal: false },
+    { key: "completada",  label: "Completada",  color: "#10b981", terminal: true  },
+    { key: "cancelada",   label: "Cancelada",   color: "#71717a", terminal: true  },
+  ],
+}
 
 const PRIORITY_STYLE: Record<Priority, { flag: string; pill: string; weight: number }> = {
   baja:    { flag: "text-zinc-500",   pill: "text-zinc-700  border-zinc-300  bg-zinc-50",   weight: 1 },
@@ -115,11 +146,13 @@ const PRIORITY_STYLE: Record<Priority, { flag: string; pill: string; weight: num
   urgente: { flag: "text-[#E42D2C]",  pill: "text-[#E42D2C] border-red-300   bg-red-50",   weight: 4 },
 }
 
-const STATUS_STYLE: Record<Status, string> = {
-  pendiente:   "text-slate-700   border-slate-300       bg-slate-50",
-  en_progreso: "text-[#1e3a8a]   border-[#1e3a8a]/30    bg-[#1e3a8a]/[0.06]",
-  completada:  "text-emerald-700 border-emerald-300     bg-emerald-50",
-  cancelada:   "text-zinc-600    border-zinc-300        bg-zinc-50",
+// Inline style helper — turns a hex color into pill bg/text/border styles.
+function statusInlineStyle(color: string): React.CSSProperties {
+  return {
+    backgroundColor: color + "10",
+    borderColor:     color + "40",
+    color:           color,
+  }
 }
 
 // ─── Reusable input class ─────────────────────────────────────────────────────
@@ -342,7 +375,7 @@ function CommentsSection({ taskId }: { taskId: string }) {
 // ─── Detail Drawer ────────────────────────────────────────────────────────────
 
 function DetailDrawer({
-  task, allTasks, personas, onClose, onPatch, onDelete, deleting, onCreateSubtask,
+  task, allTasks, personas, onClose, onPatch, onDelete, deleting, onCreateSubtask, statuses,
 }: {
   task:            Task
   allTasks:        Task[]
@@ -352,6 +385,7 @@ function DetailDrawer({
   onDelete:        (id: string) => void
   deleting:        boolean
   onCreateSubtask: (parentId: string, title: string) => Promise<void>
+  statuses:        StatusDef[]
 }) {
   const subtasks = allTasks.filter(t => t.parent_id === task.id)
   const [newSub, setNewSub] = useState("")
@@ -430,10 +464,10 @@ function DetailDrawer({
                   <select
                     value={task.status}
                     onChange={e => onPatch(task.id, { status: e.target.value as Status })}
-                    className={inputCls + " capitalize"}
+                    className={inputCls}
                   >
-                    {STATUS_OPTIONS.map(s => (
-                      <option key={s} value={s} className="capitalize">{s.replace("_", " ")}</option>
+                    {statuses.map(s => (
+                      <option key={s.key} value={s.key}>{s.label}</option>
                     ))}
                   </select>
                 </div>
@@ -660,12 +694,11 @@ function NewTaskModal({
 // ─── Board Column (droppable wrapper) ────────────────────────────────────────
 
 function BoardColumn({
-  status, label, dot, headerBg, count, isOver, children,
+  status, label, color, count, isOver, children,
 }: {
   status:   Status
   label:    string
-  dot:      string
-  headerBg: string
+  color:    string         // hex color for the column accent
   count:    number
   isOver?:  boolean
   children: React.ReactNode
@@ -679,9 +712,12 @@ function BoardColumn({
         isOver ? "border-[#1e3a8a]/40 bg-[#1e3a8a]/[0.04] shadow-[0_0_0_3px_rgba(30,58,138,0.10)]" : "border-slate-200"
       }`}
     >
-      <div className={`flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-3 rounded-t-2xl ${headerBg}`}>
+      <div
+        className="flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-3 rounded-t-2xl"
+        style={{ backgroundColor: color + "10" }}
+      >
         <div className="flex items-center gap-2">
-          <span className={`h-2 w-2 rounded-full ${dot}`} />
+          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
           <h3 className="text-[12px] font-bold uppercase tracking-widest text-slate-700">{label}</h3>
         </div>
         <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold tabular-nums text-slate-600">
@@ -755,18 +791,20 @@ function QuickAddRow({
 function TaskCard({
   task, persona, subtaskCount, completedSubs, onClick, onToggleStatus,
   selected, onToggleSelect, selectionMode, draggable = false, ghost = false,
+  isTerminal = false,
 }: {
   task: Task
   persona: PersonaLite | null
   subtaskCount: number
   completedSubs: number
   onClick: () => void
-  onToggleStatus: (next: Status) => void
+  onToggleStatus: () => void   // parent computes next status using active set
   selected: boolean
   onToggleSelect: (e: React.MouseEvent) => void
   selectionMode: boolean
   draggable?: boolean
   ghost?: boolean
+  isTerminal?: boolean
 }) {
   const overdue = isOverdue(task)
   const due = fmtDateTime(task.due_at)
@@ -779,12 +817,6 @@ function TaskCard({
   const dragStyle = transform && draggable
     ? { transform: `translate(${transform.x}px, ${transform.y}px)` }
     : undefined
-
-  const nextStatus: Status =
-    task.status === "pendiente"   ? "en_progreso" :
-    task.status === "en_progreso" ? "completada"  :
-    task.status === "completada"  ? "pendiente"   :
-                                    "pendiente"
 
   return (
     <div
@@ -818,16 +850,15 @@ function TaskCard({
         </button>
 
         <button
-          onClick={e => { e.stopPropagation(); onToggleStatus(nextStatus) }}
+          onClick={e => { e.stopPropagation(); onToggleStatus() }}
           className={`shrink-0 mt-1 h-3 w-3 rounded-full border-2 transition-all ${
-            task.status === "completada"  ? "bg-emerald-500 border-emerald-500" :
-            task.status === "en_progreso" ? "border-[#1e3a8a]" :
-            task.status === "cancelada"   ? "border-zinc-400" :
-                                            "border-slate-300 hover:border-slate-500"
+            isTerminal
+              ? "bg-emerald-500 border-emerald-500"
+              : "border-slate-300 hover:border-slate-500"
           }`}
         />
         <p className={`flex-1 text-[13px] font-medium leading-snug ${
-          task.status === "completada" || task.status === "cancelada" ? "text-slate-400 line-through" : "text-slate-900"
+          isTerminal ? "text-slate-400 line-through" : "text-slate-900"
         }`}>
           {task.title}
         </p>
@@ -877,13 +908,14 @@ function TaskCard({
 // ─── Multi-select bottom bar ─────────────────────────────────────────────────
 
 function BulkBar({
-  count, onClear, onSetStatus, onDelete, onSetPriority,
+  count, onClear, onSetStatus, onDelete, onSetPriority, statuses,
 }: {
   count:         number
   onClear:       () => void
   onSetStatus:   (s: Status) => void
   onSetPriority: (p: Priority) => void
   onDelete:      () => void
+  statuses:      StatusDef[]
 }) {
   return (
     <Portal>
@@ -901,14 +933,15 @@ function BulkBar({
             <button className="flex items-center gap-1.5 h-8 rounded-lg border border-slate-200 bg-white px-2.5 text-[12px] font-medium text-slate-700 hover:border-[#1e3a8a]/30 transition-colors">
               <Circle className="h-3 w-3" /> Estado <ChevronDown className="h-3 w-3" />
             </button>
-            <div className="absolute bottom-full mb-1 left-0 hidden group-hover:block min-w-[160px] rounded-lg border border-slate-200 bg-white shadow-lg overflow-hidden">
-              {STATUS_OPTIONS.map(s => (
+            <div className="absolute bottom-full mb-1 left-0 hidden group-hover:block min-w-[180px] rounded-lg border border-slate-200 bg-white shadow-lg overflow-hidden">
+              {statuses.map(s => (
                 <button
-                  key={s}
-                  onClick={() => onSetStatus(s)}
-                  className="block w-full text-left px-3 py-2 text-[12px] text-slate-700 capitalize hover:bg-slate-50"
+                  key={s.key}
+                  onClick={() => onSetStatus(s.key)}
+                  className="flex w-full items-center gap-2 text-left px-3 py-2 text-[12px] text-slate-700 hover:bg-slate-50"
                 >
-                  {s.replace("_", " ")}
+                  <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: s.color }} />
+                  {s.label}
                 </button>
               ))}
             </div>
@@ -1072,6 +1105,8 @@ export function TasksView() {
   const [currentEmail,  setCurrentEmail]  = useState<string>("")
   const [draggingId,    setDraggingId]    = useState<string | null>(null)
   const [overColumn,    setOverColumn]    = useState<Status | null>(null)
+  const [statusSets,    setStatusSets]    = useState<StatusSet[]>([DEFAULT_STATUS_SET])
+  const [activeSetId,   setActiveSetId]   = useState<string>("_default_local")
 
   // dnd-kit sensor with a small drag-activation distance so clicks still work
   const sensors = useSensors(
@@ -1104,17 +1139,51 @@ export function TasksView() {
       if (!session) return
       setCurrentEmail(session.user?.email ?? "")
       const headers = { Authorization: `Bearer ${session.access_token}` }
-      const [tRes, pRes] = await Promise.all([
+      const [tRes, pRes, sRes] = await Promise.all([
         fetch("/api/admin/tasks?include_subtasks=true", { headers }),
         fetch("/api/admin/personas",                     { headers }),
+        fetch("/api/admin/task-status-sets",             { headers }),
       ])
       if (tRes.ok) setTasks((await tRes.json()).tasks ?? [])
       if (pRes.ok) {
         const j = await pRes.json()
         setPersonas((j.personas ?? []).map((p: any) => ({ id: p.id, name: p.name })))
       }
+      if (sRes.ok) {
+        const j = await sRes.json()
+        const sets = (j.sets ?? []) as StatusSet[]
+        if (sets.length) {
+          setStatusSets(sets)
+          // Resolve active set: localStorage > default > first
+          const stored = typeof window !== "undefined" ? window.localStorage.getItem("tasksActiveSetId") : null
+          const found  = stored && sets.find(s => s.id === stored)
+          const def    = sets.find(s => s.is_default) ?? sets[0]
+          setActiveSetId((found ? found.id : def?.id) ?? "_default_local")
+        }
+      }
     } finally { setLoading(false) }
   }, [])
+
+  // Derived active set + columns
+  const activeSet  = useMemo(() => {
+    return statusSets.find(s => s.id === activeSetId) ?? statusSets[0] ?? DEFAULT_STATUS_SET
+  }, [statusSets, activeSetId])
+
+  // Set of "terminal" status keys (completed/cancelled/lost/awarded etc) — used to
+  // exclude finished tasks from overdue + due-this-week filters.
+  const terminalKeys = useMemo(() => {
+    const k = new Set(activeSet.statuses.filter(s => s.terminal).map(s => s.key))
+    // Always include the legacy hardcoded terminals so a mix of old + new tasks behaves correctly
+    k.add("completada"); k.add("cancelada")
+    return k
+  }, [activeSet])
+
+  const handleSetChange = (id: string) => {
+    setActiveSetId(id)
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("tasksActiveSetId", id)
+    }
+  }
 
   useEffect(() => { fetchAll() }, [fetchAll])
 
@@ -1232,18 +1301,18 @@ export function TasksView() {
   const counts = useMemo(() => ({
     all:        topLevel.length,
     mine:       topLevel.filter(t => currentEmail && t.assignees?.includes(currentEmail)).length,
-    overdue:    topLevel.filter(isOverdue).length,
-    this_week:  topLevel.filter(isDueThisWeek).length,
+    overdue:    topLevel.filter(t => isOverdue(t, terminalKeys)).length,
+    this_week:  topLevel.filter(t => isDueThisWeek(t, terminalKeys)).length,
     unassigned: topLevel.filter(t => !t.assignees?.length).length,
-  }), [topLevel, currentEmail])
+  }), [topLevel, currentEmail, terminalKeys])
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     return topLevel.filter(t => {
       // Quick filter
       if (quickFilter === "mine" && (!currentEmail || !t.assignees?.includes(currentEmail))) return false
-      if (quickFilter === "overdue" && !isOverdue(t)) return false
-      if (quickFilter === "this_week" && !isDueThisWeek(t)) return false
+      if (quickFilter === "overdue" && !isOverdue(t, terminalKeys)) return false
+      if (quickFilter === "this_week" && !isDueThisWeek(t, terminalKeys)) return false
       if (quickFilter === "unassigned" && t.assignees?.length) return false
 
       // Dropdown filters
@@ -1256,7 +1325,7 @@ export function TasksView() {
       return [t.title, t.description, ...(t.assignees ?? []), ...(t.tags ?? [])]
         .some(v => v?.toLowerCase().includes(q))
     })
-  }, [topLevel, search, filterAssignee, filterTag, filterPriority, quickFilter, currentEmail])
+  }, [topLevel, search, filterAssignee, filterTag, filterPriority, quickFilter, currentEmail, terminalKeys])
 
   // Sort
   const sorted = useMemo(() => {
@@ -1300,10 +1369,41 @@ export function TasksView() {
   }, [tasks])
 
   const grouped = useMemo(() => {
-    const g: Record<Status, Task[]> = { pendiente: [], en_progreso: [], completada: [], cancelada: [] }
-    sorted.forEach(t => g[t.status].push(t))
+    const g: Record<string, Task[]> = {}
+    activeSet.statuses.forEach(s => { g[s.key] = [] })
+    // "Otros" bucket: tasks whose status doesn't match any column in the active set
+    g["__other"] = []
+    sorted.forEach(t => {
+      if (g[t.status]) g[t.status].push(t)
+      else g["__other"].push(t)
+    })
     return g
-  }, [sorted])
+  }, [sorted, activeSet])
+
+  // Cycle a task to the "next" status using the active set.
+  // Logic: if currently in a non-terminal status, move to the next non-terminal
+  // (or to the first terminal if it's the last non-terminal). If currently terminal,
+  // go back to the first non-terminal.
+  const cycleStatus = useCallback((task: Task) => {
+    const all = activeSet.statuses
+    if (!all.length) return
+    const nonTerminals = all.filter(s => !s.terminal)
+    const terminals    = all.filter(s => s.terminal)
+    const idx = all.findIndex(s => s.key === task.status)
+    let next: string
+    if (idx === -1) {
+      next = nonTerminals[0]?.key ?? all[0].key
+    } else {
+      const cur = all[idx]
+      if (cur.terminal) {
+        next = nonTerminals[0]?.key ?? all[0].key
+      } else {
+        // first terminal status if available, else next non-terminal, else loop
+        next = terminals[0]?.key ?? nonTerminals[(idx + 1) % nonTerminals.length]?.key ?? all[0].key
+      }
+    }
+    if (next !== task.status) patch(task.id, { status: next })
+  }, [activeSet, patch])
 
   // ─── Selection helpers ────────────────────────────────────────────────────
   const toggleSelect = (id: string) => {
@@ -1390,7 +1490,7 @@ export function TasksView() {
         }
         if (e.key === "x" || e.key === "X") {
           e.preventDefault()
-          patch(selected.id, { status: selected.status === "completada" ? "pendiente" : "completada" })
+          cycleStatus(selected)
           return
         }
       }
@@ -1415,7 +1515,7 @@ export function TasksView() {
 
     document.addEventListener("keydown", onKey)
     return () => document.removeEventListener("keydown", onKey)
-  }, [selected, selectedIds, sorted, showNewForm, showShortcuts, showAiExtract, showTemplates, patch, handleDelete])
+  }, [selected, selectedIds, sorted, showNewForm, showShortcuts, showAiExtract, showTemplates, patch, handleDelete, cycleStatus])
 
   // ─── Render ──────────────────────────────────────────────────────────────
 
@@ -1441,6 +1541,7 @@ export function TasksView() {
           onDelete={handleDelete}
           deleting={deletingId === selected.id}
           onCreateSubtask={createSubtask}
+          statuses={activeSet.statuses}
         />
       )}
 
@@ -1467,6 +1568,7 @@ export function TasksView() {
           onSetStatus={s => bulkPatch({ status: s })}
           onSetPriority={p => bulkPatch({ priority: p })}
           onDelete={bulkDelete}
+          statuses={activeSet.statuses}
         />
       )}
 
@@ -1507,6 +1609,22 @@ export function TasksView() {
                 </button>
               ))}
             </div>
+
+            {/* Status set picker (only when more than one set is available) */}
+            {statusSets.length > 1 && (
+              <select
+                value={activeSetId}
+                onChange={e => handleSetChange(e.target.value)}
+                className="hidden lg:block h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] font-semibold text-slate-700 outline-none cursor-pointer hover:border-[#1e3a8a]/30 transition-colors"
+                title="Cambiar workflow de estados"
+              >
+                {statusSets.map(s => (
+                  <option key={s.id} value={s.id}>
+                    {s.is_default ? "★ " : ""}{s.name}
+                  </option>
+                ))}
+              </select>
+            )}
 
             <button
               onClick={() => setShowTemplates(true)}
@@ -1699,16 +1817,21 @@ export function TasksView() {
               }
             }}
           >
-            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
-              {STATUS_COLUMNS.map(col => {
-                const list = grouped[col.key]
+            <div
+              className={`grid gap-4 ${
+                activeSet.statuses.length <= 3 ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" :
+                activeSet.statuses.length === 4 ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-4" :
+                "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6"
+              }`}
+            >
+              {activeSet.statuses.map(col => {
+                const list = grouped[col.key] ?? []
                 return (
                   <BoardColumn
                     key={col.key}
                     status={col.key}
                     label={col.label}
-                    dot={col.dot}
-                    headerBg={col.headerBg}
+                    color={col.color}
                     count={list.length}
                     isOver={overColumn === col.key}
                   >
@@ -1722,11 +1845,12 @@ export function TasksView() {
                           subtaskCount={stat?.total ?? 0}
                           completedSubs={stat?.done ?? 0}
                           onClick={() => { if (!draggingId) setSelected(t) }}
-                          onToggleStatus={ns => patch(t.id, { status: ns })}
+                          onToggleStatus={() => cycleStatus(t)}
                           selected={selectedIds.has(t.id)}
                           onToggleSelect={(e) => { e.stopPropagation(); toggleSelect(t.id) }}
                           selectionMode={selectedIds.size > 0}
                           draggable
+                          isTerminal={terminalKeys.has(t.status)}
                         />
                       )
                     })}
@@ -1734,6 +1858,36 @@ export function TasksView() {
                   </BoardColumn>
                 )
               })}
+
+              {/* "Otros" bucket: tasks whose status doesn't match any column in active set */}
+              {grouped["__other"]?.length > 0 && (
+                <BoardColumn
+                  key="__other"
+                  status="__other"
+                  label="Otros"
+                  color="#94a3b8"
+                  count={grouped["__other"].length}
+                >
+                  {grouped["__other"].map(t => {
+                    const stat = subtaskStats.get(t.id)
+                    return (
+                      <TaskCard
+                        key={t.id}
+                        task={t}
+                        persona={t.persona_id ? personasMap.get(t.persona_id) ?? null : null}
+                        subtaskCount={stat?.total ?? 0}
+                        completedSubs={stat?.done ?? 0}
+                        onClick={() => { if (!draggingId) setSelected(t) }}
+                        onToggleStatus={() => cycleStatus(t)}
+                        selected={selectedIds.has(t.id)}
+                        onToggleSelect={(e) => { e.stopPropagation(); toggleSelect(t.id) }}
+                        selectionMode={selectedIds.size > 0}
+                        isTerminal={terminalKeys.has(t.status)}
+                      />
+                    )
+                  })}
+                </BoardColumn>
+              )}
             </div>
 
             {/* Drag overlay — visual feedback while dragging */}
@@ -1781,7 +1935,7 @@ export function TasksView() {
                 </thead>
                 <tbody>
                   {sorted.map(t => {
-                    const overdue = isOverdue(t)
+                    const overdue = isOverdue(t, terminalKeys)
                     const stat = subtaskStats.get(t.id)
                     const persona = t.persona_id ? personasMap.get(t.persona_id) : null
                     const isSelected = selectedIds.has(t.id)
@@ -1802,19 +1956,18 @@ export function TasksView() {
 
                         <td className="px-3 py-3 whitespace-nowrap" onClick={e => e.stopPropagation()}>
                           <button
-                            onClick={() => patch(t.id, { status: t.status === "completada" ? "pendiente" : "completada" })}
+                            onClick={() => cycleStatus(t)}
                             className={`h-3.5 w-3.5 rounded-full border-2 transition-all ${
-                              t.status === "completada"  ? "bg-emerald-500 border-emerald-500" :
-                              t.status === "en_progreso" ? "border-[#1e3a8a]" :
-                              t.status === "cancelada"   ? "border-zinc-400" :
-                                                            "border-slate-300 hover:border-slate-500"
+                              terminalKeys.has(t.status)
+                                ? "bg-emerald-500 border-emerald-500"
+                                : "border-slate-300 hover:border-slate-500"
                             }`}
                           />
                         </td>
 
                         <td className="px-3 py-3">
                           <div className={`text-[13px] font-medium ${
-                            t.status === "completada" || t.status === "cancelada" ? "text-slate-400 line-through" : "text-slate-900"
+                            terminalKeys.has(t.status) ? "text-slate-400 line-through" : "text-slate-900"
                           }`}>
                             {t.title}
                           </div>
@@ -1826,9 +1979,19 @@ export function TasksView() {
                         </td>
 
                         <td className="px-3 py-3 whitespace-nowrap">
-                          <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${STATUS_STYLE[t.status]}`}>
-                            {t.status.replace("_", " ")}
-                          </span>
+                          {(() => {
+                            const def = activeSet.statuses.find(s => s.key === t.status)
+                            const color = def?.color ?? "#94a3b8"
+                            const label = def?.label ?? t.status.replace("_", " ")
+                            return (
+                              <span
+                                className="rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide"
+                                style={statusInlineStyle(color)}
+                              >
+                                {label}
+                              </span>
+                            )
+                          })()}
                         </td>
 
                         <td className="px-3 py-3 whitespace-nowrap">

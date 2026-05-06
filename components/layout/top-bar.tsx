@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
 import { ChevronDown, LogOut, Menu, Search, Command } from "lucide-react"
 import { MonthSelector } from "@/components/layout/month-selector"
+import { NotificationsBell } from "@/components/layout/notifications-bell"
 
 interface TopBarProps {
   pageTitle:        string
@@ -119,6 +120,9 @@ export function TopBar({
             enabledMonths={[]}
           />
         </div>
+
+        {/* Notifications bell */}
+        <NotificationsBell />
 
         {/* Profile */}
         <div className="relative" ref={profileRef}>
