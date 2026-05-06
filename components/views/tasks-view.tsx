@@ -1890,29 +1890,34 @@ export function TasksView() {
               )}
             </div>
 
-            {/* Drag overlay — visual feedback while dragging */}
-            <DragOverlay dropAnimation={null}>
-              {draggingId ? (() => {
-                const t = tasks.find(x => x.id === draggingId)
-                if (!t) return null
-                const stat = subtaskStats.get(t.id)
-                return (
-                  <div className="rotate-1 scale-[1.02] shadow-[0_20px_40px_rgba(15,23,42,0.20)]">
-                    <TaskCard
-                      task={t}
-                      persona={t.persona_id ? personasMap.get(t.persona_id) ?? null : null}
-                      subtaskCount={stat?.total ?? 0}
-                      completedSubs={stat?.done ?? 0}
-                      onClick={() => {}}
-                      onToggleStatus={() => {}}
-                      selected={false}
-                      onToggleSelect={() => {}}
-                      selectionMode={false}
-                    />
-                  </div>
-                )
-              })() : null}
-            </DragOverlay>
+            {/* Drag overlay — visual feedback while dragging.
+                Portaled to document.body to escape the .page-enter transform
+                that would otherwise create a containing block and offset the
+                overlay from the cursor. */}
+            <Portal>
+              <DragOverlay dropAnimation={null}>
+                {draggingId ? (() => {
+                  const t = tasks.find(x => x.id === draggingId)
+                  if (!t) return null
+                  const stat = subtaskStats.get(t.id)
+                  return (
+                    <div className="rotate-1 scale-[1.02] shadow-[0_20px_40px_rgba(15,23,42,0.20)]">
+                      <TaskCard
+                        task={t}
+                        persona={t.persona_id ? personasMap.get(t.persona_id) ?? null : null}
+                        subtaskCount={stat?.total ?? 0}
+                        completedSubs={stat?.done ?? 0}
+                        onClick={() => {}}
+                        onToggleStatus={() => {}}
+                        selected={false}
+                        onToggleSelect={() => {}}
+                        selectionMode={false}
+                      />
+                    </div>
+                  )
+                })() : null}
+              </DragOverlay>
+            </Portal>
           </DndContext>
         ) : view === "list" ? (
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
