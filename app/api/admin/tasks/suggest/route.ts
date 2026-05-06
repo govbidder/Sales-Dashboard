@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
 import { createClient } from "@/lib/supabase"
 
+// Edge runtime: latencia más baja, ideal para llamadas cortas a la IA
+// (este endpoint solo recibe título+descripción y devuelve JSON).
+export const runtime = "edge"
+
 async function getUser(req: NextRequest) {
   const token = req.headers.get("authorization")?.replace("Bearer ", "")
   if (!token) return null

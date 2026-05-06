@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
-import { ChevronDown, LogOut, Menu, Search, Command } from "lucide-react"
+import { ChevronDown, LogOut, Menu, Search, Command, Sun, Moon, Monitor } from "lucide-react"
 import { MonthSelector } from "@/components/layout/month-selector"
 import { NotificationsBell } from "@/components/layout/notifications-bell"
+import { useTheme } from "@/components/ui/theme-provider"
 
 interface TopBarProps {
   pageTitle:        string
@@ -40,6 +41,7 @@ export function TopBar({
   const pathname = usePathname()
   const [profileOpen, setProfileOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement | null>(null)
+  const { theme, setTheme } = useTheme()
 
   const [isMac, setIsMac] = useState(true)
   useEffect(() => {
@@ -74,7 +76,7 @@ export function TopBar({
   const crumb = CRUMB_GROUPS[pathname] ?? null
 
   return (
-    <header className="sticky top-0 z-10 border-b-2 border-[#1e3a8a]/10 bg-white/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-10 border-b-2 border-[#1e3a8a]/10 dark:border-[#1e3a8a]/30 bg-white/85 dark:bg-[#080d1e]/85 backdrop-blur-xl">
       <div className="flex h-16 items-center gap-3 px-4 lg:px-6">
 
         {/* Mobile sidebar trigger */}
@@ -158,6 +160,31 @@ export function TopBar({
                   </span>
                 )}
               </div>
+              {/* Theme toggle */}
+              <div className="px-4 py-2.5 border-b border-slate-100">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Tema</p>
+                <div className="flex items-center gap-1 rounded-lg bg-slate-100 p-0.5">
+                  {[
+                    { k: "light"  as const, label: "Claro",   Icon: Sun     },
+                    { k: "dark"   as const, label: "Oscuro",  Icon: Moon    },
+                    { k: "system" as const, label: "Sistema", Icon: Monitor },
+                  ].map(o => (
+                    <button
+                      key={o.k}
+                      onClick={() => setTheme(o.k)}
+                      className={`flex flex-1 items-center justify-center gap-1 h-7 rounded-md text-[10.5px] font-bold transition-all ${
+                        theme === o.k
+                          ? "bg-white text-[#1e3a8a] shadow-sm"
+                          : "text-slate-500 hover:text-slate-900"
+                      }`}
+                    >
+                      <o.Icon className="h-3 w-3" />
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <button
                 type="button"
                 role="menuitem"

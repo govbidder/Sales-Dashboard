@@ -1,6 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Raleway } from "next/font/google"
+import { ThemeProvider } from "@/components/ui/theme-provider"
 import "./globals.css"
 
 const raleway = Raleway({
@@ -38,9 +39,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={raleway.variable}>
-      <body className="font-sans antialiased">
-        {children}
+    <html lang="en" className={raleway.variable} suppressHydrationWarning>
+      <body className="font-sans antialiased bg-background text-foreground">
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )

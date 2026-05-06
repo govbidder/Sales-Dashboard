@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useState, useCallback, useMemo } from "react"
+import { useEffect, useState, useCallback, useMemo, useRef } from "react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase"
+import { useVirtualizer } from "@tanstack/react-virtual"
 import {
   Activity, Loader2, RefreshCw, ListTodo, MessageSquare, CheckCircle2,
   Plus, Users2, ArrowRight, Filter, AlertCircle,
@@ -102,6 +103,30 @@ export function ActivityView() {
     return Array.from(m.entries())
   }, [filtered])
 
+  // Decide if we need virtualization (only kicks in for > 100 items)
+  const useVirtualization = filtered.length > 100
+
+  // Flatten groups into a single list with type tags for the virtualized renderer.
+  type Row = { type: "header"; dayKey: string; count: number } | { type: "item"; item: ActivityItem }
+  const flatRows = useMemo<Row[]>(() => {
+    if (!useVirtualization) return []
+    const rows: Row[] = []
+    for (const [dayKey, list] of groups) {
+      rows.push({ type: "header", dayKey, count: list.length })
+      for (const item of list) rows.push({ type: "item", item })
+    }
+    return rows
+  }, [groups, useVirtualization])
+
+  // Virtualizer
+  const parentRef = useRef<HTMLDivElement | null>(null)
+  const virtualizer = useVirtualizer({
+    count: flatRows.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: (i) => flatRows[i]?.type === "header" ? 56 : 84,
+    overscan: 8,
+  })
+
   return (
     <div className="space-y-6">
 
@@ -153,6 +178,77 @@ export function ActivityView() {
           </div>
           <p className="text-[15px] font-semibold text-slate-700">Sin actividad</p>
           <p className="text-[13px] text-slate-400 mt-1">No hay eventos en los últimos 30 días.</p>
+        </div>
+      ) : useVirtualization ? (
+        // ─── Virtualized rendering (>100 items) ───────────────────────
+        <div
+          ref={parentRef}
+          className="overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
+          style={{ height: "calc(100vh - 320px)", minHeight: 400 }}
+        >
+          <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
+            {virtualizer.getVirtualItems().map(vi => {
+              const row = flatRows[vi.index]
+              if (!row) return null
+              const style = {
+                position: "absolute" as const,
+                top:      0,
+                left:     0,
+                right:    0,
+                transform: `translateY(${vi.start}px)`,
+                height:   `${vi.size}px`,
+              }
+              if (row.type === "header") {
+                return (
+                  <div key={`h-${row.dayKey}`} style={style} className="flex items-center gap-3 px-5 pt-4 pb-2 bg-white border-b border-slate-100">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1e3a8a]/70 capitalize">
+                      {fmtDayHeader(row.dayKey)}
+                    </p>
+                    <div className="flex-1 h-px bg-slate-200" />
+                    <span className="text-[10.5px] text-slate-400 tabular-nums">{row.count}</span>
+                  </div>
+                )
+              }
+              const item = row.item
+              const meta = KIND_META[item.kind] ?? KIND_META.task_updated
+              const Icon = meta.icon
+              return (
+                <Link
+                  key={item.id}
+                  href={item.href ?? "#"}
+                  style={style}
+                  className="group flex items-start gap-3 px-5 py-3.5 border-b border-slate-100 hover:bg-slate-50 transition-colors"
+                >
+                  <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ring-1 ring-slate-200 ${meta.bg}`}>
+                    <Icon className={`h-3.5 w-3.5 ${meta.color}`} />
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-[12.5px] font-bold text-slate-900">{item.title}</p>
+                      <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${meta.bg} ${meta.color}`}>
+                        {meta.label}
+                      </span>
+                    </div>
+                    {item.body && (
+                      <p className="text-[12px] text-slate-600 mt-0.5 line-clamp-2 leading-snug">{item.body}</p>
+                    )}
+                    <div className="flex items-center gap-2 mt-1">
+                      {item.actor && (
+                        <span className="inline-flex items-center gap-1 text-[10.5px] text-slate-500 font-medium" title={item.actor}>
+                          <span className="flex h-4 w-4 items-center justify-center rounded-full ring-2 ring-white bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] text-[7.5px] font-bold text-white">
+                            {initials(item.actor_name ?? item.actor)}
+                          </span>
+                          {item.actor_name ?? item.actor}
+                        </span>
+                      )}
+                      <span className="text-[10.5px] text-slate-400">{fmtRelative(item.timestamp)}</span>
+                    </div>
+                  </div>
+                  <ArrowRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all mt-1.5" />
+                </Link>
+              )
+            })}
+          </div>
         </div>
       ) : (
         <div className="space-y-6">
