@@ -8,8 +8,9 @@ import { useToast } from "@/components/ui/toast"
 import {
   Loader2, Trash2, RefreshCw, Download, X, Star, Plus,
   Instagram, ExternalLink, ChevronRight, Phone, Mail, Calendar as CalIcon,
-  CheckCircle2, Circle, MessageCircle, Copy, Users2,
+  CheckCircle2, Circle, MessageCircle, Copy, Users2, Sparkles, Upload,
 } from "lucide-react"
+import { AiEmailModal } from "@/components/views/personas/ai-email-modal"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -222,6 +223,7 @@ function DetailDrawer({
   onDeleteSeguimiento: (id: string) => void
 }) {
   const ig = persona.instagram?.replace("@", "")
+  const [showAiEmail, setShowAiEmail] = useState(false)
 
   const [newSegContent, setNewSegContent] = useState("")
   const [newSegType, setNewSegType] = useState<SegType>("nota")
@@ -299,7 +301,26 @@ function DetailDrawer({
 
             {/* Quick contact actions */}
             <ContactActions persona={persona} />
+
+            {/* AI email composer */}
+            <button
+              onClick={() => setShowAiEmail(true)}
+              className="mt-2 inline-flex items-center gap-1.5 h-8 rounded-lg border border-[#1e3a8a]/25 bg-gradient-to-br from-[#E42D2C]/[0.05] to-[#1e3a8a]/[0.05] px-3 text-[12px] font-bold text-[#1e3a8a] hover:border-[#1e3a8a]/40 transition-colors"
+              title="Redactar email personalizado con IA"
+            >
+              <Sparkles className="h-3 w-3" />
+              Email con IA
+            </button>
           </div>
+
+          {showAiEmail && (
+            <AiEmailModal
+              personaId={persona.id}
+              personaName={persona.name}
+              personaEmail={persona.email}
+              onClose={() => setShowAiEmail(false)}
+            />
+          )}
 
           {/* Editable fields */}
           <div className="px-6 py-5 space-y-4">

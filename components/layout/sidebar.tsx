@@ -56,6 +56,7 @@ const NAV_GROUPS: NavGroup[] = [
       { name: "Centro Operativo",   href: "/admin/centro-operativo", icon: Layers   },
       { name: "Actividad",          href: "/admin/activity",         icon: Rss      },
       { name: "Forms",              href: "/admin/forms",            icon: FormInput },
+      { name: "Templates",          href: "/admin/task-templates",   icon: Layers   },
     ],
   },
   {

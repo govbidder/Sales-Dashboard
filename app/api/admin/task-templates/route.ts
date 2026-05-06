@@ -33,7 +33,9 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ templates: data ?? [] })
 }
 
-// POST — apply a template (create parent + subtasks)
+// POST — dual purpose:
+//   * If body.templateId → APPLY existing template (legacy behavior)
+//   * If body.name + body.parent_title → CREATE new template
 export async function POST(req: NextRequest) {
   const user = await getUser(req)
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
@@ -41,6 +43,33 @@ export async function POST(req: NextRequest) {
   let body: any
   try { body = await req.json() } catch { return NextResponse.json({ error: "JSON inválido" }, { status: 400 }) }
 
+  // ── Branch: CREATE new template ────────────────────────────────────────
+  if (body.name && body.parent_title && !body.templateId) {
+    const db = createServiceClient()
+    const { data, error } = await db
+      .from("task_templates")
+      .insert({
+        name:                   body.name,
+        description:            body.description ?? null,
+        icon:                   body.icon ?? null,
+        color:                  body.color ?? "#1e3a8a",
+        parent_title:           body.parent_title,
+        parent_description:     body.parent_description ?? null,
+        parent_priority:        body.parent_priority ?? "media",
+        parent_tags:            body.parent_tags ?? [],
+        parent_assignees:       body.parent_assignees ?? [],
+        parent_due_offset_days: body.parent_due_offset_days ?? null,
+        subtasks:               body.subtasks ?? [],
+        is_default:             false,
+        created_by:             user.email ?? null,
+      })
+      .select()
+      .single()
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ template: data })
+  }
+
+  // ── Branch: APPLY existing template ────────────────────────────────────
   const templateId  = body.templateId as string
   const overrideTitle = body.title as string | undefined
   if (!templateId) return NextResponse.json({ error: "Falta templateId" }, { status: 400 })
