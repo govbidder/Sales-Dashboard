@@ -79,6 +79,20 @@ interface TaskComment {
 
 interface PersonaLite { id: string; name: string }
 
+interface SavedView {
+  id:             string
+  name:           string
+  search:         string
+  filterPriority: string
+  filterAssignee: string
+  filterTag:      string
+  quickFilter:    string
+  sortBy:         string
+  view:           ViewMode
+}
+
+const SAVED_VIEWS_KEY = "tasksSavedViews_v1"
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function fmtDateTime(iso: string | null) {
@@ -604,6 +618,32 @@ function NewTaskModal({
   const [tags,        setTags]        = useState<string[]>([])
   const [dueAt,       setDueAt]       = useState(prefillDueAt ? toLocalInputValue(prefillDueAt) : "")
   const [personaId,   setPersonaId]   = useState("")
+  const [suggesting,  setSuggesting]  = useState(false)
+
+  const handleSuggest = async () => {
+    if (!title.trim()) return
+    setSuggesting(true)
+    try {
+      const { data: { session } } = await createClient().auth.getSession()
+      if (!session) return
+      const res = await fetch("/api/admin/tasks/suggest", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+        body:    JSON.stringify({ title, description }),
+      })
+      const j = await res.json()
+      if (res.ok) {
+        if (j.priority) setPriority(j.priority)
+        if (Array.isArray(j.tags) && j.tags.length) {
+          // Merge — don't replace user-entered tags
+          setTags(prev => Array.from(new Set([...prev, ...j.tags])))
+        }
+        if (j.due_at && !dueAt) {
+          setDueAt(toLocalInputValue(j.due_at))
+        }
+      }
+    } finally { setSuggesting(false) }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -636,7 +676,20 @@ function NewTaskModal({
           </div>
 
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Título *</p>
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Título *</p>
+              <button
+                type="button"
+                onClick={handleSuggest}
+                disabled={!title.trim() || suggesting}
+                className="inline-flex items-center gap-1 text-[10px] font-bold text-[#1e3a8a] hover:text-[#E42D2C] transition-colors disabled:opacity-40"
+                title="Sugerir prioridad / tags / fecha con IA"
+              >
+                {suggesting
+                  ? <><Loader2 className="h-3 w-3 animate-spin" /> Pensando…</>
+                  : <><Sparkles className="h-3 w-3" /> Auto-completar con IA</>}
+              </button>
+            </div>
             <input autoFocus type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="¿Qué hay que hacer?" className={inputCls} />
           </div>
 
@@ -1109,6 +1162,7 @@ export function TasksView() {
   const [statusSets,    setStatusSets]    = useState<StatusSet[]>([DEFAULT_STATUS_SET])
   const [activeSetId,   setActiveSetId]   = useState<string>("_default_local")
   const [filtersOpen,   setFiltersOpen]   = useState(false)   // mobile filters drawer
+  const [savedViews,    setSavedViews]    = useState<SavedView[]>([])
 
   // dnd-kit sensor with a small drag-activation distance so clicks still work
   const sensors = useSensors(
@@ -1185,6 +1239,53 @@ export function TasksView() {
     if (typeof window !== "undefined") {
       window.localStorage.setItem("tasksActiveSetId", id)
     }
+  }
+
+  // Load + save saved views (localStorage)
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    try {
+      const raw = window.localStorage.getItem(SAVED_VIEWS_KEY)
+      if (raw) setSavedViews(JSON.parse(raw))
+    } catch { /* corrupt — ignore */ }
+  }, [])
+
+  const persistViews = (views: SavedView[]) => {
+    setSavedViews(views)
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(SAVED_VIEWS_KEY, JSON.stringify(views))
+    }
+  }
+
+  const handleSaveCurrentView = () => {
+    const name = window.prompt("Nombre de esta vista:")
+    if (!name?.trim()) return
+    const v: SavedView = {
+      id: `sv-${Date.now()}`,
+      name: name.trim(),
+      search,
+      filterPriority,
+      filterAssignee,
+      filterTag,
+      quickFilter,
+      sortBy,
+      view,
+    }
+    persistViews([...savedViews, v])
+  }
+
+  const applyView = (v: SavedView) => {
+    setSearch(v.search)
+    setFilterPriority(v.filterPriority as any)
+    setFilterAssignee(v.filterAssignee)
+    setFilterTag(v.filterTag)
+    setQuickFilter(v.quickFilter as any)
+    setSortBy(v.sortBy as any)
+    setView(v.view)
+  }
+
+  const deleteView = (id: string) => {
+    persistViews(savedViews.filter(v => v.id !== id))
   }
 
   useEffect(() => { fetchAll() }, [fetchAll])
@@ -1701,6 +1802,52 @@ export function TasksView() {
             </button>
           </div>
         </div>
+
+        {/* ─── Saved Views (tabs) ──────────────────────────────────────── */}
+        {savedViews.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]/70 mr-1">
+              Vistas:
+            </span>
+            {savedViews.map(v => (
+              <div key={v.id} className="group inline-flex items-stretch rounded-full border border-slate-200 bg-white overflow-hidden hover:border-[#1e3a8a]/30 transition-colors">
+                <button
+                  onClick={() => applyView(v)}
+                  className="px-3 h-7 text-[11px] font-medium text-slate-700 hover:text-[#1e3a8a] transition-colors"
+                >
+                  {v.name}
+                </button>
+                <button
+                  onClick={() => deleteView(v.id)}
+                  className="px-1.5 h-7 text-slate-300 hover:text-red-600 hover:bg-red-50 transition-colors border-l border-slate-200 opacity-0 group-hover:opacity-100"
+                  title="Borrar vista"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+            <button
+              onClick={handleSaveCurrentView}
+              className="inline-flex items-center gap-1 h-7 rounded-full border border-dashed border-slate-300 bg-white px-3 text-[10.5px] font-medium text-slate-500 hover:border-[#1e3a8a]/40 hover:text-[#1e3a8a] transition-colors"
+              title="Guardar combinación actual de filtros como vista"
+            >
+              <Plus className="h-3 w-3" />
+              Guardar vista
+            </button>
+          </div>
+        )}
+        {savedViews.length === 0 && (
+          <div className="flex items-center">
+            <button
+              onClick={handleSaveCurrentView}
+              className="inline-flex items-center gap-1 h-7 rounded-full border border-dashed border-slate-300 bg-white px-3 text-[10.5px] font-medium text-slate-400 hover:border-[#1e3a8a]/40 hover:text-[#1e3a8a] transition-colors"
+              title="Guardar combinación actual de filtros como vista"
+            >
+              <Plus className="h-3 w-3" />
+              Guardar vista actual
+            </button>
+          </div>
+        )}
 
         {/* ─── Quick filter chips ──────────────────────────────────────── */}
         <div className="flex flex-wrap items-center gap-2">
