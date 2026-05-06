@@ -11,14 +11,19 @@ import { exportToCSV, csvDate } from "@/lib/export-csv"
 import {
   DndContext, DragEndEvent, DragOverlay, DragStartEvent,
   PointerSensor, useDraggable, useDroppable, useSensor, useSensors,
+  closestCenter,
 } from "@dnd-kit/core"
+import {
+  SortableContext, useSortable, verticalListSortingStrategy, arrayMove,
+} from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 import {
   Loader2, Trash2, RefreshCw, Plus, X, Calendar as CalIcon,
   Flag, ChevronRight, AlertCircle, Tag as TagIcon,
   LayoutGrid, List, GitBranch, Send, CalendarDays,
   CheckCircle2, Circle, Clock, User, Search, Keyboard,
   ArrowDownUp, ChevronDown, Inbox, CheckSquare, Square,
-  Sparkles, Layers, Download, SlidersHorizontal,
+  Sparkles, Layers, Download, SlidersHorizontal, GripVertical,
 } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -387,6 +392,62 @@ function CommentsSection({ taskId }: { taskId: string }) {
   )
 }
 
+// ─── Sortable Subtask (used inside DetailDrawer) ─────────────────────────────
+
+function SortableSubtaskRow({
+  subtask, onToggle, onDelete,
+}: {
+  subtask:  Task
+  onToggle: () => void
+  onDelete: () => void
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: subtask.id,
+  })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="group flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5"
+    >
+      <button
+        {...attributes}
+        {...listeners}
+        className="shrink-0 cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-500 transition-colors"
+        aria-label="Arrastrar"
+      >
+        <GripVertical className="h-3.5 w-3.5" />
+      </button>
+      <button
+        onClick={onToggle}
+        className={`shrink-0 h-3 w-3 rounded-full border-2 transition-all ${
+          subtask.status === "completada"
+            ? "bg-emerald-500 border-emerald-500"
+            : "border-slate-300 hover:border-slate-500"
+        }`}
+      />
+      <span className={`flex-1 text-[12px] ${
+        subtask.status === "completada" ? "text-slate-400 line-through" : "text-slate-800"
+      }`}>
+        {subtask.title}
+      </span>
+      <button
+        onClick={onDelete}
+        className="text-slate-300 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100"
+      >
+        <Trash2 className="h-3 w-3" />
+      </button>
+    </div>
+  )
+}
+
 // ─── Detail Drawer ────────────────────────────────────────────────────────────
 
 function DetailDrawer({
@@ -402,7 +463,36 @@ function DetailDrawer({
   onCreateSubtask: (parentId: string, title: string) => Promise<void>
   statuses:        StatusDef[]
 }) {
-  const subtasks = allTasks.filter(t => t.parent_id === task.id)
+  const subtasks = allTasks
+    .filter(t => t.parent_id === task.id)
+    .sort((a, b) => {
+      const av = (a as any).sort_order ?? Infinity
+      const bv = (b as any).sort_order ?? Infinity
+      if (av !== bv) return av - bv
+      return a.created_at.localeCompare(b.created_at)
+    })
+
+  // Drag&drop sensor
+  const subtaskSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } })
+  )
+
+  const handleSubtaskDragEnd = (e: DragEndEvent) => {
+    const { active, over } = e
+    if (!over || active.id === over.id) return
+    const ids = subtasks.map(s => s.id)
+    const oldIdx = ids.indexOf(String(active.id))
+    const newIdx = ids.indexOf(String(over.id))
+    if (oldIdx === -1 || newIdx === -1) return
+    const reordered = arrayMove(subtasks, oldIdx, newIdx)
+    // Reassign sort_order with steps of 100 (room for in-between inserts)
+    reordered.forEach((s, i) => {
+      const newOrder = (i + 1) * 100
+      if ((s as any).sort_order !== newOrder) {
+        onPatch(s.id, { sort_order: newOrder } as any)
+      }
+    })
+  }
   const [newSub, setNewSub] = useState("")
   const [savingSub, setSavingSub] = useState(false)
   const [tab, setTab] = useState<"detail" | "comments">("detail")
@@ -554,24 +644,27 @@ function DetailDrawer({
                 </div>
 
                 {subtasks.length > 0 && (
-                  <div className="space-y-1">
-                    {subtasks.map(s => (
-                      <div key={s.id} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5">
-                        <button
-                          onClick={() => onPatch(s.id, { status: s.status === "completada" ? "pendiente" : "completada" })}
-                          className={`shrink-0 h-3 w-3 rounded-full border-2 transition-all ${
-                            s.status === "completada" ? "bg-emerald-500 border-emerald-500" : "border-slate-300 hover:border-slate-500"
-                          }`}
-                        />
-                        <span className={`flex-1 text-[12px] ${s.status === "completada" ? "text-slate-400 line-through" : "text-slate-800"}`}>
-                          {s.title}
-                        </span>
-                        <button onClick={() => onDelete(s.id)} className="text-slate-300 hover:text-red-600 transition-colors">
-                          <Trash2 className="h-3 w-3" />
-                        </button>
+                  <DndContext
+                    sensors={subtaskSensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleSubtaskDragEnd}
+                  >
+                    <SortableContext
+                      items={subtasks.map(s => s.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <div className="space-y-1">
+                        {subtasks.map(s => (
+                          <SortableSubtaskRow
+                            key={s.id}
+                            subtask={s}
+                            onToggle={() => onPatch(s.id, { status: s.status === "completada" ? "pendiente" : "completada" })}
+                            onDelete={() => onDelete(s.id)}
+                          />
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </SortableContext>
+                  </DndContext>
                 )}
 
                 <form onSubmit={submitSub} className="flex gap-2">
