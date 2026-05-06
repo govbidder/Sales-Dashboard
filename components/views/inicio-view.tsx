@@ -325,7 +325,7 @@ export function InicioView() {
 
       {/* HERO ─────────────────────────────────────────────────────────────── */}
       <div
-        className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white"
+        className="relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-[#1e3a8a]/30 bg-white dark:bg-[#0d1745]"
         style={{ boxShadow: "0 1px 2px rgba(15,23,42,0.04), 0 16px 40px -16px rgba(15,23,42,0.10)" }}
       >
         {/* Ambient glow background — más sutil */}
