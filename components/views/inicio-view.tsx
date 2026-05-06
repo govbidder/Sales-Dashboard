@@ -3,10 +3,12 @@
 import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase"
+import { AiStandupModal } from "@/components/views/inicio/ai-standup-modal"
 import {
   Loader2, AlertCircle, AlertTriangle, CheckCircle2, RefreshCw,
   Users2, ListTodo, FileBarChart, TrendingDown, TrendingUp,
   Activity, ArrowRight, Flag, Sparkles, BarChart3, Target,
+  Sun, Calendar as CalIcon,
 } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -198,10 +200,22 @@ function IssueSection({
 
 // ─── Inicio View ──────────────────────────────────────────────────────────────
 
+interface MyDayTask {
+  id:        string
+  title:     string
+  status:    string
+  priority:  string
+  due_at:    string | null
+  overdue:   boolean
+}
+
 export function InicioView() {
-  const [data,    setData]    = useState<HealthData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error,   setError]   = useState<string | null>(null)
+  const [data,         setData]         = useState<HealthData | null>(null)
+  const [loading,      setLoading]      = useState(true)
+  const [error,        setError]        = useState<string | null>(null)
+  const [myDay,        setMyDay]        = useState<MyDayTask[]>([])
+  const [currentEmail, setCurrentEmail] = useState<string>("")
+  const [showStandup,  setShowStandup]  = useState(false)
 
   const fetchHealth = useCallback(async () => {
     setLoading(true)
@@ -210,6 +224,7 @@ export function InicioView() {
       const supabase = createClient()
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) return
+      setCurrentEmail(session.user?.email ?? "")
       const res = await fetch("/api/admin/health", {
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
@@ -218,6 +233,37 @@ export function InicioView() {
         return
       }
       setData(await res.json())
+
+      // Fetch user's "Mi día" tasks: assigned to current user, not completed, due ≤ end of today
+      const tasksRes = await fetch("/api/admin/tasks", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      })
+      if (tasksRes.ok) {
+        const tasksJ = await tasksRes.json()
+        const all: any[] = tasksJ.tasks ?? []
+        const myEmail = session.user?.email ?? ""
+        const now = Date.now()
+        const endOfToday = new Date()
+        endOfToday.setHours(23, 59, 59, 999)
+        const mine = all
+          .filter(t => !t.parent_id)
+          .filter(t => myEmail && (t.assignees ?? []).includes(myEmail))
+          .filter(t => t.status !== "completada" && t.status !== "cancelada")
+          .filter(t => {
+            if (!t.due_at) return false
+            const due = new Date(t.due_at).getTime()
+            return due <= endOfToday.getTime()
+          })
+          .map(t => ({
+            id: t.id, title: t.title, status: t.status, priority: t.priority, due_at: t.due_at,
+            overdue: t.due_at && new Date(t.due_at).getTime() < now,
+          }))
+          .sort((a, b) => {
+            if (a.overdue !== b.overdue) return a.overdue ? -1 : 1
+            return (a.due_at ?? "").localeCompare(b.due_at ?? "")
+          })
+        setMyDay(mine)
+      }
     } catch (e: any) {
       setError(e?.message ?? "Error")
     } finally {
@@ -274,6 +320,8 @@ export function InicioView() {
 
   return (
     <div className="space-y-6">
+
+      {showStandup && <AiStandupModal onClose={() => setShowStandup(false)} />}
 
       {/* HERO ─────────────────────────────────────────────────────────────── */}
       <div
@@ -346,14 +394,24 @@ export function InicioView() {
                 : "Revisá los puntos críticos abajo para mantener el dashboard saludable."}
             </p>
 
-            <button
-              onClick={fetchHealth}
-              disabled={loading}
-              className="mt-5 inline-flex items-center gap-2 h-9 rounded-full border border-slate-200 bg-white px-3.5 text-[12px] font-semibold text-slate-700 hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] hover:shadow-[0_2px_8px_rgba(30,58,138,0.10)] transition-all disabled:opacity-40"
-            >
-              <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-              Actualizar estado
-            </button>
+            <div className="mt-5 flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => setShowStandup(true)}
+                className="inline-flex items-center gap-2 h-9 rounded-full border border-[#1e3a8a]/25 bg-gradient-to-br from-[#E42D2C]/[0.05] to-[#1e3a8a]/[0.05] px-3.5 text-[12px] font-bold text-[#1e3a8a] hover:border-[#1e3a8a]/40 hover:from-[#E42D2C]/[0.08] hover:to-[#1e3a8a]/[0.08] hover:shadow-[0_2px_8px_rgba(30,58,138,0.10)] transition-all"
+                title="Generar resumen de las últimas 24h con IA"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                Generar standup
+              </button>
+              <button
+                onClick={fetchHealth}
+                disabled={loading}
+                className="inline-flex items-center gap-2 h-9 rounded-full border border-slate-200 bg-white px-3.5 text-[12px] font-semibold text-slate-700 hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] hover:shadow-[0_2px_8px_rgba(30,58,138,0.10)] transition-all disabled:opacity-40"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+                Actualizar estado
+              </button>
+            </div>
           </div>
 
           {/* RIGHT — health ring */}
@@ -423,6 +481,67 @@ export function InicioView() {
           })}
         </div>
       </div>
+
+      {/* MI DÍA ───────────────────────────────────────────────────────────── */}
+      {currentEmail && myDay.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 px-1">
+            <Sun className="h-3.5 w-3.5 text-amber-500" />
+            <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]">
+              Mi día
+            </h2>
+            <span className="rounded-full bg-slate-100 px-1.5 text-[10px] font-bold text-slate-600 tabular-nums">
+              {myDay.length}
+            </span>
+            <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent" />
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+            <div className="divide-y divide-slate-100">
+              {myDay.slice(0, 6).map(t => (
+                <Link
+                  key={t.id}
+                  href="/admin/tasks"
+                  className="group flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors"
+                >
+                  <span className={`shrink-0 h-2 w-2 rounded-full ${
+                    t.priority === "urgente" ? "bg-[#E42D2C]" :
+                    t.priority === "alta"    ? "bg-orange-500" :
+                    t.priority === "media"   ? "bg-amber-500" :
+                                                "bg-slate-300"
+                  }`} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-medium text-slate-900 truncate">{t.title}</p>
+                    {t.due_at && (
+                      <p className={`text-[11px] mt-0.5 flex items-center gap-1 ${t.overdue ? "text-[#E42D2C] font-semibold" : "text-slate-400"}`}>
+                        {t.overdue ? <AlertCircle className="h-3 w-3" /> : <CalIcon className="h-3 w-3" />}
+                        {t.overdue ? "Vencida " : "Vence "}
+                        {new Date(t.due_at).toLocaleString("es-AR", { hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    )}
+                  </div>
+                  <Flag className={`h-3 w-3 shrink-0 ${
+                    t.priority === "urgente" ? "text-[#E42D2C]" :
+                    t.priority === "alta"    ? "text-orange-600" :
+                    t.priority === "media"   ? "text-amber-600" :
+                                                "text-slate-400"
+                  }`} />
+                  <ArrowRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all" />
+                </Link>
+              ))}
+              {myDay.length > 6 && (
+                <Link
+                  href="/admin/tasks"
+                  className="flex items-center justify-center gap-1.5 px-5 py-2.5 text-[11px] font-semibold text-slate-500 hover:text-[#1e3a8a] transition-colors hover:bg-slate-50"
+                >
+                  Ver las {myDay.length - 6} restantes
+                  <ArrowRight className="h-3 w-3" />
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ALERTS GRID ──────────────────────────────────────────────────────── */}
       {(overdueTasks.length > 0 || stalePersonas.length > 0 || missingCurrentReport || declining.length > 0) ? (

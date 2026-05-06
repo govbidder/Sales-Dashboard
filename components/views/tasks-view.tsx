@@ -7,6 +7,7 @@ import { Portal } from "@/components/ui/portal"
 import { CalendarView } from "@/components/views/tasks/calendar-view"
 import { AiExtractModal } from "@/components/views/tasks/ai-extract-modal"
 import { TemplatesModal } from "@/components/views/tasks/templates-modal"
+import { exportToCSV, csvDate } from "@/lib/export-csv"
 import {
   DndContext, DragEndEvent, DragOverlay, DragStartEvent,
   PointerSensor, useDraggable, useDroppable, useSensor, useSensors,
@@ -17,7 +18,7 @@ import {
   LayoutGrid, List, GitBranch, Send, CalendarDays,
   CheckCircle2, Circle, Clock, User, Search, Keyboard,
   ArrowDownUp, ChevronDown, Inbox, CheckSquare, Square,
-  Sparkles, Layers,
+  Sparkles, Layers, Download, SlidersHorizontal,
 } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -1107,6 +1108,7 @@ export function TasksView() {
   const [overColumn,    setOverColumn]    = useState<Status | null>(null)
   const [statusSets,    setStatusSets]    = useState<StatusSet[]>([DEFAULT_STATUS_SET])
   const [activeSetId,   setActiveSetId]   = useState<string>("_default_local")
+  const [filtersOpen,   setFiltersOpen]   = useState(false)   // mobile filters drawer
 
   // dnd-kit sensor with a small drag-activation distance so clicks still work
   const sensors = useSensors(
@@ -1420,6 +1422,32 @@ export function TasksView() {
     else setSelectedIds(new Set(sorted.map(t => t.id)))
   }
 
+  // Export to CSV — uses the currently filtered + sorted set
+  const handleExportCSV = () => {
+    const rows = sorted.map(t => ({
+      titulo:       t.title,
+      estado:       t.status,
+      prioridad:    t.priority,
+      asignados:    (t.assignees ?? []).join("; "),
+      tags:         (t.tags ?? []).join("; "),
+      vence:        csvDate(t.due_at),
+      creada:       csvDate(t.created_at),
+      descripcion:  t.description ?? "",
+    }))
+    exportToCSV(rows, `tareas_${new Date().toISOString().slice(0, 10)}.csv`, {
+      columns: [
+        { key: "titulo",       header: "Título"      },
+        { key: "estado",       header: "Estado"      },
+        { key: "prioridad",    header: "Prioridad"   },
+        { key: "asignados",    header: "Asignados"   },
+        { key: "tags",         header: "Tags"        },
+        { key: "vence",        header: "Vence"       },
+        { key: "creada",       header: "Creada"      },
+        { key: "descripcion",  header: "Descripción" },
+      ],
+    })
+  }
+
   // ─── Keyboard shortcuts ──────────────────────────────────────────────────
   useEffect(() => {
     function isInsideEditable(target: EventTarget | null) {
@@ -1643,8 +1671,15 @@ export function TasksView() {
               IA Extract
             </button>
             <button
+              onClick={handleExportCSV}
+              className="hidden md:flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-[#1e3a8a] hover:border-[#1e3a8a]/30 transition-all"
+              title="Exportar CSV"
+            >
+              <Download className="h-4 w-4" />
+            </button>
+            <button
               onClick={() => setShowShortcuts(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-[#1e3a8a] hover:border-[#1e3a8a]/30 transition-all"
+              className="hidden md:flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-[#1e3a8a] hover:border-[#1e3a8a]/30 transition-all"
               title="Atajos (?)"
             >
               <Keyboard className="h-4 w-4" />
@@ -1711,61 +1746,81 @@ export function TasksView() {
         </div>
 
         {/* ─── Toolbar: search + filters + sort ───────────────────────── */}
-        <div className="flex flex-wrap items-center gap-2.5 border-b border-slate-200 pb-4">
-          <div className="relative flex-1 min-w-[220px] max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
-            <input
-              ref={searchInputRef}
-              type="text"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Buscar tareas, tags, asignados..."
-              className="h-9 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/10"
-            />
-            <kbd className="hidden sm:inline absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-slate-200 bg-slate-50 px-1.5 text-[10px] font-bold text-slate-400">/</kbd>
+        <div className="border-b border-slate-200 pb-4 space-y-2.5">
+          {/* Row 1: search + (mobile) filters toggle */}
+          <div className="flex items-center gap-2.5">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Buscar tareas, tags, asignados..."
+                className="h-9 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/10"
+              />
+              <kbd className="hidden sm:inline absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-slate-200 bg-slate-50 px-1.5 text-[10px] font-bold text-slate-400">/</kbd>
+            </div>
+
+            {/* Mobile filters toggle */}
+            <button
+              onClick={() => setFiltersOpen(o => !o)}
+              className={`md:hidden flex items-center gap-1.5 h-9 rounded-xl border px-3 text-[12px] font-semibold transition-colors ${
+                filtersOpen
+                  ? "border-[#1e3a8a]/40 bg-[#1e3a8a]/[0.06] text-[#1e3a8a]"
+                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+              }`}
+              aria-label="Filtros"
+            >
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              Filtros
+            </button>
           </div>
 
-          <select
-            value={filterPriority}
-            onChange={e => setFilterPriority(e.target.value as any)}
-            className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300">
-            <option value="todos">Todas las prioridades</option>
-            {PRIORITY_OPTIONS.map(p => <option key={p} value={p} className="capitalize">{p}</option>)}
-          </select>
-
-          {allAssignees.length > 0 && (
+          {/* Row 2: filters (always visible md+; toggleable on mobile) */}
+          <div className={`${filtersOpen ? "flex" : "hidden md:flex"} flex-wrap items-center gap-2.5`}>
             <select
-              value={filterAssignee}
-              onChange={e => setFilterAssignee(e.target.value)}
+              value={filterPriority}
+              onChange={e => setFilterPriority(e.target.value as any)}
               className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300">
-              <option value="todos">Todos los asignados</option>
-              {allAssignees.map(a => <option key={a} value={a}>{a}</option>)}
+              <option value="todos">Todas las prioridades</option>
+              {PRIORITY_OPTIONS.map(p => <option key={p} value={p} className="capitalize">{p}</option>)}
             </select>
-          )}
-          {allTags.length > 0 && (
-            <select
-              value={filterTag}
-              onChange={e => setFilterTag(e.target.value)}
-              className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300">
-              <option value="todos">Todos los tags</option>
-              {allTags.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
-          )}
 
-          <div className="ml-auto flex items-center gap-2">
-            <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
-              <ArrowDownUp className="h-3 w-3" />
-              <span>Ordenar:</span>
+            {allAssignees.length > 0 && (
+              <select
+                value={filterAssignee}
+                onChange={e => setFilterAssignee(e.target.value)}
+                className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300">
+                <option value="todos">Todos los asignados</option>
+                {allAssignees.map(a => <option key={a} value={a}>{a}</option>)}
+              </select>
+            )}
+            {allTags.length > 0 && (
+              <select
+                value={filterTag}
+                onChange={e => setFilterTag(e.target.value)}
+                className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300">
+                <option value="todos">Todos los tags</option>
+                {allTags.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            )}
+
+            <div className="ml-auto flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-slate-400">
+                <ArrowDownUp className="h-3 w-3" />
+                <span>Ordenar:</span>
+              </div>
+              <select
+                value={sortBy}
+                onChange={e => setSortBy(e.target.value as SortBy)}
+                className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300">
+                <option value="due_at">Vencimiento</option>
+                <option value="priority">Prioridad</option>
+                <option value="created_at">Creación</option>
+                <option value="title">Título</option>
+              </select>
             </div>
-            <select
-              value={sortBy}
-              onChange={e => setSortBy(e.target.value as SortBy)}
-              className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300">
-              <option value="due_at">Vencimiento</option>
-              <option value="priority">Prioridad</option>
-              <option value="created_at">Creación</option>
-              <option value="title">Título</option>
-            </select>
           </div>
         </div>
 
