@@ -139,7 +139,22 @@ export async function DELETE(req: NextRequest) {
   if (!id) return NextResponse.json({ error: "id requerido" }, { status: 400 })
 
   const db = createServiceClient()
+
+  // Snapshot for audit
+  const { data: before } = await db.from("tasks").select("title,status,priority").eq("id", id).maybeSingle()
+
   const { error } = await db.from("tasks").delete().eq("id", id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Audit (fire and forget)
+  const { audit } = await import("@/lib/audit")
+  await audit(req, {
+    actor:     user.email ?? null,
+    action:    "task.delete",
+    entity:    "task",
+    entity_id: id,
+    payload:   { before },
+  })
+
   return NextResponse.json({ success: true })
 }

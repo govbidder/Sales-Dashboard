@@ -11,6 +11,7 @@ import {
   CheckCircle2, Circle, MessageCircle, Copy, Users2, Sparkles, Upload,
 } from "lucide-react"
 import { AiEmailModal } from "@/components/views/personas/ai-email-modal"
+import { CsvImportModal } from "@/components/ui/csv-import-modal"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -617,6 +618,7 @@ export function PersonasAgendadasView() {
   const [search,           setSearch]           = useState("")
   const [filterCallStatus, setFilterCallStatus] = useState<CallStatus | "todas">("todas")
   const [showNewForm,      setShowNewForm]      = useState(false)
+  const [showImport,       setShowImport]       = useState(false)
   const [creating,         setCreating]         = useState(false)
 
   const router       = useRouter()
@@ -786,6 +788,57 @@ export function PersonasAgendadasView() {
         />
       )}
 
+      {showImport && (
+        <CsvImportModal
+          title="Importar personas desde CSV"
+          description="Cada fila se convierte en una persona agendada con sus campos."
+          templateCSV={`name,email,phone,scheduled_at,sales_status,call_status,owner,source,notes,instagram
+"Juan Pérez",juan@example.com,+5491155551234,2026-05-15T15:00:00Z,pendiente,no_realizada,santo@govbidder.com,SAM.gov,"Cliente potencial gov contracting",@juanperez
+"María López",maria@example.com,,,propuesta,realizada,marcelo@govbidder.com,referral,,
+`}
+          columns={[
+            { field: "name",         label: "Nombre",       required: true,  aliases: ["nombre","full_name"] },
+            { field: "email",        label: "Email",        aliases: ["e-mail","correo"] },
+            { field: "phone",        label: "Teléfono",     aliases: ["telefono","tel","whatsapp"] },
+            { field: "scheduled_at", label: "Reunión",      aliases: ["scheduled","fecha","reunion","reunión"] },
+            { field: "sales_status", label: "Estado venta", aliases: ["sales","venta","status_venta"] },
+            { field: "call_status",  label: "Estado llamada", aliases: ["call","llamada","status_llamada"] },
+            { field: "owner",        label: "Owner",        aliases: ["asignado","responsable"] },
+            { field: "source",       label: "Source",       aliases: ["origen","fuente"] },
+            { field: "notes",        label: "Notas",        aliases: ["notas","observaciones"] },
+            { field: "instagram",    label: "Instagram",    aliases: ["ig"] },
+          ]}
+          onClose={() => setShowImport(false)}
+          onImport={async (rowsToInsert) => {
+            const session = await (async () => {
+              const { data: { session } } = await createClient().auth.getSession()
+              return session
+            })()
+            if (!session) return { inserted: 0, failed: rowsToInsert.length, errors: ["Sesión expirada"] }
+            let inserted = 0
+            const errors: string[] = []
+            for (const row of rowsToInsert) {
+              try {
+                const res = await fetch("/api/admin/personas", {
+                  method:  "POST",
+                  headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+                  body:    JSON.stringify(row),
+                })
+                if (res.ok) inserted++
+                else {
+                  const j = await res.json().catch(() => ({}))
+                  errors.push(`"${row.name ?? "—"}": ${j.error ?? "error"}`)
+                }
+              } catch (e: any) {
+                errors.push(`"${row.name ?? "—"}": ${e?.message ?? "error"}`)
+              }
+            }
+            await fetchAll()
+            return { inserted, failed: rowsToInsert.length - inserted, errors }
+          }}
+        />
+      )}
+
       {selected && (
         <DetailDrawer
           persona={selected}
@@ -814,6 +867,11 @@ export function PersonasAgendadasView() {
             <button onClick={fetchAll} disabled={loading}
               className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40">
               <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            </button>
+            <button onClick={() => setShowImport(true)}
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-400 hover:text-[#1e3a8a] hover:border-[#1e3a8a]/30 transition-all"
+              title="Importar CSV">
+              <Upload className="h-4 w-4" />
             </button>
             <button onClick={exportCsv} disabled={!filtered.length}
               className="flex items-center gap-2 h-9 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-500 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40">

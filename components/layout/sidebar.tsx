@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation"
 import {
   X, BarChart3, DollarSign, LayoutGrid, FileBarChart,
   Users2, ListTodo, Users, Layers, Wrench, BookOpen, CalendarDays,
-  Activity, ChevronLeft, ChevronRight, Rss, FormInput,
+  Activity, ChevronLeft, ChevronRight, Rss, FormInput, Shield,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -57,6 +57,7 @@ const NAV_GROUPS: NavGroup[] = [
       { name: "Actividad",          href: "/admin/activity",         icon: Rss      },
       { name: "Forms",              href: "/admin/forms",            icon: FormInput },
       { name: "Templates",          href: "/admin/task-templates",   icon: Layers   },
+      { name: "Audit log",          href: "/admin/audit-log",        icon: Shield   },
     ],
   },
   {

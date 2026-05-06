@@ -8,6 +8,7 @@ import { CalendarView } from "@/components/views/tasks/calendar-view"
 import { AiExtractModal } from "@/components/views/tasks/ai-extract-modal"
 import { TemplatesModal } from "@/components/views/tasks/templates-modal"
 import { exportToCSV, csvDate } from "@/lib/export-csv"
+import { CsvImportModal } from "@/components/ui/csv-import-modal"
 import {
   DndContext, DragEndEvent, DragOverlay, DragStartEvent,
   PointerSensor, useDraggable, useDroppable, useSensor, useSensors,
@@ -23,7 +24,7 @@ import {
   LayoutGrid, List, GitBranch, Send, CalendarDays,
   CheckCircle2, Circle, Clock, User, Search, Keyboard,
   ArrowDownUp, ChevronDown, Inbox, CheckSquare, Square,
-  Sparkles, Layers, Download, SlidersHorizontal, GripVertical,
+  Sparkles, Layers, Download, SlidersHorizontal, GripVertical, Upload,
 } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -1301,6 +1302,7 @@ export function TasksView() {
   const [showShortcuts, setShowShortcuts] = useState(false)
   const [showAiExtract, setShowAiExtract] = useState(false)
   const [showTemplates, setShowTemplates] = useState(false)
+  const [showImport,    setShowImport]    = useState(false)
   const [currentEmail,  setCurrentEmail]  = useState<string>("")
   const [draggingId,    setDraggingId]    = useState<string | null>(null)
   const [overColumn,    setOverColumn]    = useState<Status | null>(null)
@@ -1835,6 +1837,52 @@ export function TasksView() {
         />
       )}
 
+      {showImport && (
+        <CsvImportModal
+          title="Importar tareas desde CSV"
+          description="Cada fila se convierte en una tarea nueva. Pendiente por default."
+          templateCSV={`titulo,descripcion,prioridad,asignados,tags,vence
+"Mandar capability statement","Cliente XYZ necesita capability statement actualizada",alta,"santo@govbidder.com,marcelo@govbidder.com","client,capability_statement",2026-05-15T18:00:00Z
+"Research bid 2024-007",,media,marcelo@govbidder.com,"bid,research",
+`}
+          columns={[
+            { field: "title",       label: "Título",       required: true,  aliases: ["titulo","name","tarea"] },
+            { field: "description", label: "Descripción",  aliases: ["descripcion","desc","detalle"] },
+            { field: "priority",    label: "Prioridad",    aliases: ["prioridad"] },
+            { field: "assignees",   label: "Asignados",    aliases: ["asignados","asignado","assignee","emails"],
+              transform: v => v.split(/[,;]/).map(s => s.trim()).filter(Boolean) },
+            { field: "tags",        label: "Tags",         aliases: ["tags"],
+              transform: v => v.split(/[,;]/).map(s => s.trim()).filter(Boolean) },
+            { field: "due_at",      label: "Vence",        aliases: ["vence","due","deadline","due_date"] },
+          ]}
+          onClose={() => setShowImport(false)}
+          onImport={async (rowsToInsert) => {
+            const session = await getSession()
+            if (!session) return { inserted: 0, failed: rowsToInsert.length, errors: ["Sesión expirada"] }
+            let inserted = 0
+            const errors: string[] = []
+            for (const row of rowsToInsert) {
+              try {
+                const res = await fetch("/api/admin/tasks", {
+                  method:  "POST",
+                  headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+                  body:    JSON.stringify(row),
+                })
+                if (res.ok) inserted++
+                else {
+                  const j = await res.json().catch(() => ({}))
+                  errors.push(`"${row.title ?? "—"}": ${j.error ?? "error"}`)
+                }
+              } catch (e: any) {
+                errors.push(`"${row.title ?? "—"}": ${e?.message ?? "error"}`)
+              }
+            }
+            await fetchAll()
+            return { inserted, failed: rowsToInsert.length - inserted, errors }
+          }}
+        />
+      )}
+
       {selectedIds.size > 0 && (
         <BulkBar
           count={selectedIds.size}
@@ -1915,6 +1963,13 @@ export function TasksView() {
             >
               <Sparkles className="h-3.5 w-3.5" />
               IA Extract
+            </button>
+            <button
+              onClick={() => setShowImport(true)}
+              className="hidden md:flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-[#1e3a8a] hover:border-[#1e3a8a]/30 transition-all"
+              title="Importar CSV"
+            >
+              <Upload className="h-4 w-4" />
             </button>
             <button
               onClick={handleExportCSV}

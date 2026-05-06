@@ -102,7 +102,19 @@ export async function DELETE(req: NextRequest) {
   if (!id) return NextResponse.json({ error: "id requerido" }, { status: 400 })
 
   const db = createServiceClient()
+  const { data: before } = await db.from("task_forms").select("slug,title,submit_count").eq("id", id).maybeSingle()
+
   const { error } = await db.from("task_forms").delete().eq("id", id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  const { audit } = await import("@/lib/audit")
+  await audit(req, {
+    actor:     user.email ?? null,
+    action:    "form.delete",
+    entity:    "task_form",
+    entity_id: id,
+    payload:   { before },
+  })
+
   return NextResponse.json({ ok: true })
 }
