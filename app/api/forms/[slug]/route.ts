@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createServiceClient } from "@/lib/supabase-service"
+import { rateLimit } from "@/lib/rate-limit"
 
 interface FormField {
   key:         string
@@ -29,6 +30,31 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ slug: stri
 // POST — submit the form (no auth required, creates a task)
 export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: string }> }) {
   const { slug } = await ctx.params
+
+  // Rate limit: 5 submits per IP per hour per form slug
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
+  const rl = rateLimit({
+    key:      `forms:${slug}:${ip}`,
+    limit:    5,
+    windowMs: 3600_000,   // 1 hour
+  })
+  if (!rl.allowed) {
+    return NextResponse.json(
+      {
+        error:        "Demasiados intentos. Probá de nuevo más tarde.",
+        retryAfterMs: rl.retryAfterMs,
+      },
+      {
+        status: 429,
+        headers: {
+          "Retry-After":           String(Math.ceil(rl.retryAfterMs / 1000)),
+          "X-RateLimit-Limit":     String(rl.limit),
+          "X-RateLimit-Remaining": String(rl.remaining),
+        },
+      }
+    )
+  }
+
   let body: Record<string, any>
   try { body = await req.json() } catch { return NextResponse.json({ error: "JSON inválido" }, { status: 400 }) }
 
@@ -100,7 +126,6 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: stri
   }
 
   // 5) Audit submission
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null
   const ua = req.headers.get("user-agent")
   await db.from("task_form_submissions").insert({
     form_id:        form.id,
@@ -108,7 +133,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: stri
     submitter_email: submitterEmail,
     submitter_name:  submitterName,
     payload:        body,
-    ip,
+    ip:             ip === "unknown" ? null : ip,
     user_agent:     ua,
   })
 

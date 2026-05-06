@@ -9,14 +9,15 @@ import {
 } from "lucide-react"
 
 interface ActivityItem {
-  id:        string
-  kind:      "task_created" | "task_updated" | "task_comment" | "task_status" | "persona_created"
-  timestamp: string
-  actor:     string | null
-  title:     string
-  body:      string | null
-  href:      string | null
-  meta:      Record<string, any>
+  id:         string
+  kind:       "task_created" | "task_updated" | "task_comment" | "task_status" | "persona_created"
+  timestamp:  string
+  actor:      string | null
+  actor_name: string | null
+  title:      string
+  body:       string | null
+  href:       string | null
+  meta:       Record<string, any>
 }
 
 const KIND_META: Record<string, { icon: any; color: string; bg: string; label: string }> = {
@@ -195,11 +196,14 @@ export function ActivityView() {
                           )}
                           <div className="flex items-center gap-2 mt-1">
                             {item.actor && (
-                              <span className="inline-flex items-center gap-1 text-[10.5px] text-slate-400">
-                                <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] text-[7px] font-bold text-white">
-                                  {initials(item.actor)}
+                              <span
+                                className="inline-flex items-center gap-1 text-[10.5px] text-slate-500 font-medium"
+                                title={item.actor}
+                              >
+                                <span className="flex h-4 w-4 items-center justify-center rounded-full ring-2 ring-white bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] text-[7.5px] font-bold text-white">
+                                  {initials(item.actor_name ?? item.actor)}
                                 </span>
-                                {item.actor}
+                                {item.actor_name ?? item.actor}
                               </span>
                             )}
                             <span className="text-[10.5px] text-slate-400">

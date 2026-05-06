@@ -10,14 +10,21 @@ async function getUser(req: NextRequest) {
 }
 
 interface ActivityItem {
-  id:        string
-  kind:      "task_created" | "task_updated" | "task_comment" | "task_status" | "persona_created"
-  timestamp: string
-  actor:     string | null
-  title:     string
-  body:      string | null
-  href:      string | null
-  meta:      Record<string, any>
+  id:         string
+  kind:       "task_created" | "task_updated" | "task_comment" | "task_status" | "persona_created"
+  timestamp:  string
+  actor:      string | null
+  actor_name: string | null
+  title:      string
+  body:       string | null
+  href:       string | null
+  meta:       Record<string, any>
+}
+
+function enrichActor(email: string | null, profilesByEmail: Map<string, { name: string }>): { actor: string | null; actor_name: string | null } {
+  if (!email) return { actor: null, actor_name: null }
+  const p = profilesByEmail.get(email)
+  return { actor: email, actor_name: p?.name ?? email.split("@")[0] }
 }
 
 // GET — chronological feed of last N activity events
@@ -31,7 +38,7 @@ export async function GET(req: NextRequest) {
   const cutoff = new Date(Date.now() - days * 86400_000).toISOString()
 
   const db = createServiceClient()
-  const [tasksRes, commentsRes, personasRes] = await Promise.all([
+  const [tasksRes, commentsRes, personasRes, profilesRes] = await Promise.all([
     db.from("tasks")
       .select("id,title,status,priority,owner,assignees,created_by,parent_id,created_at,updated_at,completed_at")
       .gte("updated_at", cutoff)
@@ -47,7 +54,14 @@ export async function GET(req: NextRequest) {
       .gte("created_at", cutoff)
       .order("created_at", { ascending: false })
       .limit(50),
+    db.from("profiles").select("email,full_name,role,status"),
   ])
+
+  // Build email → profile map for actor enrichment
+  const profilesByEmail = new Map<string, { name: string }>()
+  for (const p of (profilesRes.data ?? []) as any[]) {
+    if (p.email) profilesByEmail.set(p.email, { name: p.full_name ?? p.email.split("@")[0] })
+  }
 
   const tasks   = tasksRes.data    ?? []
   const comments = commentsRes.data ?? []
@@ -66,7 +80,7 @@ export async function GET(req: NextRequest) {
         id:        `t-c-${t.id}`,
         kind:      "task_created",
         timestamp: t.created_at,
-        actor:     t.created_by,
+        ...enrichActor(t.created_by, profilesByEmail),
         title:     "Nueva tarea",
         body:      t.title,
         href:      "/admin/tasks",
@@ -77,7 +91,7 @@ export async function GET(req: NextRequest) {
         id:        `t-d-${t.id}`,
         kind:      "task_status",
         timestamp: t.completed_at,
-        actor:     t.created_by,
+        ...enrichActor(t.created_by, profilesByEmail),
         title:     "Tarea completada",
         body:      t.title,
         href:      "/admin/tasks",
@@ -89,7 +103,7 @@ export async function GET(req: NextRequest) {
         id:        `t-u-${t.id}-${t.updated_at}`,
         kind:      "task_updated",
         timestamp: t.updated_at,
-        actor:     t.created_by,
+        ...enrichActor(t.created_by, profilesByEmail),
         title:     "Tarea actualizada",
         body:      t.title,
         href:      "/admin/tasks",
@@ -106,7 +120,7 @@ export async function GET(req: NextRequest) {
       id:        `c-${c.id}`,
       kind:      "task_comment",
       timestamp: c.created_at,
-      actor:     c.author,
+      ...enrichActor(c.author, profilesByEmail),
       title:     c.kind === "system" ? "Evento" : "Comentario",
       body:      `${taskTitle}: ${c.content}`,
       href:      "/admin/tasks",
@@ -120,7 +134,7 @@ export async function GET(req: NextRequest) {
       id:        `p-${p.id}`,
       kind:      "persona_created",
       timestamp: p.created_at,
-      actor:     p.owner,
+      ...enrichActor(p.owner, profilesByEmail),
       title:     "Nueva persona agendada",
       body:      p.name,
       href:      "/admin/personas",

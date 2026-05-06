@@ -635,6 +635,58 @@ function DetailDrawer({
                 />
               </div>
 
+              {/* Recurrencia (solo para tareas top-level) */}
+              {!task.parent_id && (
+                <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50/50 p-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">
+                      Tarea recurrente
+                    </p>
+                    <label className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={(task as any).is_recurrence_template ?? false}
+                        onChange={e => onPatch(task.id, {
+                          is_recurrence_template: e.target.checked,
+                          recurrence_rule: e.target.checked ? ((task as any).recurrence_rule ?? "weekly") : null,
+                        } as any)}
+                        className="h-3 w-3 accent-[#E42D2C]"
+                      />
+                      Activar
+                    </label>
+                  </div>
+                  {(task as any).is_recurrence_template && (
+                    <>
+                      <div className="grid grid-cols-2 gap-2">
+                        <select
+                          value={(task as any).recurrence_rule ?? "weekly"}
+                          onChange={e => onPatch(task.id, { recurrence_rule: e.target.value } as any)}
+                          className="h-9 rounded-lg border border-slate-200 bg-white px-2.5 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300"
+                        >
+                          <option value="daily">Diaria</option>
+                          <option value="weekly">Semanal</option>
+                          <option value="monthly">Mensual</option>
+                        </select>
+                        <input
+                          type="date"
+                          value={(task as any).recurrence_until ?? ""}
+                          onChange={e => onPatch(task.id, { recurrence_until: e.target.value || null } as any)}
+                          className="h-9 rounded-lg border border-slate-200 bg-white px-2.5 text-[12px] text-slate-900 outline-none focus:border-[#1e3a8a]/40"
+                          placeholder="Hasta cuándo"
+                          title="Fecha límite (opcional)"
+                        />
+                      </div>
+                      <p className="text-[10.5px] text-slate-500 leading-snug">
+                        Esta tarea actúa como plantilla. Cada{" "}
+                        {(task as any).recurrence_rule === "daily"   ? "día"  :
+                         (task as any).recurrence_rule === "monthly" ? "mes"  : "semana"}
+                        {" "}se crea automáticamente una instancia nueva con due date a las 18:00.
+                      </p>
+                    </>
+                  )}
+                </div>
+              )}
+
               {/* Subtasks */}
               <div className="space-y-2 pt-2 border-t border-slate-200">
                 <div className="flex items-center gap-2">
