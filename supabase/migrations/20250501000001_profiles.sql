@@ -17,10 +17,18 @@ create policy "users_own_profile_select" on public.profiles
 create policy "users_own_profile_update" on public.profiles
   for update to authenticated using (id = auth.uid()) with check (id = auth.uid());
 
--- Admins can read all profiles
+-- Admins can read all profiles.
+-- IMPORTANTE: usar una función security-definer para evitar recursión infinita.
+-- Si la policy hiciera `exists (select from profiles ...)` directo, la sub-query
+-- volvería a fire la policy → loop. La función bypasea RLS.
+create or replace function public.is_admin() returns boolean
+language sql security definer stable as $$
+  select exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+$$;
+
 create policy "admin_read_all_profiles" on public.profiles
   for select to authenticated
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin'));
+  using (public.is_admin());
 
 -- Service role has full access
 create policy "service_role_all_profiles" on public.profiles

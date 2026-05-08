@@ -43,9 +43,16 @@ drop policy if exists "admin_read_all_profiles"  on public.profiles;
 drop policy if exists "service_role_all_profiles" on public.profiles;
 create policy "users_own_profile_select"  on public.profiles for select to authenticated using (auth.uid() = id);
 create policy "users_own_profile_update"  on public.profiles for update to authenticated using (auth.uid() = id);
-create policy "admin_read_all_profiles"   on public.profiles for select to authenticated using (
-  exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin')
-);
+-- IMPORTANTE: la policy de admin usa is_admin() (security definer) para evitar
+-- recursión infinita. Si la consulta hiciera "select * from profiles where role=admin",
+-- la policy se llamaría a sí misma → loop. La función bypasea RLS.
+create or replace function public.is_admin() returns boolean
+language sql security definer stable as $$
+  select exists (
+    select 1 from public.profiles where id = auth.uid() and role = 'admin'
+  )
+$$;
+create policy "admin_read_all_profiles"   on public.profiles for select to authenticated using (public.is_admin());
 create policy "service_role_all_profiles" on public.profiles for all to service_role using (true) with check (true);
 
 
