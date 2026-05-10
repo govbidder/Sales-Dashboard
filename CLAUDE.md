@@ -1,6 +1,34 @@
-# GovBidder Sales Dashboard
+# GovBidder General Dashboard
 
-Dashboard de coaching de ventas para gobierno. Gestión de clientes, deals (Cha-Ching), tareas, auditorías, calendario, reportes mensuales, AI assistant, y herramientas de content research.
+Dashboard general/operativo interno de GovBidder. La "vista de comando" del negocio — pensada para que Santo (founder) la abra a primera hora y entienda en menos de 2 minutos cómo está todo, sin abrir 8 herramientas distintas.
+
+## Quién lo usa
+
+- **Santo (founder)**: vista global. Qué se vendió ayer, qué tareas están trabadas, qué KPIs de contenido están bajos, qué área del equipo está saturada.
+- **Equipo interno por área**: cada departamento entra a su sección y ve sus tareas asignadas, KPIs propios, lo que tiene que hacer hoy.
+
+## Qué incluye
+
+- KPIs de contenido (publicaciones, performance, alcance, tendencias).
+- KPIs de ventas (deals, conversiones, números del mes).
+- KPIs de negocio general (revenue, métricas operativas).
+- Vista por departamento (cada área tiene su sub-dashboard).
+- Tareas asignadas por departamento.
+- Reportes mensuales y métricas comparativas.
+- AI assistant para preguntas tipo "cómo va el mes" sin armar queries.
+
+## UX
+
+- **Vibe**: tipo Go High Level. Sobrio, profesional, modular.
+- **Secuenciado**: información en orden de importancia, no todo apilado.
+- **Masticable**: cards que se leen rápido, sin sobrecarga cognitiva.
+- **Organizado**: agrupado por área/temática. No mezclar KPIs de ventas con tareas operativas en la misma card.
+
+## Lo que NO es
+
+- No es un CRM, ni una landing pública, ni un sistema de coaching.
+- No es self-service para clientes finales — es herramienta interna.
+- No es un proyecto de showcase — es operación real diaria.
 
 ## Stack
 
