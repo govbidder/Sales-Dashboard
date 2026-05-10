@@ -1,6 +1,6 @@
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Discovery — GovBidder General Dashboard
--- Form interno para que Santo + socio respondan juntos el cuestionario de
+-- Form interno para que Santo + Cristian respondan juntos el cuestionario de
 -- 35 preguntas (8 bloques) que enmarca la visión y el alcance del dashboard.
 --
 -- Slug público: /forms/discovery-dashboard
@@ -22,7 +22,7 @@ insert into public.task_forms (
   'Discovery — GovBidder General Dashboard',
   'Respondan los dos juntos. Si discrepan, escriban AMBAS opiniones — eso es lo más valioso. Si no saben, escriban "no sabemos todavía". Si no aplica, escriban "no aplica" y por qué. Tiempo estimado: 30-45 minutos.',
   $JSON$[
-    { "key": "name",  "label": "Quién/quiénes responden (ej: Santo + socio)", "type": "text",  "required": true,  "placeholder": "Santo + Nombre del socio" },
+    { "key": "name",  "label": "Quién/quiénes responden (ej: Santo + Cristian)", "type": "text",  "required": true,  "placeholder": "Santo + Cristian" },
     { "key": "email", "label": "Email de contacto",                            "type": "email", "required": true,  "placeholder": "santo@govbidder.com" },
 
     { "key": "q01", "label": "B1·Q1 — En 2 frases máximo: ¿qué es GovBidder y a quién se lo venden?", "type": "longtext", "required": false },
@@ -63,7 +63,7 @@ insert into public.task_forms (
     { "key": "q30", "label": "B7·Q30 — ¿Imaginan que CLIENTES de GovBidder accedan a algún módulo? ¿A cuál? (CRÍTICO: cambia toda la arquitectura)", "type": "longtext", "required": false },
     { "key": "q31", "label": "B7·Q31 — ¿Integraciones con otras herramientas que sí o sí necesitan? (Stripe, Mailchimp, WhatsApp Business, APIs de gobierno, etc.)", "type": "longtext", "required": false },
 
-    { "key": "q32", "label": "B8·Q32 — ¿Hay alguna decisión sobre el dashboard donde Santo y socio NO están de acuerdo? ¿Qué piensa cada uno?", "type": "longtext", "required": false },
+    { "key": "q32", "label": "B8·Q32 — ¿Hay alguna decisión sobre el dashboard donde Santo y Cristian NO están de acuerdo? ¿Qué piensa cada uno?", "type": "longtext", "required": false },
     { "key": "q33", "label": "B8·Q33 — ¿Hay alguna feature que les vendieron / pensaron al principio pero hoy no creen que sea necesaria?", "type": "longtext", "required": false },
     { "key": "q34", "label": "B8·Q34 — Si tuvieran que poner el dashboard en producción REAL para todo el equipo en 30 días, ¿qué les preocupa más que pueda fallar?", "type": "longtext", "required": false },
     { "key": "q35", "label": "B8·Q35 — Cualquier cosa que sientan importante y no preguntamos.", "type": "longtext", "required": false }
