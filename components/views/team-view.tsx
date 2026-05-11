@@ -8,6 +8,7 @@ import {
   Crown, Shield, ListTodo, Clock, UserPlus, CheckCircle2,
 } from "lucide-react"
 import { Portal } from "@/components/ui/portal"
+import type { Department } from "@/lib/types/department"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -24,6 +25,7 @@ interface Member {
   started_at:       string | null
   avatar_url:       string | null
   notes:            string | null
+  department_id:    string | null
   last_sign_in_at:  string | null
   created_at:       string
   personas_owned:   number
@@ -46,9 +48,10 @@ const inputCls = "w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-
 // ─── Detail Drawer ────────────────────────────────────────────────────────────
 
 function DetailDrawer({
-  member, onClose, onPatch, isAdmin,
+  member, departments, onClose, onPatch, isAdmin,
 }: {
   member: Member
+  departments: Department[]
   onClose: () => void
   onPatch: (id: string, updates: Partial<Member>) => void
   isAdmin: boolean
@@ -153,6 +156,20 @@ function DetailDrawer({
               />
             </div>
 
+            {departments.length > 0 && (
+              <div className="space-y-1.5">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Departamento</p>
+                <select
+                  value={member.department_id ?? ""}
+                  onChange={e => onPatch(member.id, { department_id: e.target.value || null } as any)}
+                  className={inputCls}
+                >
+                  <option value="">— Sin departamento —</option>
+                  {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                </select>
+              </div>
+            )}
+
             <div className="space-y-1.5">
               <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Empezó el</p>
               <input
@@ -189,23 +206,25 @@ function DetailDrawer({
 // ─── Invite Modal ─────────────────────────────────────────────────────────────
 
 function InviteModal({
-  onClose, onInvite, inviting,
+  onClose, onInvite, inviting, departments,
 }: {
   onClose:  () => void
-  onInvite: (data: { email: string; full_name: string; position: string; role: Role }) => Promise<{ error?: string }>
+  onInvite: (data: { email: string; full_name: string; position: string; role: Role; department_id: string | null }) => Promise<{ error?: string }>
   inviting: boolean
+  departments: Department[]
 }) {
-  const [email,    setEmail]    = useState("")
-  const [fullName, setFullName] = useState("")
-  const [position, setPosition] = useState("")
-  const [role,     setRole]     = useState<Role>("user")
-  const [error,    setError]    = useState<string | null>(null)
+  const [email,        setEmail]        = useState("")
+  const [fullName,     setFullName]     = useState("")
+  const [position,     setPosition]     = useState("")
+  const [role,         setRole]         = useState<Role>("user")
+  const [departmentId, setDepartmentId] = useState("")
+  const [error,        setError]        = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email.trim()) return
     setError(null)
-    const result = await onInvite({ email: email.trim(), full_name: fullName.trim(), position: position.trim(), role })
+    const result = await onInvite({ email: email.trim(), full_name: fullName.trim(), position: position.trim(), role, department_id: departmentId || null })
     if (result.error) setError(result.error)
   }
 
@@ -293,6 +312,20 @@ function InviteModal({
               </div>
             </div>
 
+            {departments.length > 0 && (
+              <div className="space-y-1.5">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">Departamento</p>
+                <select
+                  value={departmentId}
+                  onChange={e => setDepartmentId(e.target.value)}
+                  className={inputCls + " cursor-pointer"}
+                >
+                  <option value="">— Sin departamento —</option>
+                  {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                </select>
+              </div>
+            )}
+
             {error && (
               <div className="flex items-start gap-2 rounded-xl border border-red-500/25 bg-red-500/10 px-3 py-2.5 text-[12px] text-red-700">
                 <X className="h-3.5 w-3.5 shrink-0 mt-0.5" />
@@ -329,7 +362,7 @@ function InviteModal({
 
 // ─── Member Card ──────────────────────────────────────────────────────────────
 
-function MemberCard({ member, onClick }: { member: Member; onClick: () => void }) {
+function MemberCard({ member, department, onClick }: { member: Member; department: Department | null; onClick: () => void }) {
   const displayName = member.full_name || member.email || "Sin nombre"
   const isAdmin = member.role === "admin"
   const isInactive = member.status === "inactivo"
@@ -379,6 +412,14 @@ function MemberCard({ member, onClick }: { member: Member; onClick: () => void }
               Admin
             </span>
           )}
+          {department && (
+            <span
+              className="rounded-full border px-2 py-0.5 text-[10px] font-bold"
+              style={{ borderColor: department.color + "40", backgroundColor: department.color + "15", color: department.color }}
+            >
+              {department.name}
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-3 text-[11px] text-slate-500">
@@ -405,6 +446,8 @@ export function TeamView() {
   const [search,         setSearch]         = useState("")
   const [filterStatus,   setFilterStatus]   = useState<"todos" | Status>("todos")
   const [currentRole,    setCurrentRole]    = useState<Role>("user")
+  const [departments,    setDepartments]    = useState<Department[]>([])
+  const [filterDepartment, setFilterDepartment] = useState<string>("todos")
 
   const router       = useRouter()
   const pathname     = usePathname()
@@ -427,10 +470,12 @@ export function TeamView() {
         .from("profiles").select("role").eq("id", session.user.id).single()
       setCurrentRole((profile?.role as Role) ?? "user")
 
-      const res = await fetch("/api/admin/team", {
-        headers: { Authorization: `Bearer ${session.access_token}` },
-      })
+      const [res, dRes] = await Promise.all([
+        fetch("/api/admin/team",  { headers: { Authorization: `Bearer ${session.access_token}` } }),
+        fetch("/api/departments", { headers: { Authorization: `Bearer ${session.access_token}` } }),
+      ])
       if (res.ok) setMembers((await res.json()).members ?? [])
+      if (dRes.ok) setDepartments((await dRes.json()).departments ?? [])
     } finally { setLoading(false) }
   }, [])
 
@@ -445,7 +490,7 @@ export function TeamView() {
     router.replace(pathname, { scroll: false })
   }, [searchParams, loading, currentRole, router, pathname])
 
-  const handleInvite = async (data: { email: string; full_name: string; position: string; role: Role }) => {
+  const handleInvite = async (data: { email: string; full_name: string; position: string; role: Role; department_id: string | null }) => {
     setInviting(true)
     try {
       const session = await getSession()
@@ -475,12 +520,15 @@ export function TeamView() {
     })
   }
 
+  const deptMap = useMemo(() => new Map(departments.map(d => [d.id, d])), [departments])
+
   const filtered = useMemo(() => members.filter(m => {
     if (filterStatus !== "todos" && m.status !== filterStatus) return false
+    if (filterDepartment !== "todos" && m.department_id !== filterDepartment) return false
     if (!search.trim()) return true
     const q = search.toLowerCase()
     return [m.full_name, m.email, m.position].some(v => v?.toLowerCase().includes(q))
-  }), [members, search, filterStatus])
+  }), [members, search, filterStatus, filterDepartment])
 
   const isAdmin       = currentRole === "admin"
   const activeCount   = members.filter(m => m.status === "activo").length
@@ -492,12 +540,13 @@ export function TeamView() {
   return (
     <>
       {showInvite && (
-        <InviteModal onClose={() => setShowInvite(false)} onInvite={handleInvite} inviting={inviting} />
+        <InviteModal onClose={() => setShowInvite(false)} onInvite={handleInvite} inviting={inviting} departments={departments} />
       )}
 
       {selected && (
         <DetailDrawer
           member={selected}
+          departments={departments}
           onClose={() => setSelected(null)}
           onPatch={patch}
           isAdmin={isAdmin}
@@ -612,6 +661,16 @@ export function TeamView() {
               </button>
             ))}
           </div>
+          {departments.length > 0 && (
+            <select
+              value={filterDepartment}
+              onChange={e => setFilterDepartment(e.target.value)}
+              className="h-9 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300"
+            >
+              <option value="todos">Todos los departamentos</option>
+              {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+            </select>
+          )}
         </div>
 
         {/* Grid */}
@@ -646,7 +705,7 @@ export function TeamView() {
         ) : (
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map(m => (
-              <MemberCard key={m.id} member={m} onClick={() => setSelected(m)} />
+              <MemberCard key={m.id} member={m} department={m.department_id ? deptMap.get(m.department_id) ?? null : null} onClick={() => setSelected(m)} />
             ))}
           </div>
         )}
