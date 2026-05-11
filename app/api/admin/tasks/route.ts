@@ -67,8 +67,9 @@ export async function POST(req: NextRequest) {
       tags:        Array.isArray(body.tags)      ? body.tags.filter(Boolean)      : [],
       due_at:      body.due_at   || null,
       persona_id:  body.persona_id || null,
-      parent_id:   body.parent_id  || null,
-      created_by:  user.email || user.id,
+      parent_id:     body.parent_id    || null,
+      department_id: body.department_id || null,
+      created_by:    user.email || user.id,
     })
     .select()
     .single()
