@@ -49,11 +49,13 @@ Dashboard general/operativo interno de GovBidder. La "vista de comando" del nego
 ## Comandos clave
 
 ```bash
-npm run dev      # Dev server
-npm run build    # Build de producción
-npm run lint     # ESLint
-npm run start    # Serve build local
-npx tsc --noEmit # Type check (no hay script, correr manualmente)
+npm run dev          # Dev server
+npm run build        # Build de producción
+npm run lint         # ESLint
+npm run start        # Serve build local
+npx tsc --noEmit     # Type check (no hay script, correr manualmente)
+pnpm seed:demo       # Llena la DB con data demo (12 meses de KPIs, 60 tasks, 30 personas, 20 usuarios)
+pnpm cleanup:demo    # Borra todo lo seedeado (filtra por prefijo "Demo - ")
 ```
 
 ## Convenciones
@@ -123,6 +125,12 @@ supabase/
 - **ThemeProvider**: dark mode está activo. Todos los colores deben funcionar en ambos modos.
 - **No hay test runner configurado**: no hay jest/vitest/playwright en el repo. Validar con `npx tsc --noEmit` y `npm run lint`.
 - **View-As: server-side solo para user simulado**: cuando un developer simula un **user concreto** (`viewAsUser`), `fetchWithViewAs` manda el header `X-View-As-User-Id` y `getEffectiveUser` lo respeta — el server devuelve solo data del user simulado. Cuando se simula **solo un rol o solo un departamento** (sin user puntual), el server NO filtra: es una vista *previa* client-side. Las views afectadas (ej. `tasks-view.tsx`) aplican un filtro client por `simulatedDeptId` cuando corresponde, y el banner amarillo dice "solo visual" en ese caso. Decisión consciente — un dept o un rol no son identidades, no encajan en el modelo del impersonation log que requiere un `user_id` real.
+- **Schema drift entre `schema.sql`/migrations y el live DB**: confirmado a 2026-05-12. El archivo `schema.sql` y los archivos de migración NO son la fuente de verdad sobre qué columnas existen realmente. Casos concretos detectados:
+  - `monthly_reports.client_id` sigue `NOT NULL` aunque la migración `20250504000005_monthly_reports_single_tenant.sql` declaró que "queda nullable" — nunca hizo el `ALTER COLUMN DROP NOT NULL`. Necesitás un `client_id` válido al insertar.
+  - `monthly_reports.no_show` no existe en live.
+  - `personas_agendadas.rating` no existe en live (en algunos environments).
+  - `seguimientos`: el cache de PostgREST a veces no expone `type`/`owner`/`completed` aunque la migration los declara — usar payload mínimo (`persona_id` + `content`) cuando sea posible.
+  - Regla: al escribir seeds o queries de mutación, manejá el error de columna faltante con un `try/catch` o un fallback a payload mínimo, no asumas que el schema del repo refleja el live DB.
 
 ## Variables de entorno
 
