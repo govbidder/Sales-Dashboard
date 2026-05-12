@@ -105,11 +105,13 @@ const inputCls = "w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-
 // ─── Form ─────────────────────────────────────────────────────────────────────
 
 function ReportForm({
-  initialMonth, initialReport, allMonths, onSaved,
+  initialMonth, initialReport, allMonths, departmentId, onSaved,
 }: {
   initialMonth:  string
   initialReport: any | null
   allMonths:     string[]
+  /** null = reporte global de empresa. uuid = scope a ese depto. */
+  departmentId:  string | null
   onSaved:       (r: any) => void
 }) {
   const [month,    setMonth]    = useState(initialMonth)
@@ -125,14 +127,15 @@ function ReportForm({
     [month, allMonths]
   )
 
-  // Fetch report when month changes
+  // Fetch report when month or departmentId changes
   const loadMonth = useCallback(async (m: string) => {
     setLoading(true)
     try {
       const supabase = createClient()
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) return
-      const res = await fetchWithViewAs(`/api/admin/reports?month=${m}`, {
+      const deptQs = departmentId ? `&department=${departmentId}` : `&department=global`
+      const res = await fetchWithViewAs(`/api/admin/reports?month=${m}${deptQs}`, {
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
       if (res.ok) {
@@ -140,7 +143,7 @@ function ReportForm({
         setValues(json.report ?? {})
       }
     } finally { setLoading(false) }
-  }, [])
+  }, [departmentId])
 
   useEffect(() => {
     if (initialReport) setValues(initialReport)
@@ -166,8 +169,8 @@ function ReportForm({
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) return
 
-      // Build payload
-      const payload: Record<string, any> = { month }
+      // Build payload — incluye department_id para identificar la fila correcta.
+      const payload: Record<string, any> = { month, department_id: departmentId }
       for (const sec of SECTIONS) for (const f of sec.fields) {
         const v = values[f.key]
         if (v == null || v === "") payload[f.key] = null
@@ -410,13 +413,18 @@ const CSV_TEMPLATE_EXAMPLE_ROW = {
   cash_collected: 18000, total_revenue: 22000, mrr: 12000,
 }
 
+interface DeptOption { id: string; name: string; color: string }
+
 export function ReportsInputView() {
-  const [tab,        setTab]        = useState<"form" | "history">("form")
-  const [month,      setMonth]      = useState(getCurrentMonth())
-  const [reports,    setReports]    = useState<any[]>([])
-  const [loading,    setLoading]    = useState(true)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [showImport, setShowImport] = useState(false)
+  const [tab,         setTab]         = useState<"form" | "history">("form")
+  const [month,       setMonth]       = useState(getCurrentMonth())
+  const [reports,     setReports]     = useState<any[]>([])
+  const [loading,     setLoading]     = useState(true)
+  const [deletingId,  setDeletingId]  = useState<string | null>(null)
+  const [showImport,  setShowImport]  = useState(false)
+  const [departments, setDepartments] = useState<DeptOption[]>([])
+  /** null = scope global; uuid = scope a un depto. */
+  const [selectedDept, setSelectedDept] = useState<string | null>(null)
   const toast = useToast()
 
   const getSession = async () => {
@@ -429,11 +437,30 @@ export function ReportsInputView() {
     try {
       const session = await getSession()
       if (!session) return
-      const res = await fetchWithViewAs("/api/admin/reports", {
+      // History muestra TODOS los reportes (global + deptos) para que admin pueda
+      // browsear. El filtro visual queda dentro de HistoryView.
+      const res = await fetchWithViewAs("/api/admin/reports?department=all", {
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
       if (res.ok) setReports((await res.json()).reports ?? [])
     } finally { setLoading(false) }
+  }, [])
+
+  // Fetch departments once for the selector.
+  useEffect(() => {
+    let mounted = true
+    ;(async () => {
+      const session = await getSession()
+      if (!session) return
+      const res = await fetchWithViewAs("/api/departments", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      })
+      if (res.ok && mounted) {
+        const j = await res.json()
+        setDepartments(j.departments ?? [])
+      }
+    })()
+    return () => { mounted = false }
   }, [])
 
   useEffect(() => { fetchReports() }, [fetchReports])
@@ -590,11 +617,24 @@ export function ReportsInputView() {
         <div>
           <h1 className="text-2xl font-bold text-[#1e3a8a] tracking-tight">Métricas Mensuales</h1>
           <p className="text-sm text-slate-400 mt-0.5">
-            Cargá los KPIs del mes para ver el dashboard alimentado.
+            Cargá los KPIs del mes — globales de empresa o por departamento.
           </p>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
+          {/* Selector: scope global vs depto específico */}
+          <select
+            value={selectedDept ?? ""}
+            onChange={e => setSelectedDept(e.target.value || null)}
+            className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300"
+            title="A qué scope pertenece este reporte"
+          >
+            <option value="">🏢 Empresa (global)</option>
+            {departments.map(d => (
+              <option key={d.id} value={d.id}>📁 {d.name}</option>
+            ))}
+          </select>
+
           <button
             onClick={handleDownloadTemplate}
             className="flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[12px] font-semibold text-slate-700 hover:border-slate-300 hover:text-slate-900 transition-all"
@@ -637,9 +677,11 @@ export function ReportsInputView() {
           </div>
         ) : (
           <ReportForm
+            key={selectedDept ?? "global"}
             initialMonth={month}
             initialReport={null}
             allMonths={allMonths}
+            departmentId={selectedDept}
             onSaved={handleSaved}
           />
         )

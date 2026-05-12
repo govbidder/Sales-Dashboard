@@ -4,6 +4,8 @@ import { useMemo } from "react"
 import { TrendingDown, TrendingUp, DollarSign, Wallet, Repeat, Megaphone, Phone, UserPlus, CalendarClock, CheckCircle2, MessageCircle } from "lucide-react"
 import { useSelectedMonth } from "@/components/layout/dashboard-layout"
 import { useMonthlyReports } from "@/hooks/use-monthly-reports"
+import { useCurrentUser } from "@/components/ui/use-current-user"
+import { isAdminOrAbove } from "@/lib/types/role"
 import { useMarkPageReady } from "@/hooks/use-mark-page-ready"
 import { useMinLoading } from "@/hooks/use-min-loading"
 import { KpiCardSkeleton, SectionHeaderSkeleton } from "@/components/ui/skeleton"
@@ -75,7 +77,17 @@ export function BusinessKPIs({ selectedMonth: propMonth }: { selectedMonth?: str
   const ctxMonth    = useSelectedMonth()
   const effectiveMonth = (propMonth ?? ctxMonth ?? "").slice(0, 7)
 
-  const { reports, loading } = useMonthlyReports()
+  // Scope del fetch:
+  //  - Admin/Founder/Developer → reportes globales de empresa.
+  //  - Team con depto asignado → reportes de SU depto.
+  //  - Team sin depto → fallback a global (no muestra nada útil de otro modo).
+  const { user } = useCurrentUser()
+  const scope =
+    user && !isAdminOrAbove(user.role) && user.department_id
+      ? user.department_id
+      : "global"
+
+  const { reports, loading } = useMonthlyReports(scope)
   const showSkeleton = useMinLoading(loading)
   useMarkPageReady(!showSkeleton)
 
