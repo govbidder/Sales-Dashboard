@@ -12,6 +12,10 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip,
 } from "recharts"
 
+// Conversión view: embudo + tasa de cierre + tendencia histórica del embudo.
+// Antes incluía Offer Docs y Aplicaciones; esas secciones se sacaron como
+// parte del rediseño (no eran parte del flujo de ventas core).
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function fmtMonth(m: string) {
@@ -86,18 +90,6 @@ function FunnelStep({
   )
 }
 
-// ─── Mini stat card ───────────────────────────────────────────────────────────
-
-function MiniStat({ label, value, sub, color = "#E42D2C" }: { label: string; value: string | number; sub?: string; color?: string }) {
-  return (
-    <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 hover:border-slate-300 transition-colors">
-      <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: `${color}99` }}>{label}</p>
-      <p className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 leading-none">{value}</p>
-      {sub && <p className="mt-2 text-xs text-slate-400">{sub}</p>}
-    </div>
-  )
-}
-
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function SalesView() {
@@ -132,12 +124,12 @@ export function SalesView() {
         const [curRes, histRes] = await Promise.all([
           supabase
             .from("monthly_reports")
-            .select("scheduled_calls,attended_calls,applications,new_clients,offer_docs_sent,offer_docs_responded,cierres_por_offerdoc")
+            .select("scheduled_calls,attended_calls,new_clients")
             .eq("month", monthValue)
             .maybeSingle(),
           supabase
             .from("monthly_reports")
-            .select("month,scheduled_calls,attended_calls,new_clients,offer_docs_sent,offer_docs_responded,cierres_por_offerdoc,applications")
+            .select("month,scheduled_calls,attended_calls,new_clients")
             .order("month", { ascending: true })
             .limit(12),
         ])
@@ -153,9 +145,6 @@ export function SalesView() {
               agendadas:    Number(r.scheduled_calls)      || 0,
               atendidas:    Number(r.attended_calls)       || 0,
               cierres:      Number(r.new_clients)          || 0,
-              odEnviados:   Number(r.offer_docs_sent)      || 0,
-              odRespondidos:Number(r.offer_docs_responded) || 0,
-              odCierres:    Number(r.cierres_por_offerdoc) || 0,
             }))
           )
           setLoading(false)
@@ -170,15 +159,9 @@ export function SalesView() {
 
   const scheduled  = Number(data?.scheduled_calls) || 0
   const attended   = Number(data?.attended_calls)  || 0
-  const applications = Number(data?.applications)  || 0
   const closed     = Number(data?.new_clients)     || 0
-  const odSent     = Number(data?.offer_docs_sent) || 0
-  const odResp     = Number(data?.offer_docs_responded) || 0
-  const odCierres  = Number(data?.cierres_por_offerdoc) || 0
 
   const closeRatePct = attended > 0 ? ((closed / attended) * 100).toFixed(1) : "—"
-  const odRespRate   = odSent    > 0 ? ((odResp / odSent)   * 100).toFixed(1) : "—"
-  const odCloseRate  = odResp    > 0 ? ((odCierres / odResp) * 100).toFixed(1) : "—"
 
   if (showSkeleton) {
     return (
@@ -193,8 +176,8 @@ export function SalesView() {
     <div className="space-y-10">
       {/* Header */}
       <div>
-        <h2 className="text-xl font-bold text-slate-900">Ventas y Conversión</h2>
-        <p suppressHydrationWarning className="text-[13px] text-slate-400 mt-0.5">
+        <h2 className="text-xl font-bold text-slate-900">Conversión</h2>
+        <p suppressHydrationWarning className="text-[13px] text-slate-500 mt-0.5">
           Embudo mensual · {selectedMonth}
         </p>
       </div>
@@ -202,12 +185,12 @@ export function SalesView() {
       {error && <p className="text-red-600 text-sm">{error}</p>}
       {!loading && !error && !data && <p className="text-slate-400 text-sm">No hay reporte para este mes.</p>}
 
-      <div className="grid gap-10 lg:grid-cols-2">
+      <div className="grid gap-10">
         {/* ── Funnel visual ── */}
         <section className="space-y-4">
           <div>
             <h3 className="text-base font-bold text-slate-900">Embudo de llamadas</h3>
-            <p className="text-xs text-slate-400 mt-0.5">Cada barra muestra qué tan ancho llega a cada paso</p>
+            <p className="text-xs text-slate-500 mt-0.5">Cada barra muestra qué tan ancho llega a cada paso</p>
           </div>
           <div>
             <FunnelStep
@@ -244,7 +227,7 @@ export function SalesView() {
           }`}>
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">Tasa de cierre</p>
-              <p className="text-xs text-slate-400 mt-0.5">cierres / llamadas atendidas</p>
+              <p className="text-xs text-slate-500 mt-0.5">cierres / llamadas atendidas</p>
             </div>
             <p className={`text-2xl sm:text-4xl font-bold tabular-nums ${
               Number(closeRatePct) >= 20 ? "text-emerald-700"
@@ -252,53 +235,6 @@ export function SalesView() {
               : "text-red-700"
             }`}>{closeRatePct}{closeRatePct !== "—" ? "%" : ""}</p>
           </div>
-        </section>
-
-        {/* ── Offer Docs + Aplicaciones ── */}
-        <section className="space-y-4">
-          <div>
-            <h3 className="text-base font-bold text-slate-900">Offer Docs & Pipeline</h3>
-            <p className="text-xs text-slate-400 mt-0.5">El recorrido desde la aplicación al cierre</p>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <MiniStat label="Aplicaciones"        value={applications || "—"} color="#818cf8" />
-            <MiniStat label="Offer Docs enviados" value={odSent || "—"}      color="#60a5fa" />
-            <MiniStat
-              label="Offer Docs respondidos"
-              value={odResp || "—"}
-              sub={`Response rate: ${odRespRate}${odRespRate !== "—" ? "%" : ""}`}
-              color="#4ade80"
-            />
-            <MiniStat
-              label="Cierres por Offer Doc"
-              value={odCierres || "—"}
-              sub={`Tasa: ${odCloseRate}${odCloseRate !== "—" ? "%" : ""}`}
-              color="#E42D2C"
-            />
-          </div>
-
-          {/* Offer Doc funnel */}
-          {odSent > 0 && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-3">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">Funnel Offer Doc</p>
-              {[
-                { label: "Enviados", value: odSent,    pctW: 100,                         color: "#60a5fa" },
-                { label: "Respondidos", value: odResp, pctW: pct(odResp, odSent),         color: "#4ade80" },
-                { label: "Cerrados",  value: odCierres,pctW: pct(odCierres, odSent),      color: "#E42D2C" },
-              ].map(row => (
-                <div key={row.label} className="space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-slate-500">{row.label}</span>
-                    <span className="font-bold text-slate-900 tabular-nums">{row.value} <span className="text-slate-400 font-normal">({row.pctW}%)</span></span>
-                  </div>
-                  <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-                    <div className="h-full rounded-full transition-all duration-700"
-                      style={{ width: `${row.pctW}%`, backgroundColor: row.color }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </section>
       </div>
 
@@ -341,44 +277,6 @@ export function SalesView() {
         </section>
       )}
 
-      {/* ── Offer Doc trend ── */}
-      {history.length >= 2 && (
-        <section className="space-y-4">
-          <div>
-            <h3 className="text-base font-bold text-slate-900">Tendencia de Offer Docs</h3>
-            <p className="text-xs text-slate-400 mt-0.5">Evolución mensual del pipeline de Offer Docs</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-6">
-            <div className="flex flex-wrap gap-5 mb-5">
-              {[
-                { label: "OD Enviados",    color: "#60a5fa" },
-                { label: "OD Respondidos", color: "#4ade80" },
-                { label: "Cierres x OD",   color: "#E42D2C" },
-              ].map(l => (
-                <div key={l.label} className="flex items-center gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: l.color }} />
-                  <span className="text-[11px] text-slate-500">{l.label}</span>
-                </div>
-              ))}
-            </div>
-            <ResponsiveContainer width="100%" height={240}>
-              <ComposedChart data={history} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
-                <CartesianGrid vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="month" stroke="transparent" tick={{ fill: "#94a3b8", fontSize: 11 }} tickLine={false} axisLine={false} />
-                <YAxis stroke="transparent" tick={{ fill: "#94a3b8", fontSize: 11 }} tickLine={false} axisLine={false} width={32} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "10px 14px" }}
-                  labelStyle={{ color: "#0f172a", fontWeight: 700, fontSize: 12 }}
-                  itemStyle={{ fontSize: 13, fontWeight: 600 }}
-                />
-                <Bar dataKey="odEnviados"    name="OD Enviados"    fill="#60a5fa" fillOpacity={0.7} radius={[3,3,0,0]} maxBarSize={32} />
-                <Line dataKey="odRespondidos" name="OD Respondidos" stroke="#4ade80" strokeWidth={2.5} dot={{ fill: "#4ade80", r: 3, strokeWidth: 0 }} activeDot={{ r: 5 }} />
-                <Line dataKey="odCierres"     name="Cierres x OD"  stroke="#E42D2C" strokeWidth={2.5} dot={{ fill: "#E42D2C", r: 3, strokeWidth: 0 }} activeDot={{ r: 5 }} />
-              </ComposedChart>
-            </ResponsiveContainer>
-          </div>
-        </section>
-      )}
     </div>
   )
 }
