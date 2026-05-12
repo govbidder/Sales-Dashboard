@@ -134,17 +134,17 @@ export function AuditLogView() {
             <Shield className="h-5 w-5" />
             Auditoría
           </h1>
-          <p className="text-sm text-slate-400 mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             Solo admins · {tab === "audit" ? `${entries.length} acciones registradas` : `${imps.length} impersonations`}
           </p>
         </div>
         <div className="flex items-center gap-2">
           {/* Tabs */}
-          <div className="inline-flex h-9 rounded-xl border border-slate-200 bg-slate-50 p-0.5">
+          <div className="inline-flex h-9 rounded-xl border border-border bg-muted p-0.5">
             <button
               onClick={() => setTab("audit")}
               className={`flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium transition-all ${
-                tab === "audit" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-900"
+                tab === "audit" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <Shield className="h-3.5 w-3.5" />
@@ -153,7 +153,7 @@ export function AuditLogView() {
             <button
               onClick={() => setTab("impersonations")}
               className={`flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium transition-all ${
-                tab === "impersonations" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-900"
+                tab === "impersonations" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <Eye className="h-3.5 w-3.5" />
@@ -163,7 +163,7 @@ export function AuditLogView() {
           <button
             onClick={tab === "audit" ? fetchEntries : fetchImpersonations}
             disabled={loading}
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40"
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:text-foreground hover:border-border transition-all disabled:opacity-40"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
           </button>
@@ -199,41 +199,41 @@ export function AuditLogView() {
             <Loader2 className="h-6 w-6 animate-spin text-[#E42D2C]/40" />
           </div>
         ) : imps.length === 0 ? (
-          <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-3xl border border-slate-200 bg-white py-20 text-center">
+          <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-3xl border border-border bg-card py-20 text-center">
             <div className="pointer-events-none absolute -top-24 -right-24 h-[300px] w-[300px] rounded-full bg-amber-400/[0.06] blur-[100px]" />
             <span className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-400/15 ring-1 ring-amber-400/40 mb-4">
               <Eye className="h-6 w-6 text-amber-700" />
             </span>
-            <h3 className="relative text-[16px] font-bold text-slate-900 mb-1">
+            <h3 className="relative text-[16px] font-bold text-foreground mb-1">
               Sin impersonations registradas
             </h3>
-            <p className="relative max-w-sm text-[13px] text-slate-500 px-4">
+            <p className="relative max-w-sm text-[13px] text-muted-foreground px-4">
               Cuando un developer use View-As con un usuario simulado, cada request
               quedará registrada acá.
             </p>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-            <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3 px-5 py-2.5 bg-slate-50 border-b border-slate-100 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">
+          <div className="overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3 px-5 py-2.5 bg-muted border-b border-border text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
               <div>Developer real</div>
               <div>Usuario impersonado</div>
               <div>Endpoint</div>
               <div className="text-right">Cuándo</div>
             </div>
-            <div className="divide-y divide-slate-100">
+            <div className="divide-y divide-border">
               {imps.map(e => (
-                <div key={e.id} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3 px-5 py-3 hover:bg-slate-50 transition-colors items-center">
+                <div key={e.id} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3 px-5 py-3 hover:bg-muted transition-colors items-center">
                   <div className="min-w-0">
-                    <p className="text-[12.5px] font-semibold text-slate-900 truncate">
+                    <p className="text-[12.5px] font-semibold text-foreground truncate">
                       {e.real_user_name ?? "—"}
                     </p>
-                    <p className="text-xs text-slate-500 truncate">{e.real_user_email ?? "—"}</p>
+                    <p className="text-xs text-muted-foreground truncate">{e.real_user_email ?? "—"}</p>
                   </div>
                   <div className="min-w-0">
                     <p className="text-[12.5px] font-semibold text-amber-800 truncate">
                       ↳ {e.impersonated_user_name ?? "—"}
                     </p>
-                    <p className="text-xs text-slate-500 truncate">{e.impersonated_user_email ?? "—"}</p>
+                    <p className="text-xs text-muted-foreground truncate">{e.impersonated_user_email ?? "—"}</p>
                   </div>
                   <div className="min-w-0 flex items-center gap-2">
                     <span className={`shrink-0 inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-mono font-bold ${
@@ -241,13 +241,13 @@ export function AuditLogView() {
                       e.method === "POST"   ? "border-emerald-200 bg-emerald-50 text-emerald-700" :
                       e.method === "PATCH"  ? "border-amber-200 bg-amber-50 text-amber-700" :
                       e.method === "DELETE" ? "border-red-200 bg-red-50 text-red-700" :
-                      "border-slate-200 bg-slate-50 text-slate-600"
+                      "border-border bg-muted text-muted-foreground"
                     }`}>
                       {e.method}
                     </span>
-                    <span className="font-mono text-[11px] text-slate-600 truncate">{e.endpoint}</span>
+                    <span className="font-mono text-[11px] text-muted-foreground truncate">{e.endpoint}</span>
                   </div>
-                  <div className="text-right text-[11px] text-slate-500 shrink-0">
+                  <div className="text-right text-[11px] text-muted-foreground shrink-0">
                     {fmtRelative(e.created_at)}
                   </div>
                 </div>
@@ -261,22 +261,22 @@ export function AuditLogView() {
       {tab === "audit" && (
       <>
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-2.5 border-b border-slate-200 pb-4">
+      <div className="flex flex-wrap items-center gap-2.5 border-b border-border pb-4">
         <div className="relative flex-1 min-w-[220px] max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
           <input
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar por actor, acción, payload..."
-            className="h-9 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-500 focus:border-[#1e3a8a]/40 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/10"
+            className="h-9 w-full rounded-xl border border-border bg-card pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-[#1e3a8a]/40 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/10"
           />
         </div>
-        <Filter className="h-3.5 w-3.5 text-slate-400" />
+        <Filter className="h-3.5 w-3.5 text-muted-foreground" />
         <select
           value={filterEnt}
           onChange={e => setFilterEnt(e.target.value)}
-          className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300"
+          className="h-9 rounded-xl border border-border bg-card px-3 text-[12px] text-foreground outline-none cursor-pointer hover:border-border"
         >
           <option value="">Todas las entidades</option>
           {entityOptions.map(e => <option key={e} value={e}>{e}</option>)}
@@ -289,53 +289,53 @@ export function AuditLogView() {
           <Loader2 className="h-6 w-6 animate-spin text-[#E42D2C]/40" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-3xl border border-slate-200 bg-white py-20 text-center">
+        <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-3xl border border-border bg-card py-20 text-center">
           <div className="pointer-events-none absolute -top-24 -right-24 h-[300px] w-[300px] rounded-full bg-[#E42D2C]/[0.06] blur-[100px]" />
           <span className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-[#E42D2C]/10 ring-1 ring-[#E42D2C]/25 mb-4">
             <Shield className="h-6 w-6 text-[#ff6b6a]" />
           </span>
-          <h3 className="relative text-[16px] font-bold text-slate-900 mb-1">
+          <h3 className="relative text-[16px] font-bold text-foreground mb-1">
             {entries.length === 0 ? "No hay actividad registrada" : "Sin coincidencias"}
           </h3>
-          <p className="relative max-w-sm text-[13px] text-slate-500 px-4">
+          <p className="relative max-w-sm text-[13px] text-muted-foreground px-4">
             {entries.length === 0
               ? "Las acciones del equipo aparecerán acá."
               : "Probá ajustar el filtro o búsqueda."}
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          <div className="divide-y divide-slate-100">
+        <div className="overflow-hidden rounded-2xl border border-border bg-card">
+          <div className="divide-y divide-border">
             {filtered.map(e => (
-              <div key={e.id} className="flex items-start gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors">
+              <div key={e.id} className="flex items-start gap-3 px-5 py-3.5 hover:bg-muted transition-colors">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] text-[10px] font-bold text-white ring-2 ring-white">
                   {initials(e.actor ?? "?")}
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[13px] font-bold text-slate-900">{e.actor ?? "(sistema)"}</span>
-                    <span className="text-[12px] text-slate-500">→</span>
-                    <span className="font-mono text-[11.5px] text-slate-700">{e.action}</span>
-                    <span className={`rounded-full border px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${ENTITY_COLOR[e.entity] ?? "border-slate-200 bg-slate-50 text-slate-600"}`}>
+                    <span className="text-[13px] font-bold text-foreground">{e.actor ?? "(sistema)"}</span>
+                    <span className="text-[12px] text-muted-foreground">→</span>
+                    <span className="font-mono text-[11.5px] text-muted-foreground">{e.action}</span>
+                    <span className={`rounded-full border px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${ENTITY_COLOR[e.entity] ?? "border-border bg-muted text-muted-foreground"}`}>
                       {e.entity}
                     </span>
                     {e.entity_id && (
-                      <span className="font-mono text-xs text-slate-500">
+                      <span className="font-mono text-xs text-muted-foreground">
                         {e.entity_id.slice(0, 8)}
                       </span>
                     )}
                   </div>
                   {Object.keys(e.payload ?? {}).length > 0 && (
                     <details className="mt-1 group">
-                      <summary className="cursor-pointer text-xs text-slate-500 group-hover:text-slate-700">
+                      <summary className="cursor-pointer text-xs text-muted-foreground group-hover:text-muted-foreground">
                         Ver payload
                       </summary>
-                      <pre className="mt-1 rounded-md bg-slate-50 px-2 py-1.5 text-[10.5px] text-slate-600 overflow-x-auto">
+                      <pre className="mt-1 rounded-md bg-muted px-2 py-1.5 text-[10.5px] text-muted-foreground overflow-x-auto">
                         {JSON.stringify(e.payload, null, 2)}
                       </pre>
                     </details>
                   )}
-                  <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
+                  <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
                     <span>{fmtRelative(e.created_at)}</span>
                     {e.ip && <><span>·</span><span className="font-mono">{e.ip}</span></>}
                   </div>

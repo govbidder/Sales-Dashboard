@@ -105,19 +105,19 @@ export function TemplatesModal({ onClose, onApplied }: Props) {
     <Portal>
       <div className="fixed inset-0 z-[100] bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
       <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-        <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl flex flex-col max-h-[90vh]">
+        <div className="w-full max-w-2xl rounded-2xl border border-border bg-card shadow-2xl flex flex-col max-h-[90vh]">
 
           {/* Header */}
-          <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-6 py-4">
+          <div className="flex items-center justify-between gap-3 border-b border-border px-6 py-4">
             <div className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1e3a8a]/[0.06] ring-1 ring-[#1e3a8a]/15">
                 <Layers className="h-4 w-4 text-[#1e3a8a]" />
               </div>
               <div>
-                <h3 className="text-[15px] font-bold text-slate-900">
+                <h3 className="text-[15px] font-bold text-foreground">
                   {selected ? selected.name : "Templates de tareas"}
                 </h3>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-muted-foreground">
                   {selected
                     ? `Crea ${selected.subtasks.length + 1} tareas (1 principal + ${selected.subtasks.length} subtareas).`
                     : "Workflows pre-armados para arrancar rápido."}
@@ -125,7 +125,7 @@ export function TemplatesModal({ onClose, onApplied }: Props) {
               </div>
             </div>
             <button onClick={onClose}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -138,11 +138,11 @@ export function TemplatesModal({ onClose, onApplied }: Props) {
               </div>
             ) : !selected ? (
               templates.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/50 px-5 py-8 text-center">
-                  <Layers className="h-5 w-5 text-slate-400 mx-auto mb-2" />
-                  <p className="text-[13px] text-slate-500">No hay templates todavía.</p>
-                  <p className="text-[11px] text-slate-400 mt-1">
-                    Aplicá la migración <code className="text-[10.5px] bg-slate-100 px-1 rounded">20250505000001_task_templates.sql</code> en Supabase para precargar los defaults.
+                <div className="rounded-xl border border-dashed border-border bg-muted/50 px-5 py-8 text-center">
+                  <Layers className="h-5 w-5 text-muted-foreground mx-auto mb-2" />
+                  <p className="text-[13px] text-muted-foreground">No hay templates todavía.</p>
+                  <p className="text-[11px] text-muted-foreground mt-1">
+                    Aplicá la migración <code className="text-[10.5px] bg-muted px-1 rounded">20250505000001_task_templates.sql</code> en Supabase para precargar los defaults.
                   </p>
                 </div>
               ) : (
@@ -153,7 +153,7 @@ export function TemplatesModal({ onClose, onApplied }: Props) {
                       <button
                         key={t.id}
                         onClick={() => { setSelected(t); setTitleOverride(t.parent_title) }}
-                        className="group w-full flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left transition-all hover:border-[#1e3a8a]/30 hover:shadow-[0_4px_14px_rgba(15,23,42,0.06)]"
+                        className="group w-full flex items-start gap-3 rounded-xl border border-border bg-card p-4 text-left transition-all hover:border-[#1e3a8a]/30 hover:shadow-[0_4px_14px_rgba(15,23,42,0.06)]"
                       >
                         <div
                           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1"
@@ -167,17 +167,17 @@ export function TemplatesModal({ onClose, onApplied }: Props) {
 
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <p className="text-[13.5px] font-bold text-slate-900">{t.name}</p>
+                            <p className="text-[13.5px] font-bold text-foreground">{t.name}</p>
                             {t.is_default && (
-                              <span className="rounded-full border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">
+                              <span className="rounded-full border border-border bg-muted px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
                                 Default
                               </span>
                             )}
                           </div>
                           {t.description && (
-                            <p className="text-[12px] text-slate-500 mt-0.5 leading-snug">{t.description}</p>
+                            <p className="text-[12px] text-muted-foreground mt-0.5 leading-snug">{t.description}</p>
                           )}
-                          <div className="flex items-center gap-3 mt-2 text-[11px] text-slate-400">
+                          <div className="flex items-center gap-3 mt-2 text-[11px] text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <GitBranch className="h-3 w-3" />
                               {t.subtasks.length} subtareas
@@ -197,7 +197,7 @@ export function TemplatesModal({ onClose, onApplied }: Props) {
                           </div>
                         </div>
 
-                        <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all mt-1.5" />
+                        <ChevronRight className="h-4 w-4 text-muted-foreground/70 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all mt-1.5" />
                       </button>
                     )
                   })}
@@ -214,26 +214,26 @@ export function TemplatesModal({ onClose, onApplied }: Props) {
                     value={titleOverride}
                     onChange={e => setTitleOverride(e.target.value)}
                     autoFocus
-                    className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-[13px] text-slate-900 outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10 transition-all"
+                    className="h-10 w-full rounded-xl border border-border bg-card px-3 text-[13px] text-foreground outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10 transition-all"
                   />
                 </div>
 
-                <div className="rounded-xl border border-slate-200 bg-slate-50/50 overflow-hidden">
-                  <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                <div className="rounded-xl border border-border bg-muted/50 overflow-hidden">
+                  <div className="px-4 py-2.5 bg-muted border-b border-border flex items-center justify-between">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                       Subtareas que se crean
                     </p>
-                    <span className="text-[11px] font-semibold text-slate-500">
+                    <span className="text-[11px] font-semibold text-muted-foreground">
                       {selected.subtasks.length}
                     </span>
                   </div>
-                  <div className="divide-y divide-slate-100">
+                  <div className="divide-y divide-border">
                     {selected.subtasks.map((s, i) => (
-                      <div key={i} className="flex items-center gap-3 px-4 py-2.5 bg-white">
-                        <span className="flex h-5 w-5 items-center justify-center rounded-md bg-slate-100 text-[10px] font-bold text-slate-500 shrink-0">
+                      <div key={i} className="flex items-center gap-3 px-4 py-2.5 bg-card">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-md bg-muted text-[10px] font-bold text-muted-foreground shrink-0">
                           {i + 1}
                         </span>
-                        <span className="flex-1 text-[12.5px] text-slate-700 truncate">{s.title}</span>
+                        <span className="flex-1 text-[12.5px] text-muted-foreground truncate">{s.title}</span>
                         {s.priority && (
                           <span className={`inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide ${PRIORITY_PILL[s.priority]}`}>
                             <Flag className="h-2 w-2" />
@@ -241,7 +241,7 @@ export function TemplatesModal({ onClose, onApplied }: Props) {
                           </span>
                         )}
                         {s.due_offset_days != null && (
-                          <span className="text-[10px] text-slate-400 tabular-nums shrink-0">
+                          <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">
                             +{s.due_offset_days}d
                           </span>
                         )}
@@ -262,10 +262,10 @@ export function TemplatesModal({ onClose, onApplied }: Props) {
 
           {/* Footer */}
           {selected && (
-            <div className="border-t border-slate-200 px-6 py-3 flex items-center justify-between gap-3">
+            <div className="border-t border-border px-6 py-3 flex items-center justify-between gap-3">
               <button
                 onClick={() => { setSelected(null); setErr(null) }}
-                className="text-[12px] text-slate-500 hover:text-slate-900 transition-colors px-2 py-1.5"
+                className="text-[12px] text-muted-foreground hover:text-foreground transition-colors px-2 py-1.5"
               >
                 ← Volver
               </button>

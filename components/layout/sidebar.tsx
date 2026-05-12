@@ -169,7 +169,7 @@ function DeptPills({
                   : "h-7 w-7 justify-center",
                 active
                   ? "border-transparent shadow-[0_0_0_2px_var(--dept-color)]"
-                  : "border-slate-200 hover:border-transparent hover:shadow-[0_0_0_2px_var(--dept-color)]",
+                  : "border-border hover:border-transparent hover:shadow-[0_0_0_2px_var(--dept-color)]",
               )}
               style={
                 {
@@ -189,7 +189,7 @@ function DeptPills({
                   className={cn(
                     "ml-1.5 mr-2.5 text-[12px] font-semibold whitespace-nowrap",
                     "opacity-0 group-hover:opacity-100 transition-opacity",
-                    active ? "text-slate-900" : "text-slate-700",
+                    active ? "text-foreground" : "text-muted-foreground",
                   )}
                 >
                   {d.name}
@@ -235,7 +235,7 @@ export function Sidebar({
       <aside
         className={cn(
           "fixed left-0 top-0 z-50 h-full transition-all duration-300 ease-out",
-          "flex flex-col bg-white dark:bg-[#080d1e] border-r-2 border-[#1e3a8a]/10 dark:border-[#1e3a8a]/30",
+          "flex flex-col bg-card dark:bg-[#080d1e] border-r-2 border-[#1e3a8a]/10 dark:border-[#1e3a8a]/30",
           collapsed && !isMobile ? "lg:w-[80px]" : "lg:w-[240px]",
           "w-[240px]",
           open ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
@@ -261,7 +261,7 @@ export function Sidebar({
           </Link>
 
           <button
-            className="lg:hidden absolute right-3 flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all"
+            className="lg:hidden absolute right-3 flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
             onClick={onClose}
             aria-label="Cerrar"
           >
@@ -300,7 +300,7 @@ export function Sidebar({
                           showLabels ? "gap-2.5 px-3 py-2" : "justify-center h-10 w-12 mx-auto",
                           isActive
                             ? "bg-[#1e3a8a]/[0.10] text-[#1e3a8a]"
-                            : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
                         )}
                       >
                         {isActive && (
@@ -311,7 +311,7 @@ export function Sidebar({
                           className={cn(
                             "shrink-0 transition-colors",
                             showLabels ? "h-[16px] w-[16px]" : "h-[18px] w-[18px]",
-                            isActive ? "text-[#1e3a8a]" : "text-slate-500 group-hover:text-slate-700"
+                            isActive ? "text-[#1e3a8a]" : "text-muted-foreground group-hover:text-muted-foreground"
                           )}
                         />
                         {showLabels && (
@@ -393,7 +393,7 @@ export function Sidebar({
           className={cn(
             "hidden lg:flex absolute top-[20px] -right-3 z-10",
             "h-6 w-6 items-center justify-center rounded-full",
-            "border border-[#1e3a8a]/15 bg-white text-slate-500",
+            "border border-[#1e3a8a]/15 bg-card text-muted-foreground",
             "shadow-[0_2px_8px_rgba(15,23,42,0.08)]",
             "transition-all duration-200",
             "hover:border-[#1e3a8a]/40 hover:text-[#1e3a8a] hover:scale-110",

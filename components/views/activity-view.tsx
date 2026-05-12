@@ -24,7 +24,7 @@ interface ActivityItem {
 
 const KIND_META: Record<string, { icon: any; color: string; bg: string; label: string }> = {
   task_created:    { icon: Plus,           color: "text-[#1e3a8a]",  bg: "bg-[#1e3a8a]/[0.08]",  label: "Tarea creada" },
-  task_updated:    { icon: ListTodo,       color: "text-slate-600",  bg: "bg-slate-100",         label: "Actualización" },
+  task_updated:    { icon: ListTodo,       color: "text-muted-foreground",  bg: "bg-muted",         label: "Actualización" },
   task_comment:    { icon: MessageSquare,  color: "text-amber-700",  bg: "bg-amber-50",          label: "Comentario" },
   task_status:     { icon: CheckCircle2,   color: "text-emerald-700", bg: "bg-emerald-50",       label: "Cambio de estado" },
   persona_created: { icon: Users2,         color: "text-[#E42D2C]",  bg: "bg-[#E42D2C]/[0.08]",  label: "Persona agendada" },
@@ -135,14 +135,14 @@ export function ActivityView() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-[#1e3a8a] tracking-tight">Actividad</h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             Últimos 30 días — {filtered.length} eventos
           </p>
         </div>
         <button
           onClick={fetchActivity}
           disabled={loading}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:text-foreground hover:border-border transition-all disabled:opacity-40"
           title="Refrescar"
         >
           <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
@@ -150,8 +150,8 @@ export function ActivityView() {
       </div>
 
       {/* Filter chips */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-4">
-        <Filter className="h-3.5 w-3.5 text-slate-400" />
+      <div className="flex flex-wrap items-center gap-2 border-b border-border pb-4">
+        <Filter className="h-3.5 w-3.5 text-muted-foreground" />
         {FILTERS.map(f => (
           <button
             key={f.k}
@@ -159,7 +159,7 @@ export function ActivityView() {
             className={`inline-flex items-center gap-1.5 h-8 rounded-full border px-3 text-[12px] font-medium transition-colors ${
               filter === f.k
                 ? "border-[#1e3a8a]/30 bg-[#1e3a8a]/[0.06] text-[#1e3a8a]"
-                : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900"
+                : "border-border bg-card text-muted-foreground hover:border-border hover:text-foreground"
             }`}
           >
             {f.label}
@@ -174,17 +174,17 @@ export function ActivityView() {
         </div>
       ) : groups.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50 ring-1 ring-slate-200 mb-4">
-            <Activity className="h-6 w-6 text-slate-400" />
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted ring-1 ring-border mb-4">
+            <Activity className="h-6 w-6 text-muted-foreground" />
           </div>
-          <p className="text-[15px] font-semibold text-slate-700">Sin actividad</p>
-          <p className="text-[13px] text-slate-400 mt-1">No hay eventos en los últimos 30 días.</p>
+          <p className="text-[15px] font-semibold text-muted-foreground">Sin actividad</p>
+          <p className="text-[13px] text-muted-foreground mt-1">No hay eventos en los últimos 30 días.</p>
         </div>
       ) : useVirtualization ? (
         // ─── Virtualized rendering (>100 items) ───────────────────────
         <div
           ref={parentRef}
-          className="overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
+          className="overflow-y-auto rounded-2xl border border-border bg-card shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
           style={{ height: "calc(100vh - 320px)", minHeight: 400 }}
         >
           <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
@@ -201,12 +201,12 @@ export function ActivityView() {
               }
               if (row.type === "header") {
                 return (
-                  <div key={`h-${row.dayKey}`} style={style} className="flex items-center gap-3 px-5 pt-4 pb-2 bg-white border-b border-slate-100">
+                  <div key={`h-${row.dayKey}`} style={style} className="flex items-center gap-3 px-5 pt-4 pb-2 bg-card border-b border-border">
                     <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1e3a8a]/70 capitalize">
                       {fmtDayHeader(row.dayKey)}
                     </p>
                     <div className="flex-1 h-px bg-slate-200" />
-                    <span className="text-[10.5px] text-slate-400 tabular-nums">{row.count}</span>
+                    <span className="text-[10.5px] text-muted-foreground tabular-nums">{row.count}</span>
                   </div>
                 )
               }
@@ -218,34 +218,34 @@ export function ActivityView() {
                   key={item.id}
                   href={item.href ?? "#"}
                   style={style}
-                  className="group flex items-start gap-3 px-5 py-3.5 border-b border-slate-100 hover:bg-slate-50 transition-colors"
+                  className="group flex items-start gap-3 px-5 py-3.5 border-b border-border hover:bg-muted transition-colors"
                 >
-                  <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ring-1 ring-slate-200 ${meta.bg}`}>
+                  <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ring-1 ring-border ${meta.bg}`}>
                     <Icon className={`h-3.5 w-3.5 ${meta.color}`} />
                   </span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-[12.5px] font-bold text-slate-900">{item.title}</p>
+                      <p className="text-[12.5px] font-bold text-foreground">{item.title}</p>
                       <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${meta.bg} ${meta.color}`}>
                         {meta.label}
                       </span>
                     </div>
                     {item.body && (
-                      <p className="text-[12px] text-slate-600 mt-0.5 line-clamp-2 leading-snug">{item.body}</p>
+                      <p className="text-[12px] text-muted-foreground mt-0.5 line-clamp-2 leading-snug">{item.body}</p>
                     )}
                     <div className="flex items-center gap-2 mt-1">
                       {item.actor && (
-                        <span className="inline-flex items-center gap-1 text-[10.5px] text-slate-500 font-medium" title={item.actor}>
+                        <span className="inline-flex items-center gap-1 text-[10.5px] text-muted-foreground font-medium" title={item.actor}>
                           <span className="flex h-4 w-4 items-center justify-center rounded-full ring-2 ring-white bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] text-[7.5px] font-bold text-white">
                             {initials(item.actor_name ?? item.actor)}
                           </span>
                           {item.actor_name ?? item.actor}
                         </span>
                       )}
-                      <span className="text-[10.5px] text-slate-500">{fmtRelative(item.timestamp)}</span>
+                      <span className="text-[10.5px] text-muted-foreground">{fmtRelative(item.timestamp)}</span>
                     </div>
                   </div>
-                  <ArrowRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all mt-1.5" />
+                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/70 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all mt-1.5" />
                 </Link>
               )
             })}
@@ -260,13 +260,13 @@ export function ActivityView() {
                   {fmtDayHeader(dayKey)}
                 </p>
                 <div className="flex-1 h-px bg-slate-200" />
-                <span className="text-[10.5px] text-slate-500 tabular-nums">
+                <span className="text-[10.5px] text-muted-foreground tabular-nums">
                   {list.length}
                 </span>
               </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] overflow-hidden">
-                <div className="divide-y divide-slate-100">
+              <div className="rounded-2xl border border-border bg-card shadow-[0_1px_2px_rgba(15,23,42,0.04)] overflow-hidden">
+                <div className="divide-y divide-border">
                   {list.map(item => {
                     const meta = KIND_META[item.kind] ?? KIND_META.task_updated
                     const Icon = meta.icon
@@ -274,27 +274,27 @@ export function ActivityView() {
                       <Link
                         key={item.id}
                         href={item.href ?? "#"}
-                        className="group flex items-start gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors"
+                        className="group flex items-start gap-3 px-5 py-3.5 hover:bg-muted transition-colors"
                       >
-                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ring-1 ring-slate-200 ${meta.bg}`}>
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ring-1 ring-border ${meta.bg}`}>
                           <Icon className={`h-3.5 w-3.5 ${meta.color}`} />
                         </span>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <p className="text-[12.5px] font-bold text-slate-900">{item.title}</p>
+                            <p className="text-[12.5px] font-bold text-foreground">{item.title}</p>
                             <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${meta.bg} ${meta.color}`}>
                               {meta.label}
                             </span>
                           </div>
                           {item.body && (
-                            <p className="text-[12px] text-slate-600 mt-0.5 line-clamp-2 leading-snug">
+                            <p className="text-[12px] text-muted-foreground mt-0.5 line-clamp-2 leading-snug">
                               {item.body}
                             </p>
                           )}
                           <div className="flex items-center gap-2 mt-1">
                             {item.actor && (
                               <span
-                                className="inline-flex items-center gap-1 text-[10.5px] text-slate-500 font-medium"
+                                className="inline-flex items-center gap-1 text-[10.5px] text-muted-foreground font-medium"
                                 title={item.actor}
                               >
                                 <span className="flex h-4 w-4 items-center justify-center rounded-full ring-2 ring-white bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] text-[7.5px] font-bold text-white">
@@ -303,12 +303,12 @@ export function ActivityView() {
                                 {item.actor_name ?? item.actor}
                               </span>
                             )}
-                            <span className="text-[10.5px] text-slate-400">
+                            <span className="text-[10.5px] text-muted-foreground">
                               {fmtRelative(item.timestamp)}
                             </span>
                           </div>
                         </div>
-                        <ArrowRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all mt-1.5" />
+                        <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/70 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all mt-1.5" />
                       </Link>
                     )
                   })}

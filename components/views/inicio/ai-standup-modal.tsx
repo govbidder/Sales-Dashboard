@@ -59,17 +59,17 @@ export function AiStandupModal({ onClose }: Props) {
     <Portal>
       <div className="fixed inset-0 z-[100] bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
       <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-        <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl flex flex-col max-h-[90vh]">
+        <div className="w-full max-w-2xl rounded-2xl border border-border bg-card shadow-2xl flex flex-col max-h-[90vh]">
 
           {/* Header */}
-          <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-6 py-4">
+          <div className="flex items-center justify-between gap-3 border-b border-border px-6 py-4">
             <div className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#E42D2C]/10 to-[#1e3a8a]/10 ring-1 ring-[#1e3a8a]/15">
                 <Sparkles className="h-4 w-4 text-[#1e3a8a]" />
               </div>
               <div>
-                <h3 className="text-[15px] font-bold text-slate-900">Standup diario</h3>
-                <p className="text-[11px] text-slate-500">
+                <h3 className="text-[15px] font-bold text-foreground">Standup diario</h3>
+                <p className="text-[11px] text-muted-foreground">
                   {loading
                     ? "Generando con IA…"
                     : meta
@@ -82,13 +82,13 @@ export function AiStandupModal({ onClose }: Props) {
               <button
                 onClick={generate}
                 disabled={loading}
-                className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:text-[#1e3a8a] hover:bg-slate-100 transition-all disabled:opacity-40"
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:text-[#1e3a8a] hover:bg-muted transition-all disabled:opacity-40"
                 title="Regenerar"
               >
                 <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
               </button>
               <button onClick={onClose}
-                className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -99,7 +99,7 @@ export function AiStandupModal({ onClose }: Props) {
             {loading ? (
               <div className="flex flex-col items-center justify-center py-12 gap-3">
                 <Loader2 className="h-6 w-6 animate-spin text-[#1e3a8a]/60" />
-                <p className="text-[12px] text-slate-500">Analizando últimas 24h…</p>
+                <p className="text-[12px] text-muted-foreground">Analizando últimas 24h…</p>
               </div>
             ) : err ? (
               <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-[12px] text-red-700">
@@ -107,8 +107,8 @@ export function AiStandupModal({ onClose }: Props) {
                 <span>{err}</span>
               </div>
             ) : (
-              <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
-                <pre className="whitespace-pre-wrap font-sans text-[13px] leading-relaxed text-slate-800">
+              <div className="rounded-xl border border-border bg-muted/50 p-4">
+                <pre className="whitespace-pre-wrap font-sans text-[13px] leading-relaxed text-foreground">
                   {markdown}
                 </pre>
               </div>
@@ -117,8 +117,8 @@ export function AiStandupModal({ onClose }: Props) {
 
           {/* Footer */}
           {!loading && !err && markdown && (
-            <div className="border-t border-slate-200 px-6 py-3 flex items-center justify-between gap-3">
-              <span className="text-[11px] text-slate-400">
+            <div className="border-t border-border px-6 py-3 flex items-center justify-between gap-3">
+              <span className="text-[11px] text-muted-foreground">
                 Listo para pegar en Slack o WhatsApp.
               </span>
               <button

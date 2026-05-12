@@ -59,7 +59,7 @@ export function MoMPanel() {
   if (loading) {
     return (
       <section>
-        <div className="h-72 animate-pulse rounded-2xl border border-slate-200 bg-white" />
+        <div className="h-72 animate-pulse rounded-2xl border border-border bg-card" />
       </section>
     )
   }
@@ -82,8 +82,8 @@ export function MoMPanel() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="text-xl font-bold text-slate-900">Month vs Month</h2>
-          <p className="text-[13px] text-slate-400 mt-0.5">
+          <h2 className="text-xl font-bold text-foreground">Month vs Month</h2>
+          <p className="text-[13px] text-muted-foreground mt-0.5">
             {fmtMonthLong(current.month)} vs {fmtMonthLong(previous.month)} — ¿qué cambió?
           </p>
         </div>
@@ -99,16 +99,16 @@ export function MoMPanel() {
           <span className={`text-sm font-bold ${scorePositive ? "text-emerald-700" : "text-red-700"}`}>
             {scorePositive ? "Mes positivo" : "Mes para revisar"}
           </span>
-          <span className="text-slate-400 text-xs ml-1">
+          <span className="text-muted-foreground text-xs ml-1">
             {totalUp}↑ · {totalDown}↓
           </span>
         </div>
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+      <div className="overflow-hidden rounded-2xl border border-border bg-card">
         {/* Column headers */}
-        <div className="grid grid-cols-[1.4fr_1fr_1.6fr_1fr] border-b border-slate-200 px-6 py-3">
+        <div className="grid grid-cols-[1.4fr_1fr_1.6fr_1fr] border-b border-border px-6 py-3">
           <span className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">Métrica</span>
           <span className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80 text-right">{fmtMonthLong(previous.month)}</span>
           <span className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80 text-center">Cambio</span>
@@ -128,21 +128,21 @@ export function MoMPanel() {
           return (
             <div
               key={metric.key}
-              className={`grid grid-cols-[1.4fr_1fr_1.6fr_1fr] items-center border-b border-slate-100 last:border-0 px-6 py-4 transition-colors ${
+              className={`grid grid-cols-[1.4fr_1fr_1.6fr_1fr] items-center border-b border-border last:border-0 px-6 py-4 transition-colors ${
                 isUp   ? "hover:bg-emerald-500/[0.03]"
                 : isDown ? "hover:bg-red-500/[0.03]"
-                :           "hover:bg-slate-50"
+                :           "hover:bg-muted"
               }`}
             >
               {/* Metric name */}
               <div className="flex items-center gap-2.5">
                 <span className="h-2.5 w-2.5 rounded-full flex-shrink-0 ring-2 ring-black/40"
                   style={{ backgroundColor: metric.color }} />
-                <span className="text-[13px] font-medium text-slate-600">{metric.label}</span>
+                <span className="text-[13px] font-medium text-muted-foreground">{metric.label}</span>
               </div>
 
               {/* Previous value */}
-              <span className="text-[13px] font-medium text-slate-400 text-right tabular-nums pr-2">
+              <span className="text-[13px] font-medium text-muted-foreground text-right tabular-nums pr-2">
                 {fmtVal(prev)}
               </span>
 
@@ -151,7 +151,7 @@ export function MoMPanel() {
                 <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-bold ${
                   isUp   ? "bg-emerald-500/15 text-emerald-700"
                   : isDown ? "bg-red-500/15 text-red-700"
-                  :           "bg-slate-100 text-slate-400"
+                  :           "bg-muted text-muted-foreground"
                 }`}>
                   {isUp   && <TrendingUp   className="h-3 w-3 flex-shrink-0" />}
                   {isDown && <TrendingDown className="h-3 w-3 flex-shrink-0" />}
@@ -161,7 +161,7 @@ export function MoMPanel() {
                     : "Sin cambio"}
                 </span>
                 {/* Progress bar showing magnitude */}
-                <div className="w-full h-1 rounded-full bg-slate-100 overflow-hidden">
+                <div className="w-full h-1 rounded-full bg-muted overflow-hidden">
                   <div
                     className={`h-full rounded-full ${isUp ? "bg-emerald-400" : isDown ? "bg-red-400" : "bg-slate-300"}`}
                     style={{ width: `${absPct}%` }}
@@ -174,7 +174,7 @@ export function MoMPanel() {
                 <span className={`text-[15px] font-bold tabular-nums ${
                   isUp   ? "text-emerald-700"
                   : isDown ? "text-red-700"
-                  :           "text-slate-900"
+                  :           "text-foreground"
                 }`}>
                   {fmtVal(cur)}
                 </span>

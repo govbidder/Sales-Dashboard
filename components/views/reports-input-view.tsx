@@ -100,7 +100,7 @@ function getCurrentMonth() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
 }
 
-const inputCls = "w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none transition-all tabular-nums"
+const inputCls = "w-full rounded-xl border border-border bg-muted px-3 py-2.5 text-[13px] text-foreground placeholder:text-muted-foreground focus:border-[#1e3a8a]/40 focus:outline-none transition-all tabular-nums"
 
 // ─── Form ─────────────────────────────────────────────────────────────────────
 
@@ -233,14 +233,14 @@ function ReportForm({
     <form onSubmit={handleSubmit} className="space-y-5">
 
       {/* Month + status header */}
-      <div className="flex flex-wrap items-end justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4">
+      <div className="flex flex-wrap items-end justify-between gap-3 rounded-2xl border border-border bg-card px-5 py-4">
         <div className="space-y-1.5">
           <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">Mes</p>
           <input
             type="month"
             value={month}
             onChange={e => setMonth(e.target.value)}
-            className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-[14px] text-slate-900 outline-none focus:border-[#1e3a8a]/40"
+            className="rounded-xl border border-border bg-muted px-3 py-2 text-[14px] text-foreground outline-none focus:border-[#1e3a8a]/40"
           />
         </div>
 
@@ -254,7 +254,7 @@ function ReportForm({
               Nuevo reporte
             </span>
           )}
-          {loading && <Loader2 className="h-4 w-4 animate-spin text-slate-400" />}
+          {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
         </div>
       </div>
 
@@ -263,23 +263,23 @@ function ReportForm({
         const isCollapsed = collapsed[sec.id]
         const Icon = sec.icon
         return (
-          <div key={sec.id} className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+          <div key={sec.id} className="rounded-2xl border border-border bg-card overflow-hidden">
             <button
               type="button"
               onClick={() => toggle(sec.id)}
-              className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left transition-colors hover:bg-slate-50"
+              className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left transition-colors hover:bg-muted"
             >
               <div className="flex items-center gap-2.5">
                 <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E42D2C]/10 ring-1 ring-[#E42D2C]/20">
                   <Icon className="h-4 w-4 text-[#E42D2C]" />
                 </span>
-                <h3 className="text-sm font-bold text-slate-900 tracking-tight">{sec.title}</h3>
+                <h3 className="text-sm font-bold text-foreground tracking-tight">{sec.title}</h3>
               </div>
-              {isCollapsed ? <ChevronDown className="h-4 w-4 text-slate-400" /> : <ChevronUp className="h-4 w-4 text-slate-400" />}
+              {isCollapsed ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronUp className="h-4 w-4 text-muted-foreground" />}
             </button>
 
             {!isCollapsed && (
-              <div className="border-t border-slate-100 px-5 py-4">
+              <div className="border-t border-border px-5 py-4">
                 <div className={`grid gap-3 ${sec.id === "reflection" ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2"}`}>
                   {sec.fields.map(f => (
                     <div key={f.key} className="space-y-1.5">
@@ -296,9 +296,9 @@ function ReportForm({
 
       {/* Submit row */}
       <div className="sticky bottom-4 z-10">
-        <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white/95 backdrop-blur-md px-5 py-3 shadow-2xl">
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-white/95 backdrop-blur-md px-5 py-3 shadow-2xl">
           {message && (
-            <div className={`flex items-center gap-2 text-[13px] ${status === "success" ? "text-emerald-700" : status === "error" ? "text-red-700" : "text-slate-600"}`}>
+            <div className={`flex items-center gap-2 text-[13px] ${status === "success" ? "text-emerald-700" : status === "error" ? "text-red-700" : "text-muted-foreground"}`}>
               {status === "success" && <Check className="h-4 w-4" />}
               {status === "error"   && <AlertCircle className="h-4 w-4" />}
               {message}
@@ -328,20 +328,20 @@ function HistoryView({ reports, onPick, onDelete, deletingId }: {
 }) {
   if (reports.length === 0) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white py-12 text-center">
-        <p className="text-sm text-slate-400">Todavía no hay reportes cargados.</p>
+      <div className="rounded-2xl border border-border bg-card py-12 text-center">
+        <p className="text-sm text-muted-foreground">Todavía no hay reportes cargados.</p>
       </div>
     )
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card">
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="border-b border-slate-200 bg-slate-50">
+            <tr className="border-b border-border bg-muted">
               {["Mes","Cobrado","Revenue","MRR","Cierres","NPS","Última edición",""].map(h => (
-                <th key={h} className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 whitespace-nowrap">{h}</th>
+                <th key={h} className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground whitespace-nowrap">{h}</th>
               ))}
             </tr>
           </thead>
@@ -351,35 +351,35 @@ function HistoryView({ reports, onPick, onDelete, deletingId }: {
               return (
                 <tr
                   key={r.id}
-                  className="border-b border-slate-100 cursor-pointer transition-colors hover:bg-slate-50"
+                  className="border-b border-border cursor-pointer transition-colors hover:bg-muted"
                   onClick={() => onPick(String(r.month).slice(0, 7))}
                 >
-                  <td className="px-4 py-3 whitespace-nowrap text-[14px] font-semibold text-slate-900">
+                  <td className="px-4 py-3 whitespace-nowrap text-[14px] font-semibold text-foreground">
                     {fmtMonthLabel(r.month)}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-[13px] tabular-nums text-emerald-700/80">
                     {fmtMoney(r.cash_collected)}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-[13px] tabular-nums text-slate-800">
+                  <td className="px-4 py-3 whitespace-nowrap text-[13px] tabular-nums text-foreground">
                     {fmtMoney(r.total_revenue)}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-[13px] tabular-nums text-slate-600">
+                  <td className="px-4 py-3 whitespace-nowrap text-[13px] tabular-nums text-muted-foreground">
                     {fmtMoney(r.mrr)}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-[13px] tabular-nums text-slate-600">
+                  <td className="px-4 py-3 whitespace-nowrap text-[13px] tabular-nums text-muted-foreground">
                     {r.new_clients ?? "—"}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-[13px] tabular-nums text-slate-600">
+                  <td className="px-4 py-3 whitespace-nowrap text-[13px] tabular-nums text-muted-foreground">
                     {r.nps_score != null ? Number(r.nps_score).toFixed(1) : "—"}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-[12px] text-slate-500">
+                  <td className="px-4 py-3 whitespace-nowrap text-[12px] text-muted-foreground">
                     {fmtDateTime(r.updated_at ?? r.created_at)}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap" onClick={e => e.stopPropagation()}>
                     <button
                       onClick={() => onDelete(r.id)}
                       disabled={deletingId === r.id}
-                      className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-300 hover:text-red-600 hover:bg-red-500/10 transition-all disabled:opacity-40"
+                      className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground/70 hover:text-red-600 hover:bg-red-500/10 transition-all disabled:opacity-40"
                     >
                       {deletingId === r.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                     </button>
@@ -617,7 +617,7 @@ export function ReportsInputView() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#1e3a8a] tracking-tight">Métricas Mensuales</h1>
-          <p className="text-sm text-slate-400 mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             Cargá los KPIs del mes — globales de empresa o por departamento.
           </p>
         </div>
@@ -627,7 +627,7 @@ export function ReportsInputView() {
           <select
             value={selectedDept ?? ""}
             onChange={e => setSelectedDept(e.target.value || null)}
-            className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300"
+            className="h-9 rounded-xl border border-border bg-card px-3 text-[12px] text-foreground outline-none cursor-pointer hover:border-border"
             title="A qué scope pertenece este reporte"
           >
             <option value="">🏢 Empresa (global)</option>
@@ -638,7 +638,7 @@ export function ReportsInputView() {
 
           <button
             onClick={handleDownloadTemplate}
-            className="flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[12px] font-semibold text-slate-700 hover:border-slate-300 hover:text-slate-900 transition-all"
+            className="flex h-9 items-center gap-1.5 rounded-xl border border-border bg-muted px-3 text-[12px] font-semibold text-muted-foreground hover:border-border hover:text-foreground transition-all"
             title="Descargar CSV template con los campos esperados"
           >
             <Download className="h-3.5 w-3.5" />
@@ -652,18 +652,18 @@ export function ReportsInputView() {
             Importar CSV
           </button>
 
-          <div className="inline-flex h-9 rounded-xl border border-slate-200 bg-slate-50 p-0.5">
+          <div className="inline-flex h-9 rounded-xl border border-border bg-muted p-0.5">
             <button
               onClick={() => setTab("form")}
               className={`flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium transition-all ${
-                tab === "form" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-900"
+                tab === "form" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"
               }`}>
               Cargar
             </button>
             <button
               onClick={() => setTab("history")}
               className={`flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium transition-all ${
-                tab === "history" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-900"
+                tab === "history" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"
               }`}>
               Historial ({reports.length})
             </button>
@@ -690,7 +690,7 @@ export function ReportsInputView() {
         <>
           <div className="flex items-center justify-end">
             <button onClick={fetchReports} disabled={loading}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40">
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-muted text-muted-foreground hover:text-foreground hover:border-border transition-all disabled:opacity-40">
               <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             </button>
           </div>

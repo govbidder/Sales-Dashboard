@@ -110,19 +110,19 @@ function TemplateEditor({
   return (
     <Portal>
       <div className="fixed inset-0 z-[100] bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[640px] flex-col border-l border-slate-200 shadow-2xl bg-white">
+      <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[640px] flex-col border-l border-border shadow-2xl bg-card">
 
-        <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5">
+        <div className="flex items-start justify-between gap-4 border-b border-border px-6 py-5">
           <div>
-            <h3 className="text-lg font-bold text-slate-900">
+            <h3 className="text-lg font-bold text-foreground">
               {isNew ? "Nuevo template" : "Editar template"}
             </h3>
-            <p className="text-[12px] text-slate-400 mt-0.5">
+            <p className="text-[12px] text-muted-foreground mt-0.5">
               Plantilla pre-armada con tarea principal + subtasks.
             </p>
           </div>
           <button onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -136,7 +136,7 @@ function TemplateEditor({
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="Ej: Nueva oportunidad de bid"
-              className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-[13px] text-slate-900 outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10"
+              className="h-10 w-full rounded-xl border border-border bg-card px-3 text-[13px] text-foreground outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10"
             />
           </div>
 
@@ -147,12 +147,12 @@ function TemplateEditor({
               onChange={e => setDescription(e.target.value)}
               rows={2}
               placeholder="Para qué sirve este workflow"
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[13px] text-slate-900 outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10 resize-none"
+              className="w-full rounded-xl border border-border bg-card px-3 py-2 text-[13px] text-foreground outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10 resize-none"
             />
           </div>
 
           {/* Parent task */}
-          <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 space-y-3">
+          <div className="rounded-xl border border-border bg-muted/50 p-4 space-y-3">
             <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">
               Tarea principal
             </p>
@@ -162,21 +162,21 @@ function TemplateEditor({
               value={parentTitle}
               onChange={e => setParentTitle(e.target.value)}
               placeholder="Ej: Bid: <nombre del RFP>"
-              className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-[13px] font-semibold text-slate-900 outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10"
+              className="h-10 w-full rounded-xl border border-border bg-card px-3 text-[13px] font-semibold text-foreground outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10"
             />
             <textarea
               value={parentDescription}
               onChange={e => setParentDescription(e.target.value)}
               rows={2}
               placeholder="Descripción inicial de la tarea (opcional)"
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[12.5px] text-slate-700 outline-none focus:border-[#1e3a8a]/40 resize-none"
+              className="w-full rounded-xl border border-border bg-card px-3 py-2 text-[12.5px] text-muted-foreground outline-none focus:border-[#1e3a8a]/40 resize-none"
             />
 
             <div className="grid grid-cols-2 gap-2">
               <select
                 value={parentPriority}
                 onChange={e => setParentPriority(e.target.value as Priority)}
-                className="h-9 rounded-lg border border-slate-200 bg-white px-2.5 text-[12px] text-slate-900 outline-none cursor-pointer"
+                className="h-9 rounded-lg border border-border bg-card px-2.5 text-[12px] text-foreground outline-none cursor-pointer"
               >
                 <option value="baja">Baja</option>
                 <option value="media">Media</option>
@@ -188,7 +188,7 @@ function TemplateEditor({
                 value={parentOffset}
                 onChange={e => setParentOffset(e.target.value)}
                 placeholder="Días hasta vencer"
-                className="h-9 rounded-lg border border-slate-200 bg-white px-2.5 text-[12px] text-slate-900 outline-none focus:border-[#1e3a8a]/40"
+                className="h-9 rounded-lg border border-border bg-card px-2.5 text-[12px] text-foreground outline-none focus:border-[#1e3a8a]/40"
               />
             </div>
             <input
@@ -196,14 +196,14 @@ function TemplateEditor({
               value={parentTags}
               onChange={e => setParentTags(e.target.value)}
               placeholder="Tags separados por coma"
-              className="h-9 w-full rounded-lg border border-slate-200 bg-white px-2.5 text-[12px] text-slate-700 outline-none focus:border-[#1e3a8a]/40"
+              className="h-9 w-full rounded-lg border border-border bg-card px-2.5 text-[12px] text-muted-foreground outline-none focus:border-[#1e3a8a]/40"
             />
             <input
               type="text"
               value={parentAssignees}
               onChange={e => setParentAssignees(e.target.value)}
               placeholder="Asignados (emails) separados por coma"
-              className="h-9 w-full rounded-lg border border-slate-200 bg-white px-2.5 text-[12px] text-slate-700 outline-none focus:border-[#1e3a8a]/40"
+              className="h-9 w-full rounded-lg border border-border bg-card px-2.5 text-[12px] text-muted-foreground outline-none focus:border-[#1e3a8a]/40"
             />
           </div>
 
@@ -223,14 +223,14 @@ function TemplateEditor({
             </div>
 
             {subtasks.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/50 px-4 py-6 text-center">
-                <p className="text-[12px] text-slate-500">Sin subtareas todavía.</p>
+              <div className="rounded-xl border border-dashed border-border bg-muted/50 px-4 py-6 text-center">
+                <p className="text-[12px] text-muted-foreground">Sin subtareas todavía.</p>
               </div>
             ) : (
               <div className="space-y-1.5">
                 {subtasks.map((s, i) => (
-                  <div key={i} className="flex items-start gap-2 rounded-lg border border-slate-200 bg-white p-2">
-                    <span className="flex h-5 w-5 shrink-0 mt-0.5 items-center justify-center rounded-md bg-slate-100 text-[10px] font-bold text-slate-500">
+                  <div key={i} className="flex items-start gap-2 rounded-lg border border-border bg-card p-2">
+                    <span className="flex h-5 w-5 shrink-0 mt-0.5 items-center justify-center rounded-md bg-muted text-[10px] font-bold text-muted-foreground">
                       {i + 1}
                     </span>
                     <div className="flex-1 min-w-0 space-y-1.5">
@@ -239,13 +239,13 @@ function TemplateEditor({
                         value={s.title}
                         onChange={e => updateSub(i, { ...s, title: e.target.value })}
                         placeholder="Título de la subtarea"
-                        className="w-full text-[12.5px] font-medium text-slate-900 outline-none placeholder:text-slate-400"
+                        className="w-full text-[12.5px] font-medium text-foreground outline-none placeholder:text-muted-foreground"
                       />
                       <div className="flex items-center gap-1.5">
                         <select
                           value={s.priority ?? "media"}
                           onChange={e => updateSub(i, { ...s, priority: e.target.value as Priority })}
-                          className="h-6 rounded border border-slate-200 bg-white px-1.5 text-[10px] outline-none cursor-pointer"
+                          className="h-6 rounded border border-border bg-card px-1.5 text-[10px] outline-none cursor-pointer"
                         >
                           <option value="baja">baja</option>
                           <option value="media">media</option>
@@ -257,21 +257,21 @@ function TemplateEditor({
                           value={s.due_offset_days ?? ""}
                           onChange={e => updateSub(i, { ...s, due_offset_days: e.target.value ? parseInt(e.target.value, 10) : null })}
                           placeholder="+Nd"
-                          className="h-6 w-14 rounded border border-slate-200 bg-white px-1.5 text-[10px] outline-none text-center"
+                          className="h-6 w-14 rounded border border-border bg-card px-1.5 text-[10px] outline-none text-center"
                         />
                         <input
                           type="text"
                           value={(s.tags ?? []).join(",")}
                           onChange={e => updateSub(i, { ...s, tags: e.target.value.split(",").map(x => x.trim()).filter(Boolean) })}
                           placeholder="tags,coma"
-                          className="h-6 flex-1 rounded border border-slate-200 bg-white px-1.5 text-[10px] outline-none"
+                          className="h-6 flex-1 rounded border border-border bg-card px-1.5 text-[10px] outline-none"
                         />
                       </div>
                     </div>
                     <button
                       type="button"
                       onClick={() => removeSub(i)}
-                      className="text-slate-300 hover:text-red-600 transition-colors"
+                      className="text-muted-foreground/70 hover:text-red-600 transition-colors"
                     >
                       <Trash2 className="h-3 w-3" />
                     </button>
@@ -289,8 +289,8 @@ function TemplateEditor({
           )}
         </div>
 
-        <div className="border-t border-slate-200 px-6 py-3 flex items-center justify-between gap-3">
-          <button onClick={onClose} className="text-[12px] text-slate-500 hover:text-slate-900 px-2 py-1.5">
+        <div className="border-t border-border px-6 py-3 flex items-center justify-between gap-3">
+          <button onClick={onClose} className="text-[12px] text-muted-foreground hover:text-foreground px-2 py-1.5">
             Cancelar
           </button>
           <button
@@ -368,7 +368,7 @@ export function TaskTemplatesAdminView() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold text-[#1e3a8a] tracking-tight">Templates de tareas</h1>
-            <p className="text-sm text-slate-400 mt-0.5">
+            <p className="text-sm text-muted-foreground mt-0.5">
               {templates.length} {templates.length === 1 ? "template" : "templates"} · usalos desde el botón "Templates" en /admin/tasks
             </p>
           </div>
@@ -376,7 +376,7 @@ export function TaskTemplatesAdminView() {
             <button
               onClick={fetchTemplates}
               disabled={loading}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40"
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:text-foreground hover:border-border transition-all disabled:opacity-40"
             >
               <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             </button>
@@ -397,11 +397,11 @@ export function TaskTemplatesAdminView() {
           </div>
         ) : templates.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50 ring-1 ring-slate-200 mb-4">
-              <Layers className="h-6 w-6 text-slate-400" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted ring-1 ring-border mb-4">
+              <Layers className="h-6 w-6 text-muted-foreground" />
             </div>
-            <p className="text-[15px] font-semibold text-slate-700">Sin templates</p>
-            <p className="text-[13px] text-slate-400 mt-1 max-w-sm">
+            <p className="text-[15px] font-semibold text-muted-foreground">Sin templates</p>
+            <p className="text-[13px] text-muted-foreground mt-1 max-w-sm">
               Creá un template para acelerar los workflows recurrentes (nuevo bid, onboarding, etc).
             </p>
             <button
@@ -415,7 +415,7 @@ export function TaskTemplatesAdminView() {
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
             {templates.map(t => (
-              <div key={t.id} className="rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:shadow-[0_4px_14px_rgba(15,23,42,0.06)]">
+              <div key={t.id} className="rounded-2xl border border-border bg-card p-4 transition-all hover:shadow-[0_4px_14px_rgba(15,23,42,0.06)]">
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex items-center gap-2 min-w-0">
                     <div
@@ -429,17 +429,17 @@ export function TaskTemplatesAdminView() {
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <p className="text-[14px] font-bold text-slate-900 truncate">{t.name}</p>
+                        <p className="text-[14px] font-bold text-foreground truncate">{t.name}</p>
                         {t.is_default && <Star className="h-3 w-3 text-amber-500 shrink-0" />}
                       </div>
                       {t.description && (
-                        <p className="text-[11.5px] text-slate-500 truncate">{t.description}</p>
+                        <p className="text-[11.5px] text-muted-foreground truncate">{t.description}</p>
                       )}
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 my-3 text-[11px] text-slate-400">
+                <div className="flex items-center gap-3 my-3 text-[11px] text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <GitBranch className="h-3 w-3" /> {t.subtasks.length} subtasks
                   </span>
@@ -456,13 +456,13 @@ export function TaskTemplatesAdminView() {
                 <div className="flex items-center gap-1.5">
                   <button
                     onClick={() => setEditing(t)}
-                    className="inline-flex items-center gap-1 h-7 rounded-lg border border-slate-200 bg-white px-2.5 text-[11px] font-medium text-slate-600 hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors"
+                    className="inline-flex items-center gap-1 h-7 rounded-lg border border-border bg-card px-2.5 text-[11px] font-medium text-muted-foreground hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors"
                   >
                     <Edit3 className="h-3 w-3" /> Editar
                   </button>
                   <button
                     onClick={() => handleDelete(t)}
-                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400 hover:border-red-300 hover:text-red-600 hover:bg-red-50 transition-colors ml-auto"
+                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground hover:border-red-300 hover:text-red-600 hover:bg-red-50 transition-colors ml-auto"
                     title="Borrar"
                   >
                     <Trash2 className="h-3 w-3" />

@@ -101,17 +101,17 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
 
   return (
     <div
-      className={`pointer-events-auto flex items-start gap-2.5 min-w-[260px] max-w-[380px] rounded-xl border border-slate-200 backdrop-blur-xl px-3.5 py-3 shadow-[0_12px_40px_rgba(15,23,42,0.15)] ring-1 ${palette.ring} ${palette.bg} transition-all duration-300 ${
+      className={`pointer-events-auto flex items-start gap-2.5 min-w-[260px] max-w-[380px] rounded-xl border border-border backdrop-blur-xl px-3.5 py-3 shadow-[0_12px_40px_rgba(15,23,42,0.15)] ring-1 ${palette.ring} ${palette.bg} transition-all duration-300 ${
         open ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
       }`}
       style={{ backgroundColor: "rgba(255,255,255,0.95)" }}
       role="status"
     >
       <Icon className={`h-4 w-4 mt-0.5 shrink-0 ${palette.color}`} />
-      <p className="flex-1 text-[13px] text-slate-900 leading-snug">{toast.message}</p>
+      <p className="flex-1 text-[13px] text-foreground leading-snug">{toast.message}</p>
       <button
         onClick={onDismiss}
-        className="shrink-0 text-slate-400 hover:text-slate-600 transition-colors -mt-0.5"
+        className="shrink-0 text-muted-foreground hover:text-muted-foreground transition-colors -mt-0.5"
         aria-label="Cerrar"
       >
         <X className="h-3.5 w-3.5" />

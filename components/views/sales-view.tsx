@@ -47,7 +47,7 @@ function FunnelStep({
   const col = convColor(pctOfTop)
   return (
     <div>
-      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 hover:border-slate-300 transition-colors">
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 hover:border-border transition-colors">
         {/* Proportional fill bar as background */}
         <div
           className="absolute inset-y-0 left-0 rounded-2xl opacity-[0.07] transition-all duration-700"
@@ -59,7 +59,7 @@ function FunnelStep({
         <div className="relative flex items-center justify-between">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80 mb-1">{label}</p>
-            <p className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-900 leading-none">
+            <p className="text-2xl sm:text-4xl font-bold tracking-tight text-foreground leading-none">
               {count > 0 ? count : "—"}
             </p>
           </div>
@@ -68,7 +68,7 @@ function FunnelStep({
             <span className={`text-2xl font-bold tabular-nums ${col.text}`}>
               {pctOfTop}%
             </span>
-            <p className="text-[10px] text-slate-400">del total agendado</p>
+            <p className="text-[10px] text-muted-foreground">del total agendado</p>
             {/* Conversion from previous step */}
             {!isLast && convFromPrev < 100 && (
               <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold ring-1 ${col.bg} ${col.text} ${col.ring}`}>
@@ -83,7 +83,7 @@ function FunnelStep({
       {!isLast && (
         <div className="flex flex-col items-center py-1 gap-0">
           <div className="h-3 w-px bg-white/10" />
-          <ArrowDown className="h-3.5 w-3.5 text-slate-300" />
+          <ArrowDown className="h-3.5 w-3.5 text-muted-foreground/70" />
         </div>
       )}
     </div>
@@ -176,21 +176,21 @@ export function SalesView() {
     <div className="space-y-10">
       {/* Header */}
       <div>
-        <h2 className="text-xl font-bold text-slate-900">Conversión</h2>
-        <p suppressHydrationWarning className="text-[13px] text-slate-500 mt-0.5">
+        <h2 className="text-xl font-bold text-foreground">Conversión</h2>
+        <p suppressHydrationWarning className="text-[13px] text-muted-foreground mt-0.5">
           Embudo mensual · {selectedMonth}
         </p>
       </div>
 
       {error && <p className="text-red-600 text-sm">{error}</p>}
-      {!loading && !error && !data && <p className="text-slate-400 text-sm">No hay reporte para este mes.</p>}
+      {!loading && !error && !data && <p className="text-muted-foreground text-sm">No hay reporte para este mes.</p>}
 
       <div className="grid gap-10">
         {/* ── Funnel visual ── */}
         <section className="space-y-4">
           <div>
-            <h3 className="text-base font-bold text-slate-900">Embudo de llamadas</h3>
-            <p className="text-xs text-slate-500 mt-0.5">Cada barra muestra qué tan ancho llega a cada paso</p>
+            <h3 className="text-base font-bold text-foreground">Embudo de llamadas</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">Cada barra muestra qué tan ancho llega a cada paso</p>
           </div>
           <div>
             <FunnelStep
@@ -227,7 +227,7 @@ export function SalesView() {
           }`}>
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">Tasa de cierre</p>
-              <p className="text-xs text-slate-500 mt-0.5">cierres / llamadas atendidas</p>
+              <p className="text-xs text-muted-foreground mt-0.5">cierres / llamadas atendidas</p>
             </div>
             <p className={`text-2xl sm:text-4xl font-bold tabular-nums ${
               Number(closeRatePct) >= 20 ? "text-emerald-700"
@@ -242,10 +242,10 @@ export function SalesView() {
       {history.length >= 2 && (
         <section className="space-y-4">
           <div>
-            <h3 className="text-base font-bold text-slate-900">Tendencia del Embudo</h3>
-            <p className="text-xs text-slate-400 mt-0.5">¿El pipeline está creciendo o deteriorándose?</p>
+            <h3 className="text-base font-bold text-foreground">Tendencia del Embudo</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">¿El pipeline está creciendo o deteriorándose?</p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <div className="rounded-2xl border border-border bg-card p-6">
             <div className="flex flex-wrap gap-5 mb-5">
               {[
                 { label: "Agendadas", color: "#818cf8" },
@@ -254,7 +254,7 @@ export function SalesView() {
               ].map(l => (
                 <div key={l.label} className="flex items-center gap-1.5">
                   <span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: l.color }} />
-                  <span className="text-[11px] text-slate-500">{l.label}</span>
+                  <span className="text-[11px] text-muted-foreground">{l.label}</span>
                 </div>
               ))}
             </div>

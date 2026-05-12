@@ -182,7 +182,7 @@ function statusInlineStyle(color: string): React.CSSProperties {
 }
 
 // ─── Reusable input class ─────────────────────────────────────────────────────
-const inputCls = "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/10 transition-all"
+const inputCls = "w-full rounded-xl border border-border bg-card px-3 py-2.5 text-[13px] text-foreground placeholder:text-muted-foreground focus:border-[#1e3a8a]/40 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/10 transition-all"
 
 // ─── Avatar Stack ─────────────────────────────────────────────────────────────
 
@@ -200,7 +200,7 @@ function AvatarStack({ users, size = "sm" }: { users: string[]; size?: "sm" | "m
         </div>
       ))}
       {extra > 0 && (
-        <div className={`${dim} flex items-center justify-center rounded-full ring-2 ring-white bg-slate-100 text-slate-700 font-bold`}>
+        <div className={`${dim} flex items-center justify-center rounded-full ring-2 ring-white bg-muted text-muted-foreground font-bold`}>
           +{extra}
         </div>
       )}
@@ -222,10 +222,10 @@ function TagsEditor({ value, onChange }: { value: string[]; onChange: (v: string
     <div className="space-y-2">
       <div className="flex flex-wrap gap-1.5 min-h-[24px]">
         {value.map(t => (
-          <span key={t} className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[11px] text-slate-700">
-            <TagIcon className="h-2.5 w-2.5 text-slate-400" />
+          <span key={t} className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
+            <TagIcon className="h-2.5 w-2.5 text-muted-foreground" />
             {t}
-            <button onClick={() => remove(t)} className="text-slate-400 hover:text-red-600 transition-colors ml-0.5">
+            <button onClick={() => remove(t)} className="text-muted-foreground hover:text-red-600 transition-colors ml-0.5">
               <X className="h-2.5 w-2.5" />
             </button>
           </span>
@@ -238,7 +238,7 @@ function TagsEditor({ value, onChange }: { value: string[]; onChange: (v: string
         onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); add() } }}
         onBlur={add}
         placeholder="Agregar tag y Enter"
-        className="h-7 w-full rounded-lg border border-slate-200 bg-white px-2.5 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none"
+        className="h-7 w-full rounded-lg border border-border bg-card px-2.5 text-[12px] text-foreground placeholder:text-muted-foreground focus:border-[#1e3a8a]/40 focus:outline-none"
       />
     </div>
   )
@@ -258,12 +258,12 @@ function AssigneesEditor({ value, onChange }: { value: string[]; onChange: (v: s
     <div className="space-y-2">
       <div className="flex flex-wrap gap-1.5 min-h-[24px]">
         {value.map(a => (
-          <span key={a} className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-100 pl-1 pr-2 py-0.5 text-[11px] text-slate-700">
+          <span key={a} className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted pl-1 pr-2 py-0.5 text-[11px] text-muted-foreground">
             <span className="flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] text-[8px] font-bold text-white">
               {initials(a)}
             </span>
             {a}
-            <button onClick={() => remove(a)} className="text-slate-400 hover:text-red-600 transition-colors">
+            <button onClick={() => remove(a)} className="text-muted-foreground hover:text-red-600 transition-colors">
               <X className="h-2.5 w-2.5" />
             </button>
           </span>
@@ -276,7 +276,7 @@ function AssigneesEditor({ value, onChange }: { value: string[]; onChange: (v: s
         onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); add() } }}
         onBlur={add}
         placeholder="email o nombre + Enter"
-        className="h-7 w-full rounded-lg border border-slate-200 bg-white px-2.5 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none"
+        className="h-7 w-full rounded-lg border border-border bg-card px-2.5 text-[12px] text-foreground placeholder:text-muted-foreground focus:border-[#1e3a8a]/40 focus:outline-none"
       />
     </div>
   )
@@ -343,13 +343,13 @@ function CommentsSection({ taskId }: { taskId: string }) {
   return (
     <div className="space-y-3">
       {loading ? (
-        <div className="flex justify-center py-3"><Loader2 className="h-4 w-4 animate-spin text-slate-400" /></div>
+        <div className="flex justify-center py-3"><Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /></div>
       ) : comments.length === 0 ? (
-        <p className="text-[12px] text-slate-400 text-center py-3">Sin actividad todavía.</p>
+        <p className="text-[12px] text-muted-foreground text-center py-3">Sin actividad todavía.</p>
       ) : (
         <div className="space-y-2">
           {comments.map(c => (
-            <div key={c.id} className={`flex items-start gap-2 rounded-xl px-3 py-2 ${c.kind === "system" ? "" : "border border-slate-200 bg-slate-50"}`}>
+            <div key={c.id} className={`flex items-start gap-2 rounded-xl px-3 py-2 ${c.kind === "system" ? "" : "border border-border bg-muted"}`}>
               {c.kind === "system" ? (
                 <span className="h-1 w-1 mt-2 rounded-full bg-slate-300 shrink-0" />
               ) : (
@@ -359,18 +359,18 @@ function CommentsSection({ taskId }: { taskId: string }) {
               )}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-[11px] text-slate-400">
-                    {c.kind === "system" ? "" : <span className="font-semibold text-slate-500">{c.author}</span>}
+                  <p className="text-[11px] text-muted-foreground">
+                    {c.kind === "system" ? "" : <span className="font-semibold text-muted-foreground">{c.author}</span>}
                     {c.kind === "system" ? "" : " · "}
                     {fmtRelative(c.created_at)}
                   </p>
                   {c.kind === "comment" && (
-                    <button onClick={() => del(c.id)} className="text-slate-300 hover:text-red-600 transition-colors">
+                    <button onClick={() => del(c.id)} className="text-muted-foreground/70 hover:text-red-600 transition-colors">
                       <X className="h-3 w-3" />
                     </button>
                   )}
                 </div>
-                <p className={`text-[13px] ${c.kind === "system" ? "text-slate-500 italic" : "text-slate-800"}`}>
+                <p className={`text-[13px] ${c.kind === "system" ? "text-muted-foreground italic" : "text-foreground"}`}>
                   {c.content}
                 </p>
               </div>
@@ -384,7 +384,7 @@ function CommentsSection({ taskId }: { taskId: string }) {
           value={draft}
           onChange={e => setDraft(e.target.value)}
           placeholder="Escribir comentario..."
-          className="h-9 flex-1 rounded-lg border border-slate-200 bg-white px-3 text-[13px] text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#1e3a8a]/40"
+          className="h-9 flex-1 rounded-lg border border-border bg-card px-3 text-[13px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#1e3a8a]/40"
         />
         <button
           type="submit"
@@ -421,12 +421,12 @@ function SortableSubtaskRow({
     <div
       ref={setNodeRef}
       style={style}
-      className="group flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5"
+      className="group flex items-center gap-2 rounded-lg border border-border bg-muted px-2 py-1.5"
     >
       <button
         {...attributes}
         {...listeners}
-        className="shrink-0 cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-500 transition-colors"
+        className="shrink-0 cursor-grab active:cursor-grabbing text-muted-foreground/70 hover:text-muted-foreground transition-colors"
         aria-label="Arrastrar"
       >
         <GripVertical className="h-3.5 w-3.5" />
@@ -436,17 +436,17 @@ function SortableSubtaskRow({
         className={`shrink-0 h-3 w-3 rounded-full border-2 transition-all ${
           subtask.status === "completada"
             ? "bg-emerald-500 border-emerald-500"
-            : "border-slate-300 hover:border-slate-500"
+            : "border-border hover:border-foreground/30"
         }`}
       />
       <span className={`flex-1 text-[12px] ${
-        subtask.status === "completada" ? "text-slate-400 line-through" : "text-slate-800"
+        subtask.status === "completada" ? "text-muted-foreground line-through" : "text-foreground"
       }`}>
         {subtask.title}
       </span>
       <button
         onClick={onDelete}
-        className="text-slate-300 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100"
+        className="text-muted-foreground/70 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100"
       >
         <Trash2 className="h-3 w-3" />
       </button>
@@ -516,30 +516,30 @@ function DetailDrawer({
   return (
     <Portal>
       <div className="fixed inset-0 z-[100] bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[560px] flex-col border-l border-slate-200 shadow-2xl bg-white">
+      <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[560px] flex-col border-l border-border shadow-2xl bg-card">
 
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5">
+        <div className="flex items-start justify-between gap-4 border-b border-border px-6 py-5">
           <div className="min-w-0 flex-1">
             <input
               type="text"
               defaultValue={task.title}
               onBlur={e => { const v = e.target.value.trim(); if (v && v !== task.title) onPatch(task.id, { title: v }) }}
-              className="w-full bg-transparent text-lg font-bold text-slate-900 outline-none"
+              className="w-full bg-transparent text-lg font-bold text-foreground outline-none"
             />
-            <p className="text-[12px] text-slate-400 mt-0.5">
+            <p className="text-[12px] text-muted-foreground mt-0.5">
               Creada {fmtDateTime(task.created_at)}{task.created_by ? ` · ${task.created_by}` : ""}
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button onClick={() => onDelete(task.id)} disabled={deleting}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-300 hover:text-red-600 hover:bg-red-50 transition-all disabled:opacity-40"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground/70 hover:text-red-600 hover:bg-red-50 transition-all disabled:opacity-40"
               title="Borrar (⌫)"
             >
               {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             </button>
             <button onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
               title="Cerrar (Esc)"
             >
               <X className="h-4 w-4" />
@@ -548,7 +548,7 @@ function DetailDrawer({
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-slate-200 px-6">
+        <div className="flex border-b border-border px-6">
           {[
             { k: "detail" as const,   l: "Detalle" },
             { k: "comments" as const, l: "Actividad" },
@@ -558,8 +558,8 @@ function DetailDrawer({
               onClick={() => setTab(t.k)}
               className={`px-4 py-3 text-[12px] font-bold uppercase tracking-widest transition-colors border-b-2 ${
                 tab === t.k
-                  ? "border-[#E42D2C] text-slate-900"
-                  : "border-transparent text-slate-400 hover:text-slate-600"
+                  ? "border-[#E42D2C] text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-muted-foreground"
               }`}>
               {t.l}
             </button>
@@ -658,12 +658,12 @@ function DetailDrawer({
 
               {/* Recurrencia (solo para tareas top-level) */}
               {!task.parent_id && (
-                <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50/50 p-3">
+                <div className="space-y-2 rounded-xl border border-border bg-muted/50 p-3">
                   <div className="flex items-center justify-between">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">
                       Tarea recurrente
                     </p>
-                    <label className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600 cursor-pointer">
+                    <label className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground cursor-pointer">
                       <input
                         type="checkbox"
                         checked={(task as any).is_recurrence_template ?? false}
@@ -682,7 +682,7 @@ function DetailDrawer({
                         <select
                           value={(task as any).recurrence_rule ?? "weekly"}
                           onChange={e => onPatch(task.id, { recurrence_rule: e.target.value } as any)}
-                          className="h-9 rounded-lg border border-slate-200 bg-white px-2.5 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300"
+                          className="h-9 rounded-lg border border-border bg-card px-2.5 text-[12px] text-foreground outline-none cursor-pointer hover:border-border"
                         >
                           <option value="daily">Diaria</option>
                           <option value="weekly">Semanal</option>
@@ -692,12 +692,12 @@ function DetailDrawer({
                           type="date"
                           value={(task as any).recurrence_until ?? ""}
                           onChange={e => onPatch(task.id, { recurrence_until: e.target.value || null } as any)}
-                          className="h-9 rounded-lg border border-slate-200 bg-white px-2.5 text-[12px] text-slate-900 outline-none focus:border-[#1e3a8a]/40"
+                          className="h-9 rounded-lg border border-border bg-card px-2.5 text-[12px] text-foreground outline-none focus:border-[#1e3a8a]/40"
                           placeholder="Hasta cuándo"
                           title="Fecha límite (opcional)"
                         />
                       </div>
-                      <p className="text-[10.5px] text-slate-500 leading-snug">
+                      <p className="text-[10.5px] text-muted-foreground leading-snug">
                         Esta tarea actúa como plantilla. Cada{" "}
                         {(task as any).recurrence_rule === "daily"   ? "día"  :
                          (task as any).recurrence_rule === "monthly" ? "mes"  : "semana"}
@@ -709,11 +709,11 @@ function DetailDrawer({
               )}
 
               {/* Subtasks */}
-              <div className="space-y-2 pt-2 border-t border-slate-200">
+              <div className="space-y-2 pt-2 border-t border-border">
                 <div className="flex items-center gap-2">
-                  <GitBranch className="h-3.5 w-3.5 text-slate-400" />
+                  <GitBranch className="h-3.5 w-3.5 text-muted-foreground" />
                   <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">Subtareas</p>
-                  <span className="text-[11px] text-slate-400">({subtasks.length})</span>
+                  <span className="text-[11px] text-muted-foreground">({subtasks.length})</span>
                 </div>
 
                 {subtasks.length > 0 && (
@@ -745,12 +745,12 @@ function DetailDrawer({
                     value={newSub}
                     onChange={e => setNewSub(e.target.value)}
                     placeholder="Sumar subtarea..."
-                    className="h-8 flex-1 rounded-lg border border-slate-200 bg-white px-2.5 text-[12px] text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#1e3a8a]/40"
+                    className="h-8 flex-1 rounded-lg border border-border bg-card px-2.5 text-[12px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#1e3a8a]/40"
                   />
                   <button
                     type="submit"
                     disabled={!newSub.trim() || savingSub}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 disabled:opacity-30 transition-all"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-30 transition-all"
                   >
                     {savingSub ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
                   </button>
@@ -834,12 +834,12 @@ function NewTaskModal({
       <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-md rounded-2xl border border-slate-200 shadow-2xl p-6 space-y-3.5 max-h-[90vh] overflow-y-auto bg-white"
+          className="w-full max-w-md rounded-2xl border border-border shadow-2xl p-6 space-y-3.5 max-h-[90vh] overflow-y-auto bg-card"
         >
           <div className="flex items-center justify-between mb-1">
-            <h3 className="text-base font-bold text-slate-900">Nueva tarea</h3>
+            <h3 className="text-base font-bold text-foreground">Nueva tarea</h3>
             <button type="button" onClick={onClose}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -941,19 +941,19 @@ function BoardColumn({
   return (
     <div
       ref={setNodeRef}
-      className={`flex flex-col rounded-2xl border bg-slate-50/50 min-h-[200px] transition-all ${
-        isOver ? "border-[#1e3a8a]/40 bg-[#1e3a8a]/[0.04] shadow-[0_0_0_3px_rgba(30,58,138,0.10)]" : "border-slate-200"
+      className={`flex flex-col rounded-2xl border bg-muted/50 min-h-[200px] transition-all ${
+        isOver ? "border-[#1e3a8a]/40 bg-[#1e3a8a]/[0.04] shadow-[0_0_0_3px_rgba(30,58,138,0.10)]" : "border-border"
       }`}
     >
       <div
-        className="flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-3 rounded-t-2xl"
+        className="flex items-center justify-between gap-2 border-b border-border px-4 py-3 rounded-t-2xl"
         style={{ backgroundColor: color + "10" }}
       >
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
-          <h3 className="text-[12px] font-bold uppercase tracking-widest text-slate-700">{label}</h3>
+          <h3 className="text-[12px] font-bold uppercase tracking-widest text-muted-foreground">{label}</h3>
         </div>
-        <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold tabular-nums text-slate-600">
+        <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold tabular-nums text-muted-foreground">
           {count}
         </span>
       </div>
@@ -992,7 +992,7 @@ function QuickAddRow({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="group flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-[12px] text-slate-400 hover:bg-white hover:text-[#1e3a8a] transition-colors"
+        className="group flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-[12px] text-muted-foreground hover:bg-card hover:text-[#1e3a8a] transition-colors"
       >
         <Plus className="h-3.5 w-3.5" />
         <span className="font-medium">Agregar tarea</span>
@@ -1001,7 +1001,7 @@ function QuickAddRow({
   }
 
   return (
-    <div className="rounded-lg border border-[#1e3a8a]/30 bg-white p-2 shadow-sm">
+    <div className="rounded-lg border border-[#1e3a8a]/30 bg-card p-2 shadow-sm">
       <input
         ref={inputRef}
         value={title}
@@ -1012,7 +1012,7 @@ function QuickAddRow({
         }}
         onBlur={() => { if (!busy && !title.trim()) setOpen(false); else if (!busy) submit() }}
         placeholder="Título..."
-        className="w-full text-[13px] text-slate-900 placeholder:text-slate-400 outline-none bg-transparent"
+        className="w-full text-[13px] text-foreground placeholder:text-muted-foreground outline-none bg-transparent"
         disabled={busy}
       />
     </div>
@@ -1059,14 +1059,14 @@ function TaskCard({
       {...(draggable ? listeners : {})}
       {...(draggable ? attributes : {})}
       onClick={onClick}
-      className={`group rounded-xl border bg-white transition-all p-3 space-y-2 ${
+      className={`group rounded-xl border bg-card transition-all p-3 space-y-2 ${
         ghost
-          ? "opacity-50 border-slate-200"
+          ? "opacity-50 border-border"
           : isDragging
-            ? "opacity-30 border-slate-200"
+            ? "opacity-30 border-border"
             : selected
               ? "cursor-pointer border-[#1e3a8a]/40 shadow-[0_0_0_3px_rgba(30,58,138,0.10)]"
-              : "cursor-pointer border-slate-200 hover:border-[#1e3a8a]/20 hover:shadow-[0_4px_14px_rgba(15,23,42,0.06)]"
+              : "cursor-pointer border-border hover:border-[#1e3a8a]/20 hover:shadow-[0_4px_14px_rgba(15,23,42,0.06)]"
       } ${draggable && !ghost ? "active:cursor-grabbing" : ""}`}
     >
       <div className="flex items-start gap-2">
@@ -1080,7 +1080,7 @@ function TaskCard({
         >
           {selected
             ? <CheckSquare className="h-3.5 w-3.5 text-[#1e3a8a]" />
-            : <Square      className="h-3.5 w-3.5 text-slate-400 hover:text-[#1e3a8a]" />}
+            : <Square      className="h-3.5 w-3.5 text-muted-foreground hover:text-[#1e3a8a]" />}
         </button>
 
         <button
@@ -1088,11 +1088,11 @@ function TaskCard({
           className={`shrink-0 mt-1 h-3 w-3 rounded-full border-2 transition-all ${
             isTerminal
               ? "bg-emerald-500 border-emerald-500"
-              : "border-slate-300 hover:border-slate-500"
+              : "border-border hover:border-foreground/30"
           }`}
         />
         <p className={`flex-1 text-[13px] font-medium leading-snug ${
-          isTerminal ? "text-slate-400 line-through" : "text-slate-900"
+          isTerminal ? "text-muted-foreground line-through" : "text-foreground"
         }`}>
           {task.title}
         </p>
@@ -1111,15 +1111,15 @@ function TaskCard({
             </span>
           )}
           {task.tags.slice(0, 4).map(t => (
-            <span key={t} className="rounded-full border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] text-slate-600">{t}</span>
+            <span key={t} className="rounded-full border border-border bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">{t}</span>
           ))}
-          {task.tags.length > 4 && <span className="text-[10px] text-slate-400">+{task.tags.length - 4}</span>}
+          {task.tags.length > 4 && <span className="text-[10px] text-muted-foreground">+{task.tags.length - 4}</span>}
         </div>
       )}
 
       {/* Metadata row */}
       <div className="flex items-center justify-between gap-2 pl-9">
-        <div className="flex items-center gap-2.5 text-[11px] text-slate-400">
+        <div className="flex items-center gap-2.5 text-[11px] text-muted-foreground">
           {subtaskCount > 0 && (
             <span className="flex items-center gap-1" title="Subtareas">
               <GitBranch className="h-3 w-3" />
@@ -1138,7 +1138,7 @@ function TaskCard({
 
       {persona && (
         <div className="pl-9">
-          <span className="inline-block rounded-md bg-slate-50 px-2 py-0.5 text-[10px] text-slate-500">
+          <span className="inline-block rounded-md bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
             ↳ {persona.name}
           </span>
         </div>
@@ -1162,25 +1162,25 @@ function BulkBar({
   return (
     <Portal>
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[120] animate-in slide-in-from-bottom-4">
-        <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-[0_20px_40px_rgba(15,23,42,0.15)]">
-          <div className="flex items-center gap-2 pr-2 border-r border-slate-200">
+        <div className="flex items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2 shadow-[0_20px_40px_rgba(15,23,42,0.15)]">
+          <div className="flex items-center gap-2 pr-2 border-r border-border">
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#1e3a8a] text-[12px] font-bold text-white">
               {count}
             </span>
-            <span className="text-[12px] font-medium text-slate-700">seleccionadas</span>
+            <span className="text-[12px] font-medium text-muted-foreground">seleccionadas</span>
           </div>
 
           {/* Status selector */}
           <div className="relative group">
-            <button className="flex items-center gap-1.5 h-8 rounded-lg border border-slate-200 bg-white px-2.5 text-[12px] font-medium text-slate-700 hover:border-[#1e3a8a]/30 transition-colors">
+            <button className="flex items-center gap-1.5 h-8 rounded-lg border border-border bg-card px-2.5 text-[12px] font-medium text-muted-foreground hover:border-[#1e3a8a]/30 transition-colors">
               <Circle className="h-3 w-3" /> Estado <ChevronDown className="h-3 w-3" />
             </button>
-            <div className="absolute bottom-full mb-1 left-0 hidden group-hover:block min-w-[180px] rounded-lg border border-slate-200 bg-white shadow-lg overflow-hidden">
+            <div className="absolute bottom-full mb-1 left-0 hidden group-hover:block min-w-[180px] rounded-lg border border-border bg-card shadow-lg overflow-hidden">
               {statuses.map(s => (
                 <button
                   key={s.key}
                   onClick={() => onSetStatus(s.key)}
-                  className="flex w-full items-center gap-2 text-left px-3 py-2 text-[12px] text-slate-700 hover:bg-slate-50"
+                  className="flex w-full items-center gap-2 text-left px-3 py-2 text-[12px] text-muted-foreground hover:bg-muted"
                 >
                   <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: s.color }} />
                   {s.label}
@@ -1191,15 +1191,15 @@ function BulkBar({
 
           {/* Priority selector */}
           <div className="relative group">
-            <button className="flex items-center gap-1.5 h-8 rounded-lg border border-slate-200 bg-white px-2.5 text-[12px] font-medium text-slate-700 hover:border-[#1e3a8a]/30 transition-colors">
+            <button className="flex items-center gap-1.5 h-8 rounded-lg border border-border bg-card px-2.5 text-[12px] font-medium text-muted-foreground hover:border-[#1e3a8a]/30 transition-colors">
               <Flag className="h-3 w-3" /> Prioridad <ChevronDown className="h-3 w-3" />
             </button>
-            <div className="absolute bottom-full mb-1 left-0 hidden group-hover:block min-w-[120px] rounded-lg border border-slate-200 bg-white shadow-lg overflow-hidden">
+            <div className="absolute bottom-full mb-1 left-0 hidden group-hover:block min-w-[120px] rounded-lg border border-border bg-card shadow-lg overflow-hidden">
               {PRIORITY_OPTIONS.map(p => (
                 <button
                   key={p}
                   onClick={() => onSetPriority(p)}
-                  className="block w-full text-left px-3 py-2 text-[12px] capitalize hover:bg-slate-50 flex items-center gap-2"
+                  className="block w-full text-left px-3 py-2 text-[12px] capitalize hover:bg-muted flex items-center gap-2"
                 >
                   <Flag className={`h-3 w-3 ${PRIORITY_STYLE[p].flag}`} /> {p}
                 </button>
@@ -1214,10 +1214,10 @@ function BulkBar({
             <Trash2 className="h-3 w-3" /> Borrar
           </button>
 
-          <div className="border-l border-slate-200 pl-2">
+          <div className="border-l border-border pl-2">
             <button
               onClick={onClear}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-muted-foreground transition-colors"
               title="Cancelar (Esc)"
             >
               <X className="h-4 w-4" />
@@ -1254,23 +1254,23 @@ function ShortcutsModal({ onClose }: { onClose: () => void }) {
     <Portal>
       <div className="fixed inset-0 z-[100] bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
       <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-        <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+        <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Keyboard className="h-4 w-4 text-[#1e3a8a]" />
-              <h3 className="text-base font-bold text-slate-900">Atajos de teclado</h3>
+              <h3 className="text-base font-bold text-foreground">Atajos de teclado</h3>
             </div>
-            <button onClick={onClose} className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100">
+            <button onClick={onClose} className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted">
               <X className="h-4 w-4" />
             </button>
           </div>
           <div className="space-y-1.5">
             {shortcuts.map(s => (
               <div key={s.label} className="flex items-center justify-between gap-3 py-1.5">
-                <span className="text-[13px] text-slate-700">{s.label}</span>
+                <span className="text-[13px] text-muted-foreground">{s.label}</span>
                 <div className="flex items-center gap-1">
                   {s.keys.map(k => (
-                    <kbd key={k} className="inline-flex items-center justify-center min-w-[24px] h-6 rounded-md border border-slate-200 bg-slate-50 px-1.5 text-[11px] font-bold text-slate-700">
+                    <kbd key={k} className="inline-flex items-center justify-center min-w-[24px] h-6 rounded-md border border-border bg-muted px-1.5 text-[11px] font-bold text-muted-foreground">
                       {k}
                     </kbd>
                   ))}
@@ -1301,7 +1301,7 @@ function FilterChip({
     red:     "border-red-300 bg-red-50 text-[#E42D2C]",
     amber:   "border-amber-300 bg-amber-50 text-amber-800",
     emerald: "border-emerald-300 bg-emerald-50 text-emerald-700",
-  }[accent ?? "navy"] : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900"
+  }[accent ?? "navy"] : "border-border bg-card text-muted-foreground hover:border-border hover:text-foreground"
 
   return (
     <button
@@ -1312,7 +1312,7 @@ function FilterChip({
       {label}
       {count !== undefined && count > 0 && (
         <span className={`tabular-nums rounded-full px-1.5 text-[10px] font-bold ${
-          active ? "bg-white/60" : "bg-slate-100"
+          active ? "bg-white/60" : "bg-muted"
         }`}>
           {count}
         </span>
@@ -1998,7 +1998,7 @@ export function TasksView() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-[#1e3a8a] tracking-tight">Tareas</h1>
-            <p className="text-sm text-slate-400 mt-0.5">
+            <p className="text-sm text-muted-foreground mt-0.5">
               {topLevel.length} {topLevel.length === 1 ? "tarea" : "tareas"}
               {counts.overdue > 0 && (
                 <span className="ml-2 inline-flex items-center gap-1 text-[#E42D2C]">
@@ -2009,7 +2009,7 @@ export function TasksView() {
           </div>
           <div className="flex items-center gap-2">
             {/* View toggle */}
-            <div className="inline-flex h-9 rounded-xl border border-slate-200 bg-white p-0.5">
+            <div className="inline-flex h-9 rounded-xl border border-border bg-card p-0.5">
               {[
                 { k: "board" as ViewMode,    Icon: LayoutGrid,   label: "Board",      shortcut: "1" },
                 { k: "list" as ViewMode,     Icon: List,         label: "Lista",      shortcut: "2" },
@@ -2021,7 +2021,7 @@ export function TasksView() {
                   className={`flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium transition-all ${
                     view === v.k
                       ? "bg-[#1e3a8a] text-white shadow-sm"
-                      : "text-slate-500 hover:text-slate-900"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                   title={`${v.label} (${v.shortcut})`}
                 >
@@ -2035,7 +2035,7 @@ export function TasksView() {
               <select
                 value={activeSetId}
                 onChange={e => handleSetChange(e.target.value)}
-                className="hidden lg:block h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] font-semibold text-slate-700 outline-none cursor-pointer hover:border-[#1e3a8a]/30 transition-colors"
+                className="hidden lg:block h-9 rounded-xl border border-border bg-card px-3 text-[12px] font-semibold text-muted-foreground outline-none cursor-pointer hover:border-[#1e3a8a]/30 transition-colors"
                 title="Cambiar workflow de estados"
               >
                 {statusSets.map(s => (
@@ -2048,7 +2048,7 @@ export function TasksView() {
 
             <button
               onClick={() => setShowTemplates(true)}
-              className="hidden sm:flex items-center gap-1.5 h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] font-semibold text-slate-600 hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-all"
+              className="hidden sm:flex items-center gap-1.5 h-9 rounded-xl border border-border bg-card px-3 text-[12px] font-semibold text-muted-foreground hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-all"
               title="Aplicar template (T)"
             >
               <Layers className="h-3.5 w-3.5" />
@@ -2064,27 +2064,27 @@ export function TasksView() {
             </button>
             <button
               onClick={() => setShowImport(true)}
-              className="hidden md:flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-[#1e3a8a] hover:border-[#1e3a8a]/30 transition-all"
+              className="hidden md:flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:text-[#1e3a8a] hover:border-[#1e3a8a]/30 transition-all"
               title="Importar CSV"
             >
               <Upload className="h-4 w-4" />
             </button>
             <button
               onClick={handleExportCSV}
-              className="hidden md:flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-[#1e3a8a] hover:border-[#1e3a8a]/30 transition-all"
+              className="hidden md:flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:text-[#1e3a8a] hover:border-[#1e3a8a]/30 transition-all"
               title="Exportar CSV"
             >
               <Download className="h-4 w-4" />
             </button>
             <button
               onClick={() => setShowShortcuts(true)}
-              className="hidden md:flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-[#1e3a8a] hover:border-[#1e3a8a]/30 transition-all"
+              className="hidden md:flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:text-[#1e3a8a] hover:border-[#1e3a8a]/30 transition-all"
               title="Atajos (?)"
             >
               <Keyboard className="h-4 w-4" />
             </button>
             <button onClick={fetchAll} disabled={loading}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40"
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:text-foreground hover:border-border transition-all disabled:opacity-40"
               title="Refrescar"
             >
               <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
@@ -2108,16 +2108,16 @@ export function TasksView() {
               Vistas:
             </span>
             {savedViews.map(v => (
-              <div key={v.id} className="group inline-flex items-stretch rounded-full border border-slate-200 bg-white overflow-hidden hover:border-[#1e3a8a]/30 transition-colors">
+              <div key={v.id} className="group inline-flex items-stretch rounded-full border border-border bg-card overflow-hidden hover:border-[#1e3a8a]/30 transition-colors">
                 <button
                   onClick={() => applyView(v)}
-                  className="px-3 h-7 text-[11px] font-medium text-slate-700 hover:text-[#1e3a8a] transition-colors"
+                  className="px-3 h-7 text-[11px] font-medium text-muted-foreground hover:text-[#1e3a8a] transition-colors"
                 >
                   {v.name}
                 </button>
                 <button
                   onClick={() => deleteView(v.id)}
-                  className="px-1.5 h-7 text-slate-300 hover:text-red-600 hover:bg-red-50 transition-colors border-l border-slate-200 opacity-0 group-hover:opacity-100"
+                  className="px-1.5 h-7 text-muted-foreground/70 hover:text-red-600 hover:bg-red-50 transition-colors border-l border-border opacity-0 group-hover:opacity-100"
                   title="Borrar vista"
                 >
                   <X className="h-3 w-3" />
@@ -2126,7 +2126,7 @@ export function TasksView() {
             ))}
             <button
               onClick={handleSaveCurrentView}
-              className="inline-flex items-center gap-1 h-7 rounded-full border border-dashed border-slate-300 bg-white px-3 text-[10.5px] font-medium text-slate-500 hover:border-[#1e3a8a]/40 hover:text-[#1e3a8a] transition-colors"
+              className="inline-flex items-center gap-1 h-7 rounded-full border border-dashed border-border bg-card px-3 text-[10.5px] font-medium text-muted-foreground hover:border-[#1e3a8a]/40 hover:text-[#1e3a8a] transition-colors"
               title="Guardar combinación actual de filtros como vista"
             >
               <Plus className="h-3 w-3" />
@@ -2138,7 +2138,7 @@ export function TasksView() {
           <div className="flex items-center">
             <button
               onClick={handleSaveCurrentView}
-              className="inline-flex items-center gap-1 h-7 rounded-full border border-dashed border-slate-300 bg-white px-3 text-[10.5px] font-medium text-slate-400 hover:border-[#1e3a8a]/40 hover:text-[#1e3a8a] transition-colors"
+              className="inline-flex items-center gap-1 h-7 rounded-full border border-dashed border-border bg-card px-3 text-[10.5px] font-medium text-muted-foreground hover:border-[#1e3a8a]/40 hover:text-[#1e3a8a] transition-colors"
               title="Guardar combinación actual de filtros como vista"
             >
               <Plus className="h-3 w-3" />
@@ -2191,20 +2191,20 @@ export function TasksView() {
         </div>
 
         {/* ─── Toolbar: search + filters + sort ───────────────────────── */}
-        <div className="border-b border-slate-200 pb-4 space-y-2.5">
+        <div className="border-b border-border pb-4 space-y-2.5">
           {/* Row 1: search + (mobile) filters toggle */}
           <div className="flex items-center gap-2.5">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <input
                 ref={searchInputRef}
                 type="text"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Buscar tareas, tags, asignados..."
-                className="h-9 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/10"
+                className="h-9 w-full rounded-xl border border-border bg-card pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-[#1e3a8a]/40 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/10"
               />
-              <kbd className="hidden sm:inline absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-slate-200 bg-slate-50 px-1.5 text-[10px] font-bold text-slate-400">/</kbd>
+              <kbd className="hidden sm:inline absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-border bg-muted px-1.5 text-[10px] font-bold text-muted-foreground">/</kbd>
             </div>
 
             {/* Mobile filters toggle */}
@@ -2213,7 +2213,7 @@ export function TasksView() {
               className={`md:hidden flex items-center gap-1.5 h-9 rounded-xl border px-3 text-[12px] font-semibold transition-colors ${
                 filtersOpen
                   ? "border-[#1e3a8a]/40 bg-[#1e3a8a]/[0.06] text-[#1e3a8a]"
-                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                  : "border-border bg-card text-muted-foreground hover:border-border"
               }`}
               aria-label="Filtros"
             >
@@ -2227,7 +2227,7 @@ export function TasksView() {
             <select
               value={filterPriority}
               onChange={e => setFilterPriority(e.target.value as any)}
-              className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300">
+              className="h-9 rounded-xl border border-border bg-card px-3 text-[12px] text-foreground outline-none cursor-pointer hover:border-border">
               <option value="todos">Todas las prioridades</option>
               {PRIORITY_OPTIONS.map(p => <option key={p} value={p} className="capitalize">{p}</option>)}
             </select>
@@ -2236,7 +2236,7 @@ export function TasksView() {
               <select
                 value={filterAssignee}
                 onChange={e => setFilterAssignee(e.target.value)}
-                className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300">
+                className="h-9 rounded-xl border border-border bg-card px-3 text-[12px] text-foreground outline-none cursor-pointer hover:border-border">
                 <option value="todos">Todos los asignados</option>
                 {allAssignees.map(a => <option key={a} value={a}>{a}</option>)}
               </select>
@@ -2245,7 +2245,7 @@ export function TasksView() {
               <select
                 value={filterTag}
                 onChange={e => setFilterTag(e.target.value)}
-                className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300">
+                className="h-9 rounded-xl border border-border bg-card px-3 text-[12px] text-foreground outline-none cursor-pointer hover:border-border">
                 <option value="todos">Todos los tags</option>
                 {allTags.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
@@ -2265,7 +2265,7 @@ export function TasksView() {
               <select
                 value={filterDepartment}
                 onChange={e => setFilterDepartment(e.target.value)}
-                className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300">
+                className="h-9 rounded-xl border border-border bg-card px-3 text-[12px] text-foreground outline-none cursor-pointer hover:border-border">
                 <option value="todos">Todos los departamentos</option>
                 {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
               </select>
@@ -2276,7 +2276,7 @@ export function TasksView() {
                 <select
                   value={groupBy}
                   onChange={e => setGroupBy(e.target.value as GroupBy)}
-                  className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300"
+                  className="h-9 rounded-xl border border-border bg-card px-3 text-[12px] text-foreground outline-none cursor-pointer hover:border-border"
                   title="Agrupar por"
                 >
                   <option value="status">Por estado</option>
@@ -2286,14 +2286,14 @@ export function TasksView() {
                   <option value="tag">Por tag</option>
                 </select>
               )}
-              <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-slate-400">
+              <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-muted-foreground">
                 <ArrowDownUp className="h-3 w-3" />
                 <span>Ordenar:</span>
               </div>
               <select
                 value={sortBy}
                 onChange={e => setSortBy(e.target.value as SortBy)}
-                className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300">
+                className="h-9 rounded-xl border border-border bg-card px-3 text-[12px] text-foreground outline-none cursor-pointer hover:border-border">
                 <option value="due_at">Vencimiento</option>
                 <option value="priority">Prioridad</option>
                 <option value="created_at">Creación</option>
@@ -2310,11 +2310,11 @@ export function TasksView() {
           </div>
         ) : sorted.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50 ring-1 ring-slate-200 mb-4">
-              <Inbox className="h-6 w-6 text-slate-400" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted ring-1 ring-border mb-4">
+              <Inbox className="h-6 w-6 text-muted-foreground" />
             </div>
-            <p className="text-[15px] font-semibold text-slate-700">No hay tareas que coincidan</p>
-            <p className="text-[13px] text-slate-400 mt-1">Probá ajustar los filtros, o creá una nueva con <kbd className="rounded border border-slate-200 bg-slate-50 px-1 text-[11px] font-bold text-slate-600">Q</kbd>.</p>
+            <p className="text-[15px] font-semibold text-muted-foreground">No hay tareas que coincidan</p>
+            <p className="text-[13px] text-muted-foreground mt-1">Probá ajustar los filtros, o creá una nueva con <kbd className="rounded border border-border bg-muted px-1 text-[11px] font-bold text-muted-foreground">Q</kbd>.</p>
             <button
               onClick={() => setShowNewForm(true)}
               className="mt-4 inline-flex items-center gap-1.5 h-9 rounded-xl bg-[#E42D2C] px-4 text-[12px] font-bold text-white hover:bg-[#c42423] transition-all"
@@ -2444,21 +2444,21 @@ export function TasksView() {
             </Portal>
           </DndContext>
         ) : view === "list" ? (
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+          <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50">
+                  <tr className="border-b border-border bg-muted">
                     <th className="px-3 py-3 w-8" onClick={(e) => e.stopPropagation()}>
                       <button onClick={toggleSelectAll} aria-label="Seleccionar todo" className="flex items-center justify-center">
                         {allSelected
                           ? <CheckSquare className="h-3.5 w-3.5 text-[#1e3a8a]" />
-                          : <Square className="h-3.5 w-3.5 text-slate-400" />}
+                          : <Square className="h-3.5 w-3.5 text-muted-foreground" />}
                       </button>
                     </th>
                     <th className="px-3 py-3 w-8" />
                     {["Título", "Depto.", "Estado", "Prioridad", "Asignados", "Tags", "Vence", "Subtareas", ""].map((h, i) => (
-                      <th key={i} className="px-3 py-3 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 whitespace-nowrap">{h}</th>
+                      <th key={i} className="px-3 py-3 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -2471,15 +2471,15 @@ export function TasksView() {
                     return (
                       <tr key={t.id}
                         onClick={() => setSelected(t)}
-                        className={`group border-b border-slate-100 cursor-pointer transition-colors ${
-                          isSelected ? "bg-[#1e3a8a]/[0.04]" : "hover:bg-slate-50"
+                        className={`group border-b border-border cursor-pointer transition-colors ${
+                          isSelected ? "bg-[#1e3a8a]/[0.04]" : "hover:bg-muted"
                         }`}
                       >
                         <td className="px-3 py-3 whitespace-nowrap" onClick={e => e.stopPropagation()}>
                           <button onClick={() => toggleSelect(t.id)} className="flex items-center justify-center">
                             {isSelected
                               ? <CheckSquare className="h-3.5 w-3.5 text-[#1e3a8a]" />
-                              : <Square className="h-3.5 w-3.5 text-slate-300 group-hover:text-slate-500" />}
+                              : <Square className="h-3.5 w-3.5 text-muted-foreground/70 group-hover:text-muted-foreground" />}
                           </button>
                         </td>
 
@@ -2489,19 +2489,19 @@ export function TasksView() {
                             className={`h-3.5 w-3.5 rounded-full border-2 transition-all ${
                               terminalKeys.has(t.status)
                                 ? "bg-emerald-500 border-emerald-500"
-                                : "border-slate-300 hover:border-slate-500"
+                                : "border-border hover:border-foreground/30"
                             }`}
                           />
                         </td>
 
                         <td className="px-3 py-3">
                           <div className={`text-[13px] font-medium ${
-                            terminalKeys.has(t.status) ? "text-slate-400 line-through" : "text-slate-900"
+                            terminalKeys.has(t.status) ? "text-muted-foreground line-through" : "text-foreground"
                           }`}>
                             {t.title}
                           </div>
                           {persona && (
-                            <span className="mt-0.5 inline-block rounded-md bg-slate-50 px-1.5 py-0.5 text-[10px] text-slate-400">
+                            <span className="mt-0.5 inline-block rounded-md bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
                               ↳ {persona.name}
                             </span>
                           )}
@@ -2510,7 +2510,7 @@ export function TasksView() {
                         <td className="px-3 py-3 whitespace-nowrap">
                           {(() => {
                             const dept = t.department_id ? deptMap.get(t.department_id) : null
-                            if (!dept) return <span className="text-slate-300 text-[11px]">—</span>
+                            if (!dept) return <span className="text-muted-foreground/70 text-[11px]">—</span>
                             return (
                               <span
                                 className="rounded-full border px-2 py-0.5 text-[10px] font-bold"
@@ -2551,27 +2551,27 @@ export function TasksView() {
                         <td className="px-3 py-3 whitespace-nowrap max-w-[200px]">
                           <div className="flex flex-wrap gap-1">
                             {t.tags.slice(0, 3).map(tag => (
-                              <span key={tag} className="rounded-full border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] text-slate-600">{tag}</span>
+                              <span key={tag} className="rounded-full border border-border bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">{tag}</span>
                             ))}
-                            {t.tags.length > 3 && <span className="text-[10px] text-slate-400">+{t.tags.length - 3}</span>}
+                            {t.tags.length > 3 && <span className="text-[10px] text-muted-foreground">+{t.tags.length - 3}</span>}
                           </div>
                         </td>
 
                         <td className="px-3 py-3 whitespace-nowrap">
                           {t.due_at ? (
-                            <span className={`flex items-center gap-1 text-[11px] ${overdue ? "text-[#E42D2C] font-semibold" : "text-slate-500"}`}>
+                            <span className={`flex items-center gap-1 text-[11px] ${overdue ? "text-[#E42D2C] font-semibold" : "text-muted-foreground"}`}>
                               {overdue ? <AlertCircle className="h-3 w-3" /> : <CalIcon className="h-3 w-3" />}
                               {fmtDateTime(t.due_at)}
                             </span>
-                          ) : <span className="text-slate-300 text-[11px]">—</span>}
+                          ) : <span className="text-muted-foreground/70 text-[11px]">—</span>}
                         </td>
 
-                        <td className="px-3 py-3 whitespace-nowrap text-[11px] text-slate-500">
+                        <td className="px-3 py-3 whitespace-nowrap text-[11px] text-muted-foreground">
                           {stat ? `${stat.done}/${stat.total}` : "—"}
                         </td>
 
                         <td className="px-3 py-3 whitespace-nowrap">
-                          <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-[#1e3a8a] transition-colors" />
+                          <ChevronRight className="h-4 w-4 text-muted-foreground/70 group-hover:text-[#1e3a8a] transition-colors" />
                         </td>
                       </tr>
                     )

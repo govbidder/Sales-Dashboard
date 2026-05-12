@@ -111,19 +111,19 @@ function SortableFieldRow({
     <div
       ref={setNodeRef}
       style={style}
-      className="rounded-xl border border-slate-200 bg-white p-3 space-y-2"
+      className="rounded-xl border border-border bg-card p-3 space-y-2"
     >
       <div className="flex items-center gap-2">
         <button
           {...attributes}
           {...listeners}
-          className="shrink-0 cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-500 transition-colors"
+          className="shrink-0 cursor-grab active:cursor-grabbing text-muted-foreground/70 hover:text-muted-foreground transition-colors"
           aria-label="Arrastrar"
           type="button"
         >
           <GripVertical className="h-4 w-4" />
         </button>
-        <span className="flex h-5 w-5 items-center justify-center rounded-md bg-slate-100 text-[10px] font-bold text-slate-600 shrink-0">
+        <span className="flex h-5 w-5 items-center justify-center rounded-md bg-muted text-[10px] font-bold text-muted-foreground shrink-0">
           {idx + 1}
         </span>
         <input
@@ -131,12 +131,12 @@ function SortableFieldRow({
           value={field.label}
           onChange={e => onChange({ ...field, label: e.target.value })}
           placeholder="Label visible al usuario"
-          className="flex-1 bg-transparent text-[13px] font-bold text-slate-900 outline-none placeholder:text-slate-400"
+          className="flex-1 bg-transparent text-[13px] font-bold text-foreground outline-none placeholder:text-muted-foreground"
         />
         <button
           type="button"
           onClick={onDelete}
-          className="text-slate-300 hover:text-red-600 transition-colors"
+          className="text-muted-foreground/70 hover:text-red-600 transition-colors"
         >
           <Trash2 className="h-3.5 w-3.5" />
         </button>
@@ -146,7 +146,7 @@ function SortableFieldRow({
         <select
           value={field.type}
           onChange={e => onChange({ ...field, type: e.target.value as FieldType })}
-          className="h-7 rounded-lg border border-slate-200 bg-white px-2 text-[11px] text-slate-700 outline-none cursor-pointer hover:border-slate-300"
+          className="h-7 rounded-lg border border-border bg-card px-2 text-[11px] text-muted-foreground outline-none cursor-pointer hover:border-border"
         >
           {FIELD_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
         </select>
@@ -156,7 +156,7 @@ function SortableFieldRow({
           value={field.key}
           onChange={e => onChange({ ...field, key: e.target.value.replace(/[^a-z0-9_]/gi, "_").toLowerCase() })}
           placeholder="campo_id"
-          className="h-7 w-24 rounded-lg border border-slate-200 bg-slate-50 px-2 text-[11px] font-mono text-slate-600 outline-none focus:border-[#1e3a8a]/40 focus:bg-white"
+          className="h-7 w-24 rounded-lg border border-border bg-muted px-2 text-[11px] font-mono text-muted-foreground outline-none focus:border-[#1e3a8a]/40 focus:bg-card"
           title="Identifier interno (snake_case)"
         />
 
@@ -165,10 +165,10 @@ function SortableFieldRow({
           value={field.placeholder ?? ""}
           onChange={e => onChange({ ...field, placeholder: e.target.value })}
           placeholder="Placeholder (opcional)"
-          className="flex-1 min-w-[100px] h-7 rounded-lg border border-slate-200 bg-white px-2 text-[11px] text-slate-700 outline-none focus:border-[#1e3a8a]/40"
+          className="flex-1 min-w-[100px] h-7 rounded-lg border border-border bg-card px-2 text-[11px] text-muted-foreground outline-none focus:border-[#1e3a8a]/40"
         />
 
-        <label className="flex items-center gap-1 text-[11px] font-medium text-slate-600 cursor-pointer">
+        <label className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground cursor-pointer">
           <input
             type="checkbox"
             checked={field.required ?? false}
@@ -281,19 +281,19 @@ function FormEditor({
   return (
     <Portal>
       <div className="fixed inset-0 z-[100] bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[640px] flex-col border-l border-slate-200 shadow-2xl bg-white">
+      <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[640px] flex-col border-l border-border shadow-2xl bg-card">
 
-        <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5">
+        <div className="flex items-start justify-between gap-4 border-b border-border px-6 py-5">
           <div className="min-w-0 flex-1">
-            <h3 className="text-lg font-bold text-slate-900">
+            <h3 className="text-lg font-bold text-foreground">
               {isNew ? "Nuevo form" : "Editar form"}
             </h3>
-            <p className="text-[12px] text-slate-400 mt-0.5">
+            <p className="text-[12px] text-muted-foreground mt-0.5">
               {isNew ? "Configurá los campos y publicá." : `Slug: /forms/${slug}`}
             </p>
           </div>
           <button onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -309,19 +309,19 @@ function FormEditor({
                 value={title}
                 onChange={e => handleTitleChange(e.target.value)}
                 placeholder="Brief inicial de proyecto"
-                className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-[13px] text-slate-900 outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10"
+                className="h-10 w-full rounded-xl border border-border bg-card px-3 text-[13px] text-foreground outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10"
               />
             </div>
             <div className="space-y-1.5">
               <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Slug (URL) *</p>
               <div className="flex items-center gap-1">
-                <span className="text-[12px] text-slate-400">/forms/</span>
+                <span className="text-[12px] text-muted-foreground">/forms/</span>
                 <input
                   type="text"
                   value={slug}
                   onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
                   placeholder="brief-inicial"
-                  className="h-10 flex-1 rounded-xl border border-slate-200 bg-white px-3 text-[13px] font-mono text-slate-900 outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10"
+                  className="h-10 flex-1 rounded-xl border border-border bg-card px-3 text-[13px] font-mono text-foreground outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10"
                 />
               </div>
             </div>
@@ -334,12 +334,12 @@ function FormEditor({
               onChange={e => setDescription(e.target.value)}
               rows={2}
               placeholder="Contanos qué necesitás y nos ponemos en contacto en 24h."
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[13px] text-slate-900 outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10 resize-none"
+              className="w-full rounded-xl border border-border bg-card px-3 py-2 text-[13px] text-foreground outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10 resize-none"
             />
           </div>
 
           {/* Fields */}
-          <div className="space-y-2 pt-2 border-t border-slate-200">
+          <div className="space-y-2 pt-2 border-t border-border">
             <div className="flex items-center justify-between">
               <p className="text-[11px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">
                 Campos del form ({fields.length})
@@ -354,9 +354,9 @@ function FormEditor({
             </div>
 
             {fields.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/50 px-5 py-8 text-center">
-                <FormInput className="h-5 w-5 text-slate-400 mx-auto mb-2" />
-                <p className="text-[12.5px] text-slate-500">Todavía no hay campos. Agregá el primero.</p>
+              <div className="rounded-xl border border-dashed border-border bg-muted/50 px-5 py-8 text-center">
+                <FormInput className="h-5 w-5 text-muted-foreground mx-auto mb-2" />
+                <p className="text-[12.5px] text-muted-foreground">Todavía no hay campos. Agregá el primero.</p>
               </div>
             ) : (
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -378,7 +378,7 @@ function FormEditor({
           </div>
 
           {/* Defaults para la tarea creada */}
-          <div className="space-y-2 pt-3 border-t border-slate-200">
+          <div className="space-y-2 pt-3 border-t border-border">
             <p className="text-[11px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">
               Valores por defecto en la tarea
             </p>
@@ -388,7 +388,7 @@ function FormEditor({
                 <select
                   value={defaultPriority}
                   onChange={e => setDefaultPriority(e.target.value as any)}
-                  className="h-9 w-full rounded-xl border border-slate-200 bg-white px-3 text-[13px] text-slate-900 outline-none cursor-pointer hover:border-slate-300 capitalize"
+                  className="h-9 w-full rounded-xl border border-border bg-card px-3 text-[13px] text-foreground outline-none cursor-pointer hover:border-border capitalize"
                 >
                   <option value="baja">Baja</option>
                   <option value="media">Media</option>
@@ -404,7 +404,7 @@ function FormEditor({
                   className={`h-9 w-full rounded-xl border px-3 text-[12px] font-bold transition-colors flex items-center justify-center gap-2 ${
                     isActive
                       ? "border-emerald-300 bg-emerald-50 text-emerald-700"
-                      : "border-slate-200 bg-slate-50 text-slate-500"
+                      : "border-border bg-muted text-muted-foreground"
                   }`}
                 >
                   <Power className="h-3.5 w-3.5" />
@@ -419,7 +419,7 @@ function FormEditor({
                 value={defaultTagsInput}
                 onChange={e => setDefaultTagsInput(e.target.value)}
                 placeholder="form, lead, brief"
-                className="h-9 w-full rounded-xl border border-slate-200 bg-white px-3 text-[13px] text-slate-900 outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10"
+                className="h-9 w-full rounded-xl border border-border bg-card px-3 text-[13px] text-foreground outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10"
               />
             </div>
             <div className="space-y-1.5">
@@ -429,7 +429,7 @@ function FormEditor({
                 value={defaultAssignees}
                 onChange={e => setDefaultAssignees(e.target.value)}
                 placeholder="santo@govbidder.com"
-                className="h-9 w-full rounded-xl border border-slate-200 bg-white px-3 text-[13px] text-slate-900 outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10"
+                className="h-9 w-full rounded-xl border border-border bg-card px-3 text-[13px] text-foreground outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10"
               />
             </div>
           </div>
@@ -442,8 +442,8 @@ function FormEditor({
           )}
         </div>
 
-        <div className="border-t border-slate-200 px-6 py-3 flex items-center justify-between gap-3">
-          <button onClick={onClose} className="text-[12px] text-slate-500 hover:text-slate-900 px-2 py-1.5">
+        <div className="border-t border-border px-6 py-3 flex items-center justify-between gap-3">
+          <button onClick={onClose} className="text-[12px] text-muted-foreground hover:text-foreground px-2 py-1.5">
             Cancelar
           </button>
           <button
@@ -489,48 +489,48 @@ function SubmissionsPanel({
   return (
     <Portal>
       <div className="fixed inset-0 z-[100] bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[640px] flex-col border-l border-slate-200 shadow-2xl bg-white">
-        <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5">
+      <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[640px] flex-col border-l border-border shadow-2xl bg-card">
+        <div className="flex items-start justify-between gap-4 border-b border-border px-6 py-5">
           <div>
-            <h3 className="text-lg font-bold text-slate-900">{form.title}</h3>
-            <p className="text-[12px] text-slate-400 mt-0.5">
+            <h3 className="text-lg font-bold text-foreground">{form.title}</h3>
+            <p className="text-[12px] text-muted-foreground mt-0.5">
               {items.length} submission{items.length === 1 ? "" : "s"}
             </p>
           </div>
           <button onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
             <X className="h-4 w-4" />
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-2">
           {loading ? (
-            <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-slate-400" /></div>
+            <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
           ) : items.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/50 px-5 py-12 text-center">
-              <FileText className="h-5 w-5 text-slate-400 mx-auto mb-2" />
-              <p className="text-[13px] text-slate-500">Todavía nadie completó este form.</p>
-              <p className="text-[11px] text-slate-400 mt-1">Compartí el link público para empezar a recibir.</p>
+            <div className="rounded-xl border border-dashed border-border bg-muted/50 px-5 py-12 text-center">
+              <FileText className="h-5 w-5 text-muted-foreground mx-auto mb-2" />
+              <p className="text-[13px] text-muted-foreground">Todavía nadie completó este form.</p>
+              <p className="text-[11px] text-muted-foreground mt-1">Compartí el link público para empezar a recibir.</p>
             </div>
           ) : (
             items.map(s => (
-              <div key={s.id} className="rounded-xl border border-slate-200 bg-white p-3">
+              <div key={s.id} className="rounded-xl border border-border bg-card p-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="text-[13px] font-bold text-slate-900">
+                    <p className="text-[13px] font-bold text-foreground">
                       {s.submitter_name || s.submitter_email || "Anónimo"}
                     </p>
                     {s.submitter_email && s.submitter_name && (
-                      <p className="text-[11px] text-slate-500">{s.submitter_email}</p>
+                      <p className="text-[11px] text-muted-foreground">{s.submitter_email}</p>
                     )}
                   </div>
-                  <span className="text-[10px] text-slate-400 shrink-0">{fmtRelative(s.created_at)}</span>
+                  <span className="text-[10px] text-muted-foreground shrink-0">{fmtRelative(s.created_at)}</span>
                 </div>
-                <div className="mt-2 rounded-lg bg-slate-50 p-2.5 text-[11.5px] text-slate-700 space-y-0.5">
+                <div className="mt-2 rounded-lg bg-muted p-2.5 text-[11.5px] text-muted-foreground space-y-0.5">
                   {Object.entries(s.payload).map(([k, v]) => (
                     <div key={k} className="flex gap-2">
-                      <span className="font-bold text-slate-500 min-w-[100px]">{k}:</span>
-                      <span className="text-slate-700">{String(v)}</span>
+                      <span className="font-bold text-muted-foreground min-w-[100px]">{k}:</span>
+                      <span className="text-muted-foreground">{String(v)}</span>
                     </div>
                   ))}
                 </div>
@@ -632,7 +632,7 @@ export function FormsAdminView() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold text-[#1e3a8a] tracking-tight">Forms públicos</h1>
-            <p className="text-sm text-slate-400 mt-0.5">
+            <p className="text-sm text-muted-foreground mt-0.5">
               {forms.length} {forms.length === 1 ? "form" : "forms"} · cada submit crea una tarea automáticamente
             </p>
           </div>
@@ -640,7 +640,7 @@ export function FormsAdminView() {
             <button
               onClick={fetchForms}
               disabled={loading}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40"
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:text-foreground hover:border-border transition-all disabled:opacity-40"
               title="Refrescar"
             >
               <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
@@ -662,11 +662,11 @@ export function FormsAdminView() {
           </div>
         ) : forms.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50 ring-1 ring-slate-200 mb-4">
-              <FormInput className="h-6 w-6 text-slate-400" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted ring-1 ring-border mb-4">
+              <FormInput className="h-6 w-6 text-muted-foreground" />
             </div>
-            <p className="text-[15px] font-semibold text-slate-700">Todavía no hay forms</p>
-            <p className="text-[13px] text-slate-400 mt-1 max-w-sm">
+            <p className="text-[15px] font-semibold text-muted-foreground">Todavía no hay forms</p>
+            <p className="text-[13px] text-muted-foreground mt-1 max-w-sm">
               Creá un form público — la URL la podés mandar a clientes o postear en LinkedIn.
               Cada submit crea una tarea automáticamente en el board.
             </p>
@@ -683,8 +683,8 @@ export function FormsAdminView() {
             {forms.map(f => {
               const url = typeof window !== "undefined" ? `${window.location.origin}/forms/${f.slug}` : `/forms/${f.slug}`
               return (
-                <div key={f.id} className={`relative overflow-hidden rounded-2xl border bg-white p-4 transition-all hover:shadow-[0_4px_14px_rgba(15,23,42,0.06)] ${
-                  f.is_active ? "border-slate-200" : "border-slate-200 opacity-60"
+                <div key={f.id} className={`relative overflow-hidden rounded-2xl border bg-card p-4 transition-all hover:shadow-[0_4px_14px_rgba(15,23,42,0.06)] ${
+                  f.is_active ? "border-border" : "border-border opacity-60"
                 }`}>
                   {/* Active badge */}
                   <div className="flex items-start justify-between gap-3 mb-3">
@@ -692,13 +692,13 @@ export function FormsAdminView() {
                       <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1 ${
                         f.is_active
                           ? "bg-[#1e3a8a]/[0.08] ring-[#1e3a8a]/15"
-                          : "bg-slate-100 ring-slate-200"
+                          : "bg-muted ring-border"
                       }`}>
-                        <FormInput className={`h-4 w-4 ${f.is_active ? "text-[#1e3a8a]" : "text-slate-400"}`} />
+                        <FormInput className={`h-4 w-4 ${f.is_active ? "text-[#1e3a8a]" : "text-muted-foreground"}`} />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[14px] font-bold text-slate-900 truncate">{f.title}</p>
-                        <p className="text-[11px] text-slate-500 font-mono truncate">/forms/{f.slug}</p>
+                        <p className="text-[14px] font-bold text-foreground truncate">{f.title}</p>
+                        <p className="text-[11px] text-muted-foreground font-mono truncate">/forms/{f.slug}</p>
                       </div>
                     </div>
                     <button
@@ -706,7 +706,7 @@ export function FormsAdminView() {
                       className={`flex h-6 w-6 items-center justify-center rounded-md transition-colors ${
                         f.is_active
                           ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
-                          : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                          : "bg-muted text-muted-foreground hover:bg-muted"
                       }`}
                       title={f.is_active ? "Desactivar" : "Activar"}
                     >
@@ -715,10 +715,10 @@ export function FormsAdminView() {
                   </div>
 
                   {f.description && (
-                    <p className="text-[12px] text-slate-500 mb-3 line-clamp-2 leading-snug">{f.description}</p>
+                    <p className="text-[12px] text-muted-foreground mb-3 line-clamp-2 leading-snug">{f.description}</p>
                   )}
 
-                  <div className="flex items-center gap-3 mb-3 text-[11px] text-slate-400">
+                  <div className="flex items-center gap-3 mb-3 text-[11px] text-muted-foreground">
                     <span>{f.fields.length} campos</span>
                     <span>·</span>
                     <span className="font-bold text-[#1e3a8a]">{f.submit_count} submissions</span>
@@ -729,7 +729,7 @@ export function FormsAdminView() {
                   <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => copyLink(f)}
-                      className="inline-flex items-center gap-1 h-7 rounded-lg border border-slate-200 bg-white px-2.5 text-[11px] font-medium text-slate-600 hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors"
+                      className="inline-flex items-center gap-1 h-7 rounded-lg border border-border bg-card px-2.5 text-[11px] font-medium text-muted-foreground hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors"
                     >
                       {copiedId === f.id
                         ? <><Check className="h-3 w-3" /> Copiado</>
@@ -739,25 +739,25 @@ export function FormsAdminView() {
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 h-7 rounded-lg border border-slate-200 bg-white px-2.5 text-[11px] font-medium text-slate-600 hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors"
+                      className="inline-flex items-center gap-1 h-7 rounded-lg border border-border bg-card px-2.5 text-[11px] font-medium text-muted-foreground hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors"
                     >
                       <ExternalLink className="h-3 w-3" /> Ver
                     </a>
                     <button
                       onClick={() => setSubmissionsOf(f)}
-                      className="inline-flex items-center gap-1 h-7 rounded-lg border border-slate-200 bg-white px-2.5 text-[11px] font-medium text-slate-600 hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors"
+                      className="inline-flex items-center gap-1 h-7 rounded-lg border border-border bg-card px-2.5 text-[11px] font-medium text-muted-foreground hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors"
                     >
                       <FileText className="h-3 w-3" /> Submissions
                     </button>
                     <button
                       onClick={() => setEditing(f)}
-                      className="inline-flex items-center gap-1 h-7 rounded-lg border border-slate-200 bg-white px-2.5 text-[11px] font-medium text-slate-600 hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors ml-auto"
+                      className="inline-flex items-center gap-1 h-7 rounded-lg border border-border bg-card px-2.5 text-[11px] font-medium text-muted-foreground hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors ml-auto"
                     >
                       <Edit3 className="h-3 w-3" /> Editar
                     </button>
                     <button
                       onClick={() => handleDelete(f)}
-                      className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400 hover:border-red-300 hover:text-red-600 hover:bg-red-50 transition-colors"
+                      className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground hover:border-red-300 hover:text-red-600 hover:bg-red-50 transition-colors"
                       title="Borrar"
                     >
                       <Trash2 className="h-3 w-3" />

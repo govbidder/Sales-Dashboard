@@ -29,7 +29,7 @@ const PRESET_COLORS = [
   "#ec4899", "#14b8a6", "#0ea5e9", "#a855f7", "#f97316",
 ]
 
-const inputCls = "w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none transition-all"
+const inputCls = "w-full rounded-xl border border-border bg-muted px-3 py-2.5 text-[13px] text-foreground placeholder:text-muted-foreground focus:border-[#1e3a8a]/40 focus:outline-none transition-all"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -71,14 +71,14 @@ function NewDeptModal({
       <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
         <form
           onSubmit={handleSubmit}
-          className="relative w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden rounded-3xl border border-slate-200 shadow-[0_30px_80px_rgba(15,23,42,0.20)]"
+          className="relative w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden rounded-3xl border border-border shadow-[0_30px_80px_rgba(15,23,42,0.20)]"
           style={{ backgroundColor: "#ffffff" }}
         >
-          <div className="relative shrink-0 px-6 pt-6 pb-5 border-b border-slate-200">
+          <div className="relative shrink-0 px-6 pt-6 pb-5 border-b border-border">
             <button
               type="button"
               onClick={onClose}
-              className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all"
+              className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
             >
               <X className="h-4 w-4" />
             </button>
@@ -87,10 +87,10 @@ function NewDeptModal({
                 <Layers className="h-5 w-5 text-white" />
               </span>
               <div className="pt-1">
-                <h3 className="text-[18px] font-bold tracking-tight text-slate-900 leading-none">
+                <h3 className="text-[18px] font-bold tracking-tight text-foreground leading-none">
                   Nuevo departamento
                 </h3>
-                <p className="mt-2 text-[12px] text-slate-500 leading-relaxed">
+                <p className="mt-2 text-[12px] text-muted-foreground leading-relaxed">
                   Los departamentos organizan tareas y miembros por área.
                 </p>
               </div>
@@ -136,7 +136,7 @@ function NewDeptModal({
                   type="color"
                   value={color}
                   onChange={e => setColor(e.target.value)}
-                  className="h-8 w-8 rounded-full border border-slate-200 cursor-pointer"
+                  className="h-8 w-8 rounded-full border border-border cursor-pointer"
                   title="Color custom"
                 />
               </div>
@@ -159,7 +159,7 @@ function NewDeptModal({
             )}
           </div>
 
-          <div className="shrink-0 px-6 py-4 border-t border-slate-200 bg-slate-50">
+          <div className="shrink-0 px-6 py-4 border-t border-border bg-muted">
             <button
               type="submit"
               disabled={creating || !name.trim()}
@@ -219,7 +219,7 @@ function DeptCard({
           onClick={(e) => e.preventDefault()}
           aria-label="Arrastrar para reordenar"
           title="Arrastrar para reordenar"
-          className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-slate-100 hover:text-slate-700 cursor-grab active:cursor-grabbing"
+          className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-muted hover:text-muted-foreground cursor-grab active:cursor-grabbing"
         >
           <GripVertical className="h-4 w-4" />
         </button>
@@ -243,10 +243,10 @@ function DeptCard({
                 if (v && v !== dept.name) onPatch(dept.id, { name: v })
                 else e.target.value = dept.name
               }}
-              className="w-full bg-transparent text-base font-bold text-slate-900 outline-none border-b border-transparent hover:border-slate-200 focus:border-slate-300 transition-colors"
+              className="w-full bg-transparent text-base font-bold text-foreground outline-none border-b border-transparent hover:border-border focus:border-border transition-colors"
             />
           ) : (
-            <h3 className="text-base font-bold text-slate-900 truncate">{dept.name}</h3>
+            <h3 className="text-base font-bold text-foreground truncate">{dept.name}</h3>
           )}
           {isAdmin ? (
             <textarea
@@ -258,34 +258,34 @@ function DeptCard({
                 const v = e.target.value.trim()
                 if (v !== (dept.description ?? "")) onPatch(dept.id, { description: v || null })
               }}
-              className="mt-1 w-full bg-transparent text-xs text-slate-500 placeholder:text-slate-400 outline-none resize-none border-b border-transparent hover:border-slate-200 focus:border-slate-300 transition-colors"
+              className="mt-1 w-full bg-transparent text-xs text-muted-foreground placeholder:text-muted-foreground outline-none resize-none border-b border-transparent hover:border-border focus:border-border transition-colors"
             />
           ) : (
-            <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{dept.description || "Sin descripción"}</p>
+            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{dept.description || "Sin descripción"}</p>
           )}
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-2 mb-4">
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5">
+        <div className="rounded-xl border border-border bg-muted p-2.5">
           <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">
             <Users2 className="h-3 w-3" /> Miembros
           </div>
-          <p className="mt-0.5 text-lg font-bold text-slate-900 tabular-nums">{counts.members}</p>
+          <p className="mt-0.5 text-lg font-bold text-foreground tabular-nums">{counts.members}</p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5">
+        <div className="rounded-xl border border-border bg-muted p-2.5">
           <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">
             <ListTodo className="h-3 w-3" /> Tareas
           </div>
-          <p className="mt-0.5 text-lg font-bold text-slate-900 tabular-nums">{counts.tasks}</p>
+          <p className="mt-0.5 text-lg font-bold text-foreground tabular-nums">{counts.tasks}</p>
         </div>
       </div>
 
       {isAdmin && (
-        <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
+        <div className="flex items-center justify-between gap-2 pt-3 border-t border-border">
           <div className="flex items-center gap-2">
-            <label className="flex items-center gap-1.5 text-xs text-slate-500">
+            <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
               Orden:
               <input
                 type="number" min={0} defaultValue={dept.sort_order}
@@ -294,7 +294,7 @@ function DeptCard({
                   const v = parseInt(e.target.value)
                   if (!Number.isNaN(v) && v !== dept.sort_order) onPatch(dept.id, { sort_order: v })
                 }}
-                className="w-14 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-xs text-slate-900 outline-none focus:border-slate-300"
+                className="w-14 rounded-md border border-border bg-card px-1.5 py-0.5 text-xs text-foreground outline-none focus:border-border"
               />
             </label>
             <input
@@ -306,7 +306,7 @@ function DeptCard({
                   onPatch(dept.id, { color: e.target.value })
                 }
               }}
-              className="h-6 w-6 rounded-full border border-slate-200 cursor-pointer"
+              className="h-6 w-6 rounded-full border border-border cursor-pointer"
               title="Cambiar color"
             />
           </div>
@@ -315,7 +315,7 @@ function DeptCard({
             <div className="flex items-center gap-1" {...stopAll}>
               <button
                 onClick={(e) => { e.stopPropagation(); setConfirmDelete(false) }}
-                className="rounded-lg px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
+                className="rounded-lg px-2 py-1 text-xs text-muted-foreground hover:bg-muted"
               >
                 Cancelar
               </button>
@@ -331,7 +331,7 @@ function DeptCard({
             <button
               {...stopAll}
               onClick={(e) => { e.stopPropagation(); setConfirmDelete(true) }}
-              className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all"
+              className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-muted-foreground hover:text-red-600 hover:bg-red-50 transition-all"
               title="Eliminar departamento"
             >
               <Trash2 className="h-3.5 w-3.5" />
@@ -346,7 +346,7 @@ function DeptCard({
     <div
       ref={setNodeRef}
       style={style}
-      className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all hover:border-slate-300 hover:shadow-[0_0_30px_rgba(15,23,42,0.04)]"
+      className="group relative overflow-hidden rounded-2xl border border-border bg-card transition-all hover:border-border hover:shadow-[0_0_30px_rgba(15,23,42,0.04)]"
     >
       <Link
         href={`/admin/departments/${dept.id}`}
@@ -537,7 +537,7 @@ export function DepartmentsView() {
 
       <div className="space-y-6">
         {/* HERO */}
-        <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white">
+        <div className="relative overflow-hidden rounded-3xl border border-border bg-card">
           <div className="pointer-events-none absolute inset-0">
             <div className="absolute -top-32 -right-32 h-[400px] w-[400px] rounded-full bg-[#E42D2C]/[0.08] blur-[100px]" />
             <div className="absolute -bottom-24 -left-24 h-[300px] w-[300px] rounded-full bg-slate-100/40 blur-[100px]" />
@@ -553,17 +553,17 @@ export function DepartmentsView() {
                   Departamentos
                 </span>
               </div>
-              <h1 className="text-[32px] sm:text-[40px] font-bold tracking-tight text-slate-900 leading-[1.05]">
+              <h1 className="text-[32px] sm:text-[40px] font-bold tracking-tight text-foreground leading-[1.05]">
                 {departments.length === 0 ? (
                   <>Sin departamentos aún</>
                 ) : (
                   <>
-                    <span className="text-slate-900">{departments.length}</span>{" "}
-                    <span className="text-slate-800">{departments.length === 1 ? "departamento" : "departamentos"}</span>
+                    <span className="text-foreground">{departments.length}</span>{" "}
+                    <span className="text-foreground">{departments.length === 1 ? "departamento" : "departamentos"}</span>
                   </>
                 )}
               </h1>
-              <p className="text-sm text-slate-500 mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 Organizá tareas y miembros del equipo por área.
               </p>
             </div>
@@ -572,7 +572,7 @@ export function DepartmentsView() {
               <button
                 onClick={fetchAll}
                 disabled={loading}
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40"
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-muted text-muted-foreground hover:text-foreground hover:border-border transition-all disabled:opacity-40"
               >
                 <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
               </button>
@@ -589,7 +589,7 @@ export function DepartmentsView() {
           </div>
 
           {/* Stats strip */}
-          <div className="relative grid grid-cols-3 border-t border-slate-100">
+          <div className="relative grid grid-cols-3 border-t border-border">
             {[
               { label: "Departamentos",   val: departments.length },
               { label: "Miembros asignados", val: totalMembers },
@@ -597,12 +597,12 @@ export function DepartmentsView() {
             ].map((s, i) => (
               <div
                 key={s.label}
-                className={`relative px-5 py-4 ${i < 2 ? "border-r border-slate-100" : ""}`}
+                className={`relative px-5 py-4 ${i < 2 ? "border-r border-border" : ""}`}
               >
                 <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#1e3a8a]/80 mb-1.5">
                   {s.label}
                 </div>
-                <p className="text-[24px] font-bold tabular-nums text-slate-900 leading-none">
+                <p className="text-[24px] font-bold tabular-nums text-foreground leading-none">
                   {s.val}
                 </p>
               </div>
@@ -623,14 +623,14 @@ export function DepartmentsView() {
             <Loader2 className="h-6 w-6 animate-spin text-[#E42D2C]/40" />
           </div>
         ) : departments.length === 0 ? (
-          <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-3xl border border-slate-200 bg-white py-20 text-center">
+          <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-3xl border border-border bg-card py-20 text-center">
             <span className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-[#E42D2C]/10 ring-1 ring-[#E42D2C]/25 mb-4">
               <Layers className="h-6 w-6 text-[#ff6b6a]" />
             </span>
-            <h3 className="relative text-[16px] font-bold text-slate-900 mb-1">
+            <h3 className="relative text-[16px] font-bold text-foreground mb-1">
               Creá el primer departamento
             </h3>
-            <p className="relative max-w-sm text-[13px] text-slate-500 mb-5 px-4">
+            <p className="relative max-w-sm text-[13px] text-muted-foreground mb-5 px-4">
               Los departamentos te permiten agrupar tareas y miembros por área (ej: Marketing, IA, Ventas).
             </p>
             {isAdmin && (
