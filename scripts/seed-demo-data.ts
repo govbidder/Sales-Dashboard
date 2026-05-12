@@ -12,7 +12,6 @@
 
 import {
   getServiceClient,
-  DEMO_MONTHS_START,
   DEMO_TITLE_PREFIX,
   DEMO_PERSONA_PREFIX,
   DEMO_SEGUIMIENTO_PREFIX,
@@ -47,9 +46,43 @@ function daysFromNow(n: number) {
 // ─── 1) monthly_reports ──────────────────────────────────────────────────────
 
 async function seedMonthlyReports() {
-  console.log("\n[1/4] Monthly reports (12 meses, mayo 2025 → abril 2026)")
+  // Rango dinámico: últimos 12 meses ENDING en el mes actual. Garantiza
+  // que /metrics tenga data del mes corriente cada vez que se corre el seed,
+  // sin depender de una fecha hardcodeada que se desactualiza.
+  const today = new Date()
+  const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+  const start = addMonths(currentMonthStart, -11)
 
-  const start = new Date(DEMO_MONTHS_START)
+  const fmtMonthLabel = (d: Date) =>
+    `${["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"][d.getMonth()]} ${d.getFullYear()}`
+
+  console.log(`\n[1/4] Monthly reports (12 meses, ${fmtMonthLabel(start)} → ${fmtMonthLabel(currentMonthStart)})`)
+
+  // El live DB todavía tiene `client_id NOT NULL` en monthly_reports aunque la
+  // migración single-tenant lo declaró "nullable" en el comentario (no incluyó
+  // el ALTER COLUMN DROP NOT NULL). Para no asumir el estado del schema,
+  // get-or-create un client "GovBidder Demo" y lo usamos como anchor.
+  let clientId: string | null = null
+  const { data: existingClient } = await db
+    .from("clients")
+    .select("id")
+    .eq("name", "GovBidder Demo")
+    .maybeSingle()
+  if (existingClient) {
+    clientId = existingClient.id
+  } else {
+    const { data: newClient, error: clientErr } = await db
+      .from("clients")
+      .insert({ name: "GovBidder Demo", email: "demo@govbidder-demo.com" })
+      .select("id")
+      .single()
+    if (clientErr) {
+      console.error("  ✗ creando client anchor:", clientErr.message)
+    } else {
+      clientId = newClient?.id ?? null
+    }
+  }
+
   const rows: Record<string, any>[] = []
   for (let i = 0; i < 12; i++) {
     const t = i / 11 // 0..1
@@ -58,11 +91,11 @@ async function seedMonthlyReports() {
     const sent      = lerpInt(20, 50, t)
     const responded = Math.round(sent * 0.60)
     rows.push({
+      client_id:            clientId,
       month:                isoMonth(addMonths(start, i)),
       scheduled_calls:      scheduled,
       attended_calls:       attended,
       qualified_calls:      Math.round(attended * 0.65),
-      no_show:              Math.max(0, scheduled - attended - 2),
       open_conversations:   lerpInt(35, 120, t),
       applications:         lerpInt(50, 150, t),
       new_clients:          lerpInt(5, 15, t),
@@ -298,6 +331,8 @@ async function seedPersonasAndSeguimientos() {
   // Idempotencia: limpiar primero.
   await db.from("personas_agendadas").delete().like("name", `${DEMO_PERSONA_PREFIX}%`)
 
+  // `rating` no existe en la tabla en algunos environments — lo dejamos solo
+  // en la nota textual para que el contexto se preserve sin romper el insert.
   const rows = PERSONA_DEFS.map(p => ({
     name:         p.name,
     email:        p.name.replace(/^Demo - /, "").toLowerCase().replace(/\s+/g, "_") + "@demo.com",
@@ -306,7 +341,6 @@ async function seedPersonasAndSeguimientos() {
     sales_status: p.sales,
     owner:        p.owner,
     source:       p.source,
-    rating:       p.rating,
     notes:        `${DEMO_SEGUIMIENTO_PREFIX}Nota inicial del seed (rating ${p.rating}/5)`,
   }))
 
@@ -338,12 +372,14 @@ async function seedPersonasAndSeguimientos() {
     const persona = eligiblePersonas[i % eligiblePersonas.length]
     const template = CONTENT_TEMPLATES[i % CONTENT_TEMPLATES.length]
       .replace("{area}", ["onboarding", "automation", "compliance", "scaling"][i % 4])
+    // Payload mínimo (persona_id + content). El schema PostgREST de la tabla
+    // varía entre environments: en algunos el cache no muestra `type`/`owner`/
+    // `completed` y rompe el insert. Como los seguimientos son nice-to-have
+    // (los KPIs y /metrics no dependen de ellos), preferimos un insert
+    // mínimo robusto a un payload rico que falle.
     return {
       persona_id: persona.id,
-      type:       TYPES[i % TYPES.length],
-      content:    `${DEMO_SEGUIMIENTO_PREFIX}${template}`,
-      completed:  i % 3 !== 0,
-      owner:      persona.owner ?? "demo-elena@govbidder-demo.com",
+      content:    `${DEMO_SEGUIMIENTO_PREFIX}[${TYPES[i % TYPES.length]}] ${template}`,
     }
   })
 
@@ -351,7 +387,8 @@ async function seedPersonasAndSeguimientos() {
 
   const { error: segErr, data: segData } = await db.from("seguimientos").insert(followups).select("id")
   if (segErr) {
-    console.error("  ✗ seguimientos:", segErr.message)
+    // Warning, no fatal — la demo de /metrics y personas funciona sin esto.
+    console.warn(`  ⚠ seguimientos no seedeados (schema desalineado): ${segErr.message}`)
     return { personas: created?.length ?? 0, seguimientos: 0 }
   }
   console.log(`  ✓ ${segData?.length ?? 0} seguimientos insertados`)
