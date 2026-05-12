@@ -96,7 +96,7 @@ export function OnboardingTour() {
     <Portal>
       <div className="fixed inset-0 z-[200] bg-slate-900/40 backdrop-blur-sm" onClick={() => close(false)} />
       <div className="fixed inset-0 z-[210] flex items-center justify-center p-4">
-        <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden">
+        <div className="w-full max-w-md rounded-2xl border border-border bg-card shadow-2xl overflow-hidden">
 
           {/* Decorative top */}
           <div className="relative h-1 bg-gradient-to-r from-[#E42D2C] to-[#1e3a8a]" />
@@ -105,7 +105,7 @@ export function OnboardingTour() {
           <div className="p-7 space-y-4 relative">
             <button
               onClick={() => close()}
-              className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all"
+              className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
               aria-label="Cerrar"
             >
               <X className="h-4 w-4" />
@@ -119,13 +119,13 @@ export function OnboardingTour() {
                 <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]/70">
                   Paso {step + 1} de {STEPS.length}
                 </p>
-                <h3 className="text-[18px] font-bold tracking-tight text-slate-900">
+                <h3 className="text-[18px] font-bold tracking-tight text-foreground">
                   {current.title}
                 </h3>
               </div>
             </div>
 
-            <p className="text-[13.5px] leading-relaxed text-slate-600">
+            <p className="text-[13.5px] leading-relaxed text-muted-foreground">
               {current.body}
             </p>
 
@@ -141,7 +141,7 @@ export function OnboardingTour() {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between gap-3 border-t border-slate-200 bg-slate-50/50 px-5 py-3">
+          <div className="flex items-center justify-between gap-3 border-t border-border bg-muted/50 px-5 py-3">
             <div className="flex items-center gap-1.5">
               {STEPS.map((_, i) => (
                 <span
@@ -161,7 +161,7 @@ export function OnboardingTour() {
               {!isFirst && (
                 <button
                   onClick={() => setStep(s => Math.max(0, s - 1))}
-                  className="inline-flex items-center gap-1 h-8 rounded-lg border border-slate-200 bg-white px-3 text-[11.5px] font-medium text-slate-600 hover:border-slate-300 transition-colors"
+                  className="inline-flex items-center gap-1 h-8 rounded-lg border border-border bg-card px-3 text-[11.5px] font-medium text-muted-foreground hover:border-border transition-colors"
                 >
                   <ArrowLeft className="h-3 w-3" />
                   Atrás

@@ -27,8 +27,8 @@ const ROLE_OPTIONS: Array<{ value: Role | null; icon: any; iconColor: string }> 
   { value: null,           icon: EyeOff,   iconColor: "text-cyan-600"   },
   { value: "super_admin",  icon: Sparkles, iconColor: "text-purple-600" },
   { value: "admin",        icon: Crown,    iconColor: "text-amber-600"  },
-  { value: "user",         icon: UserIcon, iconColor: "text-slate-600"  },
-  { value: "viewer",       icon: Shield,   iconColor: "text-slate-500"  },
+  { value: "user",         icon: UserIcon, iconColor: "text-muted-foreground"  },
+  { value: "viewer",       icon: Shield,   iconColor: "text-muted-foreground"  },
 ]
 
 function initials(s: string | null) {
@@ -105,21 +105,21 @@ export function ViewAsDropdown({ realRole }: ViewAsDropdownProps) {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 mt-2 w-[340px] max-h-[80vh] overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-[0_20px_40px_rgba(15,23,42,0.10)] page-enter"
+          className="absolute right-0 mt-2 w-[340px] max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-card shadow-[0_20px_40px_rgba(15,23,42,0.10)] page-enter"
         >
           {/* Header */}
-          <div className="sticky top-0 z-10 px-4 py-2.5 border-b border-slate-100 bg-slate-50/95 backdrop-blur-sm">
-            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
+          <div className="sticky top-0 z-10 px-4 py-2.5 border-b border-border bg-muted/95 backdrop-blur-sm">
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
               View As · simulación visual
             </p>
-            <p className="text-[11px] text-slate-400 mt-0.5 leading-tight">
+            <p className="text-[11px] text-muted-foreground mt-0.5 leading-tight">
               Cambia solo la UI. El servidor te sigue tratando como Developer.
             </p>
           </div>
 
           {/* SECCIÓN 1 — ROL */}
           <div className="px-2 pt-2 pb-1">
-            <p className="px-2 pb-1 text-[9px] font-bold uppercase tracking-[0.16em] text-slate-400">
+            <p className="px-2 pb-1 text-[9px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
               Rol
             </p>
             {ROLE_OPTIONS.map(opt => {
@@ -137,8 +137,8 @@ export function ViewAsDropdown({ realRole }: ViewAsDropdownProps) {
                   role="menuitem"
                   className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-[13px] text-left transition-colors ${
                     isActive
-                      ? "bg-slate-100 text-slate-900 font-semibold"
-                      : "text-slate-700 hover:bg-slate-50"
+                      ? "bg-muted text-foreground font-semibold"
+                      : "text-muted-foreground hover:bg-muted"
                   }`}
                 >
                   <Icon className={`h-3.5 w-3.5 ${opt.iconColor}`} />
@@ -151,19 +151,19 @@ export function ViewAsDropdown({ realRole }: ViewAsDropdownProps) {
 
           {/* SECCIÓN 2 — DEPARTAMENTO (solo si rol simulado es user/viewer) */}
           {showDeptSection && (
-            <div className="px-2 pt-2 pb-1 border-t border-slate-100 mt-1">
-              <p className="px-2 pb-1 text-[9px] font-bold uppercase tracking-[0.16em] text-slate-400">
+            <div className="px-2 pt-2 pb-1 border-t border-border mt-1">
+              <p className="px-2 pb-1 text-[9px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
                 Departamento
               </p>
               <button
                 onClick={() => setViewAsDepartmentId(null)}
                 className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-[13px] text-left transition-colors ${
                   !viewAsDepartmentId
-                    ? "bg-slate-100 text-slate-900 font-semibold"
-                    : "text-slate-700 hover:bg-slate-50"
+                    ? "bg-muted text-foreground font-semibold"
+                    : "text-muted-foreground hover:bg-muted"
                 }`}
               >
-                <Layers className="h-3.5 w-3.5 text-slate-400" />
+                <Layers className="h-3.5 w-3.5 text-muted-foreground" />
                 <span className="flex-1">Todos</span>
                 {!viewAsDepartmentId && <Check className="h-3.5 w-3.5 text-emerald-600" />}
               </button>
@@ -175,8 +175,8 @@ export function ViewAsDropdown({ realRole }: ViewAsDropdownProps) {
                     onClick={() => setViewAsDepartmentId(d.id)}
                     className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-[13px] text-left transition-colors ${
                       isActive
-                        ? "bg-slate-100 text-slate-900 font-semibold"
-                        : "text-slate-700 hover:bg-slate-50"
+                        ? "bg-muted text-foreground font-semibold"
+                        : "text-muted-foreground hover:bg-muted"
                     }`}
                   >
                     <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
@@ -186,29 +186,29 @@ export function ViewAsDropdown({ realRole }: ViewAsDropdownProps) {
                 )
               })}
               {departments.length === 0 && (
-                <p className="px-2 py-1.5 text-[11px] text-slate-400">Cargando departamentos…</p>
+                <p className="px-2 py-1.5 text-[11px] text-muted-foreground">Cargando departamentos…</p>
               )}
             </div>
           )}
 
           {/* SECCIÓN 3 — USUARIO ESPECÍFICO */}
-          <div className="px-2 pt-2 pb-2 border-t border-slate-100 mt-1">
-            <p className="px-2 pb-1 text-[9px] font-bold uppercase tracking-[0.16em] text-slate-400">
+          <div className="px-2 pt-2 pb-2 border-t border-border mt-1">
+            <p className="px-2 pb-1 text-[9px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
               Usuario específico
             </p>
             <div className="relative px-2 mb-1">
-              <Search className="h-3.5 w-3.5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              <Search className="h-3.5 w-3.5 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
               <input
                 type="text"
                 placeholder="Buscar por nombre o email…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full h-8 pl-7 pr-2 rounded-lg border border-slate-200 bg-slate-50 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-slate-300 focus:outline-none"
+                className="w-full h-8 pl-7 pr-2 rounded-lg border border-border bg-muted text-[12px] text-foreground placeholder:text-muted-foreground focus:border-border focus:outline-none"
               />
             </div>
             <div className="max-h-[200px] overflow-y-auto">
               {filteredMembers.length === 0 && (
-                <p className="px-2 py-2 text-[11px] text-slate-400">
+                <p className="px-2 py-2 text-[11px] text-muted-foreground">
                   {members.length === 0 ? "Cargando equipo…" : "Sin resultados"}
                 </p>
               )}
@@ -221,8 +221,8 @@ export function ViewAsDropdown({ realRole }: ViewAsDropdownProps) {
                     onClick={() => { setViewAsUser(m); setSearch(""); setOpen(false) }}
                     className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-[13px] text-left transition-colors ${
                       isActive
-                        ? "bg-slate-100 text-slate-900 font-semibold"
-                        : "text-slate-700 hover:bg-slate-50"
+                        ? "bg-muted text-foreground font-semibold"
+                        : "text-muted-foreground hover:bg-muted"
                     }`}
                   >
                     <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#E42D2C]/40 to-[#152978] text-[9px] font-bold text-white">
@@ -230,7 +230,7 @@ export function ViewAsDropdown({ realRole }: ViewAsDropdownProps) {
                     </span>
                     <div className="flex-1 min-w-0">
                       <p className="text-[12.5px] leading-tight truncate">{name}</p>
-                      <p className="text-[10px] text-slate-400 leading-tight truncate">
+                      <p className="text-[10px] text-muted-foreground leading-tight truncate">
                         {ROLE_LABEL[m.role]}{m.email ? ` · ${m.email}` : ""}
                       </p>
                     </div>
@@ -242,7 +242,7 @@ export function ViewAsDropdown({ realRole }: ViewAsDropdownProps) {
             {viewAsUser && (
               <button
                 onClick={() => setViewAsUser(null)}
-                className="mt-1 w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-[11px] font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                className="mt-1 w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-[11px] font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
               >
                 <X className="h-3 w-3" />
                 Limpiar usuario simulado
@@ -252,7 +252,7 @@ export function ViewAsDropdown({ realRole }: ViewAsDropdownProps) {
 
           {/* SECCIÓN 4 — VOLVER A DEVELOPER (solo si hay simulación) */}
           {isViewing && (
-            <div className="sticky bottom-0 px-3 py-3 border-t border-slate-100 bg-amber-50/80 backdrop-blur-sm">
+            <div className="sticky bottom-0 px-3 py-3 border-t border-border bg-amber-50/80 backdrop-blur-sm">
               <button
                 onClick={() => { clearViewAs(); setOpen(false) }}
                 className="w-full flex items-center justify-center gap-2 h-9 rounded-xl bg-amber-400 text-amber-950 text-[12px] font-bold hover:bg-amber-500 transition-colors"

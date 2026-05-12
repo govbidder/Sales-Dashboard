@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
-import { ChevronDown, LogOut, Menu, Search, Command, Sun, Moon, Monitor, Sparkles } from "lucide-react"
+import { LogOut, Menu, Search, Sparkles } from "lucide-react"
 import { MonthSelector } from "@/components/layout/month-selector"
 import { NotificationsBell } from "@/components/layout/notifications-bell"
 import { ViewAsDropdown } from "@/components/layout/view-as-dropdown"
-import { useTheme } from "@/components/ui/theme-provider"
+import { ThemeToggle } from "@/components/layout/theme-toggle"
 import { type Role, ROLE_LABEL, isAdminOrAbove, isSuperAdmin, isDeveloper } from "@/lib/types/role"
 import { useViewAs } from "@/lib/contexts/view-as-context"
 
@@ -46,7 +46,6 @@ export function TopBar({
   const pathname = usePathname()
   const [profileOpen, setProfileOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement | null>(null)
-  const { theme, setTheme } = useTheme()
 
   const [isMac, setIsMac] = useState(true)
   useEffect(() => {
@@ -87,13 +86,13 @@ export function TopBar({
   const crumb = CRUMB_GROUPS[pathname] ?? null
 
   return (
-    <header className="sticky top-0 z-10 border-b-2 border-[#1e3a8a]/10 dark:border-[#1e3a8a]/30 bg-white/85 dark:bg-[#080d1e]/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-10 border-b-2 border-[#1e3a8a]/10 bg-background/85 backdrop-blur-xl">
       <div className="flex h-16 items-center gap-3 px-4 lg:px-6">
 
         {/* Mobile sidebar trigger */}
         <button
           onClick={onOpenSidebar}
-          className="lg:hidden flex h-10 w-10 items-center justify-center rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+          className="lg:hidden flex h-10 w-10 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
           aria-label="Abrir menú"
         >
           <Menu className="h-5 w-5" />
@@ -117,12 +116,12 @@ export function TopBar({
         {/* Search palette trigger */}
         <button
           onClick={onOpenPalette}
-          className="hidden md:flex items-center gap-2 h-9 rounded-lg border border-slate-200 bg-white px-3 text-[12px] text-slate-500 hover:border-[#1e3a8a]/30 hover:text-slate-700 transition-all"
+          className="hidden md:flex items-center gap-2 h-9 rounded-lg border border-border bg-card px-3 text-[12px] text-muted-foreground hover:border-foreground/20 hover:text-foreground transition-all"
           title="Buscar · ⌘K"
         >
           <Search className="h-3.5 w-3.5" />
           <span>Buscar</span>
-          <kbd className="inline-flex items-center gap-0.5 rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[9px] font-semibold text-slate-500 ml-2">
+          <kbd className="inline-flex items-center gap-0.5 rounded-md border border-border bg-muted px-1.5 py-0.5 text-[9px] font-semibold text-muted-foreground ml-2">
             {isMac ? "⌘" : "Ctrl"}K
           </kbd>
         </button>
@@ -139,20 +138,23 @@ export function TopBar({
         {/* View-As dropdown (developers only — sin efecto para el resto) */}
         <ViewAsDropdown realRole={user?.role ?? null} />
 
+        {/* Theme toggle — visible para todos */}
+        <ThemeToggle />
+
         {/* Notifications bell */}
         <NotificationsBell />
 
         {/* Profile */}
         <div className="relative" ref={profileRef}>
           <button
-            className="group flex items-center h-10 rounded-full pl-1 pr-1 transition-all hover:bg-slate-100"
+            className="group flex items-center h-10 rounded-full pl-1 pr-1 transition-all hover:bg-muted"
             onClick={() => setProfileOpen(v => !v)}
             title={viewAsUser ? `Simulando: ${displayName}` : displayName}
           >
             <span className={`flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-bold text-white shadow-sm ${
               viewAsUser
                 ? "bg-gradient-to-br from-amber-400 to-amber-600 ring-2 ring-amber-300"
-                : "bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] ring-2 ring-white"
+                : "bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] ring-2 ring-background"
             }`}>
               {initials}
             </span>
@@ -161,9 +163,9 @@ export function TopBar({
           {profileOpen && (
             <div
               role="menu"
-              className="absolute right-0 mt-2 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_20px_40px_rgba(15,23,42,0.10)] page-enter"
+              className="absolute right-0 mt-2 w-64 overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-[0_20px_40px_rgba(15,23,42,0.10)] page-enter"
             >
-              <div className="px-4 py-3.5 border-b border-slate-100">
+              <div className="px-4 py-3.5 border-b border-border">
                 <div className="flex items-center gap-3">
                   <span className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white ${
                     viewAsUser
@@ -173,8 +175,8 @@ export function TopBar({
                     {initials}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-slate-900 truncate">{displayName}</p>
-                    <p className="text-[11px] text-slate-500 truncate">{displayEmail}</p>
+                    <p className="text-sm font-semibold text-foreground truncate">{displayName}</p>
+                    <p className="text-[11px] text-muted-foreground truncate">{displayEmail}</p>
                     {viewAsUser && (
                       <p className="text-[10px] text-amber-700 font-semibold mt-0.5 truncate">
                         ↳ Simulando · Real: {user?.email}
@@ -195,38 +197,14 @@ export function TopBar({
                   </span>
                 )}
               </div>
-              {/* Theme toggle */}
-              <div className="px-4 py-2.5 border-b border-slate-100">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Tema</p>
-                <div className="flex items-center gap-1 rounded-lg bg-slate-100 p-0.5">
-                  {[
-                    { k: "light"  as const, label: "Claro",   Icon: Sun     },
-                    { k: "dark"   as const, label: "Oscuro",  Icon: Moon    },
-                    { k: "system" as const, label: "Sistema", Icon: Monitor },
-                  ].map(o => (
-                    <button
-                      key={o.k}
-                      onClick={() => setTheme(o.k)}
-                      className={`flex flex-1 items-center justify-center gap-1 h-7 rounded-md text-[10.5px] font-bold transition-all ${
-                        theme === o.k
-                          ? "bg-white text-[#1e3a8a] shadow-sm"
-                          : "text-slate-500 hover:text-slate-900"
-                      }`}
-                    >
-                      <o.Icon className="h-3 w-3" />
-                      {o.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
 
               <button
                 type="button"
                 role="menuitem"
-                className="flex w-full items-center gap-2.5 px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                className="flex w-full items-center gap-2.5 px-4 py-3 text-left text-sm text-foreground hover:bg-muted transition-colors"
                 onClick={() => { setProfileOpen(false); onSignOut() }}
               >
-                <LogOut className="h-4 w-4 text-slate-400" />
+                <LogOut className="h-4 w-4 text-muted-foreground" />
                 Cerrar sesión
               </button>
             </div>

@@ -30,7 +30,7 @@ const KIND_COLOR: Record<string, string> = {
   task_assigned: "bg-[#1e3a8a]/[0.08] text-[#1e3a8a]",
   task_mention:  "bg-amber-50 text-amber-700",
   task_overdue:  "bg-red-50 text-[#E42D2C]",
-  system:        "bg-slate-50 text-slate-600",
+  system:        "bg-muted text-muted-foreground",
 }
 
 function fmtRelative(iso: string) {
@@ -140,7 +140,7 @@ export function NotificationsBell() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => { setOpen(o => !o); if (!open) fetchNotifs() }}
-        className="relative flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-[#1e3a8a] transition-colors"
+        className="relative flex h-10 w-10 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-[#1e3a8a] transition-colors"
         aria-label="Notificaciones"
         title={unreadCount > 0 ? `${unreadCount} sin leer` : "Notificaciones"}
       >
@@ -153,13 +153,13 @@ export function NotificationsBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-[380px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_20px_40px_rgba(15,23,42,0.10)] z-50">
+        <div className="absolute right-0 mt-2 w-[380px] overflow-hidden rounded-2xl border border-border bg-card shadow-[0_20px_40px_rgba(15,23,42,0.10)] z-50">
 
           {/* Header */}
-          <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-3">
+          <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
             <div className="flex items-center gap-2">
               <Bell className="h-4 w-4 text-[#1e3a8a]" />
-              <p className="text-[13px] font-bold text-slate-900">Notificaciones</p>
+              <p className="text-[13px] font-bold text-foreground">Notificaciones</p>
               {unreadCount > 0 && (
                 <span className="rounded-full bg-[#E42D2C]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#E42D2C] tabular-nums">
                   {unreadCount}
@@ -169,7 +169,7 @@ export function NotificationsBell() {
             {unreadCount > 0 && (
               <button
                 onClick={markAllRead}
-                className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 hover:text-[#1e3a8a] transition-colors"
+                className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-[#1e3a8a] transition-colors"
               >
                 <CheckCheck className="h-3 w-3" />
                 Marcar todas leídas
@@ -178,7 +178,7 @@ export function NotificationsBell() {
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-slate-200 px-4">
+          <div className="flex border-b border-border px-4">
             {[
               { k: "unread" as const, label: "Sin leer", n: unreadCount },
               { k: "all" as const,    label: "Todas",    n: null },
@@ -188,13 +188,13 @@ export function NotificationsBell() {
                 onClick={() => setTab(t.k)}
                 className={`flex items-center gap-1.5 px-3 py-2.5 text-[11px] font-bold uppercase tracking-widest transition-colors border-b-2 ${
                   tab === t.k
-                    ? "border-[#E42D2C] text-slate-900"
-                    : "border-transparent text-slate-400 hover:text-slate-600"
+                    ? "border-[#E42D2C] text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-muted-foreground"
                 }`}
               >
                 {t.label}
                 {t.n !== null && t.n > 0 && (
-                  <span className="rounded-full bg-slate-100 px-1.5 text-[9px] font-bold text-slate-600">{t.n}</span>
+                  <span className="rounded-full bg-muted px-1.5 text-[9px] font-bold text-muted-foreground">{t.n}</span>
                 )}
               </button>
             ))}
@@ -203,46 +203,46 @@ export function NotificationsBell() {
           {/* List */}
           <div className="max-h-[420px] overflow-y-auto">
             {loading ? (
-              <div className="flex justify-center py-6"><Loader2 className="h-4 w-4 animate-spin text-slate-400" /></div>
+              <div className="flex justify-center py-6"><Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /></div>
             ) : visible.length === 0 ? (
               <div className="px-4 py-10 text-center">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-50 ring-1 ring-slate-200 mx-auto mb-2">
-                  <Check className="h-4 w-4 text-slate-400" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-muted ring-1 ring-border mx-auto mb-2">
+                  <Check className="h-4 w-4 text-muted-foreground" />
                 </div>
-                <p className="text-[12px] font-semibold text-slate-700">
+                <p className="text-[12px] font-semibold text-muted-foreground">
                   {tab === "unread" ? "Estás al día" : "Sin notificaciones"}
                 </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">
+                <p className="text-[11px] text-muted-foreground mt-0.5">
                   {tab === "unread" ? "No hay nada sin leer." : "Tampoco hay leídas."}
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-border">
                 {visible.map(n => {
                   const Icon = KIND_ICON[n.kind] ?? Bell
-                  const colorCls = KIND_COLOR[n.kind] ?? "bg-slate-50 text-slate-600"
+                  const colorCls = KIND_COLOR[n.kind] ?? "bg-muted text-muted-foreground"
                   const unread = !n.read_at
                   return (
                     <Link
                       key={n.id}
                       href={n.href ?? "#"}
                       onClick={() => { if (unread) markRead(n.id); setOpen(false) }}
-                      className={`group flex items-start gap-3 px-4 py-3 transition-colors hover:bg-slate-50 ${
+                      className={`group flex items-start gap-3 px-4 py-3 transition-colors hover:bg-muted ${
                         unread ? "bg-[#1e3a8a]/[0.02]" : ""
                       }`}
                     >
-                      <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ring-1 ring-slate-200 ${colorCls}`}>
+                      <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ring-1 ring-border ${colorCls}`}>
                         <Icon className="h-3.5 w-3.5" />
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="text-[12.5px] font-bold text-slate-900 truncate">{n.title}</p>
+                          <p className="text-[12.5px] font-bold text-foreground truncate">{n.title}</p>
                           {unread && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#E42D2C]" />}
                         </div>
                         {n.body && (
-                          <p className="text-[11.5px] text-slate-500 mt-0.5 line-clamp-2 leading-snug">{n.body}</p>
+                          <p className="text-[11.5px] text-muted-foreground mt-0.5 line-clamp-2 leading-snug">{n.body}</p>
                         )}
-                        <p className="text-[10px] text-slate-400 mt-1">{fmtRelative(n.created_at)}</p>
+                        <p className="text-[10px] text-muted-foreground mt-1">{fmtRelative(n.created_at)}</p>
                       </div>
                     </Link>
                   )

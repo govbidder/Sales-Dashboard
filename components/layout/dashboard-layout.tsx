@@ -275,10 +275,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   // Loading state
   if (!authChecked) {
     return (
-      <div className="flex h-screen items-center justify-center bg-white">
+      <div className="flex h-screen items-center justify-center bg-card">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-[#E42D2C]" />
-          <p className="text-xs text-slate-500 tracking-widest uppercase">Cargando...</p>
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-[#E42D2C]" />
+          <p className="text-xs text-muted-foreground tracking-widest uppercase">Cargando...</p>
         </div>
       </div>
     )
