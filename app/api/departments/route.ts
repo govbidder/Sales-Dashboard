@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase"
 import { createServiceClient } from "@/lib/supabase-service"
+import { isAdminOrAbove, type Role } from "@/lib/types/role"
 
 const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/
 
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
     .eq("id", user.id)
     .single()
 
-  if (profile?.role !== "admin") {
+  if (!isAdminOrAbove(profile?.role as Role | undefined)) {
     return NextResponse.json({ error: "Solo admins pueden crear departamentos" }, { status: 403 })
   }
 

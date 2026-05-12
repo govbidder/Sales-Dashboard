@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase"
 import { createServiceClient } from "@/lib/supabase-service"
+import { isAdminOrAbove, isSuperAdmin, type Role } from "@/lib/types/role"
 
 async function getUser(req: NextRequest) {
   const token = req.headers.get("authorization")?.replace("Bearer ", "")
@@ -80,12 +81,38 @@ export async function PATCH(req: NextRequest) {
   const { id, ...updates } = body
   if (!id) return NextResponse.json({ error: "id requerido" }, { status: 400 })
 
+  const db = createServiceClient()
+
+  // Verify caller is admin or above; only super_admin can change role to/from super_admin.
+  const { data: callerProfile } = await db
+    .from("profiles").select("role").eq("id", user.id).single()
+  const callerRole = callerProfile?.role as Role | undefined
+  if (!isAdminOrAbove(callerRole)) {
+    return NextResponse.json({ error: "Solo admins pueden modificar miembros" }, { status: 403 })
+  }
+
+  if ("role" in updates) {
+    const validRoles: Role[] = ["super_admin", "admin", "user", "viewer"]
+    if (!validRoles.includes(updates.role)) {
+      return NextResponse.json({ error: "Rol inválido" }, { status: 400 })
+    }
+    if (updates.role === "super_admin" && !isSuperAdmin(callerRole)) {
+      return NextResponse.json({ error: "Solo super_admin puede asignar super_admin" }, { status: 403 })
+    }
+    // Prevent demoting a super_admin if you are not a super_admin.
+    if (!isSuperAdmin(callerRole)) {
+      const { data: target } = await db.from("profiles").select("role").eq("id", id).single()
+      if (target?.role === "super_admin") {
+        return NextResponse.json({ error: "Solo super_admin puede modificar otro super_admin" }, { status: 403 })
+      }
+    }
+  }
+
   const allowed: Record<string, unknown> = {}
   for (const k of ["full_name", "role", "position", "status", "started_at", "avatar_url", "notes", "department_id"]) {
     if (k in updates) allowed[k] = updates[k]
   }
 
-  const db = createServiceClient()
   const { data, error } = await db
     .from("profiles")
     .update(allowed)

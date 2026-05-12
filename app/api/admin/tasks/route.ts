@@ -1,12 +1,27 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase"
 import { createServiceClient } from "@/lib/supabase-service"
+import { isAdminOrAbove, type Role } from "@/lib/types/role"
 
 async function getUser(req: NextRequest) {
   const token = req.headers.get("authorization")?.replace("Bearer ", "")
   if (!token) return null
   const { data: { user } } = await createClient().auth.getUser(token)
   return user
+}
+
+/** Fetch caller profile (role + department) for scoping decisions. */
+async function getCallerProfile(userId: string) {
+  const db = createServiceClient()
+  const { data } = await db
+    .from("profiles")
+    .select("role, department_id")
+    .eq("id", userId)
+    .single()
+  return {
+    role: (data?.role as Role | undefined) ?? "user",
+    departmentId: ((data as any)?.department_id as string | null) ?? null,
+  }
 }
 
 // GET /api/admin/tasks
@@ -29,6 +44,21 @@ export async function GET(req: NextRequest) {
 
   const db = createServiceClient()
   let query = db.from("tasks").select("*")
+
+  // Scoping para empleados: ven solo tasks de su depto + las que tienen asignadas
+  // por owner/assignees. Admins y super_admin ven todo.
+  const caller = await getCallerProfile(user.id)
+  if (!isAdminOrAbove(caller.role)) {
+    const email = user.email ?? ""
+    if (caller.departmentId) {
+      query = query.or(
+        `department_id.eq.${caller.departmentId},owner.eq.${email},assignees.cs.{${email}}`
+      )
+    } else {
+      // Empleado sin depto asignado: solo ve tasks suyas (owner o assignee).
+      query = query.or(`owner.eq.${email},assignees.cs.{${email}}`)
+    }
+  }
 
   if (personaId)              query = query.eq("persona_id", personaId)
   if (owner)                  query = query.eq("owner", owner)
