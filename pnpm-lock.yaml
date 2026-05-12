@@ -108,7 +108,7 @@ importers:
         specifier: 0.8.0
         version: 0.8.0(@supabase/supabase-js@2.89.0)
       '@supabase/supabase-js':
-        specifier: latest
+        specifier: ^2.89.0
         version: 2.89.0
       '@tanstack/react-virtual':
         specifier: ^3.13.24

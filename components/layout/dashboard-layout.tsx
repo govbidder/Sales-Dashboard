@@ -12,6 +12,7 @@ import { NavigationProgress } from "@/components/ui/navigation-progress"
 import { ToastProvider } from "@/components/ui/toast"
 import { AIAssistant } from "@/components/ai/ai-assistant"
 import { ViewAsProvider } from "@/lib/contexts/view-as-context"
+import { fetchWithViewAs } from "@/lib/api/fetch-with-view-as"
 import { ViewAsBanner } from "@/components/layout/view-as-banner"
 import { useEffectiveRole } from "@/hooks/use-effective-role"
 import { createClient } from "@/lib/supabase"
@@ -64,7 +65,18 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed,  setSidebarCollapsed]  = useState(false)
   const [departments,       setDepartments]       = useState<Array<{ id: string; name: string; color: string }>>([])
 
-  const pageTitle = PAGE_TITLES[pathname] ?? "GovBidder"
+  // Title estático del map, con override dinámico para rutas /admin/departments/[id]
+  // (resolvemos el nombre del depto desde el cache de departments cargado abajo).
+  const deptDetailMatch = pathname.match(/^\/admin\/departments\/([^/]+)$/)
+  const pageTitle = (() => {
+    if (PAGE_TITLES[pathname]) return PAGE_TITLES[pathname]
+    if (deptDetailMatch) {
+      const id = deptDetailMatch[1]
+      const dept = departments.find(d => d.id === id)
+      return dept ? `Departamento — ${dept.name}` : "Departamento"
+    }
+    return "GovBidder"
+  })()
 
   // Auth check
   useEffect(() => {
@@ -134,7 +146,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     ;(async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) return
-      const res = await fetch("/api/departments", {
+      const res = await fetchWithViewAs("/api/departments", {
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
       if (res.ok && mounted) {

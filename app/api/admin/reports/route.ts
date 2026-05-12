@@ -6,7 +6,7 @@ import { isAdminOrAbove } from "@/lib/types/role"
 const NUMERIC_FIELDS = [
   "total_revenue", "cash_collected", "mrr", "ad_spend", "software_costs", "variable_costs",
   "scheduled_calls", "attended_calls", "qualified_calls", "no_show", "open_conversations",
-  "aplications", "inbound_messages",
+  "applications", "inbound_messages",
   "offer_docs_sent", "offer_docs_responded", "cierres_por_offerdoc",
   "new_clients", "active_clients",
   "short_followers", "short_reach", "short_posts",

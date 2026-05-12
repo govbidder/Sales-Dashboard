@@ -135,7 +135,7 @@ export function ActivityView() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-[#1e3a8a] tracking-tight">Actividad</h1>
-          <p className="text-sm text-slate-400 mt-0.5">
+          <p className="text-sm text-slate-500 mt-0.5">
             Últimos 30 días — {filtered.length} eventos
           </p>
         </div>
@@ -242,7 +242,7 @@ export function ActivityView() {
                           {item.actor_name ?? item.actor}
                         </span>
                       )}
-                      <span className="text-[10.5px] text-slate-400">{fmtRelative(item.timestamp)}</span>
+                      <span className="text-[10.5px] text-slate-500">{fmtRelative(item.timestamp)}</span>
                     </div>
                   </div>
                   <ArrowRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all mt-1.5" />
@@ -260,7 +260,7 @@ export function ActivityView() {
                   {fmtDayHeader(dayKey)}
                 </p>
                 <div className="flex-1 h-px bg-slate-200" />
-                <span className="text-[10.5px] text-slate-400 tabular-nums">
+                <span className="text-[10.5px] text-slate-500 tabular-nums">
                   {list.length}
                 </span>
               </div>

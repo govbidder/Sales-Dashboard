@@ -43,6 +43,15 @@ export function ViewAsBanner() {
     title = `Filtrado al depto ${deptName}`
   }
 
+  // Subtítulo refleja con precisión qué hace el server:
+  // - viewAsUser activo → server respeta el header X-View-As-User-Id y
+  //   devuelve solo lo que vería ese usuario.
+  // - cualquier otro caso (rol-solo, dept-solo, rol+dept sin user) →
+  //   sólo afecta la UI; el server te trata como Developer real.
+  const subtitle = viewAsUser
+    ? "El servidor también respeta esta simulación — la data viene filtrada como la vería ese usuario."
+    : "Esto es solo visual — el servidor sigue tratándote como Developer."
+
   return (
     <div className="sticky top-0 z-[60] w-full bg-amber-400 text-amber-950 shadow-[0_2px_8px_rgba(180,83,9,0.25)]">
       <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-3 px-4 py-2 sm:px-6">
@@ -58,7 +67,7 @@ export function ViewAsBanner() {
               )}
             </p>
             <p className="hidden sm:block text-[11px] text-amber-950/75 leading-tight truncate">
-              Esto es solo visual — el servidor sigue tratándote como Developer.
+              {subtitle}
             </p>
           </div>
         </div>

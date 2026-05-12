@@ -6,7 +6,7 @@ import { useSelectedMonth, useActiveClient } from "@/components/layout/dashboard
 import { useMarkPageReady } from "@/hooks/use-mark-page-ready"
 import { useMinLoading } from "@/hooks/use-min-loading"
 import { FunnelRowSkeleton, SectionHeaderSkeleton } from "@/components/ui/skeleton"
-import { TrendingUp, TrendingDown, ArrowDown } from "lucide-react"
+import { ArrowDown } from "lucide-react"
 import {
   ResponsiveContainer, ComposedChart, Bar, Line,
   XAxis, YAxis, CartesianGrid, Tooltip,
@@ -132,12 +132,12 @@ export function SalesView() {
         const [curRes, histRes] = await Promise.all([
           supabase
             .from("monthly_reports")
-            .select("scheduled_calls,attended_calls,aplications,new_clients,offer_docs_sent,offer_docs_responded,cierres_por_offerdoc")
+            .select("scheduled_calls,attended_calls,applications,new_clients,offer_docs_sent,offer_docs_responded,cierres_por_offerdoc")
             .eq("month", monthValue)
             .maybeSingle(),
           supabase
             .from("monthly_reports")
-            .select("month,scheduled_calls,attended_calls,new_clients,offer_docs_sent,offer_docs_responded,cierres_por_offerdoc,aplications")
+            .select("month,scheduled_calls,attended_calls,new_clients,offer_docs_sent,offer_docs_responded,cierres_por_offerdoc,applications")
             .order("month", { ascending: true })
             .limit(12),
         ])
@@ -170,7 +170,7 @@ export function SalesView() {
 
   const scheduled  = Number(data?.scheduled_calls) || 0
   const attended   = Number(data?.attended_calls)  || 0
-  const aplications = Number(data?.aplications)    || 0
+  const applications = Number(data?.applications)  || 0
   const closed     = Number(data?.new_clients)     || 0
   const odSent     = Number(data?.offer_docs_sent) || 0
   const odResp     = Number(data?.offer_docs_responded) || 0
@@ -261,7 +261,7 @@ export function SalesView() {
             <p className="text-xs text-slate-400 mt-0.5">El recorrido desde la aplicación al cierre</p>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <MiniStat label="Aplicaciones"        value={aplications || "—"} color="#818cf8" />
+            <MiniStat label="Aplicaciones"        value={applications || "—"} color="#818cf8" />
             <MiniStat label="Offer Docs enviados" value={odSent || "—"}      color="#60a5fa" />
             <MiniStat
               label="Offer Docs respondidos"
