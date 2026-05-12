@@ -62,6 +62,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [paletteOpen,       setPaletteOpen]       = useState(false)
   const [sidebarOpen,       setSidebarOpen]       = useState(false)
   const [sidebarCollapsed,  setSidebarCollapsed]  = useState(false)
+  const [departments,       setDepartments]       = useState<Array<{ id: string; name: string; color: string }>>([])
 
   const pageTitle = PAGE_TITLES[pathname] ?? "GovBidder"
 
@@ -125,6 +126,24 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       subscription.unsubscribe()
     }
   }, [supabase, router])
+
+  // Fetch departments (para el sidebar). Solo si hay sesión.
+  useEffect(() => {
+    if (!authChecked || !currentUser) return
+    let mounted = true
+    ;(async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+      const res = await fetch("/api/departments", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      })
+      if (res.ok && mounted) {
+        const j = await res.json()
+        setDepartments(j.departments ?? [])
+      }
+    })()
+    return () => { mounted = false }
+  }, [authChecked, currentUser, supabase])
 
   // Restore persisted month
   useEffect(() => {
@@ -253,6 +272,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       <SidebarWithEffectiveRole
         realRole={currentUser?.role ?? null}
+        userDepartmentId={currentUser?.department_id ?? null}
+        departments={departments}
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         collapsed={sidebarCollapsed}
@@ -313,14 +334,25 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
  */
 function SidebarWithEffectiveRole({
   realRole,
+  userDepartmentId,
+  departments,
   ...rest
 }: {
   realRole: Role | null
+  userDepartmentId: string | null
+  departments: Array<{ id: string; name: string; color: string }>
   open: boolean
   onClose: () => void
   collapsed: boolean
   onToggleCollapse: () => void
 }) {
   const effective = useEffectiveRole(realRole)
-  return <Sidebar {...rest} role={effective ?? "user"} />
+  return (
+    <Sidebar
+      {...rest}
+      role={effective ?? "user"}
+      userDepartmentId={userDepartmentId}
+      departments={departments}
+    />
+  )
 }
