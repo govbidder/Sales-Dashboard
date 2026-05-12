@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase"
+import { type Role, isAdminOrAbove, isDeveloper } from "@/lib/types/role"
 
 export interface CurrentUser {
   id:    string
   email: string
   name:  string
-  role:  "admin" | "user" | "viewer"
+  role:  Role
 }
 
 /**
@@ -44,7 +45,8 @@ export function useCurrentUser() {
     load()
   }, [])
 
-  const isAdmin  = user?.role === "admin"
+  const isAdmin  = isAdminOrAbove(user?.role)  // admin | super_admin | developer
+  const isDev    = isDeveloper(user?.role)
   const isUser   = user?.role === "user" || isAdmin
   const isViewer = user?.role === "viewer"
 
@@ -83,5 +85,5 @@ export function useCurrentUser() {
     }
   }
 
-  return { user, loading, isAdmin, isUser, isViewer, can }
+  return { user, loading, isAdmin, isDev, isUser, isViewer, can }
 }

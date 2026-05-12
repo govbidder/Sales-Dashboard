@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     db.from("monthly_reports").select("*").eq("month", monthKey).maybeSingle(),
     db.from("tasks").select("id", { count: "exact", head: true })
       .lt("due_at", now.toISOString()).not("status", "in", "(completada,cancelada)"),
-    db.from("profiles").select("email,full_name").eq("role", "admin").eq("status", "activo"),
+    db.from("profiles").select("email,full_name").in("role", ["admin", "super_admin", "developer"]).eq("status", "activo"),
   ])
 
   const completedTasks = completedTasksRes.count ?? 0

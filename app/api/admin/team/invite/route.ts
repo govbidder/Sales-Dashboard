@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase"
 import { createServiceClient } from "@/lib/supabase-service"
-import { isAdminOrAbove, isSuperAdmin, type Role } from "@/lib/types/role"
+import { isAdminOrAbove, isSuperAdminOrAbove, type Role } from "@/lib/types/role"
 
 async function getUser(req: NextRequest) {
   const token = req.headers.get("authorization")?.replace("Bearer ", "")
@@ -35,11 +35,12 @@ export async function POST(req: NextRequest) {
   const fullName = body?.full_name?.trim() || null
   const position = body?.position?.trim() || null
   const requestedRole = body?.role as Role | undefined
+  // `developer` NUNCA es asignable desde la UI; solo desde scripts.
   const validRoles: Role[] = ["super_admin", "admin", "user", "viewer"]
   let role: Role = validRoles.includes(requestedRole as Role) ? (requestedRole as Role) : "user"
-  // Solo super_admin puede crear otros super_admin.
-  if (role === "super_admin" && !isSuperAdmin(callerRole)) {
-    return NextResponse.json({ error: "Solo super_admin puede crear otro super_admin" }, { status: 403 })
+  // super_admin solo lo puede asignar super_admin o developer.
+  if (role === "super_admin" && !isSuperAdminOrAbove(callerRole)) {
+    return NextResponse.json({ error: "Solo super_admin o developer puede crear otro super_admin" }, { status: 403 })
   }
   const departmentId = body?.department_id || null
 
