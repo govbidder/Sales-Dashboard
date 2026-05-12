@@ -1,8 +1,9 @@
 "use client"
 
 import { fetchWithViewAs } from "@/lib/api/fetch-with-view-as"
-import { useEffect, useMemo, useState, useCallback } from "react"
+import { useEffect, useMemo, useState, useCallback, useRef } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   startOfMonth, endOfMonth, startOfWeek, endOfWeek,
   eachDayOfInterval, format, addMonths, isSameMonth, isToday, parseISO,
@@ -11,7 +12,7 @@ import {
 import { es } from "date-fns/locale"
 import {
   CalendarDays, ChevronLeft, ChevronRight, Loader2, RefreshCw,
-  Users2, ListTodo, Flag, AlertCircle, ArrowRight,
+  Users2, ListTodo, Flag, AlertCircle, ArrowRight, X as XIcon,
 } from "lucide-react"
 import { createClient } from "@/lib/supabase"
 
@@ -33,6 +34,13 @@ interface AgendaItem {
 
 function fmtTime(iso: string) {
   return new Date(iso).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
+}
+
+function fmtTooltip(it: AgendaItem) {
+  const time = fmtTime(it.iso)
+  const kind = it.kind === "persona" ? "Persona" : "Tarea"
+  const overdue = it.overdue ? " · vencida" : ""
+  return `${kind} · ${time}${overdue}\n${it.title}${it.meta ? `\n${it.meta}` : ""}`
 }
 
 const PRIORITY_DOT: Record<string, string> = {
@@ -93,58 +101,164 @@ function MonthGrid({
           const isLastRow = idx >= grid.length - 7
 
           return (
-            <div
+            <DayCell
               key={dk}
-              className={`flex flex-col gap-1 px-2 py-2 min-h-[120px] transition-colors
-                ${isLastCol ? "" : "border-r"}
-                ${isLastRow ? "" : "border-b"}
-                border-slate-100
-                ${inMonth ? "bg-white" : "bg-slate-50/30"}
-              `}
-            >
-              <div className="flex items-center justify-between">
-                <span className={`text-[12px] font-bold tabular-nums ${
-                  today
-                    ? "flex h-6 w-6 items-center justify-center rounded-full bg-[#E42D2C] text-white"
-                    : inMonth ? "text-slate-700 px-1.5" : "text-slate-400 px-1.5"
-                }`}>
-                  {format(day, "d")}
-                </span>
-                {dayItems.length > 3 && (
-                  <span className="text-[10px] text-slate-400">+{dayItems.length - 3}</span>
-                )}
-              </div>
-              <div className="flex flex-col gap-1">
-                {dayItems.slice(0, 3).map(it => (
-                  <button
-                    key={it.id}
-                    onClick={() => onItemClick(it)}
-                    className={`group flex items-center gap-1.5 rounded-md border px-1.5 py-0.5 text-left transition-all hover:shadow-sm ${
-                      it.overdue
-                        ? "border-red-200 bg-red-50 text-red-800"
-                        : it.kind === "persona"
-                          ? "border-[#1e3a8a]/20 bg-[#1e3a8a]/[0.04] text-[#1e3a8a]"
-                          : "border-slate-200 bg-slate-50 text-slate-700"
-                    }`}
-                  >
-                    <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${
-                      it.kind === "persona"
-                        ? "bg-[#1e3a8a]"
-                        : it.priority ? PRIORITY_DOT[it.priority] : "bg-slate-400"
-                    }`} />
-                    <span className="text-[10px] font-bold tabular-nums shrink-0">
-                      {fmtTime(it.iso)}
-                    </span>
-                    <span className="text-[10.5px] font-medium leading-tight truncate">
-                      {it.title}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
+              dayKey={dk}
+              day={day}
+              dayItems={dayItems}
+              inMonth={inMonth}
+              today={today}
+              isLastCol={isLastCol}
+              isLastRow={isLastRow}
+              onItemClick={onItemClick}
+            />
           )
         })}
       </div>
+    </div>
+  )
+}
+
+// ─── Day cell (with overflow popover) ────────────────────────────────────────
+
+function DayCell({
+  dayKey, day, dayItems, inMonth, today, isLastCol, isLastRow, onItemClick,
+}: {
+  dayKey:      string
+  day:         Date
+  dayItems:    AgendaItem[]
+  inMonth:     boolean
+  today:       boolean
+  isLastCol:   boolean
+  isLastRow:   boolean
+  onItemClick: (item: AgendaItem) => void
+}) {
+  const [popoverOpen, setPopoverOpen] = useState(false)
+  const cellRef = useRef<HTMLDivElement | null>(null)
+
+  // Cierra popover al click fuera o ESC
+  useEffect(() => {
+    if (!popoverOpen) return
+    const onDocClick = (e: MouseEvent) => {
+      if (cellRef.current && !cellRef.current.contains(e.target as Node)) {
+        setPopoverOpen(false)
+      }
+    }
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setPopoverOpen(false) }
+    document.addEventListener("mousedown", onDocClick)
+    document.addEventListener("keydown", onKey)
+    return () => {
+      document.removeEventListener("mousedown", onDocClick)
+      document.removeEventListener("keydown", onKey)
+    }
+  }, [popoverOpen])
+
+  const visible = dayItems.slice(0, 3)
+  const hiddenCount = dayItems.length - visible.length
+
+  return (
+    <div
+      ref={cellRef}
+      className={`relative flex flex-col gap-1 px-2 py-2 min-h-[140px] transition-colors
+        ${isLastCol ? "" : "border-r"}
+        ${isLastRow ? "" : "border-b"}
+        border-slate-100
+        ${inMonth ? "bg-white" : "bg-slate-50/30"}
+      `}
+    >
+      <div className="flex items-center justify-between">
+        <span className={`text-xs font-bold tabular-nums ${
+          today
+            ? "flex h-6 w-6 items-center justify-center rounded-full bg-[#E42D2C] text-white"
+            : inMonth ? "text-slate-700 px-1.5" : "text-slate-400 px-1.5"
+        }`}>
+          {format(day, "d")}
+        </span>
+        {hiddenCount > 0 && (
+          <button
+            onClick={() => setPopoverOpen(v => !v)}
+            className="text-xs text-slate-500 hover:text-[#1e3a8a] font-semibold rounded px-1 hover:bg-slate-100 transition-colors"
+            title={`Ver los ${dayItems.length} eventos del día`}
+          >
+            +{hiddenCount}
+          </button>
+        )}
+      </div>
+      <div className="flex flex-col gap-1">
+        {visible.map(it => (
+          <button
+            key={it.id}
+            onClick={() => onItemClick(it)}
+            title={fmtTooltip(it)}
+            className={`group flex items-center gap-1.5 rounded-md border px-1.5 py-1 text-left transition-all hover:shadow-sm ${
+              it.overdue
+                ? "border-red-200 bg-red-50 text-red-800"
+                : it.kind === "persona"
+                  ? "border-[#1e3a8a]/20 bg-[#1e3a8a]/[0.04] text-[#1e3a8a]"
+                  : "border-slate-200 bg-slate-50 text-slate-700"
+            }`}
+          >
+            <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${
+              it.kind === "persona"
+                ? "bg-[#1e3a8a]"
+                : it.priority ? PRIORITY_DOT[it.priority] : "bg-slate-400"
+            }`} />
+            <span className="text-xs font-bold tabular-nums shrink-0">
+              {fmtTime(it.iso)}
+            </span>
+            <span className="text-xs font-medium leading-tight truncate">
+              {it.title}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Popover con TODOS los eventos del día (incluye los visibles para
+          que el usuario pueda revisarlos juntos). */}
+      {popoverOpen && (
+        <div className="absolute top-full left-2 right-2 z-40 mt-1 max-h-[280px] overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_rgba(15,23,42,0.12)]">
+          <div className="sticky top-0 flex items-center justify-between px-3 py-2 border-b border-slate-100 bg-white">
+            <p className="text-xs font-bold uppercase tracking-wider text-[#1e3a8a]/80 capitalize">
+              {format(day, "EEEE d 'de' MMMM", { locale: es })}
+            </p>
+            <button
+              onClick={() => setPopoverOpen(false)}
+              className="flex h-6 w-6 items-center justify-center rounded text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+              aria-label="Cerrar"
+            >
+              <XIcon className="h-3.5 w-3.5" />
+            </button>
+          </div>
+          <div className="p-2 flex flex-col gap-1">
+            {dayItems.map(it => (
+              <button
+                key={`pop-${it.id}`}
+                onClick={() => { setPopoverOpen(false); onItemClick(it) }}
+                title={fmtTooltip(it)}
+                className={`group flex items-center gap-2 rounded-md border px-2 py-1.5 text-left transition-all hover:shadow-sm ${
+                  it.overdue
+                    ? "border-red-200 bg-red-50 text-red-800"
+                    : it.kind === "persona"
+                      ? "border-[#1e3a8a]/20 bg-[#1e3a8a]/[0.04] text-[#1e3a8a]"
+                      : "border-slate-200 bg-slate-50 text-slate-700"
+                }`}
+              >
+                <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${
+                  it.kind === "persona"
+                    ? "bg-[#1e3a8a]"
+                    : it.priority ? PRIORITY_DOT[it.priority] : "bg-slate-400"
+                }`} />
+                <span className="text-xs font-bold tabular-nums shrink-0">
+                  {fmtTime(it.iso)}
+                </span>
+                <span className="text-xs font-medium leading-tight truncate flex-1">
+                  {it.title}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -248,6 +362,7 @@ function UpcomingList({ items }: { items: AgendaItem[] }) {
 // ─── Main view ───────────────────────────────────────────────────────────────
 
 export function CalendarView() {
+  const router = useRouter()
   const [cursor,  setCursor]  = useState(new Date())
   const [items,   setItems]   = useState<AgendaItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -410,7 +525,7 @@ export function CalendarView() {
           <MonthGrid
             cursor={cursor}
             items={filtered}
-            onItemClick={(item) => { window.location.href = item.href }}
+            onItemClick={(item) => router.push(item.href)}
           />
 
           <div className="space-y-3">
