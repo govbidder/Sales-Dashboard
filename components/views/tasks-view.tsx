@@ -14,6 +14,7 @@ import { CsvImportModal } from "@/components/ui/csv-import-modal"
 import { KanbanBoardSkeleton, TableSkeleton } from "@/components/ui/skeleton"
 import { useViewAs } from "@/lib/contexts/view-as-context"
 import { useRealtimeTable } from "@/hooks/use-realtime-table"
+import { useUrlFilterState } from "@/hooks/use-url-filter-state"
 import { useToast } from "@/components/ui/toast"
 import {
   DndContext, DragEndEvent, DragOverlay, DragStartEvent,
@@ -1332,19 +1333,21 @@ export function TasksView() {
   const [loading,       setLoading]       = useState(true)
   const [selected,      setSelected]      = useState<Task | null>(null)
   const [deletingId,    setDeletingId]    = useState<string | null>(null)
-  const [search,        setSearch]        = useState("")
-  const [filterAssignee,setFilterAssignee]= useState<string>("todos")
-  const [filterTag,     setFilterTag]     = useState<string>("todos")
-  const [filterPriority,setFilterPriority]= useState<Priority | "todos">("todos")
-  const [filterDepartment,setFilterDepartment]= useState<string>("todos")
+  // Filtros + estado de vista persistidos en URL (?q=&assignee=&...).
+  // Refrescar la página los mantiene; compartir el link los aplica al otro user.
+  const [search,           setSearch]           = useUrlFilterState<string>("q",          "",       { debounce: 250 })
+  const [filterAssignee,   setFilterAssignee]   = useUrlFilterState<string>("assignee",   "todos")
+  const [filterTag,        setFilterTag]        = useUrlFilterState<string>("tag",        "todos")
+  const [filterPriority,   setFilterPriority]   = useUrlFilterState<Priority | "todos">("priority", "todos")
+  const [filterDepartment, setFilterDepartment] = useUrlFilterState<string>("department", "todos")
   const [departments,  setDepartments]  = useState<Department[]>([])
   const [showNewForm,   setShowNewForm]   = useState(false)
   const [newPrefillDate,setNewPrefillDate]= useState<string | null>(null)
   const [creating,      setCreating]      = useState(false)
-  const [view,          setView]          = useState<ViewMode>("board")
-  const [groupBy,       setGroupBy]       = useState<GroupBy>("status")
-  const [sortBy,        setSortBy]        = useState<SortBy>("due_at")
-  const [quickFilter,   setQuickFilter]   = useState<"all" | "mine" | "overdue" | "this_week" | "unassigned">("all")
+  const [view,    setView]    = useUrlFilterState<ViewMode>("view",  "board")
+  const [groupBy, setGroupBy] = useUrlFilterState<GroupBy>("group",  "status")
+  const [sortBy,  setSortBy]  = useUrlFilterState<SortBy>("sort",    "due_at")
+  const [quickFilter, setQuickFilter] = useUrlFilterState<"all" | "mine" | "overdue" | "this_week" | "unassigned">("quick", "all")
   const [selectedIds,   setSelectedIds]   = useState<Set<string>>(new Set())
   const [showShortcuts, setShowShortcuts] = useState(false)
   const [showAiExtract, setShowAiExtract] = useState(false)
@@ -1400,24 +1403,20 @@ export function TasksView() {
   const searchParams = useSearchParams()
   const searchInputRef = useRef<HTMLInputElement | null>(null)
 
-  // Quick-action: open "Nueva tarea" modal when ?new=1 is present
+  // Quick-action: open "Nueva tarea" modal when ?new=1 is present.
+  // Removemos solo el param `new` para preservar filtros activos en URL.
   useEffect(() => {
     if (searchParams?.get("new") === "1") {
       setShowNewForm(true)
-      router.replace(pathname, { scroll: false })
+      const params = new URLSearchParams(searchParams.toString())
+      params.delete("new")
+      const qs = params.toString()
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
     }
   }, [searchParams, router, pathname])
-
-  // Pre-filter por departamento cuando viene ?department=<id> desde otra vista
-  // (ej: cards de "Departamentos" en /inicio). Limpia el param después de aplicar
-  // para que el resto de la navegación no quede pegada al filtro.
-  useEffect(() => {
-    const deptId = searchParams?.get("department")
-    if (deptId) {
-      setFilterDepartment(deptId)
-      router.replace(pathname, { scroll: false })
-    }
-  }, [searchParams, router, pathname])
+  // Nota: el pre-filter `?department=<id>` que viene de cards de /inicio ya
+  // no necesita un handler dedicado — `useUrlFilterState("department", "todos")`
+  // lo lee directamente al montar. La URL es la fuente de verdad.
 
   const getSession = async () => {
     const supabase = createClient()
