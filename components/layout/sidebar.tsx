@@ -5,10 +5,10 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
-  X, BarChart3, DollarSign, LayoutGrid, FileBarChart,
+  X, LayoutGrid,
   Users2, ListTodo, Users, Layers, Wrench, BookOpen, CalendarDays,
   Home, ChevronLeft, ChevronRight, Rss, FormInput, Shield, LayoutTemplate,
-  Folder,
+  Folder, Settings,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { type Role, isAdminOrAbove } from "@/lib/types/role"
@@ -33,25 +33,24 @@ interface SidebarProps {
 }
 
 interface NavItem {
-  name:     string
-  href:     string
-  icon:     any
-  /** Color custom (ej: dept color en sección "Por departamento"). */
-  iconColor?: string
+  name: string
+  href: string
+  icon: any
 }
 
 interface NavGroup {
-  label:  string
-  items:  NavItem[]
+  label: string
+  items: NavItem[]
 }
 
 /**
- * Construye dinámicamente los grupos de navegación según el rol del caller
- * y el depto del usuario (cuando aplica).
+ * Construye los grupos de navegación según el rol del caller.
  *
- * - Team (rol=user) con depto → "Mi área — [Dept]" + General.
- *   Sus tareas se filtran al depto vía query param + server scoping.
- * - Admin/Founder/Developer → vista completa cross-empresa + "Por departamento".
+ * - Team (rol=user/viewer): vista reducida — solo SU depto + Agenda + Actividad.
+ *   No ve Personas Agendadas, ni Performance, ni Admin.
+ * - Admin / Founder / Developer: orden por prioridad operativa:
+ *   Inicio → Operación → Performance → Equipo → Admin. Los deptos son un
+ *   rail compacto de pills al final, no items full-text que inflen el sidebar.
  */
 function buildNavGroups(
   role:             Role,
@@ -61,86 +60,47 @@ function buildNavGroups(
   const isAdmin = isAdminOrAbove(role)
 
   if (!isAdmin) {
-    // ── TEAM (rol=user/viewer) — su área + general ──────────────────────────
+    // ── TEAM ─────────────────────────────────────────────────────────────────
     const myDept = userDepartmentId
       ? departments.find(d => d.id === userDepartmentId)
       : null
 
     const myAreaItems: NavItem[] = []
     if (myDept) {
-      // Dashboard del depto: KPIs + tareas + miembros, todo en una vista.
-      myAreaItems.push({
-        name:      "Dashboard",
-        href:      `/admin/departments/${myDept.id}`,
-        icon:      Folder,
-        iconColor: myDept.color,
-      })
-      myAreaItems.push({
-        name:      "Kanban",
-        href:      `/admin/tasks?department=${myDept.id}`,
-        icon:      ListTodo,
-      })
+      myAreaItems.push({ name: "Dashboard", href: `/admin/departments/${myDept.id}`, icon: Folder })
+      myAreaItems.push({ name: "Kanban",    href: `/admin/tasks?department=${myDept.id}`, icon: ListTodo })
     } else {
-      // Sin depto asignado: lleva al kanban general (servidor seguirá scopeando
-      // por owner/assignee).
       myAreaItems.push({ name: "Tareas", href: "/admin/tasks", icon: ListTodo })
     }
-    myAreaItems.push({ name: "Personas Agendadas", href: "/admin/personas", icon: Users2 })
 
     return [
-      {
-        label: "Inicio",
-        items: [{ name: "Hoy", href: "/inicio", icon: Home }],
-      },
-      {
-        label: myDept ? `Mi área — ${myDept.name}` : "Mi área",
-        items: myAreaItems,
-      },
+      { label: "Inicio", items: [{ name: "Hoy", href: "/inicio", icon: Home }] },
+      { label: myDept ? `Mi área — ${myDept.name}` : "Mi área", items: myAreaItems },
       {
         label: "General",
         items: [
-          { name: "Agenda",          href: "/calendar",                icon: CalendarDays },
-          { name: "Actividad",       href: "/admin/activity",          icon: Rss          },
+          { name: "Agenda",    href: "/calendar",        icon: CalendarDays },
+          { name: "Actividad", href: "/admin/activity",  icon: Rss          },
         ],
       },
     ]
   }
 
-  // ── ADMIN / FOUNDER / DEVELOPER — vista cross-empresa completa ────────────
-  // Cada item de depto lleva al DASHBOARD del depto (KPIs + tareas + miembros),
-  // no al kanban filtrado. Desde ahí se puede saltar al kanban si hace falta.
-  const deptItems: NavItem[] = departments.map(d => ({
-    name:      d.name,
-    href:      `/admin/departments/${d.id}`,
-    icon:      Folder,
-    iconColor: d.color,
-  }))
-
+  // ── ADMIN / FOUNDER / DEVELOPER ──────────────────────────────────────────
   return [
+    { label: "Inicio", items: [{ name: "Hoy", href: "/inicio", icon: Home }] },
     {
-      label: "Inicio",
-      items: [{ name: "Hoy", href: "/inicio", icon: Home }],
+      label: "Operación",
+      items: [
+        { name: "Personas Agendadas", href: "/admin/personas", icon: Users2       },
+        { name: "Tareas",             href: "/admin/tasks",    icon: ListTodo     },
+        { name: "Agenda",             href: "/calendar",       icon: CalendarDays },
+      ],
     },
     {
       label: "Performance",
       items: [
-        { name: "Panel",          href: "/dashboard",     icon: BarChart3    },
-        { name: "Ventas",         href: "/sales",         icon: DollarSign   },
-        { name: "Métricas",       href: "/metrics",       icon: LayoutGrid   },
-        { name: "Cargar reporte", href: "/admin/reports", icon: FileBarChart },
-      ],
-    },
-    // "Por departamento" — solo aparece si hay deptos cargados.
-    ...(deptItems.length > 0 ? [{
-      label: "Por departamento",
-      items: deptItems,
-    }] : []),
-    {
-      label: "Operación general",
-      items: [
-        { name: "Personas Agendadas", href: "/admin/personas", icon: Users2       },
-        { name: "Tareas (todas)",     href: "/admin/tasks",    icon: ListTodo     },
-        { name: "Agenda",             href: "/calendar",       icon: CalendarDays },
+        { name: "Métricas", href: "/metrics", icon: LayoutGrid },
       ],
     },
     {
@@ -152,17 +112,95 @@ function buildNavGroups(
       ],
     },
     {
-      label: "Configuración",
+      label: "Admin",
       items: [
-        { name: "Plantillas",       href: "/admin/task-templates",   icon: LayoutTemplate },
-        { name: "Formularios",      href: "/admin/forms",            icon: FormInput      },
-        { name: "Centro Operativo", href: "/admin/centro-operativo", icon: Layers         },
-        { name: "Auditoría",        href: "/admin/audit-log",        icon: Shield         },
-        { name: "Herramientas",     href: "/tools",                  icon: Wrench         },
-        { name: "Biblioteca",       href: "/recursos",               icon: BookOpen       },
+        { name: "Templates", href: "/admin/task-templates",   icon: LayoutTemplate },
+        { name: "Forms",     href: "/admin/forms",            icon: FormInput      },
+        { name: "Procesos",  href: "/admin/centro-operativo", icon: Settings       },
+        { name: "Auditoría", href: "/admin/audit-log",        icon: Shield         },
+        { name: "Recursos",  href: "/recursos",               icon: BookOpen       },
+        { name: "Tools",     href: "/tools",                  icon: Wrench         },
       ],
     },
   ]
+}
+
+// ─── Department pills row ────────────────────────────────────────────────────
+
+function DeptPills({
+  departments,
+  pathname,
+  showLabels,
+  onClose,
+}: {
+  departments: DepartmentLite[]
+  pathname:    string
+  showLabels:  boolean
+  onClose:     () => void
+}) {
+  if (!departments.length) return null
+
+  return (
+    <div className={cn("pt-3 mt-3 border-t border-[#1e3a8a]/10", showLabels ? "px-3" : "px-2")}>
+      {showLabels && (
+        <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]/70">
+          Departamentos
+        </p>
+      )}
+      <div className={cn(
+        "flex gap-1.5",
+        showLabels ? "flex-wrap" : "flex-col items-center",
+      )}>
+        {departments.map(d => {
+          const active = pathname === `/admin/departments/${d.id}`
+          const initial = d.name.charAt(0).toUpperCase()
+
+          return (
+            <Link
+              key={d.id}
+              href={`/admin/departments/${d.id}`}
+              onClick={onClose}
+              title={d.name}
+              className={cn(
+                "group relative flex items-center overflow-hidden rounded-full",
+                "border transition-all duration-200 ease-out",
+                showLabels
+                  ? "h-7 max-w-[28px] hover:max-w-[140px]"
+                  : "h-7 w-7 justify-center",
+                active
+                  ? "border-transparent shadow-[0_0_0_2px_var(--dept-color)]"
+                  : "border-slate-200 hover:border-transparent hover:shadow-[0_0_0_2px_var(--dept-color)]",
+              )}
+              style={
+                {
+                  ["--dept-color" as any]: d.color,
+                  backgroundColor: active ? `${d.color}1a` : "white",
+                } as React.CSSProperties
+              }
+            >
+              <span
+                className="flex h-7 w-7 shrink-0 items-center justify-center text-[11px] font-bold text-white"
+                style={{ backgroundColor: d.color }}
+              >
+                {initial}
+              </span>
+              {showLabels && (
+                <span
+                  className={cn(
+                    "ml-1.5 mr-2.5 text-[12px] font-semibold whitespace-nowrap",
+                    "opacity-0 group-hover:opacity-100 transition-opacity",
+                    active ? "text-slate-900" : "text-slate-700",
+                  )}
+                >
+                  {d.name}
+                </span>
+              )}
+            </Link>
+          )
+        })}
+      </div>
+    </div>
+  )
 }
 
 export function Sidebar({
@@ -171,7 +209,6 @@ export function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname()
 
-  // On mobile, show all labels even when "collapsed" prop is true.
   const [isMobile, setIsMobile] = useState(false)
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024)
@@ -181,6 +218,7 @@ export function Sidebar({
   }, [])
 
   const showLabels = !collapsed || isMobile
+  const isAdmin    = isAdminOrAbove(role)
 
   const navGroups = buildNavGroups(role, userDepartmentId, departments)
 
@@ -247,9 +285,6 @@ export function Sidebar({
                 )}
                 <div className="space-y-0.5">
                   {group.items.map((item) => {
-                    // Active match: exacto en pathname. Si el item tiene query string,
-                    // ignoramos el match porque varios items pueden compartir base
-                    // path (ej: /admin/tasks?department=A vs ?department=B).
                     const itemBase = item.href.split("?")[0]
                     const isActive = !item.href.includes("?") && pathname === itemBase
                     const Icon = item.icon
@@ -278,7 +313,6 @@ export function Sidebar({
                             showLabels ? "h-[16px] w-[16px]" : "h-[18px] w-[18px]",
                             isActive ? "text-[#1e3a8a]" : "text-slate-500 group-hover:text-slate-700"
                           )}
-                          style={item.iconColor ? { color: item.iconColor } : undefined}
                         />
                         {showLabels && (
                           <span
@@ -297,7 +331,19 @@ export function Sidebar({
               </div>
             )
           })}
+
+          {/* Dept pills row — solo para admin+. Va abajo, separado por divisor. */}
+          {isAdmin && (
+            <DeptPills
+              departments={departments}
+              pathname={pathname}
+              showLabels={showLabels}
+              onClose={onClose}
+            />
+          )}
         </nav>
+
+        {/* SLOT — botón CRM se inyecta acá en PR #4 */}
 
         {/* Floating collapse toggle */}
         <button
