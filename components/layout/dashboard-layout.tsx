@@ -196,6 +196,14 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     }
 
     function onKey(e: KeyboardEvent) {
+      // Cmd+Shift+C / Ctrl+Shift+C — open CRM portal.
+      // Va antes del Cmd+K para que el shift no caiga al caso de palette.
+      if ((e.key === "c" || e.key === "C") && (e.metaKey || e.ctrlKey) && e.shiftKey) {
+        e.preventDefault()
+        router.push("/crm")
+        return
+      }
+
       // Cmd+K / Ctrl+K — open palette
       if ((e.key === "k" || e.key === "K") && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
