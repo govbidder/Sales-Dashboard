@@ -122,6 +122,7 @@ supabase/
 - **Cron routes** (`app/api/cron/`): se invocan desde Vercel Cron — no tienen auth de usuario, usan service role.
 - **ThemeProvider**: dark mode está activo. Todos los colores deben funcionar en ambos modos.
 - **No hay test runner configurado**: no hay jest/vitest/playwright en el repo. Validar con `npx tsc --noEmit` y `npm run lint`.
+- **View-As: server-side solo para user simulado**: cuando un developer simula un **user concreto** (`viewAsUser`), `fetchWithViewAs` manda el header `X-View-As-User-Id` y `getEffectiveUser` lo respeta — el server devuelve solo data del user simulado. Cuando se simula **solo un rol o solo un departamento** (sin user puntual), el server NO filtra: es una vista *previa* client-side. Las views afectadas (ej. `tasks-view.tsx`) aplican un filtro client por `simulatedDeptId` cuando corresponde, y el banner amarillo dice "solo visual" en ese caso. Decisión consciente — un dept o un rol no son identidades, no encajan en el modelo del impersonation log que requiere un `user_id` real.
 
 ## Variables de entorno
 
