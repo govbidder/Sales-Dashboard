@@ -3,11 +3,14 @@
 import React, { useEffect, useMemo, useState } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-// Generate months with enabled status based on enabledMonths prop
+function currentMonthKey() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
+}
+
 function generateMonths(enabledMonths?: string[]) {
-  // Only show months that exist in enabledMonths, plus ALWAYS include 2025-12.
   const set = new Set<string>()
-  set.add("2025-12")
+  set.add(currentMonthKey())
 
   const normalize = (s: any): string | null => {
     const str = String(s ?? "").trim()
@@ -41,12 +44,10 @@ type MonthSelectorProps = {
 
 export function MonthSelector({ value, onChange, enabledMonths }: MonthSelectorProps) {
   const months = useMemo(() => generateMonths(enabledMonths), [enabledMonths])
-  const defaultMonth = months.slice(-1)[0]?.value ?? "2025-12"
+  const defaultMonth = months.slice(-1)[0]?.value ?? currentMonthKey()
 
-  // Local state (used when parent doesn't control the value)
   const [selectedMonth, setSelectedMonth] = useState<string>(value ?? defaultMonth)
 
-  // If parent passes value, keep local state in sync
   useEffect(() => {
     if (typeof value === "string") setSelectedMonth(value)
   }, [value])
@@ -59,20 +60,15 @@ export function MonthSelector({ value, onChange, enabledMonths }: MonthSelectorP
         onChange?.(v)
       }}
     >
-      <SelectTrigger className="w-[110px] sm:w-[140px] bg-white/5 text-slate-900 border-border text-xs sm:text-sm">
-        <SelectValue className="text-slate-900" />
+      <SelectTrigger className="w-[110px] sm:w-[140px] text-xs sm:text-sm">
+        <SelectValue />
       </SelectTrigger>
-      <SelectContent className="bg-black text-slate-900 border-border shadow-xl">
+      <SelectContent>
         {months.map((m) => (
           <SelectItem
             key={m.value}
             value={m.value}
             disabled={m.disabled}
-            className={
-              m.disabled
-                ? "text-slate-400"
-                : "text-slate-900 data-[highlighted]:bg-white/10 data-[highlighted]:text-slate-900 data-[state=checked]:bg-white/10 data-[state=checked]:text-slate-900"
-            }
           >
             {m.value}
           </SelectItem>
