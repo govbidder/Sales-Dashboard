@@ -161,7 +161,7 @@ function DetailDrawer({
                 <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Departamento</p>
                 <select
                   value={member.department_id ?? ""}
-                  onChange={e => onPatch(member.id, { department_id: e.target.value || null } as any)}
+                  onChange={e => onPatch(member.id, { department_id: e.target.value || null })}
                   className={inputCls}
                 >
                   <option value="">— Sin departamento —</option>

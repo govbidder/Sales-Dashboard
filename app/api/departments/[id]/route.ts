@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase"
 import { createServiceClient } from "@/lib/supabase-service"
 
+const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/
+
 async function getUser(req: NextRequest) {
   const token = req.headers.get("authorization")?.replace("Bearer ", "")
   if (!token) return null
@@ -43,6 +45,13 @@ export async function PATCH(
     if (k in body) allowed[k] = typeof body[k] === "string" ? body[k].trim() : body[k]
   }
 
+  if (typeof allowed.color === "string" && !HEX_COLOR_RE.test(allowed.color)) {
+    return NextResponse.json({ error: "color debe ser HEX #RRGGBB" }, { status: 400 })
+  }
+  if (typeof allowed.name === "string" && !allowed.name) {
+    return NextResponse.json({ error: "name no puede estar vacío" }, { status: 400 })
+  }
+
   if (Object.keys(allowed).length === 0) {
     return NextResponse.json({ error: "Nada que actualizar" }, { status: 400 })
   }
@@ -55,7 +64,12 @@ export async function PATCH(
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) {
+    if (error.code === "23505") {
+      return NextResponse.json({ error: "Ya existe un departamento con ese nombre" }, { status: 409 })
+    }
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
   return NextResponse.json({ department: data })
 }
 

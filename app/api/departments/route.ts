@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase"
 import { createServiceClient } from "@/lib/supabase-service"
 
+const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/
+
 async function getUser(req: NextRequest) {
   const token = req.headers.get("authorization")?.replace("Bearer ", "")
   if (!token) return null
@@ -48,7 +50,13 @@ export async function POST(req: NextRequest) {
 
   const insert: Record<string, unknown> = { name }
   if (body.description) insert.description = body.description.trim()
-  if (body.color) insert.color = body.color.trim()
+  if (body.color) {
+    const color = body.color.trim()
+    if (!HEX_COLOR_RE.test(color)) {
+      return NextResponse.json({ error: "color debe ser HEX #RRGGBB" }, { status: 400 })
+    }
+    insert.color = color
+  }
   if (typeof body.sort_order === "number") insert.sort_order = body.sort_order
 
   const { data, error } = await db
@@ -57,6 +65,11 @@ export async function POST(req: NextRequest) {
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) {
+    if (error.code === "23505") {
+      return NextResponse.json({ error: "Ya existe un departamento con ese nombre" }, { status: 409 })
+    }
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
   return NextResponse.json({ department: data }, { status: 201 })
 }
