@@ -11,6 +11,7 @@ import {
   Sun, Calendar as CalIcon, Layers,
 } from "lucide-react"
 import type { Department } from "@/lib/types/department"
+import { useViewAs } from "@/lib/contexts/view-as-context"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -221,6 +222,9 @@ export function InicioView() {
   const [showStandup,  setShowStandup]  = useState(false)
   const [departments,  setDepartments]  = useState<Department[]>([])
   const [deptStats,    setDeptStats]    = useState<Record<string, DeptStat>>({})
+
+  // View-As: si simulás un depto, esa card se destaca; las otras se dimean.
+  const { viewAsDepartmentId: simulatedDeptId } = useViewAs()
 
   const fetchHealth = useCallback(async () => {
     setLoading(true)
@@ -543,11 +547,20 @@ export function InicioView() {
           <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {departments.map(d => {
               const s = deptStats[d.id] ?? { pending: 0, overdue: 0, members: 0 }
+              // View-As: si hay depto simulado, destacamos solo ese y dimeamos los otros.
+              const isSimulatedHighlight = simulatedDeptId && simulatedDeptId === d.id
+              const isSimulatedDimmed    = simulatedDeptId && simulatedDeptId !== d.id
               return (
                 <Link
                   key={d.id}
                   href={`/admin/tasks?department=${d.id}`}
-                  className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:border-slate-300 hover:shadow-[0_0_24px_rgba(15,23,42,0.04)]"
+                  className={`group relative overflow-hidden rounded-2xl border bg-white p-4 transition-all ${
+                    isSimulatedHighlight
+                      ? "border-amber-400 ring-2 ring-amber-400/40 shadow-[0_0_24px_rgba(245,158,11,0.20)]"
+                      : isSimulatedDimmed
+                      ? "border-slate-200 opacity-40 hover:opacity-70"
+                      : "border-slate-200 hover:border-slate-300 hover:shadow-[0_0_24px_rgba(15,23,42,0.04)]"
+                  }`}
                 >
                   {/* Top accent bar with department color */}
                   <div

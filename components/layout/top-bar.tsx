@@ -8,6 +8,7 @@ import { NotificationsBell } from "@/components/layout/notifications-bell"
 import { ViewAsDropdown } from "@/components/layout/view-as-dropdown"
 import { useTheme } from "@/components/ui/theme-provider"
 import { type Role, ROLE_LABEL, isAdminOrAbove, isSuperAdmin, isDeveloper } from "@/lib/types/role"
+import { useViewAs } from "@/lib/contexts/view-as-context"
 
 interface TopBarProps {
   pageTitle:        string
@@ -69,7 +70,13 @@ export function TopBar({
     }
   }, [])
 
-  const initials = (user?.name ?? "?")
+  // View-As: si hay user simulado, el avatar/nombre del top-bar reflejan
+  // su identidad (pero el badge de rol abajo sigue mostrando el rol REAL).
+  const { viewAsUser } = useViewAs()
+  const displayName  = viewAsUser?.full_name || viewAsUser?.email || user?.name || "?"
+  const displayEmail = viewAsUser?.email ?? user?.email ?? ""
+
+  const initials = displayName
     .split(/[\s@]/)
     .map(p => p[0])
     .filter(Boolean)
@@ -140,8 +147,13 @@ export function TopBar({
           <button
             className="group flex items-center h-10 rounded-full pl-1 pr-1 transition-all hover:bg-slate-100"
             onClick={() => setProfileOpen(v => !v)}
+            title={viewAsUser ? `Simulando: ${displayName}` : displayName}
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] text-[11px] font-bold text-white shadow-sm ring-2 ring-white">
+            <span className={`flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-bold text-white shadow-sm ${
+              viewAsUser
+                ? "bg-gradient-to-br from-amber-400 to-amber-600 ring-2 ring-amber-300"
+                : "bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] ring-2 ring-white"
+            }`}>
               {initials}
             </span>
           </button>
@@ -153,12 +165,21 @@ export function TopBar({
             >
               <div className="px-4 py-3.5 border-b border-slate-100">
                 <div className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] text-sm font-bold text-white">
+                  <span className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white ${
+                    viewAsUser
+                      ? "bg-gradient-to-br from-amber-400 to-amber-600 ring-2 ring-amber-300"
+                      : "bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a]"
+                  }`}>
                     {initials}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-slate-900 truncate">{user?.name}</p>
-                    <p className="text-[11px] text-slate-500 truncate">{user?.email}</p>
+                    <p className="text-sm font-semibold text-slate-900 truncate">{displayName}</p>
+                    <p className="text-[11px] text-slate-500 truncate">{displayEmail}</p>
+                    {viewAsUser && (
+                      <p className="text-[10px] text-amber-700 font-semibold mt-0.5 truncate">
+                        ↳ Simulando · Real: {user?.email}
+                      </p>
+                    )}
                   </div>
                 </div>
                 {user?.role && isAdminOrAbove(user.role) && (

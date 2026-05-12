@@ -10,6 +10,7 @@ import { TemplatesModal } from "@/components/views/tasks/templates-modal"
 import { exportToCSV, csvDate } from "@/lib/export-csv"
 import type { Department } from "@/lib/types/department"
 import { CsvImportModal } from "@/components/ui/csv-import-modal"
+import { useViewAs } from "@/lib/contexts/view-as-context"
 import {
   DndContext, DragEndEvent, DragOverlay, DragStartEvent,
   PointerSensor, useDraggable, useDroppable, useSensor, useSensors,
@@ -1606,20 +1607,31 @@ export function TasksView() {
 
   const deptMap = useMemo(() => new Map(departments.map(d => [d.id, d])), [departments])
 
-  // Quick filter counts
+  // ─── View-As: si hay simulación activa, aplicamos filtros adicionales
+  // client-side (el server sigue devolviendo todo). Email "mío" toma del
+  // user simulado si existe; depto simulado es constraint extra.
+  const { viewAsUser: simulatedUser, viewAsDepartmentId: simulatedDeptId } = useViewAs()
+  const simulatedEmail = simulatedUser?.email ?? null
+  const effectiveEmail = simulatedEmail ?? currentEmail
+  const simulatedDeptName = simulatedDeptId
+    ? departments.find(d => d.id === simulatedDeptId)?.name ?? null
+    : null
+
+  // Quick filter counts (usa effectiveEmail para "mine" — si simulás un user,
+  // "mine" cuenta sus tareas, no las del developer real).
   const counts = useMemo(() => ({
     all:        topLevel.length,
-    mine:       topLevel.filter(t => currentEmail && t.assignees?.includes(currentEmail)).length,
+    mine:       topLevel.filter(t => effectiveEmail && t.assignees?.includes(effectiveEmail)).length,
     overdue:    topLevel.filter(t => isOverdue(t, terminalKeys)).length,
     this_week:  topLevel.filter(t => isDueThisWeek(t, terminalKeys)).length,
     unassigned: topLevel.filter(t => !t.assignees?.length).length,
-  }), [topLevel, currentEmail, terminalKeys])
+  }), [topLevel, effectiveEmail, terminalKeys])
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     return topLevel.filter(t => {
       // Quick filter
-      if (quickFilter === "mine" && (!currentEmail || !t.assignees?.includes(currentEmail))) return false
+      if (quickFilter === "mine" && (!effectiveEmail || !t.assignees?.includes(effectiveEmail))) return false
       if (quickFilter === "overdue" && !isOverdue(t, terminalKeys)) return false
       if (quickFilter === "this_week" && !isDueThisWeek(t, terminalKeys)) return false
       if (quickFilter === "unassigned" && t.assignees?.length) return false
@@ -1630,12 +1642,15 @@ export function TasksView() {
       if (filterPriority !== "todos" && t.priority !== filterPriority) return false
       if (filterDepartment !== "todos" && t.department_id !== filterDepartment) return false
 
+      // View-As: filtro extra por depto simulado (se aplica además del UI filter).
+      if (simulatedDeptId && t.department_id !== simulatedDeptId) return false
+
       // Free-text search
       if (!q) return true
       return [t.title, t.description, ...(t.assignees ?? []), ...(t.tags ?? [])]
         .some(v => v?.toLowerCase().includes(q))
     })
-  }, [topLevel, search, filterAssignee, filterTag, filterPriority, filterDepartment, quickFilter, currentEmail, terminalKeys])
+  }, [topLevel, search, filterAssignee, filterTag, filterPriority, filterDepartment, simulatedDeptId, quickFilter, effectiveEmail, terminalKeys])
 
   // Sort
   const sorted = useMemo(() => {
@@ -2229,6 +2244,17 @@ export function TasksView() {
                 <option value="todos">Todos los tags</option>
                 {allTags.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
+            )}
+            {/* View-As disclaimer: si hay depto simulado, indicar que el filtro
+                visual está aplicado. */}
+            {simulatedDeptName && (
+              <span
+                className="inline-flex items-center gap-1.5 h-9 rounded-xl border border-amber-400/60 bg-amber-100 px-3 text-[11px] font-bold text-amber-900"
+                title="Filtro visual aplicado por View-As — el servidor sigue devolviendo todo."
+              >
+                <Layers className="h-3 w-3" />
+                Solo {simulatedDeptName} (simulación)
+              </span>
             )}
             {departments.length > 0 && (
               <select
