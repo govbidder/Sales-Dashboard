@@ -391,7 +391,7 @@ export function DepartmentDashboardView({ departmentId }: { departmentId: string
                           </p>
                         )}
                         {t.owner && (
-                          <span className="text-[11px] text-slate-400 truncate">· {t.owner}</span>
+                          <span className="text-[11px] text-slate-500 truncate">· {t.owner}</span>
                         )}
                       </div>
                     </div>

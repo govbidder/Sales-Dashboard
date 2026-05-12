@@ -247,7 +247,7 @@ export function AuditLogView() {
                     </span>
                     <span className="font-mono text-[11px] text-slate-600 truncate">{e.endpoint}</span>
                   </div>
-                  <div className="text-right text-[11px] text-slate-400 shrink-0">
+                  <div className="text-right text-[11px] text-slate-500 shrink-0">
                     {fmtRelative(e.created_at)}
                   </div>
                 </div>
@@ -263,13 +263,13 @@ export function AuditLogView() {
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-2.5 border-b border-slate-200 pb-4">
         <div className="relative flex-1 min-w-[220px] max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
           <input
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar por actor, acción, payload..."
-            className="h-9 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/10"
+            className="h-9 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-500 focus:border-[#1e3a8a]/40 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/10"
           />
         </div>
         <Filter className="h-3.5 w-3.5 text-slate-400" />

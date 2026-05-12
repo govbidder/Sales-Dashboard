@@ -220,7 +220,7 @@ export function BusinessKPIs({ selectedMonth: propMonth }: { selectedMonth?: str
                   if (prev == null) return null
                   const fmted = kpi.money ? fmtMoney(prev) : fmtNumber(prev)
                   return (
-                    <p className="mt-1 text-[11px] text-slate-300">
+                    <p className="mt-1 text-[11px] text-slate-500">
                       vs {fmted} mes anterior
                     </p>
                   )
