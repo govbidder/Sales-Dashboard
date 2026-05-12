@@ -53,6 +53,7 @@ const NAV_GROUPS: NavGroup[] = [
       { name: "Personas Agendadas", href: "/admin/personas",         icon: Users2   },
       { name: "Tareas",             href: "/admin/tasks",            icon: ListTodo },
       { name: "Equipo",             href: "/admin/team",             icon: Users    },
+      { name: "Departamentos",      href: "/admin/departments",      icon: Layers   },
       { name: "Centro Operativo",   href: "/admin/centro-operativo", icon: Layers   },
       { name: "Actividad",          href: "/admin/activity",         icon: Rss      },
       { name: "Forms",              href: "/admin/forms",            icon: FormInput },

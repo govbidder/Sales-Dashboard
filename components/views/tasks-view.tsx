@@ -1734,6 +1734,7 @@ export function TasksView() {
       titulo:       t.title,
       estado:       t.status,
       prioridad:    t.priority,
+      departamento: t.department_id ? (deptMap.get(t.department_id)?.name ?? "") : "",
       asignados:    (t.assignees ?? []).join("; "),
       tags:         (t.tags ?? []).join("; "),
       vence:        csvDate(t.due_at),
@@ -1742,14 +1743,15 @@ export function TasksView() {
     }))
     exportToCSV(rows, `tareas_${new Date().toISOString().slice(0, 10)}.csv`, {
       columns: [
-        { key: "titulo",       header: "Título"      },
-        { key: "estado",       header: "Estado"      },
-        { key: "prioridad",    header: "Prioridad"   },
-        { key: "asignados",    header: "Asignados"   },
-        { key: "tags",         header: "Tags"        },
-        { key: "vence",        header: "Vence"       },
-        { key: "creada",       header: "Creada"      },
-        { key: "descripcion",  header: "Descripción" },
+        { key: "titulo",       header: "Título"       },
+        { key: "estado",       header: "Estado"       },
+        { key: "prioridad",    header: "Prioridad"    },
+        { key: "departamento", header: "Departamento" },
+        { key: "asignados",    header: "Asignados"    },
+        { key: "tags",         header: "Tags"         },
+        { key: "vence",        header: "Vence"        },
+        { key: "creada",       header: "Creada"       },
+        { key: "descripcion",  header: "Descripción"  },
       ],
     })
   }
@@ -1897,23 +1899,27 @@ export function TasksView() {
         />
       )}
 
-      {showImport && (
+      {showImport && (() => {
+        const deptByName = new Map(departments.map(d => [d.name.toLowerCase(), d.id]))
+        return (
         <CsvImportModal
           title="Importar tareas desde CSV"
           description="Cada fila se convierte en una tarea nueva. Pendiente por default."
-          templateCSV={`titulo,descripcion,prioridad,asignados,tags,vence
-"Mandar capability statement","Cliente XYZ necesita capability statement actualizada",alta,"santo@govbidder.com,marcelo@govbidder.com","client,capability_statement",2026-05-15T18:00:00Z
-"Research bid 2024-007",,media,marcelo@govbidder.com,"bid,research",
+          templateCSV={`titulo,descripcion,prioridad,departamento,asignados,tags,vence
+"Mandar capability statement","Cliente XYZ necesita capability statement actualizada",alta,Marketing,"santo@govbidder.com,marcelo@govbidder.com","client,capability_statement",2026-05-15T18:00:00Z
+"Research bid 2024-007",,media,IA,marcelo@govbidder.com,"bid,research",
 `}
           columns={[
-            { field: "title",       label: "Título",       required: true,  aliases: ["titulo","name","tarea"] },
-            { field: "description", label: "Descripción",  aliases: ["descripcion","desc","detalle"] },
-            { field: "priority",    label: "Prioridad",    aliases: ["prioridad"] },
-            { field: "assignees",   label: "Asignados",    aliases: ["asignados","asignado","assignee","emails"],
+            { field: "title",         label: "Título",       required: true,  aliases: ["titulo","name","tarea"] },
+            { field: "description",   label: "Descripción",  aliases: ["descripcion","desc","detalle"] },
+            { field: "priority",      label: "Prioridad",    aliases: ["prioridad"] },
+            { field: "department_id", label: "Departamento", aliases: ["departamento","department","depto","area","área"],
+              transform: v => deptByName.get(v.trim().toLowerCase()) ?? null },
+            { field: "assignees",     label: "Asignados",    aliases: ["asignados","asignado","assignee","emails"],
               transform: v => v.split(/[,;]/).map(s => s.trim()).filter(Boolean) },
-            { field: "tags",        label: "Tags",         aliases: ["tags"],
+            { field: "tags",          label: "Tags",         aliases: ["tags"],
               transform: v => v.split(/[,;]/).map(s => s.trim()).filter(Boolean) },
-            { field: "due_at",      label: "Vence",        aliases: ["vence","due","deadline","due_date"] },
+            { field: "due_at",        label: "Vence",        aliases: ["vence","due","deadline","due_date"] },
           ]}
           onClose={() => setShowImport(false)}
           onImport={async (rowsToInsert) => {
@@ -1941,7 +1947,8 @@ export function TasksView() {
             return { inserted, failed: rowsToInsert.length - inserted, errors }
           }}
         />
-      )}
+        )
+      })()}
 
       {selectedIds.size > 0 && (
         <BulkBar
