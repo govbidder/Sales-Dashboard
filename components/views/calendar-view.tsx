@@ -81,11 +81,11 @@ function MonthGrid({
   const weekDays = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card">
       {/* Week headers */}
-      <div className="grid grid-cols-7 border-b border-slate-200 bg-slate-50/40">
+      <div className="grid grid-cols-7 border-b border-border bg-muted/40">
         {weekDays.map(d => (
-          <div key={d} className="px-3 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 text-center">
+          <div key={d} className="px-3 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground text-center">
             {d}
           </div>
         ))}
@@ -162,22 +162,22 @@ function DayCell({
       className={`relative flex flex-col gap-1 px-2 py-2 min-h-[140px] transition-colors
         ${isLastCol ? "" : "border-r"}
         ${isLastRow ? "" : "border-b"}
-        border-slate-100
-        ${inMonth ? "bg-white" : "bg-slate-50/30"}
+        border-border
+        ${inMonth ? "bg-card" : "bg-muted/30"}
       `}
     >
       <div className="flex items-center justify-between">
         <span className={`text-xs font-bold tabular-nums ${
           today
             ? "flex h-6 w-6 items-center justify-center rounded-full bg-[#E42D2C] text-white"
-            : inMonth ? "text-slate-700 px-1.5" : "text-slate-400 px-1.5"
+            : inMonth ? "text-muted-foreground px-1.5" : "text-muted-foreground px-1.5"
         }`}>
           {format(day, "d")}
         </span>
         {hiddenCount > 0 && (
           <button
             onClick={() => setPopoverOpen(v => !v)}
-            className="text-xs text-slate-500 hover:text-[#1e3a8a] font-semibold rounded px-1 hover:bg-slate-100 transition-colors"
+            className="text-xs text-muted-foreground hover:text-[#1e3a8a] font-semibold rounded px-1 hover:bg-muted transition-colors"
             title={`Ver los ${dayItems.length} eventos del día`}
           >
             +{hiddenCount}
@@ -195,7 +195,7 @@ function DayCell({
                 ? "border-red-200 bg-red-50 text-red-800"
                 : it.kind === "persona"
                   ? "border-[#1e3a8a]/20 bg-[#1e3a8a]/[0.04] text-[#1e3a8a]"
-                  : "border-slate-200 bg-slate-50 text-slate-700"
+                  : "border-border bg-muted text-muted-foreground"
             }`}
           >
             <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${
@@ -216,14 +216,14 @@ function DayCell({
       {/* Popover con TODOS los eventos del día (incluye los visibles para
           que el usuario pueda revisarlos juntos). */}
       {popoverOpen && (
-        <div className="absolute top-full left-2 right-2 z-40 mt-1 max-h-[280px] overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_rgba(15,23,42,0.12)]">
-          <div className="sticky top-0 flex items-center justify-between px-3 py-2 border-b border-slate-100 bg-white">
+        <div className="absolute top-full left-2 right-2 z-40 mt-1 max-h-[280px] overflow-y-auto rounded-xl border border-border bg-card shadow-[0_12px_32px_rgba(15,23,42,0.12)]">
+          <div className="sticky top-0 flex items-center justify-between px-3 py-2 border-b border-border bg-card">
             <p className="text-xs font-bold uppercase tracking-wider text-[#1e3a8a]/80 capitalize">
               {format(day, "EEEE d 'de' MMMM", { locale: es })}
             </p>
             <button
               onClick={() => setPopoverOpen(false)}
-              className="flex h-6 w-6 items-center justify-center rounded text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+              className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-muted-foreground"
               aria-label="Cerrar"
             >
               <XIcon className="h-3.5 w-3.5" />
@@ -240,7 +240,7 @@ function DayCell({
                     ? "border-red-200 bg-red-50 text-red-800"
                     : it.kind === "persona"
                       ? "border-[#1e3a8a]/20 bg-[#1e3a8a]/[0.04] text-[#1e3a8a]"
-                      : "border-slate-200 bg-slate-50 text-slate-700"
+                      : "border-border bg-muted text-muted-foreground"
                 }`}
               >
                 <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${
@@ -275,9 +275,9 @@ function UpcomingList({ items }: { items: AgendaItem[] }) {
 
   if (!upcoming.length) {
     return (
-      <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 px-5 py-8 text-center">
-        <CalendarDays className="h-5 w-5 text-slate-400 mx-auto mb-2" />
-        <p className="text-[13px] text-slate-500">No hay nada agendado para los próximos 7 días.</p>
+      <div className="rounded-2xl border border-dashed border-border bg-muted/50 px-5 py-8 text-center">
+        <CalendarDays className="h-5 w-5 text-muted-foreground mx-auto mb-2" />
+        <p className="text-[13px] text-muted-foreground">No hay nada agendado para los próximos 7 días.</p>
       </div>
     )
   }
@@ -292,44 +292,44 @@ function UpcomingList({ items }: { items: AgendaItem[] }) {
   })
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+    <div className="rounded-2xl border border-border bg-card overflow-hidden">
       {Array.from(groups.entries()).map(([dayKey, list], gi, all) => {
         const day = parseISO(dayKey + "T00:00:00")
         const todayLabel = isToday(day)
           ? "Hoy"
           : format(day, "EEEE d 'de' MMMM", { locale: es })
         return (
-          <div key={dayKey} className={gi === all.length - 1 ? "" : "border-b border-slate-100"}>
-            <div className="px-5 py-2.5 bg-slate-50/50 border-b border-slate-100">
+          <div key={dayKey} className={gi === all.length - 1 ? "" : "border-b border-border"}>
+            <div className="px-5 py-2.5 bg-muted/50 border-b border-border">
               <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]/70 capitalize">
                 {todayLabel}
               </p>
             </div>
-            <div className="divide-y divide-slate-100">
+            <div className="divide-y divide-border">
               {list.map(it => (
                 <Link
                   key={it.id}
                   href={it.href}
-                  className="group flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors"
+                  className="group flex items-center gap-3 px-5 py-3 hover:bg-muted transition-colors"
                 >
-                  <span className="text-[11px] font-bold tabular-nums text-slate-500 w-12 shrink-0">
+                  <span className="text-[11px] font-bold tabular-nums text-muted-foreground w-12 shrink-0">
                     {fmtTime(it.iso)}
                   </span>
                   <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ring-1 ${
                     it.kind === "persona"
                       ? "bg-[#1e3a8a]/[0.06] ring-[#1e3a8a]/20"
-                      : "bg-slate-50 ring-slate-200"
+                      : "bg-muted ring-border"
                   }`}>
                     {it.kind === "persona"
                       ? <Users2 className="h-3.5 w-3.5 text-[#1e3a8a]" />
-                      : <ListTodo className="h-3.5 w-3.5 text-slate-500" />}
+                      : <ListTodo className="h-3.5 w-3.5 text-muted-foreground" />}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-medium text-slate-900 truncate">
+                    <p className="text-[13px] font-medium text-foreground truncate">
                       {it.title}
                     </p>
                     {it.meta && (
-                      <p className="text-[11px] text-slate-400 mt-0.5 truncate">{it.meta}</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{it.meta}</p>
                     )}
                   </div>
                   {it.overdue && (
@@ -342,13 +342,13 @@ function UpcomingList({ items }: { items: AgendaItem[] }) {
                       it.priority === "urgente" ? "text-[#E42D2C]" :
                       it.priority === "alta"    ? "text-orange-700" :
                       it.priority === "media"   ? "text-amber-700" :
-                                                  "text-slate-400"
+                                                  "text-muted-foreground"
                     }`}>
                       <Flag className="h-2.5 w-2.5" />
                       {it.priority}
                     </span>
                   )}
-                  <ArrowRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all" />
+                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/70 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all" />
                 </Link>
               ))}
             </div>
@@ -445,13 +445,13 @@ export function CalendarView() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-[#1e3a8a] tracking-tight">Agenda</h1>
-          <p className="text-sm text-slate-400 mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             {counts.tasks} {counts.tasks === 1 ? "tarea" : "tareas"} · {counts.personas} {counts.personas === 1 ? "persona" : "personas"} agendadas
           </p>
         </div>
         <div className="flex items-center gap-2">
           {/* Filter chips */}
-          <div className="inline-flex h-9 rounded-xl border border-slate-200 bg-white p-0.5">
+          <div className="inline-flex h-9 rounded-xl border border-border bg-card p-0.5">
             {([
               { k: "all" as const,      label: "Todo",     n: counts.all },
               { k: "tasks" as const,    label: "Tareas",   n: counts.tasks },
@@ -463,12 +463,12 @@ export function CalendarView() {
                 className={`flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium transition-all ${
                   filter === f.k
                     ? "bg-[#1e3a8a] text-white shadow-sm"
-                    : "text-slate-500 hover:text-slate-900"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {f.label}
                 <span className={`tabular-nums rounded-full px-1.5 text-[10px] ${
-                  filter === f.k ? "bg-white/20" : "bg-slate-100"
+                  filter === f.k ? "bg-white/20" : "bg-muted"
                 }`}>
                   {f.n}
                 </span>
@@ -478,7 +478,7 @@ export function CalendarView() {
           <button
             onClick={fetchAll}
             disabled={loading}
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40"
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:text-foreground hover:border-border transition-all disabled:opacity-40"
             title="Refrescar"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
@@ -487,21 +487,21 @@ export function CalendarView() {
       </div>
 
       {/* Month nav */}
-      <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-2.5">
+      <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 py-2.5">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setCursor(c => addMonths(c, -1))}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-[#1e3a8a] transition-colors"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-[#1e3a8a] transition-colors"
             aria-label="Mes anterior"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
-          <h2 className="text-[14px] font-bold text-slate-900 capitalize min-w-[140px] text-center">
+          <h2 className="text-[14px] font-bold text-foreground capitalize min-w-[140px] text-center">
             {format(cursor, "MMMM yyyy", { locale: es })}
           </h2>
           <button
             onClick={() => setCursor(c => addMonths(c, 1))}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-[#1e3a8a] transition-colors"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-[#1e3a8a] transition-colors"
             aria-label="Mes siguiente"
           >
             <ChevronRight className="h-4 w-4" />
@@ -509,7 +509,7 @@ export function CalendarView() {
         </div>
         <button
           onClick={() => setCursor(new Date())}
-          className="text-[11px] font-semibold text-slate-500 hover:text-[#1e3a8a] transition-colors"
+          className="text-[11px] font-semibold text-muted-foreground hover:text-[#1e3a8a] transition-colors"
         >
           Hoy
         </button>

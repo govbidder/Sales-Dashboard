@@ -145,17 +145,17 @@ export function AiExtractModal({ onClose, onApplied }: Props) {
     <Portal>
       <div className="fixed inset-0 z-[100] bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
       <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-        <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl flex flex-col max-h-[90vh]">
+        <div className="w-full max-w-2xl rounded-2xl border border-border bg-card shadow-2xl flex flex-col max-h-[90vh]">
 
           {/* Header */}
-          <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-6 py-4">
+          <div className="flex items-center justify-between gap-3 border-b border-border px-6 py-4">
             <div className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#E42D2C]/10 to-[#1e3a8a]/10 ring-1 ring-[#1e3a8a]/15">
                 <Sparkles className="h-4 w-4 text-[#1e3a8a]" />
               </div>
               <div>
-                <h3 className="text-[15px] font-bold text-slate-900">Crear tareas desde texto</h3>
-                <p className="text-[11px] text-slate-500">
+                <h3 className="text-[15px] font-bold text-foreground">Crear tareas desde texto</h3>
+                <p className="text-[11px] text-muted-foreground">
                   {phase === "input"
                     ? "Pegá un email, brief o nota — la IA detecta las tareas."
                     : `${keep.size} de ${proposal.length} tareas seleccionadas`}
@@ -163,7 +163,7 @@ export function AiExtractModal({ onClose, onApplied }: Props) {
               </div>
             </div>
             <button onClick={onClose}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -179,10 +179,10 @@ export function AiExtractModal({ onClose, onApplied }: Props) {
                   placeholder={`Ej:\n\n"Hola Santo, necesito que me mandes la capability statement del cliente XYZ urgente, antes del viernes. Y avisame cuando tengas la propuesta del bid 2024-DOD-007 lista. Después coordinemos llamada con el equipo de Maria para revisar la submission del DOE."`}
                   rows={12}
                   autoFocus
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/10 resize-none"
+                  className="w-full rounded-xl border border-border bg-card px-4 py-3 text-[13px] text-foreground placeholder:text-muted-foreground focus:border-[#1e3a8a]/40 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/10 resize-none"
                 />
 
-                <div className="flex items-center gap-2 text-[11px] text-slate-400">
+                <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                   <Sparkles className="h-3 w-3" />
                   <span>{text.length}/8000 chars</span>
                   <span className="ml-auto">
@@ -208,8 +208,8 @@ export function AiExtractModal({ onClose, onApplied }: Props) {
                       key={idx}
                       className={`rounded-xl border p-3 transition-all ${
                         isKept
-                          ? "border-[#1e3a8a]/25 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
-                          : "border-slate-200 bg-slate-50/50 opacity-50"
+                          ? "border-[#1e3a8a]/25 bg-card shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
+                          : "border-border bg-muted/50 opacity-50"
                       }`}
                     >
                       <div className="flex items-start gap-3">
@@ -218,7 +218,7 @@ export function AiExtractModal({ onClose, onApplied }: Props) {
                           className={`shrink-0 mt-0.5 flex h-5 w-5 items-center justify-center rounded-md border-2 transition-all ${
                             isKept
                               ? "border-[#1e3a8a] bg-[#1e3a8a] text-white"
-                              : "border-slate-300 hover:border-slate-500"
+                              : "border-border hover:border-foreground/30"
                           }`}
                         >
                           {isKept && <Check className="h-3 w-3" />}
@@ -231,12 +231,12 @@ export function AiExtractModal({ onClose, onApplied }: Props) {
                             value={t.title}
                             onChange={e => editField(idx, "title", e.target.value)}
                             disabled={!isKept}
-                            className="w-full bg-transparent text-[13px] font-bold text-slate-900 outline-none disabled:opacity-60"
+                            className="w-full bg-transparent text-[13px] font-bold text-foreground outline-none disabled:opacity-60"
                           />
 
                           {/* Reasoning (italic) */}
                           {t.reasoning && (
-                            <p className="text-[10.5px] italic text-slate-400 leading-snug">
+                            <p className="text-[10.5px] italic text-muted-foreground leading-snug">
                               ↳ {t.reasoning}
                             </p>
                           )}
@@ -248,7 +248,7 @@ export function AiExtractModal({ onClose, onApplied }: Props) {
                               onChange={e => editField(idx, "description", e.target.value || null)}
                               disabled={!isKept}
                               rows={2}
-                              className="w-full bg-slate-50/50 rounded-lg border border-slate-200 px-2 py-1.5 text-[11.5px] text-slate-600 outline-none focus:border-[#1e3a8a]/40 focus:bg-white resize-none disabled:opacity-60"
+                              className="w-full bg-muted/50 rounded-lg border border-border px-2 py-1.5 text-[11.5px] text-muted-foreground outline-none focus:border-[#1e3a8a]/40 focus:bg-card resize-none disabled:opacity-60"
                             />
                           )}
 
@@ -274,15 +274,15 @@ export function AiExtractModal({ onClose, onApplied }: Props) {
                             )}
 
                             {t.tags.map(tag => (
-                              <span key={tag} className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] text-slate-600">
-                                <TagIcon className="h-2.5 w-2.5 text-slate-400" />
+                              <span key={tag} className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                                <TagIcon className="h-2.5 w-2.5 text-muted-foreground" />
                                 {tag}
                               </span>
                             ))}
 
                             {t.assignees.map(a => (
-                              <span key={a} className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] text-slate-600">
-                                <User className="h-2.5 w-2.5 text-slate-400" />
+                              <span key={a} className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                                <User className="h-2.5 w-2.5 text-muted-foreground" />
                                 {a}
                               </span>
                             ))}
@@ -304,12 +304,12 @@ export function AiExtractModal({ onClose, onApplied }: Props) {
           </div>
 
           {/* Footer */}
-          <div className="border-t border-slate-200 px-6 py-3 flex items-center justify-between gap-3">
+          <div className="border-t border-border px-6 py-3 flex items-center justify-between gap-3">
             {phase === "input" ? (
               <>
                 <button
                   onClick={onClose}
-                  className="text-[12px] text-slate-500 hover:text-slate-900 transition-colors px-2 py-1.5"
+                  className="text-[12px] text-muted-foreground hover:text-foreground transition-colors px-2 py-1.5"
                 >
                   Cancelar
                 </button>
@@ -327,7 +327,7 @@ export function AiExtractModal({ onClose, onApplied }: Props) {
               <>
                 <button
                   onClick={() => { setPhase("input"); setProposal([]); setKeep(new Set()) }}
-                  className="inline-flex items-center gap-1 text-[12px] text-slate-500 hover:text-slate-900 transition-colors px-2 py-1.5"
+                  className="inline-flex items-center gap-1 text-[12px] text-muted-foreground hover:text-foreground transition-colors px-2 py-1.5"
                 >
                   <ArrowLeft className="h-3 w-3" />
                   Volver al texto
@@ -336,7 +336,7 @@ export function AiExtractModal({ onClose, onApplied }: Props) {
                   <button
                     onClick={() => setKeep(new Set())}
                     disabled={persisting || keep.size === 0}
-                    className="inline-flex items-center gap-1 h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] font-medium text-slate-600 hover:border-slate-300 transition-colors disabled:opacity-40"
+                    className="inline-flex items-center gap-1 h-9 rounded-xl border border-border bg-card px-3 text-[12px] font-medium text-muted-foreground hover:border-border transition-colors disabled:opacity-40"
                   >
                     <Trash2 className="h-3 w-3" /> Quitar todas
                   </button>

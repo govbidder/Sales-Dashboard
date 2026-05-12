@@ -25,7 +25,7 @@ interface Props {
 }
 
 const PRIORITY_COLOR: Record<string, string> = {
-  baja:    "bg-slate-100  text-slate-700  border-slate-200",
+  baja:    "bg-muted  text-muted-foreground  border-border",
   media:   "bg-amber-50   text-amber-800  border-amber-200",
   alta:    "bg-orange-50  text-orange-800 border-orange-200",
   urgente: "bg-red-50     text-red-800    border-red-200",
@@ -81,30 +81,30 @@ export function CalendarView({ tasks, onTaskClick, onDayClick }: Props) {
   const weekDays   = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card">
       {/* Header */}
-      <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-5 py-4 bg-slate-50/40">
+      <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-4 bg-muted/40">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setCursor(c => addMonths(c, -1))}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors"
             aria-label="Mes anterior"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
-          <h2 className="text-[15px] font-bold text-slate-900 capitalize min-w-[160px]">
+          <h2 className="text-[15px] font-bold text-foreground capitalize min-w-[160px]">
             {monthLabel}
           </h2>
           <button
             onClick={() => setCursor(c => addMonths(c, 1))}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors"
             aria-label="Mes siguiente"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
           <button
             onClick={() => setCursor(new Date())}
-            className="ml-2 h-8 rounded-lg border border-slate-200 bg-white px-3 text-[12px] font-semibold text-slate-600 hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors"
+            className="ml-2 h-8 rounded-lg border border-border bg-card px-3 text-[12px] font-semibold text-muted-foreground hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors"
           >
             Hoy
           </button>
@@ -127,9 +127,9 @@ export function CalendarView({ tasks, onTaskClick, onDayClick }: Props) {
       </div>
 
       {/* Week day headers */}
-      <div className="grid grid-cols-7 border-b border-slate-200 bg-slate-50/40">
+      <div className="grid grid-cols-7 border-b border-border bg-muted/40">
         {weekDays.map(d => (
-          <div key={d} className="px-3 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 text-center">
+          <div key={d} className="px-3 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground text-center">
             {d}
           </div>
         ))}
@@ -152,8 +152,8 @@ export function CalendarView({ tasks, onTaskClick, onDayClick }: Props) {
               className={`relative group flex flex-col gap-1 px-2 py-2 min-h-[120px] cursor-pointer transition-colors
                 ${isLastCol ? "" : "border-r"}
                 ${isLastRow ? "" : "border-b"}
-                border-slate-100
-                ${inMonth ? "bg-white hover:bg-slate-50/60" : "bg-slate-50/30 text-slate-400"}
+                border-border
+                ${inMonth ? "bg-card hover:bg-muted/60" : "bg-muted/30 text-muted-foreground"}
               `}
             >
               {/* Day number */}
@@ -162,8 +162,8 @@ export function CalendarView({ tasks, onTaskClick, onDayClick }: Props) {
                   today
                     ? "flex h-6 w-6 items-center justify-center rounded-full bg-[#E42D2C] text-white"
                     : inMonth
-                      ? "text-slate-700 px-1.5"
-                      : "text-slate-400 px-1.5"
+                      ? "text-muted-foreground px-1.5"
+                      : "text-muted-foreground px-1.5"
                 }`}>
                   {format(day, "d")}
                 </span>
@@ -171,7 +171,7 @@ export function CalendarView({ tasks, onTaskClick, onDayClick }: Props) {
                 {onDayClick && inMonth && (
                   <button
                     onClick={(e) => { e.stopPropagation(); onDayClick(day.toISOString()) }}
-                    className="opacity-0 group-hover:opacity-100 flex h-5 w-5 items-center justify-center rounded-md text-slate-400 hover:bg-[#1e3a8a]/10 hover:text-[#1e3a8a] transition-all"
+                    className="opacity-0 group-hover:opacity-100 flex h-5 w-5 items-center justify-center rounded-md text-muted-foreground hover:bg-[#1e3a8a]/10 hover:text-[#1e3a8a] transition-all"
                     title="Crear tarea para este día"
                   >
                     <Plus className="h-3 w-3" />
@@ -191,7 +191,7 @@ export function CalendarView({ tasks, onTaskClick, onDayClick }: Props) {
                       onClick={(e) => { e.stopPropagation(); onTaskClick(t.id) }}
                       className={`group/chip relative flex items-center gap-1.5 rounded-md border px-1.5 py-0.5 text-left transition-all hover:shadow-sm ${
                         done
-                          ? "border-slate-200 bg-slate-50 text-slate-400 line-through"
+                          ? "border-border bg-muted text-muted-foreground line-through"
                           : overdue
                             ? "border-red-200 bg-red-50 text-red-800"
                             : PRIORITY_COLOR[t.priority] ?? PRIORITY_COLOR.media
@@ -201,7 +201,7 @@ export function CalendarView({ tasks, onTaskClick, onDayClick }: Props) {
                         t.priority === "urgente" ? "text-red-600" :
                         t.priority === "alta"    ? "text-orange-600" :
                         t.priority === "media"   ? "text-amber-600" :
-                                                   "text-slate-400"
+                                                   "text-muted-foreground"
                       }`} />
                       <span className="text-[10.5px] font-medium leading-tight truncate">
                         {t.title}
@@ -210,7 +210,7 @@ export function CalendarView({ tasks, onTaskClick, onDayClick }: Props) {
                   )
                 })}
                 {dayTasks.length > 3 && (
-                  <span className="text-[10px] text-slate-400 px-1.5">
+                  <span className="text-[10px] text-muted-foreground px-1.5">
                     + {dayTasks.length - 3} más
                   </span>
                 )}
