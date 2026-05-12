@@ -100,7 +100,6 @@ function buildNavGroups(
         label: "General",
         items: [
           { name: "Agenda",          href: "/calendar",                icon: CalendarDays },
-          { name: "Centro Operativo",href: "/admin/centro-operativo",  icon: Layers       },
           { name: "Actividad",       href: "/admin/activity",          icon: Rss          },
         ],
       },
