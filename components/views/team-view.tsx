@@ -18,6 +18,7 @@ import {
   isSuperAdminOrAbove,
   isDeveloper,
 } from "@/lib/types/role"
+import { useEffectiveRole } from "@/hooks/use-effective-role"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -489,6 +490,10 @@ export function TeamView() {
   const pathname     = usePathname()
   const searchParams = useSearchParams()
 
+  // Effective role para gates de UI (respeta view-as si está activo).
+  // El rol real (currentRole) sigue siendo la fuente para API calls.
+  const effectiveRole = useEffectiveRole(currentRole)
+
   const getSession = async () => {
     const supabase = createClient()
     const { data: { session } } = await supabase.auth.getSession()
@@ -522,9 +527,9 @@ export function TeamView() {
   useEffect(() => {
     if (searchParams?.get("invite") !== "1") return
     if (loading) return
-    if (isAdminOrAbove(currentRole)) setShowInvite(true)
+    if (isAdminOrAbove(effectiveRole)) setShowInvite(true)
     router.replace(pathname, { scroll: false })
-  }, [searchParams, loading, currentRole, router, pathname])
+  }, [searchParams, loading, effectiveRole, router, pathname])
 
   const handleInvite = async (data: { email: string; full_name: string; position: string; role: Role; department_id: string | null }) => {
     setInviting(true)
@@ -566,10 +571,10 @@ export function TeamView() {
     return [m.full_name, m.email, m.position].some(v => v?.toLowerCase().includes(q))
   }), [members, search, filterStatus, filterDepartment])
 
-  const isAdmin       = isAdminOrAbove(currentRole)
+  const isAdmin       = isAdminOrAbove(effectiveRole)
   // Variable se llama `isSuper` por compat — semánticamente es "super_admin o
   // por encima" (incluye developer). Developer pasa todos los gates de super.
-  const isSuper       = isSuperAdminOrAbove(currentRole)
+  const isSuper       = isSuperAdminOrAbove(effectiveRole)
   const activeCount   = members.filter(m => m.status === "activo").length
   const inactiveCount = members.length - activeCount
   const adminCount    = members.filter(m => isAdminOrAbove(m.role)).length
