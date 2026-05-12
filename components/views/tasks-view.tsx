@@ -11,6 +11,7 @@ import { TemplatesModal } from "@/components/views/tasks/templates-modal"
 import { exportToCSV, csvDate } from "@/lib/export-csv"
 import type { Department } from "@/lib/types/department"
 import { CsvImportModal } from "@/components/ui/csv-import-modal"
+import { KanbanBoardSkeleton, TableSkeleton } from "@/components/ui/skeleton"
 import { useViewAs } from "@/lib/contexts/view-as-context"
 import { useRealtimeTable } from "@/hooks/use-realtime-table"
 import { useToast } from "@/components/ui/toast"
@@ -2399,9 +2400,9 @@ export function TasksView() {
 
         {/* ─── Body ───────────────────────────────────────────────────── */}
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-6 w-6 animate-spin text-[#E42D2C]/40" />
-          </div>
+          // Skeleton que espejea el contenido real — kanban si la vista activa
+          // es "board", tabla si es lista. Reduce perceived load time vs spinner.
+          view === "board" ? <KanbanBoardSkeleton /> : <TableSkeleton rows={8} columns={5} />
         ) : sorted.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted ring-1 ring-border mb-4">

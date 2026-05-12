@@ -16,6 +16,7 @@ import { useViewAs } from "@/lib/contexts/view-as-context"
 import { useEffectiveRole } from "@/hooks/use-effective-role"
 import { isAdminOrAbove, type Role } from "@/lib/types/role"
 import { CountUp } from "@/components/ui/count-up"
+import { InicioSkeleton } from "@/components/ui/skeleton"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -337,11 +338,7 @@ export function InicioView() {
   useEffect(() => { fetchHealth() }, [fetchHealth])
 
   if (loading && !data) {
-    return (
-      <div className="flex items-center justify-center py-32">
-        <Loader2 className="h-6 w-6 animate-spin text-[#E42D2C]/40" />
-      </div>
-    )
+    return <InicioSkeleton deptCount={5} />
   }
 
   if (error || !data) {

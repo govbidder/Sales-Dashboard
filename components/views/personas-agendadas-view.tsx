@@ -13,6 +13,7 @@ import {
 } from "lucide-react"
 import { AiEmailModal } from "@/components/views/personas/ai-email-modal"
 import { CsvImportModal } from "@/components/ui/csv-import-modal"
+import { TableRowSkeleton } from "@/components/ui/skeleton"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -924,8 +925,12 @@ export function PersonasAgendadasView() {
         {/* Table */}
         <div className="overflow-hidden rounded-2xl border border-border bg-card">
           {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="h-6 w-6 animate-spin text-[#E42D2C]/40" />
+            // Filas skeleton dentro del wrapper card existente. Espejan
+            // la shape de la tabla real para evitar layout shift.
+            <div>
+              {Array.from({ length: 8 }).map((_, i) => (
+                <TableRowSkeleton key={i} columns={5} />
+              ))}
             </div>
           ) : !filtered.length ? (
             <div className="flex flex-col items-center justify-center py-20 text-center px-6">
