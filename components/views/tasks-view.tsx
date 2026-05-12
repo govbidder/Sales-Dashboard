@@ -8,6 +8,7 @@ import { CalendarView } from "@/components/views/tasks/calendar-view"
 import { AiExtractModal } from "@/components/views/tasks/ai-extract-modal"
 import { TemplatesModal } from "@/components/views/tasks/templates-modal"
 import { exportToCSV, csvDate } from "@/lib/export-csv"
+import type { Department } from "@/lib/types/department"
 import { CsvImportModal } from "@/components/ui/csv-import-modal"
 import {
   DndContext, DragEndEvent, DragOverlay, DragStartEvent,
@@ -53,7 +54,7 @@ interface StatusSet {
   statuses:    StatusDef[]
 }
 type ViewMode = "board" | "list" | "calendar"
-type GroupBy  = "status" | "assignee" | "priority" | "tag" | "none"
+type GroupBy  = "status" | "assignee" | "priority" | "tag" | "department" | "none"
 type SortBy   = "due_at" | "priority" | "created_at" | "title"
 
 interface Task {
@@ -72,6 +73,7 @@ interface Task {
   created_by:   string | null
   created_at:   string
   updated_at:   string
+  department_id: string | null
 }
 
 interface TaskComment {
@@ -86,15 +88,16 @@ interface TaskComment {
 interface PersonaLite { id: string; name: string }
 
 interface SavedView {
-  id:             string
-  name:           string
-  search:         string
-  filterPriority: string
-  filterAssignee: string
-  filterTag:      string
-  quickFilter:    string
-  sortBy:         string
-  view:           ViewMode
+  id:               string
+  name:             string
+  search:           string
+  filterPriority:   string
+  filterAssignee:   string
+  filterTag:        string
+  filterDepartment: string
+  quickFilter:      string
+  sortBy:           string
+  view:             ViewMode
 }
 
 const SAVED_VIEWS_KEY = "tasksSavedViews_v1"
@@ -452,11 +455,12 @@ function SortableSubtaskRow({
 // ─── Detail Drawer ────────────────────────────────────────────────────────────
 
 function DetailDrawer({
-  task, allTasks, personas, onClose, onPatch, onDelete, deleting, onCreateSubtask, statuses,
+  task, allTasks, personas, departments, onClose, onPatch, onDelete, deleting, onCreateSubtask, statuses,
 }: {
   task:            Task
   allTasks:        Task[]
   personas:        PersonaLite[]
+  departments:     Department[]
   onClose:         () => void
   onPatch:         (id: string, updates: Partial<Task>) => void
   onDelete:        (id: string) => void
@@ -611,6 +615,20 @@ function DetailDrawer({
                 <TagsEditor value={task.tags ?? []} onChange={v => onPatch(task.id, { tags: v })} />
               </div>
 
+              {departments.length > 0 && (
+                <div className="space-y-1.5">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Departamento</p>
+                  <select
+                    value={task.department_id ?? ""}
+                    onChange={e => onPatch(task.id, { department_id: e.target.value || null })}
+                    className={inputCls}
+                  >
+                    <option value="">— Sin departamento —</option>
+                    {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                  </select>
+                </div>
+              )}
+
               <div className="space-y-1.5">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Vinculada a persona agendada</p>
                 <select
@@ -749,22 +767,24 @@ function DetailDrawer({
 // ─── New Task Modal ───────────────────────────────────────────────────────────
 
 function NewTaskModal({
-  personas, onClose, onCreate, creating, prefillDueAt,
+  personas, departments, onClose, onCreate, creating, prefillDueAt,
 }: {
-  personas:     PersonaLite[]
-  onClose:      () => void
-  onCreate:     (data: Partial<Task>) => Promise<void>
-  creating:     boolean
+  personas:      PersonaLite[]
+  departments:   Department[]
+  onClose:       () => void
+  onCreate:      (data: Partial<Task>) => Promise<void>
+  creating:      boolean
   prefillDueAt?: string | null
 }) {
-  const [title,       setTitle]       = useState("")
-  const [description, setDescription] = useState("")
-  const [priority,    setPriority]    = useState<Priority>("media")
-  const [assignees,   setAssignees]   = useState<string[]>([])
-  const [tags,        setTags]        = useState<string[]>([])
-  const [dueAt,       setDueAt]       = useState(prefillDueAt ? toLocalInputValue(prefillDueAt) : "")
-  const [personaId,   setPersonaId]   = useState("")
-  const [suggesting,  setSuggesting]  = useState(false)
+  const [title,        setTitle]        = useState("")
+  const [description,  setDescription]  = useState("")
+  const [priority,     setPriority]     = useState<Priority>("media")
+  const [assignees,    setAssignees]    = useState<string[]>([])
+  const [tags,         setTags]         = useState<string[]>([])
+  const [dueAt,        setDueAt]        = useState(prefillDueAt ? toLocalInputValue(prefillDueAt) : "")
+  const [personaId,    setPersonaId]    = useState("")
+  const [departmentId, setDepartmentId] = useState("")
+  const [suggesting,   setSuggesting]   = useState(false)
 
   const handleSuggest = async () => {
     if (!title.trim()) return
@@ -795,13 +815,14 @@ function NewTaskModal({
     e.preventDefault()
     if (!title.trim()) return
     await onCreate({
-      title:       title.trim(),
-      description: description.trim() || null,
+      title:         title.trim(),
+      description:   description.trim() || null,
       priority,
       assignees,
       tags,
-      due_at:      dueAt ? new Date(dueAt).toISOString() : null,
-      persona_id:  personaId || null,
+      due_at:        dueAt ? new Date(dueAt).toISOString() : null,
+      persona_id:    personaId || null,
+      department_id: departmentId || null,
     })
   }
 
@@ -866,6 +887,16 @@ function NewTaskModal({
             <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Tags</p>
             <TagsEditor value={tags} onChange={setTags} />
           </div>
+
+          {departments.length > 0 && (
+            <div className="space-y-1.5">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Departamento</p>
+              <select value={departmentId} onChange={e => setDepartmentId(e.target.value)} className={inputCls}>
+                <option value="">— Sin departamento —</option>
+                {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+              </select>
+            </div>
+          )}
 
           {personas.length > 0 && (
             <div className="space-y-1.5">
@@ -989,12 +1020,13 @@ function QuickAddRow({
 // ─── Task Card (kanban) ───────────────────────────────────────────────────────
 
 function TaskCard({
-  task, persona, subtaskCount, completedSubs, onClick, onToggleStatus,
+  task, persona, department, subtaskCount, completedSubs, onClick, onToggleStatus,
   selected, onToggleSelect, selectionMode, draggable = false, ghost = false,
   isTerminal = false,
 }: {
   task: Task
   persona: PersonaLite | null
+  department: Department | null
   subtaskCount: number
   completedSubs: number
   onClick: () => void
@@ -1065,9 +1097,17 @@ function TaskCard({
         <Flag className={`shrink-0 h-3 w-3 ${PRIORITY_STYLE[task.priority].flag}`} />
       </div>
 
-      {/* Tags */}
-      {task.tags.length > 0 && (
+      {/* Department badge + Tags */}
+      {(department || task.tags.length > 0) && (
         <div className="flex flex-wrap gap-1 pl-9">
+          {department && (
+            <span
+              className="rounded-full border px-1.5 py-0.5 text-[10px] font-semibold"
+              style={{ borderColor: department.color + "40", backgroundColor: department.color + "15", color: department.color }}
+            >
+              {department.name}
+            </span>
+          )}
           {task.tags.slice(0, 4).map(t => (
             <span key={t} className="rounded-full border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] text-slate-600">{t}</span>
           ))}
@@ -1291,6 +1331,8 @@ export function TasksView() {
   const [filterAssignee,setFilterAssignee]= useState<string>("todos")
   const [filterTag,     setFilterTag]     = useState<string>("todos")
   const [filterPriority,setFilterPriority]= useState<Priority | "todos">("todos")
+  const [filterDepartment,setFilterDepartment]= useState<string>("todos")
+  const [departments,  setDepartments]  = useState<Department[]>([])
   const [showNewForm,   setShowNewForm]   = useState(false)
   const [newPrefillDate,setNewPrefillDate]= useState<string | null>(null)
   const [creating,      setCreating]      = useState(false)
@@ -1342,12 +1384,14 @@ export function TasksView() {
       if (!session) return
       setCurrentEmail(session.user?.email ?? "")
       const headers = { Authorization: `Bearer ${session.access_token}` }
-      const [tRes, pRes, sRes] = await Promise.all([
+      const [tRes, pRes, sRes, dRes] = await Promise.all([
         fetch("/api/admin/tasks?include_subtasks=true", { headers }),
         fetch("/api/admin/personas",                     { headers }),
         fetch("/api/admin/task-status-sets",             { headers }),
+        fetch("/api/departments",                        { headers }),
       ])
       if (tRes.ok) setTasks((await tRes.json()).tasks ?? [])
+      if (dRes.ok) setDepartments((await dRes.json()).departments ?? [])
       if (pRes.ok) {
         const j = await pRes.json()
         setPersonas((j.personas ?? []).map((p: any) => ({ id: p.id, name: p.name })))
@@ -1414,6 +1458,7 @@ export function TasksView() {
       filterPriority,
       filterAssignee,
       filterTag,
+      filterDepartment,
       quickFilter,
       sortBy,
       view,
@@ -1426,6 +1471,7 @@ export function TasksView() {
     setFilterPriority(v.filterPriority as any)
     setFilterAssignee(v.filterAssignee)
     setFilterTag(v.filterTag)
+    setFilterDepartment(v.filterDepartment ?? "todos")
     setQuickFilter(v.quickFilter as any)
     setSortBy(v.sortBy as any)
     setView(v.view)
@@ -1547,6 +1593,8 @@ export function TasksView() {
     return Array.from(set).sort()
   }, [tasks])
 
+  const deptMap = useMemo(() => new Map(departments.map(d => [d.id, d])), [departments])
+
   // Quick filter counts
   const counts = useMemo(() => ({
     all:        topLevel.length,
@@ -1569,13 +1617,14 @@ export function TasksView() {
       if (filterAssignee !== "todos" && !t.assignees?.includes(filterAssignee)) return false
       if (filterTag !== "todos" && !t.tags?.includes(filterTag)) return false
       if (filterPriority !== "todos" && t.priority !== filterPriority) return false
+      if (filterDepartment !== "todos" && t.department_id !== filterDepartment) return false
 
       // Free-text search
       if (!q) return true
       return [t.title, t.description, ...(t.assignees ?? []), ...(t.tags ?? [])]
         .some(v => v?.toLowerCase().includes(q))
     })
-  }, [topLevel, search, filterAssignee, filterTag, filterPriority, quickFilter, currentEmail, terminalKeys])
+  }, [topLevel, search, filterAssignee, filterTag, filterPriority, filterDepartment, quickFilter, currentEmail, terminalKeys])
 
   // Sort
   const sorted = useMemo(() => {
@@ -1620,15 +1669,24 @@ export function TasksView() {
 
   const grouped = useMemo(() => {
     const g: Record<string, Task[]> = {}
-    activeSet.statuses.forEach(s => { g[s.key] = [] })
-    // "Otros" bucket: tasks whose status doesn't match any column in the active set
-    g["__other"] = []
-    sorted.forEach(t => {
-      if (g[t.status]) g[t.status].push(t)
-      else g["__other"].push(t)
-    })
+    if (groupBy === "department") {
+      departments.forEach(d => { g[d.id] = [] })
+      g["__none"] = []
+      sorted.forEach(t => {
+        if (t.department_id && g[t.department_id]) g[t.department_id].push(t)
+        else g["__none"].push(t)
+      })
+    } else {
+      activeSet.statuses.forEach(s => { g[s.key] = [] })
+      // "Otros" bucket: tasks whose status doesn't match any column in the active set
+      g["__other"] = []
+      sorted.forEach(t => {
+        if (g[t.status]) g[t.status].push(t)
+        else g["__other"].push(t)
+      })
+    }
     return g
-  }, [sorted, activeSet])
+  }, [sorted, activeSet, groupBy, departments])
 
   // Cycle a task to the "next" status using the active set.
   // Logic: if currently in a non-terminal status, move to the next non-terminal
@@ -1676,6 +1734,7 @@ export function TasksView() {
       titulo:       t.title,
       estado:       t.status,
       prioridad:    t.priority,
+      departamento: t.department_id ? (deptMap.get(t.department_id)?.name ?? "") : "",
       asignados:    (t.assignees ?? []).join("; "),
       tags:         (t.tags ?? []).join("; "),
       vence:        csvDate(t.due_at),
@@ -1684,14 +1743,15 @@ export function TasksView() {
     }))
     exportToCSV(rows, `tareas_${new Date().toISOString().slice(0, 10)}.csv`, {
       columns: [
-        { key: "titulo",       header: "Título"      },
-        { key: "estado",       header: "Estado"      },
-        { key: "prioridad",    header: "Prioridad"   },
-        { key: "asignados",    header: "Asignados"   },
-        { key: "tags",         header: "Tags"        },
-        { key: "vence",        header: "Vence"       },
-        { key: "creada",       header: "Creada"      },
-        { key: "descripcion",  header: "Descripción" },
+        { key: "titulo",       header: "Título"       },
+        { key: "estado",       header: "Estado"       },
+        { key: "prioridad",    header: "Prioridad"    },
+        { key: "departamento", header: "Departamento" },
+        { key: "asignados",    header: "Asignados"    },
+        { key: "tags",         header: "Tags"         },
+        { key: "vence",        header: "Vence"        },
+        { key: "creada",       header: "Creada"       },
+        { key: "descripcion",  header: "Descripción"  },
       ],
     })
   }
@@ -1800,6 +1860,7 @@ export function TasksView() {
       {showNewForm && (
         <NewTaskModal
           personas={personas}
+          departments={departments}
           onClose={() => { setShowNewForm(false); setNewPrefillDate(null) }}
           onCreate={handleCreate}
           creating={creating}
@@ -1812,6 +1873,7 @@ export function TasksView() {
           task={selected}
           allTasks={tasks}
           personas={personas}
+          departments={departments}
           onClose={() => setSelected(null)}
           onPatch={patch}
           onDelete={handleDelete}
@@ -1837,23 +1899,27 @@ export function TasksView() {
         />
       )}
 
-      {showImport && (
+      {showImport && (() => {
+        const deptByName = new Map(departments.map(d => [d.name.toLowerCase(), d.id]))
+        return (
         <CsvImportModal
           title="Importar tareas desde CSV"
           description="Cada fila se convierte en una tarea nueva. Pendiente por default."
-          templateCSV={`titulo,descripcion,prioridad,asignados,tags,vence
-"Mandar capability statement","Cliente XYZ necesita capability statement actualizada",alta,"santo@govbidder.com,marcelo@govbidder.com","client,capability_statement",2026-05-15T18:00:00Z
-"Research bid 2024-007",,media,marcelo@govbidder.com,"bid,research",
+          templateCSV={`titulo,descripcion,prioridad,departamento,asignados,tags,vence
+"Mandar capability statement","Cliente XYZ necesita capability statement actualizada",alta,Marketing,"santo@govbidder.com,marcelo@govbidder.com","client,capability_statement",2026-05-15T18:00:00Z
+"Research bid 2024-007",,media,IA,marcelo@govbidder.com,"bid,research",
 `}
           columns={[
-            { field: "title",       label: "Título",       required: true,  aliases: ["titulo","name","tarea"] },
-            { field: "description", label: "Descripción",  aliases: ["descripcion","desc","detalle"] },
-            { field: "priority",    label: "Prioridad",    aliases: ["prioridad"] },
-            { field: "assignees",   label: "Asignados",    aliases: ["asignados","asignado","assignee","emails"],
+            { field: "title",         label: "Título",       required: true,  aliases: ["titulo","name","tarea"] },
+            { field: "description",   label: "Descripción",  aliases: ["descripcion","desc","detalle"] },
+            { field: "priority",      label: "Prioridad",    aliases: ["prioridad"] },
+            { field: "department_id", label: "Departamento", aliases: ["departamento","department","depto","area","área"],
+              transform: v => deptByName.get(v.trim().toLowerCase()) ?? null },
+            { field: "assignees",     label: "Asignados",    aliases: ["asignados","asignado","assignee","emails"],
               transform: v => v.split(/[,;]/).map(s => s.trim()).filter(Boolean) },
-            { field: "tags",        label: "Tags",         aliases: ["tags"],
+            { field: "tags",          label: "Tags",         aliases: ["tags"],
               transform: v => v.split(/[,;]/).map(s => s.trim()).filter(Boolean) },
-            { field: "due_at",      label: "Vence",        aliases: ["vence","due","deadline","due_date"] },
+            { field: "due_at",        label: "Vence",        aliases: ["vence","due","deadline","due_date"] },
           ]}
           onClose={() => setShowImport(false)}
           onImport={async (rowsToInsert) => {
@@ -1881,7 +1947,8 @@ export function TasksView() {
             return { inserted, failed: rowsToInsert.length - inserted, errors }
           }}
         />
-      )}
+        )
+      })()}
 
       {selectedIds.size > 0 && (
         <BulkBar
@@ -2152,8 +2219,31 @@ export function TasksView() {
                 {allTags.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
             )}
+            {departments.length > 0 && (
+              <select
+                value={filterDepartment}
+                onChange={e => setFilterDepartment(e.target.value)}
+                className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300">
+                <option value="todos">Todos los departamentos</option>
+                {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+              </select>
+            )}
 
             <div className="ml-auto flex items-center gap-2">
+              {view === "board" && (
+                <select
+                  value={groupBy}
+                  onChange={e => setGroupBy(e.target.value as GroupBy)}
+                  className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-900 outline-none cursor-pointer hover:border-slate-300"
+                  title="Agrupar por"
+                >
+                  <option value="status">Por estado</option>
+                  <option value="department">Por departamento</option>
+                  <option value="priority">Por prioridad</option>
+                  <option value="assignee">Por asignado</option>
+                  <option value="tag">Por tag</option>
+                </select>
+              )}
               <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-slate-400">
                 <ArrowDownUp className="h-3 w-3" />
                 <span>Ordenar:</span>
@@ -2212,85 +2302,74 @@ export function TasksView() {
               setDraggingId(null)
               setOverColumn(null)
               if (!overId?.startsWith("col-")) return
-              const newStatus = overId.slice(4) as Status
+              const colValue = overId.slice(4)
               const t = tasks.find(x => x.id === taskId)
-              if (t && t.status !== newStatus) {
-                patch(taskId, { status: newStatus })
+              if (!t) return
+              if (groupBy === "department") {
+                const newDept = colValue === "__none" ? null : colValue
+                if (t.department_id !== newDept) patch(taskId, { department_id: newDept } as any)
+              } else {
+                if (t.status !== colValue) patch(taskId, { status: colValue })
               }
             }}
           >
-            <div
-              className={`grid gap-4 ${
-                activeSet.statuses.length <= 3 ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" :
-                activeSet.statuses.length === 4 ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-4" :
-                "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6"
-              }`}
-            >
-              {activeSet.statuses.map(col => {
-                const list = grouped[col.key] ?? []
-                return (
-                  <BoardColumn
-                    key={col.key}
-                    status={col.key}
-                    label={col.label}
-                    color={col.color}
-                    count={list.length}
-                    isOver={overColumn === col.key}
-                  >
-                    {list.map(t => {
-                      const stat = subtaskStats.get(t.id)
-                      return (
-                        <TaskCard
-                          key={t.id}
-                          task={t}
-                          persona={t.persona_id ? personasMap.get(t.persona_id) ?? null : null}
-                          subtaskCount={stat?.total ?? 0}
-                          completedSubs={stat?.done ?? 0}
-                          onClick={() => { if (!draggingId) setSelected(t) }}
-                          onToggleStatus={() => cycleStatus(t)}
-                          selected={selectedIds.has(t.id)}
-                          onToggleSelect={(e) => { e.stopPropagation(); toggleSelect(t.id) }}
-                          selectionMode={selectedIds.size > 0}
-                          draggable
-                          isTerminal={terminalKeys.has(t.status)}
-                        />
-                      )
-                    })}
-                    <QuickAddRow status={col.key} onCreate={quickCreate} />
-                  </BoardColumn>
-                )
-              })}
-
-              {/* "Otros" bucket: tasks whose status doesn't match any column in active set */}
-              {grouped["__other"]?.length > 0 && (
-                <BoardColumn
-                  key="__other"
-                  status="__other"
-                  label="Otros"
-                  color="#94a3b8"
-                  count={grouped["__other"].length}
+            {(() => {
+              const boardColumns = groupBy === "department"
+                ? [
+                    ...departments.map(d => ({ key: d.id, label: d.name, color: d.color })),
+                    { key: "__none", label: "Sin departamento", color: "#94a3b8" },
+                  ]
+                : [
+                    ...activeSet.statuses.map(s => ({ key: s.key, label: s.label, color: s.color })),
+                    ...(grouped["__other"]?.length ? [{ key: "__other", label: "Otros", color: "#94a3b8" }] : []),
+                  ]
+              const colCount = boardColumns.length
+              return (
+                <div
+                  className={`grid gap-4 ${
+                    colCount <= 3 ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" :
+                    colCount === 4 ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-4" :
+                    "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6"
+                  }`}
                 >
-                  {grouped["__other"].map(t => {
-                    const stat = subtaskStats.get(t.id)
+                  {boardColumns.map(col => {
+                    const list = grouped[col.key] ?? []
                     return (
-                      <TaskCard
-                        key={t.id}
-                        task={t}
-                        persona={t.persona_id ? personasMap.get(t.persona_id) ?? null : null}
-                        subtaskCount={stat?.total ?? 0}
-                        completedSubs={stat?.done ?? 0}
-                        onClick={() => { if (!draggingId) setSelected(t) }}
-                        onToggleStatus={() => cycleStatus(t)}
-                        selected={selectedIds.has(t.id)}
-                        onToggleSelect={(e) => { e.stopPropagation(); toggleSelect(t.id) }}
-                        selectionMode={selectedIds.size > 0}
-                        isTerminal={terminalKeys.has(t.status)}
-                      />
+                      <BoardColumn
+                        key={col.key}
+                        status={col.key}
+                        label={col.label}
+                        color={col.color}
+                        count={list.length}
+                        isOver={overColumn === col.key}
+                      >
+                        {list.map(t => {
+                          const stat = subtaskStats.get(t.id)
+                          return (
+                            <TaskCard
+                              key={t.id}
+                              task={t}
+                              persona={t.persona_id ? personasMap.get(t.persona_id) ?? null : null}
+                              department={t.department_id ? deptMap.get(t.department_id) ?? null : null}
+                              subtaskCount={stat?.total ?? 0}
+                              completedSubs={stat?.done ?? 0}
+                              onClick={() => { if (!draggingId) setSelected(t) }}
+                              onToggleStatus={() => cycleStatus(t)}
+                              selected={selectedIds.has(t.id)}
+                              onToggleSelect={(e) => { e.stopPropagation(); toggleSelect(t.id) }}
+                              selectionMode={selectedIds.size > 0}
+                              draggable
+                              isTerminal={terminalKeys.has(t.status)}
+                            />
+                          )
+                        })}
+                        {groupBy !== "department" && <QuickAddRow status={col.key} onCreate={quickCreate} />}
+                      </BoardColumn>
                     )
                   })}
-                </BoardColumn>
-              )}
-            </div>
+                </div>
+              )
+            })()}
 
             {/* Drag overlay — visual feedback while dragging.
                 Portaled to document.body to escape the .page-enter transform
@@ -2307,6 +2386,7 @@ export function TasksView() {
                       <TaskCard
                         task={t}
                         persona={t.persona_id ? personasMap.get(t.persona_id) ?? null : null}
+                        department={t.department_id ? deptMap.get(t.department_id) ?? null : null}
                         subtaskCount={stat?.total ?? 0}
                         completedSubs={stat?.done ?? 0}
                         onClick={() => {}}
@@ -2335,7 +2415,7 @@ export function TasksView() {
                       </button>
                     </th>
                     <th className="px-3 py-3 w-8" />
-                    {["Título", "Estado", "Prioridad", "Asignados", "Tags", "Vence", "Subtareas", ""].map((h, i) => (
+                    {["Título", "Depto.", "Estado", "Prioridad", "Asignados", "Tags", "Vence", "Subtareas", ""].map((h, i) => (
                       <th key={i} className="px-3 py-3 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
@@ -2383,6 +2463,21 @@ export function TasksView() {
                               ↳ {persona.name}
                             </span>
                           )}
+                        </td>
+
+                        <td className="px-3 py-3 whitespace-nowrap">
+                          {(() => {
+                            const dept = t.department_id ? deptMap.get(t.department_id) : null
+                            if (!dept) return <span className="text-slate-300 text-[11px]">—</span>
+                            return (
+                              <span
+                                className="rounded-full border px-2 py-0.5 text-[10px] font-bold"
+                                style={{ borderColor: dept.color + "40", backgroundColor: dept.color + "15", color: dept.color }}
+                              >
+                                {dept.name}
+                              </span>
+                            )
+                          })()}
                         </td>
 
                         <td className="px-3 py-3 whitespace-nowrap">

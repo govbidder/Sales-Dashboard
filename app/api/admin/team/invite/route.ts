@@ -32,7 +32,8 @@ export async function POST(req: NextRequest) {
   const email    = body?.email?.trim()
   const fullName = body?.full_name?.trim() || null
   const position = body?.position?.trim() || null
-  const role     = body?.role === "admin" ? "admin" : "user"
+  const role         = body?.role === "admin" ? "admin" : "user"
+  const departmentId = body?.department_id || null
 
   if (!email || !email.includes("@")) {
     return NextResponse.json({ error: "Email válido requerido" }, { status: 400 })
@@ -53,11 +54,12 @@ export async function POST(req: NextRequest) {
     await db
       .from("profiles")
       .upsert({
-        id:        invited.user.id,
-        full_name: fullName,
+        id:            invited.user.id,
+        full_name:     fullName,
         role,
         position,
-        status:    "activo",
+        department_id: departmentId,
+        status:        "activo",
       } as any, { onConflict: "id" })
   }
 

@@ -61,6 +61,7 @@ export async function GET(req: NextRequest) {
       started_at:       (p as any).started_at ?? null,
       avatar_url:       (p as any).avatar_url ?? null,
       notes:            (p as any).notes ?? null,
+      department_id:    (p as any).department_id ?? null,
       last_sign_in_at:  auth?.last_sign_in_at ?? null,
       created_at:       p.created_at,
       personas_owned:   email ? (personasCount.get(email) ?? 0) : 0,
@@ -80,7 +81,7 @@ export async function PATCH(req: NextRequest) {
   if (!id) return NextResponse.json({ error: "id requerido" }, { status: 400 })
 
   const allowed: Record<string, unknown> = {}
-  for (const k of ["full_name", "role", "position", "status", "started_at", "avatar_url", "notes"]) {
+  for (const k of ["full_name", "role", "position", "status", "started_at", "avatar_url", "notes", "department_id"]) {
     if (k in updates) allowed[k] = updates[k]
   }
 
