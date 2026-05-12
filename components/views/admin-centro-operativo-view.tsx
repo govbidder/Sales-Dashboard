@@ -9,6 +9,9 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Portal } from "@/components/ui/portal"
+import { createClient } from "@/lib/supabase"
+import { type Role, isAdminOrAbove } from "@/lib/types/role"
+import { canModifyResource } from "@/lib/auth/can-modify-resource"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -421,12 +424,14 @@ function ContentRenderer({ content }: { content: string }) {
 function SOPModal({
   item,
   sectionId,
+  canEdit,
   onClose,
   onUpdate,
   onDelete,
 }: {
   item: Item
   sectionId: SectionId
+  canEdit: boolean
   onClose: () => void
   onUpdate: (updated: Item) => void
   onDelete: (id: string) => void
@@ -547,8 +552,8 @@ function SOPModal({
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
-          {/* Templates — only when no content */}
-          {!content && !editing && templates.length > 0 && (
+          {/* Templates — only when no content (y solo si el user puede editar) */}
+          {canEdit && !content && !editing && templates.length > 0 && (
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">
                 Comenzar con un template
@@ -595,14 +600,16 @@ function SOPModal({
         {/* Footer actions */}
         <div className="flex items-center justify-between gap-3 p-4 border-t border-border flex-shrink-0">
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleDelete}
-              disabled={deleting}
-              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-muted-foreground hover:text-red-600 hover:bg-red-400/5 border border-transparent hover:border-red-400/10 transition-all"
-            >
-              {deleting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
-              Eliminar
-            </button>
+            {canEdit && (
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-muted-foreground hover:text-red-600 hover:bg-red-400/5 border border-transparent hover:border-red-400/10 transition-all"
+              >
+                {deleting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                Eliminar
+              </button>
+            )}
             {content && !editing && (
               <button
                 onClick={handleCopy}
@@ -611,6 +618,14 @@ function SOPModal({
                 {copied ? <Check className="h-3.5 w-3.5 text-green-400" /> : <Copy className="h-3.5 w-3.5" />}
                 {copied ? "Copiado" : "Copiar"}
               </button>
+            )}
+            {!canEdit && (
+              <span
+                className="text-[10px] text-muted-foreground/70 italic"
+                title="Este SOP pertenece a otra área. Solo admins o miembros del mismo depto pueden editar."
+              >
+                Solo lectura
+              </span>
             )}
           </div>
 
@@ -632,7 +647,7 @@ function SOPModal({
                   Guardar
                 </button>
               </>
-            ) : (
+            ) : canEdit ? (
               <button
                 onClick={() => setEditing(true)}
                 className="flex items-center gap-1.5 rounded-xl bg-muted px-4 py-1.5 text-xs font-semibold text-foreground hover:bg-muted transition-colors border border-border"
@@ -640,7 +655,7 @@ function SOPModal({
                 <Pencil className="h-3.5 w-3.5" />
                 Editar
               </button>
-            )}
+            ) : null}
           </div>
         </div>
         </div>
@@ -660,42 +675,68 @@ function SOPModal({
 function AddItemForm({
   sectionId,
   departments,
+  callerRole,
+  callerDeptId,
   defaultDeptId,
   onAdd,
   onClose,
 }: {
   sectionId:     SectionId
   departments:   Department[]
+  callerRole:    Role | null
+  callerDeptId:  string | null
   defaultDeptId: string | null
   onAdd:         (item: Item) => void
   onClose:       () => void
 }) {
   const isSOP = sectionId === "sop-sistemas" || sectionId === "sop-operativos"
   return isSOP
-    ? <AddSOPForm sectionId={sectionId} departments={departments} defaultDeptId={defaultDeptId} onAdd={onAdd} onClose={onClose} />
+    ? <AddSOPForm
+        sectionId={sectionId}
+        departments={departments}
+        callerRole={callerRole}
+        callerDeptId={callerDeptId}
+        defaultDeptId={defaultDeptId}
+        onAdd={onAdd}
+        onClose={onClose}
+      />
     : <AddResourceForm sectionId={sectionId} onAdd={onAdd} onClose={onClose} />
 }
 
 function AddSOPForm({
   sectionId,
   departments,
+  callerRole,
+  callerDeptId,
   defaultDeptId,
   onAdd,
   onClose,
 }: {
   sectionId:     SectionId
   departments:   Department[]
+  callerRole:    Role | null
+  callerDeptId:  string | null
   defaultDeptId: string | null
   onAdd:         (item: Item) => void
   onClose:       () => void
 }) {
+  // Si el caller NO es admin+, solo puede elegir SU propio departamento.
+  // No mostramos "Sin asignar" ni los otros deptos en el chip selector.
+  const isAdmin = isAdminOrAbove(callerRole)
+  const restrictedDeptId = !isAdmin ? callerDeptId : null
+  // Inicial: si es user normal, forzamos su depto; si es admin, lo que vino.
+  const initialDeptId = restrictedDeptId ?? defaultDeptId
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
-  const [deptId, setDeptId] = useState<string | null>(defaultDeptId)
+  const [deptId, setDeptId] = useState<string | null>(initialDeptId)
   const [templateIdx, setTemplateIdx] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const templates = TEMPLATES[sectionId] ?? []
+  // user normal sin depto no debería poder llegar acá (el padre oculta el botón),
+  // pero defensivamente lo marcamos.
+  const cannotChooseDept = !isAdmin
+  const lockedDept = cannotChooseDept ? departments.find(d => d.id === restrictedDeptId) ?? null : null
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -764,40 +805,62 @@ function AddSOPForm({
         {departments.length > 0 && (
           <div>
             <label className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-1.5 block">
-              Área <span className="text-muted-foreground/60">(opcional)</span>
+              Área {!cannotChooseDept && <span className="text-muted-foreground/60">(opcional)</span>}
             </label>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => setDeptId(null)}
-                className={cn(
-                  "rounded-full border px-3 py-1 text-xs font-medium transition-all",
-                  deptId === null
-                    ? "border-[#E42D2C]/40 bg-[#E42D2C]/10 text-[#E42D2C]"
-                    : "border-border bg-muted text-muted-foreground hover:text-foreground",
-                )}
-              >
-                Sin asignar
-              </button>
-              {departments.map(d => {
-                const active = deptId === d.id
-                return (
-                  <button
-                    key={d.id}
-                    type="button"
-                    onClick={() => setDeptId(d.id)}
-                    style={active ? { borderColor: d.color, backgroundColor: `${d.color}1f`, color: d.color } : undefined}
-                    className={cn(
-                      "flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-all",
-                      !active && "border-border bg-muted text-muted-foreground hover:text-foreground",
-                    )}
+            {cannotChooseDept ? (
+              // user normal: depto locked al suyo, sin opciones para elegir.
+              lockedDept ? (
+                <div className="flex items-center gap-2">
+                  <span
+                    className="flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium"
+                    style={{ borderColor: lockedDept.color, backgroundColor: `${lockedDept.color}1f`, color: lockedDept.color }}
                   >
-                    <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: d.color }} />
-                    {d.name}
-                  </button>
-                )
-              })}
-            </div>
+                    <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: lockedDept.color }} />
+                    {lockedDept.name}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground/70 italic">
+                    Tu área (no editable)
+                  </span>
+                </div>
+              ) : (
+                <p className="text-[11px] text-amber-700/80">
+                  Tu cuenta no tiene departamento asignado. Pedile a un admin que te asigne uno.
+                </p>
+              )
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setDeptId(null)}
+                  className={cn(
+                    "rounded-full border px-3 py-1 text-xs font-medium transition-all",
+                    deptId === null
+                      ? "border-[#E42D2C]/40 bg-[#E42D2C]/10 text-[#E42D2C]"
+                      : "border-border bg-muted text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  Sin asignar
+                </button>
+                {departments.map(d => {
+                  const active = deptId === d.id
+                  return (
+                    <button
+                      key={d.id}
+                      type="button"
+                      onClick={() => setDeptId(d.id)}
+                      style={active ? { borderColor: d.color, backgroundColor: `${d.color}1f`, color: d.color } : undefined}
+                      className={cn(
+                        "flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-all",
+                        !active && "border-border bg-muted text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: d.color }} />
+                      {d.name}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
           </div>
         )}
 
@@ -1100,6 +1163,8 @@ function SectionPanel({
   section,
   items,
   departments,
+  callerRole,
+  callerDeptId,
   onAdd,
   onUpdate,
   onDelete,
@@ -1107,6 +1172,8 @@ function SectionPanel({
   section: (typeof SECTIONS)[number]
   items: Item[]
   departments: Department[]
+  callerRole: Role | null
+  callerDeptId: string | null
   onAdd: (item: Item) => void
   onUpdate: (item: Item) => void
   onDelete: (id: string) => void
@@ -1120,6 +1187,15 @@ function SectionPanel({
   const isAccesos = section.id === "accesos"
   const isSOP = section.id === "sop-sistemas" || section.id === "sop-operativos"
   const addLabel = isSOP ? "Nuevo SOP" : isAccesos ? "Nuevo acceso" : "Nuevo recurso"
+
+  // Permisos:
+  // - viewer no puede crear nada.
+  // - user-normal en sección SOP sin departamento asignado → no puede crear.
+  // - resto puede crear (admin+ siempre, user-normal en non-SOP también).
+  const isViewer = callerRole === "viewer"
+  const canCreate = !isViewer && (
+    !isSOP || isAdminOrAbove(callerRole) || !!callerDeptId
+  )
 
   // Mapa para lookups rápidos de un depto por id (pill en row, header de grupo).
   const deptById = new Map(departments.map(d => [d.id, d]))
@@ -1208,13 +1284,22 @@ function SectionPanel({
             className="w-full rounded-xl bg-muted border border-border pl-9 pr-4 py-2 text-sm text-foreground placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40"
           />
         </div>
-        <button
-          onClick={() => setShowForm(v => !v)}
-          className="flex items-center gap-1.5 rounded-xl bg-[#E42D2C] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#E42D2C]/90 transition-colors whitespace-nowrap"
-        >
-          <Plus className="h-3.5 w-3.5" />
-          {addLabel}
-        </button>
+        {canCreate ? (
+          <button
+            onClick={() => setShowForm(v => !v)}
+            className="flex items-center gap-1.5 rounded-xl bg-[#E42D2C] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#E42D2C]/90 transition-colors whitespace-nowrap"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            {addLabel}
+          </button>
+        ) : isSOP && !isAdminOrAbove(callerRole) && !callerDeptId && !isViewer ? (
+          <span
+            className="text-[10px] text-muted-foreground/70 italic whitespace-nowrap max-w-[200px]"
+            title="Tu cuenta no tiene departamento asignado. Pedile a un admin que te asigne uno para crear SOPs."
+          >
+            Asigná tu depto para crear SOPs
+          </span>
+        ) : null}
       </div>
 
       {/* Department filter chips — solo en SOPs */}
@@ -1260,7 +1345,15 @@ function SectionPanel({
         <AddItemForm
           sectionId={section.id}
           departments={departments}
-          defaultDeptId={isSOP && activeDeptFilter !== null && activeDeptFilter !== NO_DEPT_ID ? activeDeptFilter : null}
+          callerRole={callerRole}
+          callerDeptId={callerDeptId}
+          defaultDeptId={
+            isSOP && activeDeptFilter !== null && activeDeptFilter !== NO_DEPT_ID
+              ? activeDeptFilter
+              : !isAdminOrAbove(callerRole) && isSOP
+                ? callerDeptId  // user-normal en SOP: arranca con su propio depto.
+                : null
+          }
           onAdd={item => { onAdd(item); setShowForm(false) }}
           onClose={() => setShowForm(false)}
         />
@@ -1330,6 +1423,10 @@ function SectionPanel({
         <SOPModal
           item={activeItem}
           sectionId={section.id}
+          canEdit={canModifyResource(callerRole, callerDeptId, {
+            category:      activeItem.category,
+            department_id: activeItem.department_id,
+          })}
           onClose={() => setActiveItem(null)}
           onUpdate={updated => {
             onUpdate(updated)
@@ -1352,13 +1449,31 @@ export function AdminCentroOperativoView() {
   const [departments, setDepartments] = useState<Department[]>([])
   const [loading, setLoading] = useState(true)
   const [activeSection, setActiveSection] = useState<SectionId>("sop-sistemas")
+  // Role + depto del user actual — gobierna qué acciones puede ejecutar.
+  const [callerRole, setCallerRole]     = useState<Role | null>(null)
+  const [callerDeptId, setCallerDeptId] = useState<string | null>(null)
 
   useEffect(() => {
+    const supabase = createClient()
+
+    // Fetch del profile del user para tener role + department_id en client.
+    const profilePromise = supabase.auth.getSession().then(async ({ data }) => {
+      const userId = data.session?.user?.id
+      if (!userId) return { role: null as Role | null, department_id: null as string | null }
+      const { data: profile } = await supabase
+        .from("profiles").select("role, department_id").eq("id", userId).single()
+      return {
+        role:          (profile?.role as Role | undefined) ?? null,
+        department_id: (profile?.department_id as string | null | undefined) ?? null,
+      }
+    }).catch(() => ({ role: null as Role | null, department_id: null as string | null }))
+
     Promise.all([
       fetch("/api/resources").then(r => r.json()).catch(() => ({ resources: [] })),
       fetch("/api/departments").then(r => r.json()).catch(() => ({ departments: [] })),
+      profilePromise,
     ])
-      .then(([resData, deptData]) => {
+      .then(([resData, deptData, profile]) => {
         const fetched: Item[] = (resData.resources ?? []).map((r: any) => ({
           ...r,
           department_id: r.department_id ?? null,
@@ -1377,6 +1492,8 @@ export function AdminCentroOperativoView() {
           setItems(fetched)
         }
         setDepartments(deptData.departments ?? [])
+        setCallerRole(profile.role)
+        setCallerDeptId(profile.department_id)
       })
       .finally(() => setLoading(false))
   }, [])
@@ -1441,6 +1558,8 @@ export function AdminCentroOperativoView() {
           section={section}
           items={sectionItems}
           departments={departments}
+          callerRole={callerRole}
+          callerDeptId={callerDeptId}
           onAdd={handleAdd}
           onUpdate={handleUpdate}
           onDelete={handleDelete}

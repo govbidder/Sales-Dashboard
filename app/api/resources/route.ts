@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createServiceClient } from "@/lib/supabase-service"
 import { getEffectiveUser } from "@/lib/auth/get-effective-user"
+import { canModifyResource, resolveCreateResource } from "@/lib/auth/can-modify-resource"
+import { isAdminOrAbove } from "@/lib/types/role"
 
 export async function GET(req: NextRequest) {
   const auth = await getEffectiveUser(req); const user = auth?.effectiveUser ?? null
@@ -31,17 +33,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "El título es requerido" }, { status: 400 })
   }
 
+  // Gate de permisos: ¿este usuario puede crear este tipo de resource? Si es
+  // un user normal creando un SOP, forzamos el department_id al suyo (el
+  // helper normaliza el intento del cliente — no se confía en lo que mandó).
+  const decision = resolveCreateResource(user.role, user.department_id, {
+    category:      category?.trim() || null,
+    department_id: department_id ?? null,
+  })
+  if (!decision.allowed) {
+    return NextResponse.json({ error: decision.reason }, { status: 403 })
+  }
+
   const db = createServiceClient()
   const basePayload: Record<string, unknown> = {
-    title:       title.trim(),
-    url:         url?.trim() || "",
-    description: description?.trim() || null,
-    category:    category?.trim() || "General",
-    type:        type || "link",
+    title:         title.trim(),
+    url:           url?.trim() || "",
+    description:   description?.trim() || null,
+    category:      category?.trim() || "General",
+    type:          type || "link",
+    department_id: decision.departmentId,
   }
   const cleanedContent = typeof content === "string" ? content.trim() : ""
   if (cleanedContent) basePayload.content = cleanedContent
-  if (department_id !== undefined) basePayload.department_id = department_id || null
 
   let { data, error } = await db.from("resources").insert(basePayload).select().single()
 
@@ -73,6 +86,26 @@ export async function PATCH(req: NextRequest) {
 
   if (!id) return NextResponse.json({ error: "id requerido" }, { status: 400 })
 
+  const db = createServiceClient()
+
+  // Gate de permisos: cargar el resource y validar que el caller puede modificarlo.
+  const { data: existing, error: loadErr } = await db
+    .from("resources")
+    .select("id, category, department_id")
+    .eq("id", id)
+    .single()
+  if (loadErr || !existing) {
+    return NextResponse.json({ error: "Recurso no encontrado" }, { status: 404 })
+  }
+  if (!canModifyResource(user.role, user.department_id, {
+    category:      (existing as any).category ?? null,
+    department_id: (existing as any).department_id ?? null,
+  })) {
+    return NextResponse.json({
+      error: "No tenés permisos para editar este recurso. Solo admin o miembros del mismo departamento pueden hacerlo.",
+    }, { status: 403 })
+  }
+
   // Solo seteamos los campos que vienen explícitamente en el body. Esto permite
   // updates parciales (ej. el modal de SOP guarda solo `content` y no debería
   // pisar `title`/`url`/`description` con valores stale).
@@ -83,13 +116,20 @@ export async function PATCH(req: NextRequest) {
   if (content       !== undefined) patch.content       = content == null ? null : String(content)
   if (category      !== undefined) patch.category      = String(category).trim()
   if (type          !== undefined) patch.type          = type
-  if (department_id !== undefined) patch.department_id = department_id || null
+  if (department_id !== undefined) {
+    // Para users no-admin que intentan reasignar a otro depto: bloqueamos
+    // el cambio. Solo admin+ puede mover un SOP entre departamentos.
+    if (!isAdminOrAbove(user.role) && (department_id || null) !== ((existing as any).department_id || null)) {
+      return NextResponse.json({
+        error: "No podés cambiar el departamento de un recurso ajeno. Pedile a un admin.",
+      }, { status: 403 })
+    }
+    patch.department_id = department_id || null
+  }
 
   if (Object.keys(patch).length === 0) {
     return NextResponse.json({ error: "Nada para actualizar" }, { status: 400 })
   }
-
-  const db = createServiceClient()
   let { data, error } = await db
     .from("resources")
     .update(patch)
@@ -139,6 +179,27 @@ export async function DELETE(req: NextRequest) {
   if (!id) return NextResponse.json({ error: "id requerido" }, { status: 400 })
 
   const db = createServiceClient()
+
+  // Gate de permisos: cargar el resource y validar antes de borrar.
+  const { data: existing } = await db
+    .from("resources")
+    .select("id, category, department_id")
+    .eq("id", id)
+    .single()
+  if (!existing) {
+    // Idempotente: si no existe, devolvemos success en vez de 404 para no
+    // romper el flow del cliente cuando reintenta.
+    return NextResponse.json({ success: true })
+  }
+  if (!canModifyResource(user.role, user.department_id, {
+    category:      (existing as any).category ?? null,
+    department_id: (existing as any).department_id ?? null,
+  })) {
+    return NextResponse.json({
+      error: "No tenés permisos para eliminar este recurso.",
+    }, { status: 403 })
+  }
+
   const { error } = await db.from("resources").delete().eq("id", id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ success: true })
