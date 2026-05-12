@@ -22,8 +22,20 @@ interface Item {
   content: string | null
   category: string
   type: ResourceType
+  department_id: string | null
   created_at: string
 }
+
+interface Department {
+  id: string
+  name: string
+  color: string
+  sort_order: number
+}
+
+// Sentinel para "Sin asignar" en el filtro/selector (chip clickeable que
+// representa el null en department_id).
+const NO_DEPT_ID = "__no_dept__"
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
@@ -212,7 +224,7 @@ Dar de alta a un nuevo cliente en todos los sistemas de GovBidder.
   ],
 }
 
-const MOCK_SEED: Omit<Item, "id" | "created_at">[] = [
+const MOCK_SEED: Omit<Item, "id" | "created_at" | "department_id">[] = [
   {
     title: "SOP Zapier — Automatizaciones internas",
     url: "#",
@@ -647,30 +659,39 @@ function SOPModal({
 
 function AddItemForm({
   sectionId,
+  departments,
+  defaultDeptId,
   onAdd,
   onClose,
 }: {
-  sectionId: SectionId
-  onAdd: (item: Item) => void
-  onClose: () => void
+  sectionId:     SectionId
+  departments:   Department[]
+  defaultDeptId: string | null
+  onAdd:         (item: Item) => void
+  onClose:       () => void
 }) {
   const isSOP = sectionId === "sop-sistemas" || sectionId === "sop-operativos"
   return isSOP
-    ? <AddSOPForm sectionId={sectionId} onAdd={onAdd} onClose={onClose} />
+    ? <AddSOPForm sectionId={sectionId} departments={departments} defaultDeptId={defaultDeptId} onAdd={onAdd} onClose={onClose} />
     : <AddResourceForm sectionId={sectionId} onAdd={onAdd} onClose={onClose} />
 }
 
 function AddSOPForm({
   sectionId,
+  departments,
+  defaultDeptId,
   onAdd,
   onClose,
 }: {
-  sectionId: SectionId
-  onAdd: (item: Item) => void
-  onClose: () => void
+  sectionId:     SectionId
+  departments:   Department[]
+  defaultDeptId: string | null
+  onAdd:         (item: Item) => void
+  onClose:       () => void
 }) {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
+  const [deptId, setDeptId] = useState<string | null>(defaultDeptId)
   const [templateIdx, setTemplateIdx] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -686,12 +707,13 @@ function AddSOPForm({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title:       title.trim(),
-          description: description.trim(),
-          url:         "",
-          type:        "doc",
+          title:         title.trim(),
+          description:   description.trim(),
+          url:           "",
+          type:          "doc",
           content,
-          category:    sectionId,
+          category:      sectionId,
+          department_id: deptId,
         }),
       })
       const data = await res.json()
@@ -738,6 +760,46 @@ function AddSOPForm({
             className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-[#E42D2C]/40 resize-none"
           />
         </div>
+
+        {departments.length > 0 && (
+          <div>
+            <label className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-1.5 block">
+              Área <span className="text-muted-foreground/60">(opcional)</span>
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setDeptId(null)}
+                className={cn(
+                  "rounded-full border px-3 py-1 text-xs font-medium transition-all",
+                  deptId === null
+                    ? "border-[#E42D2C]/40 bg-[#E42D2C]/10 text-[#E42D2C]"
+                    : "border-border bg-muted text-muted-foreground hover:text-foreground",
+                )}
+              >
+                Sin asignar
+              </button>
+              {departments.map(d => {
+                const active = deptId === d.id
+                return (
+                  <button
+                    key={d.id}
+                    type="button"
+                    onClick={() => setDeptId(d.id)}
+                    style={active ? { borderColor: d.color, backgroundColor: `${d.color}1f`, color: d.color } : undefined}
+                    className={cn(
+                      "flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-all",
+                      !active && "border-border bg-muted text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: d.color }} />
+                    {d.name}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
         {templates.length > 0 && (
           <div>
@@ -932,9 +994,11 @@ function AddResourceForm({
 
 function ItemRow({
   item,
+  department,
   onClick,
 }: {
   item: Item
+  department?: Department
   onClick: () => void
 }) {
   const cfg = TYPE_CONFIG[item.type] ?? TYPE_CONFIG.link
@@ -958,6 +1022,15 @@ function ItemRow({
       </div>
 
       <div className="flex items-center gap-2 flex-shrink-0">
+        {department && (
+          <span
+            className="flex items-center gap-1 text-[10px] font-medium rounded-full px-2 py-0.5"
+            style={{ backgroundColor: `${department.color}1f`, color: department.color }}
+          >
+            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: department.color }} />
+            {department.name}
+          </span>
+        )}
         {hasContent && (
           <span className="text-[10px] font-semibold text-green-400/60 bg-green-400/10 rounded-full px-2 py-0.5">
             Documentado
@@ -969,17 +1042,71 @@ function ItemRow({
   )
 }
 
+// ─── Department Chip ──────────────────────────────────────────────────────────
+
+function DeptChip({
+  label,
+  count,
+  color,
+  active,
+  dimmed,
+  onClick,
+}: {
+  label:   string
+  count:   number
+  color?:  string
+  active:  boolean
+  dimmed?: boolean
+  onClick: () => void
+}) {
+  const baseStyles = active
+    ? color
+      ? { borderColor: color, backgroundColor: `${color}1f`, color }
+      : undefined
+    : undefined
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={baseStyles}
+      className={cn(
+        "flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-all",
+        active
+          ? color
+            ? ""
+            : "border-[#E42D2C]/40 bg-[#E42D2C]/10 text-[#E42D2C]"
+          : dimmed
+            ? "border-border bg-muted text-muted-foreground/70 hover:text-foreground"
+            : "border-border bg-muted text-muted-foreground hover:text-foreground",
+      )}
+    >
+      {color && !active && (
+        <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
+      )}
+      {label}
+      <span className={cn(
+        "text-[10px] rounded-full px-1.5 py-0.5",
+        active ? "bg-foreground/10" : "bg-muted-foreground/10",
+      )}>
+        {count}
+      </span>
+    </button>
+  )
+}
+
 // ─── Section Panel ─────────────────────────────────────────────────────────────
 
 function SectionPanel({
   section,
   items,
+  departments,
   onAdd,
   onUpdate,
   onDelete,
 }: {
   section: (typeof SECTIONS)[number]
   items: Item[]
+  departments: Department[]
   onAdd: (item: Item) => void
   onUpdate: (item: Item) => void
   onDelete: (id: string) => void
@@ -987,17 +1114,60 @@ function SectionPanel({
   const [showForm, setShowForm] = useState(false)
   const [search, setSearch] = useState("")
   const [activeItem, setActiveItem] = useState<Item | null>(null)
+  // Filtro de departamento (solo en SOPs). `null` = todos. `NO_DEPT_ID` = sin asignar.
+  const [activeDeptFilter, setActiveDeptFilter] = useState<string | null>(null)
   const Icon = section.icon
   const isAccesos = section.id === "accesos"
   const isSOP = section.id === "sop-sistemas" || section.id === "sop-operativos"
   const addLabel = isSOP ? "Nuevo SOP" : isAccesos ? "Nuevo acceso" : "Nuevo recurso"
 
-  const filtered = items.filter(
+  // Mapa para lookups rápidos de un depto por id (pill en row, header de grupo).
+  const deptById = new Map(departments.map(d => [d.id, d]))
+
+  // Filtro de búsqueda + depto (este último solo cuando es sección SOP).
+  const searchFiltered = items.filter(
     i =>
       search === "" ||
       i.title.toLowerCase().includes(search.toLowerCase()) ||
       i.description?.toLowerCase().includes(search.toLowerCase()),
   )
+  const filtered = isSOP && activeDeptFilter !== null
+    ? searchFiltered.filter(i =>
+        activeDeptFilter === NO_DEPT_ID ? !i.department_id : i.department_id === activeDeptFilter,
+      )
+    : searchFiltered
+
+  // Conteos por depto para los chips (sobre `items`, no `filtered`).
+  const countByDept = new Map<string, number>()
+  let noDeptCount = 0
+  for (const it of items) {
+    if (!it.department_id) noDeptCount++
+    else countByDept.set(it.department_id, (countByDept.get(it.department_id) ?? 0) + 1)
+  }
+
+  // Cuando filter activo + "Todos" → mostrar agrupado por depto. Cuando hay
+  // filtro específico, lista plana (ya está acotada al depto). Cuando NO es
+  // SOP, siempre lista plana.
+  const showGrouped = isSOP && activeDeptFilter === null && search === "" && filtered.length > 0
+  const grouped = (() => {
+    if (!showGrouped) return null
+    const buckets = new Map<string, Item[]>()
+    for (const it of filtered) {
+      const key = it.department_id ?? NO_DEPT_ID
+      const list = buckets.get(key) ?? []
+      list.push(it)
+      buckets.set(key, list)
+    }
+    // Orden: departamentos por sort_order, "Sin asignar" al final.
+    const ordered: { id: string; label: string; color?: string; items: Item[] }[] = []
+    for (const d of departments) {
+      const list = buckets.get(d.id)
+      if (list?.length) ordered.push({ id: d.id, label: d.name, color: d.color, items: list })
+    }
+    const noDept = buckets.get(NO_DEPT_ID)
+    if (noDept?.length) ordered.push({ id: NO_DEPT_ID, label: "Sin asignar", items: noDept })
+    return ordered
+  })()
 
   return (
     <div className="space-y-4">
@@ -1047,10 +1217,50 @@ function SectionPanel({
         </button>
       </div>
 
+      {/* Department filter chips — solo en SOPs */}
+      {isSOP && (departments.length > 0 || noDeptCount > 0) && (
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 pr-1">
+            Área
+          </span>
+          <DeptChip
+            label="Todas"
+            active={activeDeptFilter === null}
+            count={items.length}
+            onClick={() => setActiveDeptFilter(null)}
+          />
+          {departments.map(d => {
+            const c = countByDept.get(d.id) ?? 0
+            if (c === 0) return null
+            return (
+              <DeptChip
+                key={d.id}
+                label={d.name}
+                color={d.color}
+                active={activeDeptFilter === d.id}
+                count={c}
+                onClick={() => setActiveDeptFilter(d.id)}
+              />
+            )
+          })}
+          {noDeptCount > 0 && (
+            <DeptChip
+              label="Sin asignar"
+              active={activeDeptFilter === NO_DEPT_ID}
+              count={noDeptCount}
+              onClick={() => setActiveDeptFilter(NO_DEPT_ID)}
+              dimmed
+            />
+          )}
+        </div>
+      )}
+
       {/* Add form */}
       {showForm && (
         <AddItemForm
           sectionId={section.id}
+          departments={departments}
+          defaultDeptId={isSOP && activeDeptFilter !== null && activeDeptFilter !== NO_DEPT_ID ? activeDeptFilter : null}
           onAdd={item => { onAdd(item); setShowForm(false) }}
           onClose={() => setShowForm(false)}
         />
@@ -1061,7 +1271,11 @@ function SectionPanel({
         <div className="flex flex-col items-center justify-center py-14 gap-3">
           <FolderOpen className="h-8 w-8 text-muted-foreground/70" />
           <p className="text-xs text-muted-foreground/70">
-            {search ? "Sin resultados" : "Todavía no hay ítems en esta sección"}
+            {search
+              ? "Sin resultados"
+              : isSOP && activeDeptFilter !== null
+                ? "No hay SOPs en esta área todavía"
+                : "Todavía no hay ítems en esta sección"}
           </p>
           {!showForm && !search && (
             <button
@@ -1072,12 +1286,39 @@ function SectionPanel({
             </button>
           )}
         </div>
+      ) : grouped ? (
+        <div className="space-y-6">
+          {grouped.map(g => (
+            <div key={g.id} className="space-y-2">
+              <div className="flex items-center gap-2 px-1">
+                {g.color && (
+                  <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ backgroundColor: g.color }} />
+                )}
+                <h3 className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                  {g.label}
+                </h3>
+                <span className="text-[10px] text-muted-foreground/70">· {g.items.length}</span>
+              </div>
+              <div className="space-y-2">
+                {g.items.map(item => (
+                  <ItemRow
+                    key={item.id}
+                    item={item}
+                    department={item.department_id ? deptById.get(item.department_id) : undefined}
+                    onClick={() => setActiveItem(item)}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       ) : (
         <div className="space-y-2">
           {filtered.map(item => (
             <ItemRow
               key={item.id}
               item={item}
+              department={item.department_id ? deptById.get(item.department_id) : undefined}
               onClick={() => setActiveItem(item)}
             />
           ))}
@@ -1108,26 +1349,34 @@ function SectionPanel({
 
 export function AdminCentroOperativoView() {
   const [items, setItems] = useState<Item[]>([])
+  const [departments, setDepartments] = useState<Department[]>([])
   const [loading, setLoading] = useState(true)
   const [activeSection, setActiveSection] = useState<SectionId>("sop-sistemas")
 
   useEffect(() => {
-    fetch("/api/resources")
-      .then(r => r.json())
-      .then(d => {
-        const fetched: Item[] = d.resources ?? []
+    Promise.all([
+      fetch("/api/resources").then(r => r.json()).catch(() => ({ resources: [] })),
+      fetch("/api/departments").then(r => r.json()).catch(() => ({ departments: [] })),
+    ])
+      .then(([resData, deptData]) => {
+        const fetched: Item[] = (resData.resources ?? []).map((r: any) => ({
+          ...r,
+          department_id: r.department_id ?? null,
+        }))
         const opCats: string[] = SECTIONS.map(s => s.id)
         const existing = fetched.filter(i => opCats.includes(i.category))
         if (existing.length === 0) {
           const seeded = MOCK_SEED.map((s, idx) => ({
             ...s,
             id: `mock-${idx}`,
+            department_id: null,
             created_at: new Date().toISOString(),
           }))
           setItems([...fetched.filter(i => !opCats.includes(i.category)), ...seeded])
         } else {
           setItems(fetched)
         }
+        setDepartments(deptData.departments ?? [])
       })
       .finally(() => setLoading(false))
   }, [])
@@ -1191,6 +1440,7 @@ export function AdminCentroOperativoView() {
         <SectionPanel
           section={section}
           items={sectionItems}
+          departments={departments}
           onAdd={handleAdd}
           onUpdate={handleUpdate}
           onDelete={handleDelete}
