@@ -47,8 +47,8 @@ export function AiLoading({ steps = DEFAULT_STEPS, title = "Investigando conteni
 
       {/* Title */}
       <div>
-        <p className="text-sm font-semibold text-slate-700">{title}</p>
-        <p className="text-xs text-slate-400 mt-1">Puede tardar 1-2 minutos</p>
+        <p className="text-sm font-semibold text-muted-foreground">{title}</p>
+        <p className="text-xs text-muted-foreground mt-1">Puede tardar 1-2 minutos</p>
       </div>
 
       {/* Step indicator */}
@@ -68,7 +68,7 @@ export function AiLoading({ steps = DEFAULT_STEPS, title = "Investigando conteni
                 isCurrent ? "bg-[#E42D2C] animate-pulse" :
                 isPast    ? "bg-white/40" : "bg-white/15"
               }`} />
-              <p className={`text-xs ${isCurrent ? "text-slate-700" : "text-slate-400"}`}>
+              <p className={`text-xs ${isCurrent ? "text-muted-foreground" : "text-muted-foreground"}`}>
                 {isCurrent ? `${step}${dots}` : step}
               </p>
             </div>
@@ -89,7 +89,7 @@ export function AiLoadingInline({ label = "Procesando" }: { label?: string }) {
   }, [])
 
   return (
-    <span className="inline-flex items-center gap-2 text-sm text-slate-600">
+    <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
       <Sparkles className="h-3.5 w-3.5 text-[#E42D2C] animate-pulse" />
       {label}{dots}
     </span>

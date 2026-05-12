@@ -112,21 +112,21 @@ export function CsvImportModal({ title, description, columns, templateCSV, onImp
     <Portal>
       <div className="fixed inset-0 z-[100] bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
       <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-        <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl flex flex-col max-h-[90vh]">
+        <div className="w-full max-w-2xl rounded-2xl border border-border bg-card shadow-2xl flex flex-col max-h-[90vh]">
 
           {/* Header */}
-          <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-6 py-4">
+          <div className="flex items-center justify-between gap-3 border-b border-border px-6 py-4">
             <div className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1e3a8a]/[0.06] ring-1 ring-[#1e3a8a]/15">
                 <Upload className="h-4 w-4 text-[#1e3a8a]" />
               </div>
               <div>
-                <h3 className="text-[15px] font-bold text-slate-900">{title}</h3>
-                <p className="text-[11px] text-slate-500">{description}</p>
+                <h3 className="text-[15px] font-bold text-foreground">{title}</h3>
+                <p className="text-[11px] text-muted-foreground">{description}</p>
               </div>
             </div>
             <button onClick={onClose}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -139,13 +139,13 @@ export function CsvImportModal({ title, description, columns, templateCSV, onImp
               <>
                 <button
                   onClick={downloadTemplate}
-                  className="inline-flex items-center gap-1.5 h-8 rounded-lg border border-slate-200 bg-white px-3 text-[11.5px] font-semibold text-slate-600 hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors mb-2"
+                  className="inline-flex items-center gap-1.5 h-8 rounded-lg border border-border bg-card px-3 text-[11.5px] font-semibold text-muted-foreground hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors mb-2"
                 >
                   <Download className="h-3 w-3" /> Descargar template
                 </button>
 
                 <label
-                  className="flex flex-col items-center justify-center gap-2 py-12 px-6 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/50 cursor-pointer hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/[0.03] transition-colors"
+                  className="flex flex-col items-center justify-center gap-2 py-12 px-6 rounded-2xl border-2 border-dashed border-border bg-muted/50 cursor-pointer hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/[0.03] transition-colors"
                   onDragOver={e => e.preventDefault()}
                   onDrop={e => {
                     e.preventDefault()
@@ -153,9 +153,9 @@ export function CsvImportModal({ title, description, columns, templateCSV, onImp
                     if (file) handleFile(file)
                   }}
                 >
-                  <Upload className="h-7 w-7 text-slate-400" />
-                  <p className="text-[13.5px] font-bold text-slate-700">Soltá un archivo CSV o hacé click</p>
-                  <p className="text-[11px] text-slate-400">Hasta 5 MB · UTF-8 con headers en la primera fila</p>
+                  <Upload className="h-7 w-7 text-muted-foreground" />
+                  <p className="text-[13.5px] font-bold text-muted-foreground">Soltá un archivo CSV o hacé click</p>
+                  <p className="text-[11px] text-muted-foreground">Hasta 5 MB · UTF-8 con headers en la primera fila</p>
                   <input
                     ref={fileRef}
                     type="file"
@@ -188,17 +188,17 @@ export function CsvImportModal({ title, description, columns, templateCSV, onImp
                   {columns.map(col => (
                     <div key={col.field} className="flex items-center gap-2">
                       <div className="flex-1 min-w-0">
-                        <p className="text-[12.5px] font-bold text-slate-900">
+                        <p className="text-[12.5px] font-bold text-foreground">
                           {col.label}
                           {col.required && <span className="ml-1 text-[#E42D2C]">*</span>}
                         </p>
-                        <p className="text-[10.5px] text-slate-400 font-mono">{col.field}</p>
+                        <p className="text-[10.5px] text-muted-foreground font-mono">{col.field}</p>
                       </div>
-                      <span className="text-slate-300">→</span>
+                      <span className="text-muted-foreground/70">→</span>
                       <select
                         value={mapping[col.field] ?? ""}
                         onChange={e => setMapping(m => ({ ...m, [col.field]: e.target.value }))}
-                        className="h-8 w-48 rounded-lg border border-slate-200 bg-white px-2 text-[11.5px] text-slate-900 outline-none cursor-pointer focus:border-[#1e3a8a]/40"
+                        className="h-8 w-48 rounded-lg border border-border bg-card px-2 text-[11.5px] text-foreground outline-none cursor-pointer focus:border-[#1e3a8a]/40"
                       >
                         <option value="">— Ignorar —</option>
                         {headers.map(h => <option key={h} value={h}>{h}</option>)}
@@ -208,19 +208,19 @@ export function CsvImportModal({ title, description, columns, templateCSV, onImp
                 </div>
 
                 {/* Preview first 3 rows */}
-                <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50/50 p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">
+                <div className="mt-3 rounded-xl border border-border bg-muted/50 p-3">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">
                     Preview (primeras 3 filas)
                   </p>
                   <div className="space-y-1.5">
                     {rows.slice(0, 3).map((r, i) => (
-                      <div key={i} className="rounded-md bg-white p-2 text-[11px] text-slate-700 border border-slate-200">
+                      <div key={i} className="rounded-md bg-card p-2 text-[11px] text-muted-foreground border border-border">
                         {columns
                           .filter(c => mapping[c.field])
                           .map(c => (
                             <div key={c.field} className="flex gap-2">
-                              <span className="font-bold text-slate-500 min-w-[100px]">{c.label}:</span>
-                              <span className="text-slate-700 truncate">{r[mapping[c.field]] || "—"}</span>
+                              <span className="font-bold text-muted-foreground min-w-[100px]">{c.label}:</span>
+                              <span className="text-muted-foreground truncate">{r[mapping[c.field]] || "—"}</span>
                             </div>
                           ))}
                       </div>
@@ -253,7 +253,7 @@ export function CsvImportModal({ title, description, columns, templateCSV, onImp
                 </div>
 
                 <div className="text-center">
-                  <p className="text-[18px] font-bold text-slate-900">
+                  <p className="text-[18px] font-bold text-foreground">
                     {result.inserted} importadas
                   </p>
                   {result.failed > 0 && (
@@ -277,18 +277,18 @@ export function CsvImportModal({ title, description, columns, templateCSV, onImp
           </div>
 
           {/* Footer */}
-          <div className="border-t border-slate-200 px-6 py-3 flex items-center justify-between gap-3">
+          <div className="border-t border-border px-6 py-3 flex items-center justify-between gap-3">
             {phase === "upload" && (
               <>
-                <span className="text-[11px] text-slate-400">CSV con headers en la primera fila</span>
-                <button onClick={onClose} className="text-[12px] text-slate-500 hover:text-slate-900 px-2 py-1.5">Cancelar</button>
+                <span className="text-[11px] text-muted-foreground">CSV con headers en la primera fila</span>
+                <button onClick={onClose} className="text-[12px] text-muted-foreground hover:text-foreground px-2 py-1.5">Cancelar</button>
               </>
             )}
             {phase === "mapping" && (
               <>
                 <button
                   onClick={() => { setPhase("upload"); setRows([]); setHeaders([]); setMapping({}) }}
-                  className="text-[12px] text-slate-500 hover:text-slate-900 px-2 py-1.5"
+                  className="text-[12px] text-muted-foreground hover:text-foreground px-2 py-1.5"
                 >
                   ← Cambiar archivo
                 </button>
