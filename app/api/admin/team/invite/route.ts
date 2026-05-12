@@ -3,6 +3,10 @@ import { createServiceClient } from "@/lib/supabase-service"
 import { isAdminOrAbove, isSuperAdminOrAbove, type Role } from "@/lib/types/role"
 import { getEffectiveUser } from "@/lib/auth/get-effective-user"
 
+function safeOrigin(maybeUrl: string): string | null {
+  try { return new URL(maybeUrl).origin } catch { return null }
+}
+
 // POST /api/admin/team/invite — invite a new team member by email
 // Only admins can invite.
 export async function POST(req: NextRequest) {
@@ -34,9 +38,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Email válido requerido" }, { status: 400 })
   }
 
+  // Redirect explícito al flow de set-password. Si no pasamos `redirectTo`,
+  // Supabase usa el "Site URL" del dashboard que suele estar mal configurado
+  // (apunta a localhost en dev) → el invitado recibe un link a localhost
+  // que no existe en su browser. Tomamos el origin de la request misma para
+  // que el link funcione tanto en dev como en producción sin tocar config.
+  // Prioridad: env override (NEXT_PUBLIC_APP_URL) > Origin header > Referer.
+  const originHeader = req.headers.get("origin")
+  const refererHeader = req.headers.get("referer")
+  const refererOrigin = refererHeader ? safeOrigin(refererHeader) : null
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+    originHeader ||
+    refererOrigin ||
+    "" // empty → Supabase fallback a Site URL del dashboard
+  const redirectTo = baseUrl ? `${baseUrl.replace(/\/$/, "")}/reset-password` : undefined
+
   // Send invite via Supabase Auth admin
   const { data: invited, error: inviteError } = await db.auth.admin.inviteUserByEmail(email, {
     data: { full_name: fullName, role },
+    redirectTo,
   })
 
   if (inviteError) {
