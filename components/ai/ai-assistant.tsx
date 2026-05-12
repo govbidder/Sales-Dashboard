@@ -176,8 +176,7 @@ export function AIAssistant({ selectedMonth }: { selectedMonth?: string | null }
           />
 
           <div
-            className="fixed bottom-5 right-5 z-[121] flex flex-col w-[380px] max-w-[calc(100vw-2.5rem)] h-[600px] max-h-[calc(100vh-3rem)] overflow-hidden rounded-2xl border border-border shadow-[0_30px_80px_rgba(15,23,42,0.20)] page-enter"
-            style={{ backgroundColor: "#ffffff" }}
+            className="fixed bottom-5 right-5 z-[121] flex flex-col w-[380px] max-w-[calc(100vw-2.5rem)] h-[600px] max-h-[calc(100vh-3rem)] overflow-hidden rounded-2xl border border-border bg-card shadow-[0_30px_80px_rgba(15,23,42,0.20)] page-enter"
           >
             {/* Ambient glow */}
             <div className="pointer-events-none absolute -top-32 -right-32 h-[300px] w-[300px] rounded-full bg-[#E42D2C]/[0.10] blur-[80px]" />

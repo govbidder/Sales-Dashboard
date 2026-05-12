@@ -231,7 +231,7 @@ export function Projections() {
                   <stop offset="95%" stopColor="#E42D2C" stopOpacity={0}   />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
               <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} tickLine={false} />
               <YAxis
                 stroke="#94a3b8"
@@ -240,8 +240,8 @@ export function Projections() {
                 tickFormatter={(v) => fmtMoney(Number(v))}
               />
               <Tooltip
-                contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 12 }}
-                labelStyle={{ color: "#0f172a", fontWeight: 700, fontSize: 12 }}
+                contentStyle={{ backgroundColor: "var(--chart-tooltip-bg)", border: "1px solid var(--chart-tooltip-border)", borderRadius: 12 }}
+                labelStyle={{ color: "var(--chart-tooltip-fg)", fontWeight: 700, fontSize: 12 }}
                 itemStyle={{ fontSize: 12 }}
                 formatter={(value: any) => fmtMoney(Number(value))}
               />

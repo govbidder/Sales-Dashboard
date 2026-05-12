@@ -93,13 +93,13 @@ function ChartCard({
 
   const tooltipStyle = {
     contentStyle: {
-      backgroundColor: "#ffffff",
-      border: "1px solid #e2e8f0",
+      backgroundColor: "var(--chart-tooltip-bg)",
+      border: "1px solid var(--chart-tooltip-border)",
       borderRadius: "12px",
       boxShadow: "0 8px 24px rgba(15,23,42,0.10)",
       padding: "10px 14px",
     },
-    labelStyle:  { color: "#0f172a", fontWeight: 700, marginBottom: 4, fontSize: 12 },
+    labelStyle:  { color: "var(--chart-tooltip-fg)", fontWeight: 700, marginBottom: 4, fontSize: 12 },
     itemStyle:   { color: cfg.color, fontWeight: 600, fontSize: 13 },
   }
 
@@ -150,17 +150,17 @@ function ChartCard({
                     <stop offset="100%" stopColor={cfg.color} stopOpacity={0.65} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid vertical={false} stroke="#e2e8f0" />
+                <CartesianGrid vertical={false} stroke="var(--chart-grid)" />
                 <XAxis
                   dataKey="month"
                   stroke="transparent"
-                  tick={{ fill: "#94a3b8", fontSize: 11 }}
+                  tick={{ fill: "var(--chart-axis)", fontSize: 11 }}
                   tickLine={false}
                   axisLine={false}
                 />
                 <YAxis
                   stroke="transparent"
-                  tick={{ fill: "#94a3b8", fontSize: 11 }}
+                  tick={{ fill: "var(--chart-axis)", fontSize: 11 }}
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={tickFmt}
@@ -183,17 +183,17 @@ function ChartCard({
                     <stop offset="95%" stopColor={cfg.color} stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid vertical={false} stroke="#e2e8f0" />
+                <CartesianGrid vertical={false} stroke="var(--chart-grid)" />
                 <XAxis
                   dataKey="month"
                   stroke="transparent"
-                  tick={{ fill: "#94a3b8", fontSize: 11 }}
+                  tick={{ fill: "var(--chart-axis)", fontSize: 11 }}
                   tickLine={false}
                   axisLine={false}
                 />
                 <YAxis
                   stroke="transparent"
-                  tick={{ fill: "#94a3b8", fontSize: 11 }}
+                  tick={{ fill: "var(--chart-axis)", fontSize: 11 }}
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={tickFmt}

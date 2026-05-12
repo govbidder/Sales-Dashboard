@@ -56,6 +56,13 @@
   --chart-4: #059669;
   --chart-5: #7c3aed;
 
+  /* Chart canvas — grid/axis/tooltip. Cambian con el tema. */
+  --chart-grid:           #e2e8f0;
+  --chart-axis:           #94a3b8;
+  --chart-tooltip-bg:     #ffffff;
+  --chart-tooltip-fg:     #0f172a;
+  --chart-tooltip-border: #e2e8f0;
+
   /* Semantic */
   --success:    #059669;
   --success-bg: #ecfdf5;
@@ -115,6 +122,13 @@
   --input-border:      rgba(255,255,255,0.08);
   --input-focus:       rgba(228,45,44,0.40);
   --ring:              rgba(228,45,44,0.40);
+
+  /* Chart canvas overrides — dark-friendly. */
+  --chart-grid:           rgba(255,255,255,0.08);
+  --chart-axis:           rgba(255,255,255,0.45);
+  --chart-tooltip-bg:     #0d1745;
+  --chart-tooltip-fg:     #ffffff;
+  --chart-tooltip-border: rgba(255,255,255,0.12);
 }
 
 @theme inline {

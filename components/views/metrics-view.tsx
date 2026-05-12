@@ -75,10 +75,10 @@ function HealthRadar({ reports }: { reports: any[] }) {
       </p>
       <ResponsiveContainer width="100%" height={280}>
         <RadarChart data={data} margin={{ top: 10, right: 30, left: 30, bottom: 10 }}>
-          <PolarGrid stroke="#e2e8f0" />
+          <PolarGrid stroke="var(--chart-grid)" />
           <PolarAngleAxis
             dataKey="subject"
-            tick={{ fill: "#94a3b8", fontSize: 11, fontWeight: 600 }}
+            tick={{ fill: "var(--chart-axis)", fontSize: 11, fontWeight: 600 }}
           />
           <Radar
             name="Este mes"
@@ -151,8 +151,8 @@ function RollingTrend({ reports }: { reports: any[] }) {
   }))
 
   const tooltipStyle = {
-    contentStyle: { backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "10px 14px" },
-    labelStyle: { color: "#0f172a", fontWeight: 700, fontSize: 12 },
+    contentStyle: { backgroundColor: "var(--chart-tooltip-bg)", border: "1px solid var(--chart-tooltip-border)", borderRadius: "12px", padding: "10px 14px" },
+    labelStyle: { color: "var(--chart-tooltip-fg)", fontWeight: 700, fontSize: 12 },
     itemStyle: { fontSize: 12, fontWeight: 600 },
   }
 
@@ -182,9 +182,9 @@ function RollingTrend({ reports }: { reports: any[] }) {
               </linearGradient>
             ))}
           </defs>
-          <CartesianGrid vertical={false} stroke="#e2e8f0" />
-          <XAxis dataKey="month" stroke="transparent" tick={{ fill: "#94a3b8", fontSize: 11 }} tickLine={false} axisLine={false} />
-          <YAxis stroke="transparent" tick={{ fill: "#94a3b8", fontSize: 10 }} tickLine={false} axisLine={false}
+          <CartesianGrid vertical={false} stroke="var(--chart-grid)" />
+          <XAxis dataKey="month" stroke="transparent" tick={{ fill: "var(--chart-axis)", fontSize: 11 }} tickLine={false} axisLine={false} />
+          <YAxis stroke="transparent" tick={{ fill: "var(--chart-axis)", fontSize: 10 }} tickLine={false} axisLine={false}
             tickFormatter={v => v >= 1000 ? `$${(v/1000).toFixed(0)}K` : `$${v}`} width={48} />
           <Tooltip {...tooltipStyle} formatter={(v: number, name: string) => [fmtVal(v, true), name]} />
           <Area type="monotone" dataKey="cash"    name="Cobrado" stroke="#E42D2C" strokeWidth={2} fill="url(#grad_all_cash)"    dot={false} />

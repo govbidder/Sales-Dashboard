@@ -7,6 +7,7 @@ import { TopBar } from "@/components/layout/top-bar"
 import { Sidebar } from "@/components/layout/sidebar"
 import { CommandPalette } from "@/components/layout/command-palette"
 import { OnboardingTour } from "@/components/onboarding/onboarding-tour"
+import { HelpDialogProvider } from "@/components/layout/help-dialog"
 import { AnnualMetricsProvider } from "@/contexts/annual-metrics-context"
 import { NavigationProgress } from "@/components/ui/navigation-progress"
 import { ToastProvider } from "@/components/ui/toast"
@@ -341,6 +342,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       <AIAssistant selectedMonth={selectedMonth} />
 
       <OnboardingTour />
+
+      <HelpDialogProvider />
     </div>
     </ViewAsProvider>
     </ToastProvider>

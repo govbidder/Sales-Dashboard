@@ -252,7 +252,7 @@ function DetailDrawer({
   return (
     <Portal>
       <div className="fixed inset-0 z-[100] bg-slate-900/30" onClick={onClose} />
-      <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[480px] flex-col border-l border-border shadow-2xl" style={{ backgroundColor: "#ffffff" }}>
+      <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[480px] flex-col border-l border-border bg-card shadow-2xl">
 
         {/* Header */}
         <div className="flex items-start justify-between gap-4 border-b border-border px-6 py-5">
@@ -541,8 +541,7 @@ function NewPersonaModal({
       <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-md rounded-2xl border border-border shadow-2xl p-6 space-y-3.5 max-h-[90vh] overflow-y-auto"
-          style={{ backgroundColor: "#ffffff" }}
+          className="w-full max-w-md rounded-2xl border border-border bg-card shadow-2xl p-6 space-y-3.5 max-h-[90vh] overflow-y-auto"
         >
           <div className="flex items-center justify-between mb-1">
             <h3 className="text-base font-bold text-foreground">Nueva persona agendada</h3>

@@ -260,12 +260,12 @@ export function SalesView() {
             </div>
             <ResponsiveContainer width="100%" height={240}>
               <ComposedChart data={history} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
-                <CartesianGrid vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="month" stroke="transparent" tick={{ fill: "#94a3b8", fontSize: 11 }} tickLine={false} axisLine={false} />
-                <YAxis stroke="transparent" tick={{ fill: "#94a3b8", fontSize: 11 }} tickLine={false} axisLine={false} width={32} />
+                <CartesianGrid vertical={false} stroke="var(--chart-grid)" />
+                <XAxis dataKey="month" stroke="transparent" tick={{ fill: "var(--chart-axis)", fontSize: 11 }} tickLine={false} axisLine={false} />
+                <YAxis stroke="transparent" tick={{ fill: "var(--chart-axis)", fontSize: 11 }} tickLine={false} axisLine={false} width={32} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "10px 14px" }}
-                  labelStyle={{ color: "#0f172a", fontWeight: 700, fontSize: 12 }}
+                  contentStyle={{ backgroundColor: "var(--chart-tooltip-bg)", border: "1px solid var(--chart-tooltip-border)", borderRadius: "12px", padding: "10px 14px" }}
+                  labelStyle={{ color: "var(--chart-tooltip-fg)", fontWeight: 700, fontSize: 12 }}
                   itemStyle={{ fontSize: 13, fontWeight: 600 }}
                 />
                 <Bar dataKey="agendadas" name="Agendadas" fill="#818cf8" fillOpacity={0.7} radius={[3,3,0,0]} maxBarSize={32} />

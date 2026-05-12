@@ -71,8 +71,7 @@ function NewDeptModal({
       <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
         <form
           onSubmit={handleSubmit}
-          className="relative w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden rounded-3xl border border-border shadow-[0_30px_80px_rgba(15,23,42,0.20)]"
-          style={{ backgroundColor: "#ffffff" }}
+          className="relative w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-[0_30px_80px_rgba(15,23,42,0.20)]"
         >
           <div className="relative shrink-0 px-6 pt-6 pb-5 border-b border-border">
             <button
