@@ -1,12 +1,12 @@
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
-import { MetricsView} from "@/components/views/metrics-view"
+import { MetricsHubView } from "@/components/views/metrics-hub-view"
 
 export const metadata = { title: "Métricas" }
 
 export default function MetricsPage() {
   return (
     <DashboardLayout>
-      <MetricsView/>
+      <MetricsHubView />
     </DashboardLayout>
   )
 }
