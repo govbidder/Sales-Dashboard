@@ -13,6 +13,7 @@ import type { Department } from "@/lib/types/department"
 import { CsvImportModal } from "@/components/ui/csv-import-modal"
 import { KanbanBoardSkeleton, TableSkeleton } from "@/components/ui/skeleton"
 import { InlineEdit } from "@/components/ui/inline-edit"
+import { useLastSeen, isNewSince } from "@/hooks/use-last-seen"
 import { useViewAs } from "@/lib/contexts/view-as-context"
 import { useRealtimeTable } from "@/hooks/use-realtime-table"
 import { useUrlFilterState } from "@/hooks/use-url-filter-state"
@@ -873,7 +874,7 @@ function QuickAddRow({
 function TaskCard({
   task, persona, department, subtaskCount, completedSubs, onClick, onToggleStatus,
   selected, onToggleSelect, selectionMode, draggable = false, ghost = false,
-  isTerminal = false, onPatch,
+  isTerminal = false, onPatch, isNew = false,
 }: {
   task: Task
   persona: PersonaLite | null
@@ -890,6 +891,8 @@ function TaskCard({
   isTerminal?: boolean
   /** Patch optimista del parent. Si está, el title es inline-editable. */
   onPatch?: (id: string, updates: Partial<Task>) => void
+  /** Si true → muestra un pulse dot indicando "actualizada desde tu última visita". */
+  isNew?: boolean
 }) {
   // Inline edit mode: bloquea el drag mientras se edita y previene que el
   // click en el input dispare el onClick del card (que abre el drawer).
@@ -914,7 +917,7 @@ function TaskCard({
       {...(dragActive ? listeners : {})}
       {...(dragActive ? attributes : {})}
       onClick={() => { if (!titleEditing) onClick() }}
-      className={`group rounded-xl border bg-card transition-all p-3 space-y-2 ${
+      className={`group relative rounded-xl border bg-card transition-all p-3 space-y-2 ${
         ghost
           ? "opacity-50 border-border"
           : isDragging
@@ -924,6 +927,15 @@ function TaskCard({
               : "cursor-pointer border-border hover:border-[#1e3a8a]/20 hover:shadow-[0_4px_14px_rgba(15,23,42,0.06)]"
       } ${draggable && !ghost ? "active:cursor-grabbing" : ""}`}
     >
+      {/* "Nuevo desde tu última visita" — punto sutil arriba a la derecha.
+          No clutter ni texto, solo señal visual leve. */}
+      {isNew && (
+        <span className="pointer-events-none absolute top-2 right-2 flex h-1.5 w-1.5" aria-label="Actualizada desde tu última visita">
+          <span className="absolute inline-flex h-full w-full rounded-full bg-[#1e3a8a]/40 animate-ping" />
+          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#1e3a8a]" />
+        </span>
+      )}
+
       <div className="flex items-start gap-2">
         {/* Checkbox visible on hover OR if selectionMode active */}
         <button
@@ -1152,6 +1164,9 @@ export function TasksView() {
   )
 
   const toast = useToast()
+  // Tracking de cambios desde la última visita al kanban. Pinta un punto
+  // pulsante en cada card actualizada después de previousSeen.
+  const { previousSeen: tasksPreviousSeen, markSeen: markTasksSeen } = useLastSeen("tasks")
 
   // ─── Realtime subscription a `tasks` ─────────────────────────────────────
   // El servidor publica INSERT / UPDATE / DELETE vía Supabase Realtime; los
@@ -1240,8 +1255,14 @@ export function TasksView() {
           setActiveSetId((found ? found.id : def?.id) ?? "_default_local")
         }
       }
-    } finally { setLoading(false) }
-  }, [])
+    } finally {
+      setLoading(false)
+      // Marcar visto AL FINAL del primer load — los siguientes loads ya
+      // no resetean previousSeen (capturado al mount), así que el badge
+      // persiste mientras dure la sesión.
+      markTasksSeen()
+    }
+  }, [markTasksSeen])
 
   // Derived active set + columns
   const activeSet  = useMemo(() => {
@@ -2286,6 +2307,7 @@ export function TasksView() {
                               draggable
                               isTerminal={terminalKeys.has(t.status)}
                               onPatch={patch}
+                              isNew={isNewSince(t, tasksPreviousSeen)}
                             />
                           )
                         })}
