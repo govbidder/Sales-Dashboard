@@ -13,6 +13,9 @@ import {
 } from "lucide-react"
 import type { Department } from "@/lib/types/department"
 import { useViewAs } from "@/lib/contexts/view-as-context"
+import { useEffectiveRole } from "@/hooks/use-effective-role"
+import { isAdminOrAbove, type Role } from "@/lib/types/role"
+import { CountUp } from "@/components/ui/count-up"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -223,6 +226,11 @@ export function InicioView() {
   const [showStandup,  setShowStandup]  = useState(false)
   const [departments,  setDepartments]  = useState<Department[]>([])
   const [deptStats,    setDeptStats]    = useState<Record<string, DeptStat>>({})
+  // Rol real del caller (de profiles). Lo usamos para decidir qué secciones
+  // se renderizan — Team users no ven la grilla cross-empresa.
+  const [realRole,     setRealRole]     = useState<Role | null>(null)
+  const effectiveRole = useEffectiveRole(realRole)
+  const isAdmin       = isAdminOrAbove(effectiveRole)
 
   // View-As: si simulás un depto, esa card se destaca; las otras se dimean.
   const { viewAsDepartmentId: simulatedDeptId } = useViewAs()
@@ -235,6 +243,12 @@ export function InicioView() {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) return
       setCurrentEmail(session.user?.email ?? "")
+
+      // Cargar el rol REAL del caller — afecta qué secciones se renderizan.
+      const { data: profile } = await supabase
+        .from("profiles").select("role").eq("id", session.user.id).single()
+      setRealRole((profile?.role as Role | undefined) ?? null)
+
       const res = await fetchWithViewAs("/api/admin/health", {
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
@@ -480,10 +494,12 @@ export function InicioView() {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <p className={`text-[36px] font-bold tabular-nums leading-none ${scoreColor}`}>
-                  {healthScore}
-                </p>
-                <p className="text-[9px] font-bold uppercase tracking-[0.20em] text-slate-400 mt-1.5">
+                <CountUp
+                  value={healthScore}
+                  duration={1200}
+                  className={`text-[36px] font-bold leading-none ${scoreColor}`}
+                />
+                <p className="text-[9px] font-bold uppercase tracking-[0.20em] text-slate-500 mt-1.5">
                   Salud
                 </p>
               </div>
@@ -522,17 +538,21 @@ export function InicioView() {
                     {s.label}
                   </span>
                 </div>
-                <p className={`text-[24px] font-bold tabular-nums leading-none ${accentText}`}>
-                  {s.val}
-                </p>
+                <CountUp
+                  value={s.val}
+                  duration={900 + i * 150}
+                  format
+                  className={`text-[24px] font-bold leading-none ${accentText}`}
+                />
               </div>
             )
           })}
         </div>
       </div>
 
-      {/* DEPARTAMENTOS — vista de comando: cada depto con tasks + miembros */}
-      {departments.length > 0 && (
+      {/* DEPARTAMENTOS — vista de comando cross-empresa. Solo founder/admin.
+          Team users solo ven su área desde el sidebar. */}
+      {isAdmin && departments.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center gap-2 px-1">
             <Layers className="h-3.5 w-3.5 text-[#1e3a8a]" />
@@ -554,8 +574,8 @@ export function InicioView() {
               return (
                 <Link
                   key={d.id}
-                  href={`/admin/tasks?department=${d.id}`}
-                  className={`group relative overflow-hidden rounded-2xl border bg-white p-4 transition-all ${
+                  href={`/admin/departments/${d.id}`}
+                  className={`group relative overflow-hidden rounded-2xl border bg-white p-4 transition-all hover:-translate-y-0.5 ${
                     isSimulatedHighlight
                       ? "border-amber-400 ring-2 ring-amber-400/40 shadow-[0_0_24px_rgba(245,158,11,0.20)]"
                       : isSimulatedDimmed
