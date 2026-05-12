@@ -122,7 +122,7 @@ function StatTile({
     amber:   { ring: "ring-amber-500/25",   icon: "bg-amber-500/15   text-amber-700",   glow: "rgba(251,191,36,0.10)"  },
     blue:    { ring: "ring-blue-500/25",    icon: "bg-blue-500/15    text-blue-700",    glow: "rgba(96,165,250,0.10)"  },
     emerald: { ring: "ring-emerald-500/25", icon: "bg-emerald-500/15 text-emerald-700", glow: "rgba(16,185,129,0.10)"  },
-    neutral: { ring: "ring-slate-200",   icon: "bg-slate-100   text-slate-600",    glow: "rgba(15,23,42,0.05)" },
+    neutral: { ring: "ring-border",   icon: "bg-muted   text-muted-foreground",    glow: "rgba(15,23,42,0.05)" },
   }[accent]
 
   return (
@@ -135,8 +135,8 @@ function StatTile({
       />
       <div className="relative flex items-start justify-between gap-3">
         <div>
-          <p className="text-[28px] font-bold tabular-nums text-slate-900 leading-none">{value}</p>
-          <p className="mt-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{label}</p>
+          <p className="text-[28px] font-bold tabular-nums text-foreground leading-none">{value}</p>
+          <p className="mt-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">{label}</p>
         </div>
         <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${palette.icon}`}>
           <Icon className="h-4 w-4" />
@@ -168,14 +168,14 @@ function IssueSection({
   const pulseDot = severity === "high"
 
   return (
-    <div className={`overflow-hidden rounded-2xl border ${palette.border} bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]`}>
-      <div className={`flex items-center justify-between gap-3 px-5 py-4 border-b border-slate-100 ${palette.headerBg}`}>
+    <div className={`overflow-hidden rounded-2xl border ${palette.border} bg-card shadow-[0_1px_2px_rgba(15,23,42,0.04)]`}>
+      <div className={`flex items-center justify-between gap-3 px-5 py-4 border-b border-border ${palette.headerBg}`}>
         <div className="flex items-center gap-3 min-w-0">
           <span className={`flex h-9 w-9 items-center justify-center rounded-xl ring-1 ${palette.iconBg}`}>
             <Icon className={`h-4 w-4 ${palette.iconColor}`} />
           </span>
           <div className="min-w-0">
-            <h3 className="text-[14px] font-bold text-slate-900 leading-none truncate">{title}</h3>
+            <h3 className="text-[14px] font-bold text-foreground leading-none truncate">{title}</h3>
             <div className="flex items-center gap-2 mt-1.5">
               <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-bold tabular-nums uppercase tracking-wider ${palette.pillBg}`}>
                 {pulseDot && (
@@ -192,7 +192,7 @@ function IssueSection({
         {href && count > 0 && (
           <Link
             href={href}
-            className="group flex shrink-0 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-600 hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors"
+            className="group flex shrink-0 items-center gap-1 rounded-lg border border-border bg-card px-2.5 py-1.5 text-[11px] font-semibold text-muted-foreground hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors"
           >
             Ver todo
             <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
@@ -388,7 +388,7 @@ export function InicioView() {
 
       {/* HERO ─────────────────────────────────────────────────────────────── */}
       <div
-        className="relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-[#1e3a8a]/30 bg-white dark:bg-[#0d1745]"
+        className="relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-[#1e3a8a]/30 bg-card dark:bg-[#0d1745]"
         style={{ boxShadow: "0 1px 2px rgba(15,23,42,0.04), 0 16px 40px -16px rgba(15,23,42,0.10)" }}
       >
         {/* Ambient glow background — más sutil */}
@@ -436,7 +436,7 @@ export function InicioView() {
               </span>
             </div>
 
-            <h1 className="text-[30px] sm:text-[38px] font-bold tracking-tight text-slate-900 leading-[1.08]">
+            <h1 className="text-[30px] sm:text-[38px] font-bold tracking-tight text-foreground leading-[1.08]">
               {allClear ? (
                 <>Todo en orden.</>
               ) : (
@@ -444,14 +444,14 @@ export function InicioView() {
                   <span className={heroState === "critical" ? "text-[#E42D2C]" : "text-amber-600"}>
                     {issuesCount}
                   </span>{" "}
-                  <span className="text-slate-900">{issuesCount === 1 ? "ítem requiere" : "ítems requieren"}</span>
+                  <span className="text-foreground">{issuesCount === 1 ? "ítem requiere" : "ítems requieren"}</span>
                   <br className="hidden sm:block" />
-                  <span className="text-slate-500 font-semibold"> tu atención.</span>
+                  <span className="text-muted-foreground font-semibold"> tu atención.</span>
                 </>
               )}
             </h1>
 
-            <p className="text-[13.5px] text-slate-500 mt-3 max-w-xl leading-relaxed">
+            <p className="text-[13.5px] text-muted-foreground mt-3 max-w-xl leading-relaxed">
               {allClear
                 ? "Sin tareas vencidas, métricas al día, equipo activo. Buen trabajo."
                 : "Revisá los puntos críticos abajo para mantener el dashboard saludable."}
@@ -469,7 +469,7 @@ export function InicioView() {
               <button
                 onClick={fetchHealth}
                 disabled={loading}
-                className="inline-flex items-center gap-2 h-9 rounded-full border border-slate-200 bg-white px-3.5 text-[12px] font-semibold text-slate-700 hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] hover:shadow-[0_2px_8px_rgba(30,58,138,0.10)] transition-all disabled:opacity-40"
+                className="inline-flex items-center gap-2 h-9 rounded-full border border-border bg-card px-3.5 text-[12px] font-semibold text-muted-foreground hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] hover:shadow-[0_2px_8px_rgba(30,58,138,0.10)] transition-all disabled:opacity-40"
               >
                 <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
                 Actualizar estado
@@ -499,7 +499,7 @@ export function InicioView() {
                   duration={1200}
                   className={`text-[36px] font-bold leading-none ${scoreColor}`}
                 />
-                <p className="text-[9px] font-bold uppercase tracking-[0.20em] text-slate-500 mt-1.5">
+                <p className="text-[9px] font-bold uppercase tracking-[0.20em] text-muted-foreground mt-1.5">
                   Salud
                 </p>
               </div>
@@ -508,7 +508,7 @@ export function InicioView() {
         </div>
 
         {/* STATS STRIP at bottom of hero */}
-        <div className="relative border-t border-slate-100 bg-slate-50/40 grid grid-cols-2 sm:grid-cols-4">
+        <div className="relative border-t border-border bg-muted/40 grid grid-cols-2 sm:grid-cols-4">
           {[
             { label: "Tareas vencidas",  val: counts.overdueTasks,      icon: ListTodo, accent: counts.overdueTasks > 0 ? "red" as const : "neutral" as const },
             { label: "Sin seguimiento",  val: counts.stalePersonas,     icon: Users2,   accent: counts.stalePersonas > 0 ? "amber" as const : "neutral" as const },
@@ -520,7 +520,7 @@ export function InicioView() {
               s.accent === "red"   ? "text-[#E42D2C]" :
               s.accent === "amber" ? "text-amber-700" :
               s.accent === "navy"  ? "text-[#1e3a8a]" :
-              "text-slate-900"
+              "text-foreground"
             const dotColor =
               s.accent === "red"   ? "bg-[#E42D2C]" :
               s.accent === "amber" ? "bg-amber-500" :
@@ -533,8 +533,8 @@ export function InicioView() {
               >
                 <div className="flex items-center gap-2 mb-2">
                   <span className={`h-1.5 w-1.5 rounded-full ${dotColor}`} />
-                  <StatIcon className="h-3 w-3 text-slate-400" />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">
+                  <StatIcon className="h-3 w-3 text-muted-foreground" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
                     {s.label}
                   </span>
                 </div>
@@ -559,7 +559,7 @@ export function InicioView() {
             <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]">
               Departamentos
             </h2>
-            <span className="rounded-full bg-slate-100 px-1.5 text-[10px] font-bold text-slate-600 tabular-nums">
+            <span className="rounded-full bg-muted px-1.5 text-[10px] font-bold text-muted-foreground tabular-nums">
               {departments.length}
             </span>
             <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent" />
@@ -575,12 +575,12 @@ export function InicioView() {
                 <Link
                   key={d.id}
                   href={`/admin/departments/${d.id}`}
-                  className={`group relative overflow-hidden rounded-2xl border bg-white p-4 transition-all hover:-translate-y-0.5 ${
+                  className={`group relative overflow-hidden rounded-2xl border bg-card p-4 transition-all hover:-translate-y-0.5 ${
                     isSimulatedHighlight
                       ? "border-amber-400 ring-2 ring-amber-400/40 shadow-[0_0_24px_rgba(245,158,11,0.20)]"
                       : isSimulatedDimmed
-                      ? "border-slate-200 opacity-40 hover:opacity-70"
-                      : "border-slate-200 hover:border-slate-300 hover:shadow-[0_0_24px_rgba(15,23,42,0.04)]"
+                      ? "border-border opacity-40 hover:opacity-70"
+                      : "border-border hover:border-border hover:shadow-[0_0_24px_rgba(15,23,42,0.04)]"
                   }`}
                 >
                   {/* Top accent bar with department color */}
@@ -591,16 +591,16 @@ export function InicioView() {
 
                   <div className="flex items-center gap-2 mb-3">
                     <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
-                    <h3 className="text-[13px] font-bold text-slate-900 truncate flex-1">{d.name}</h3>
-                    <ArrowRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all shrink-0" />
+                    <h3 className="text-[13px] font-bold text-foreground truncate flex-1">{d.name}</h3>
+                    <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/70 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all shrink-0" />
                   </div>
 
                   <div className="flex items-end justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="text-[26px] font-bold tabular-nums leading-none text-slate-900">
+                      <p className="text-[26px] font-bold tabular-nums leading-none text-foreground">
                         {s.pending}
                       </p>
-                      <p className="text-[11px] text-slate-400 mt-1">
+                      <p className="text-[11px] text-muted-foreground mt-1">
                         {s.pending === 1 ? "tarea pendiente" : "tareas pendientes"}
                       </p>
                     </div>
@@ -611,7 +611,7 @@ export function InicioView() {
                           {s.overdue} venc{s.overdue === 1 ? "ida" : "idas"}
                         </span>
                       )}
-                      <span className="inline-flex items-center gap-1 text-[11px] text-slate-500" title="Miembros asignados al departamento">
+                      <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground" title="Miembros asignados al departamento">
                         <Users2 className="h-3 w-3" /> {s.members}
                       </span>
                     </div>
@@ -631,19 +631,19 @@ export function InicioView() {
             <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]">
               Mi día
             </h2>
-            <span className="rounded-full bg-slate-100 px-1.5 text-[10px] font-bold text-slate-600 tabular-nums">
+            <span className="rounded-full bg-muted px-1.5 text-[10px] font-bold text-muted-foreground tabular-nums">
               {myDay.length}
             </span>
             <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent" />
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
-            <div className="divide-y divide-slate-100">
+          <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+            <div className="divide-y divide-border">
               {myDay.slice(0, 6).map(t => (
                 <Link
                   key={t.id}
                   href="/admin/tasks"
-                  className="group flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors"
+                  className="group flex items-center gap-3 px-5 py-3 hover:bg-muted transition-colors"
                 >
                   <span className={`shrink-0 h-2 w-2 rounded-full ${
                     t.priority === "urgente" ? "bg-[#E42D2C]" :
@@ -652,9 +652,9 @@ export function InicioView() {
                                                 "bg-slate-300"
                   }`} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-medium text-slate-900 truncate">{t.title}</p>
+                    <p className="text-[13px] font-medium text-foreground truncate">{t.title}</p>
                     {t.due_at && (
-                      <p className={`text-[11px] mt-0.5 flex items-center gap-1 ${t.overdue ? "text-[#E42D2C] font-semibold" : "text-slate-400"}`}>
+                      <p className={`text-[11px] mt-0.5 flex items-center gap-1 ${t.overdue ? "text-[#E42D2C] font-semibold" : "text-muted-foreground"}`}>
                         {t.overdue ? <AlertCircle className="h-3 w-3" /> : <CalIcon className="h-3 w-3" />}
                         {t.overdue ? "Vencida " : "Vence "}
                         {new Date(t.due_at).toLocaleString("es-AR", { hour: "2-digit", minute: "2-digit" })}
@@ -665,15 +665,15 @@ export function InicioView() {
                     t.priority === "urgente" ? "text-[#E42D2C]" :
                     t.priority === "alta"    ? "text-orange-600" :
                     t.priority === "media"   ? "text-amber-600" :
-                                                "text-slate-400"
+                                                "text-muted-foreground"
                   }`} />
-                  <ArrowRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all" />
+                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/70 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all" />
                 </Link>
               ))}
               {myDay.length > 6 && (
                 <Link
                   href="/admin/tasks"
-                  className="flex items-center justify-center gap-1.5 px-5 py-2.5 text-[11px] font-semibold text-slate-500 hover:text-[#1e3a8a] transition-colors hover:bg-slate-50"
+                  className="flex items-center justify-center gap-1.5 px-5 py-2.5 text-[11px] font-semibold text-muted-foreground hover:text-[#1e3a8a] transition-colors hover:bg-muted"
                 >
                   Ver las {myDay.length - 6} restantes
                   <ArrowRight className="h-3 w-3" />
@@ -707,26 +707,26 @@ export function InicioView() {
                 accent="red"
                 severity={overdueTasks.length > 3 ? "high" : "medium"}
               >
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-border">
                   {overdueTasks.slice(0, 5).map(t => (
                     <Link
                       key={t.id}
                       href="/admin/tasks"
-                      className="group flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors"
+                      className="group flex items-center gap-3 px-5 py-3 hover:bg-muted transition-colors"
                     >
                       <Flag className={`h-3.5 w-3.5 shrink-0 ${PRIORITY_FLAG[t.priority]}`} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium text-slate-900 truncate">{t.title}</p>
+                        <p className="text-[13px] font-medium text-foreground truncate">{t.title}</p>
                         <p className="text-[11px] text-red-700/80 mt-0.5">
                           Venció {fmtRelative(t.due_at)}
-                          {t.owner && <span className="text-slate-400"> · {t.owner}</span>}
+                          {t.owner && <span className="text-muted-foreground"> · {t.owner}</span>}
                         </p>
                       </div>
-                      <ArrowRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all" />
+                      <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/70 group-hover:text-muted-foreground group-hover:translate-x-0.5 transition-all" />
                     </Link>
                   ))}
                   {overdueTasks.length > 5 && (
-                    <Link href="/admin/tasks" className="flex items-center justify-center gap-1.5 px-5 py-2.5 text-[11px] font-semibold text-slate-500 hover:text-slate-900 transition-colors hover:bg-slate-50">
+                    <Link href="/admin/tasks" className="flex items-center justify-center gap-1.5 px-5 py-2.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground transition-colors hover:bg-muted">
                       + {overdueTasks.length - 5} más
                       <ArrowRight className="h-3 w-3" />
                     </Link>
@@ -745,24 +745,24 @@ export function InicioView() {
                 accent="amber"
                 severity={stalePersonas.length > 3 ? "high" : "medium"}
               >
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-border">
                   {stalePersonas.slice(0, 5).map(p => (
                     <Link
                       key={p.id}
                       href="/admin/personas"
-                      className="group flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors"
+                      className="group flex items-center gap-3 px-5 py-3 hover:bg-muted transition-colors"
                     >
                       <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#ff6b6a] to-[#c42423] text-[10px] font-bold text-white shadow-sm shrink-0">
                         {(p.name ?? "?").split(/\s+/).map(s => s[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium text-slate-900 truncate">{p.name}</p>
+                        <p className="text-[13px] font-medium text-foreground truncate">{p.name}</p>
                         <p className="text-[11px] text-amber-700/80 mt-0.5">
                           Último contacto {fmtRelative(p.last_contact)}
-                          {p.owner && <span className="text-slate-400"> · {p.owner}</span>}
+                          {p.owner && <span className="text-muted-foreground"> · {p.owner}</span>}
                         </p>
                       </div>
-                      <ArrowRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all" />
+                      <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/70 group-hover:text-muted-foreground group-hover:translate-x-0.5 transition-all" />
                     </Link>
                   ))}
                 </div>
@@ -780,9 +780,9 @@ export function InicioView() {
                 severity="medium"
               >
                 <div className="px-5 py-5 space-y-4">
-                  <p className="text-[13px] text-slate-700 leading-relaxed">
+                  <p className="text-[13px] text-muted-foreground leading-relaxed">
                     No hay reporte cargado para{" "}
-                    <span className="font-semibold text-slate-900">{fmtMonthLabel(currentMonth)}</span>.
+                    <span className="font-semibold text-foreground">{fmtMonthLabel(currentMonth)}</span>.
                     {" "}Sin datos del mes actual los KPIs y proyecciones quedan ciegos.
                   </p>
                   <Link
@@ -807,14 +807,14 @@ export function InicioView() {
                 accent="red"
                 severity={declining.length > 2 ? "high" : "medium"}
               >
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-border">
                   {declining.map(m => (
                     <div key={m.key} className="flex items-center justify-between gap-3 px-5 py-3">
                       <div className="min-w-0 flex-1">
-                        <p className="text-[13px] font-medium text-slate-900 truncate">{m.label}</p>
-                        <p className="text-[11px] text-slate-500 mt-0.5">
+                        <p className="text-[13px] font-medium text-foreground truncate">{m.label}</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
                           {m.format === "money" ? fmtMoney(m.previous) : fmtNumber(m.previous)}{" "}
-                          <span className="text-slate-400">→</span>{" "}
+                          <span className="text-muted-foreground">→</span>{" "}
                           {m.format === "money" ? fmtMoney(m.current) : fmtNumber(m.current)}
                         </p>
                       </div>
@@ -846,16 +846,16 @@ export function InicioView() {
             {improving.map(m => (
               <div key={m.key} className="rounded-2xl border border-emerald-500/15 bg-gradient-to-br from-emerald-500/[0.04] via-white to-white p-4 hover:border-emerald-500/25 transition-colors">
                 <div className="flex items-center justify-between gap-3 mb-2">
-                  <p className="text-[12px] font-medium text-slate-800 truncate">{m.label}</p>
+                  <p className="text-[12px] font-medium text-foreground truncate">{m.label}</p>
                   <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold tabular-nums text-emerald-700 shrink-0 flex items-center gap-0.5">
                     <TrendingUp className="h-3 w-3" />
                     {m.pct.toFixed(0)}%
                   </span>
                 </div>
-                <p className="text-[20px] font-bold tabular-nums text-slate-900">
+                <p className="text-[20px] font-bold tabular-nums text-foreground">
                   {m.format === "money" ? fmtMoney(m.current) : fmtNumber(m.current)}
                 </p>
-                <p className="text-[10px] text-slate-400 mt-0.5">
+                <p className="text-[10px] text-muted-foreground mt-0.5">
                   vs {m.format === "money" ? fmtMoney(m.previous) : fmtNumber(m.previous)} mes anterior
                 </p>
               </div>
@@ -886,19 +886,19 @@ export function InicioView() {
               <Link
                 key={s.href}
                 href={s.href}
-                className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-[#1e3a8a]/30 hover:shadow-[0_4px_20px_rgba(30,58,138,0.10)] transition-all p-4"
+                className="group relative overflow-hidden rounded-2xl border border-border bg-card hover:border-[#1e3a8a]/30 hover:shadow-[0_4px_20px_rgba(30,58,138,0.10)] transition-all p-4"
               >
                 <div className="pointer-events-none absolute -top-12 -right-12 h-24 w-24 rounded-full bg-[#1e3a8a]/[0.08] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
 
                 <div className="relative flex items-start justify-between gap-3 mb-3">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-50 ring-1 ring-slate-200 group-hover:bg-[#1e3a8a]/10 group-hover:ring-[#1e3a8a]/25 transition-colors">
-                    <Icon className="h-4 w-4 text-slate-500 group-hover:text-[#1e3a8a] transition-colors" />
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted ring-1 ring-border group-hover:bg-[#1e3a8a]/10 group-hover:ring-[#1e3a8a]/25 transition-colors">
+                    <Icon className="h-4 w-4 text-muted-foreground group-hover:text-[#1e3a8a] transition-colors" />
                   </span>
-                  <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all" />
+                  <ArrowRight className="h-4 w-4 text-muted-foreground/70 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all" />
                 </div>
 
-                <p className="relative text-[13px] font-bold text-slate-900">{s.label}</p>
-                <p className="relative text-[11px] text-slate-400 mt-0.5">{s.desc}</p>
+                <p className="relative text-[13px] font-bold text-foreground">{s.label}</p>
+                <p className="relative text-[11px] text-muted-foreground mt-0.5">{s.desc}</p>
               </Link>
             )
           })}

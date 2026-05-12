@@ -68,9 +68,9 @@ function HealthRadar({ reports }: { reports: any[] }) {
   ]
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6">
-      <h3 className="text-[16px] font-bold text-slate-900 mb-1">Índice de Salud</h3>
-      <p className="text-xs text-slate-400 mb-4">
+    <div className="rounded-2xl border border-border bg-card p-6">
+      <h3 className="text-[16px] font-bold text-foreground mb-1">Índice de Salud</h3>
+      <p className="text-xs text-muted-foreground mb-4">
         Cada eje muestra qué tan cerca estás de tu mejor mes histórico (100 = tu máximo)
       </p>
       <ResponsiveContainer width="100%" height={280}>
@@ -118,19 +118,19 @@ function SummaryStrip({ current, previous }: { current: any; previous: any }) {
 
         return (
           <div key={kpi.key}
-            className="rounded-xl border border-slate-200 bg-white p-4 flex flex-col gap-2 hover:border-slate-300 transition-colors">
+            className="rounded-xl border border-border bg-card p-4 flex flex-col gap-2 hover:border-border transition-colors">
             <div className="flex items-center justify-between">
               <span className="h-2 w-2 rounded-full" style={{ backgroundColor: kpi.color }} />
               {pct !== null && (
-                <span className={`text-[10px] font-bold ${isUp ? "text-emerald-600" : isDown ? "text-red-600" : "text-slate-400"}`}>
+                <span className={`text-[10px] font-bold ${isUp ? "text-emerald-600" : isDown ? "text-red-600" : "text-muted-foreground"}`}>
                   {pct > 0 ? "+" : ""}{Math.round(pct)}%
                 </span>
               )}
             </div>
-            <p className="text-xl font-bold text-slate-900 leading-none tabular-nums">
+            <p className="text-xl font-bold text-foreground leading-none tabular-nums">
               {fmtVal(cur, kpi.money)}
             </p>
-            <p className="text-[10px] text-slate-400 leading-tight">{kpi.label}</p>
+            <p className="text-[10px] text-muted-foreground leading-tight">{kpi.label}</p>
           </div>
         )
       })}
@@ -157,9 +157,9 @@ function RollingTrend({ reports }: { reports: any[] }) {
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6">
-      <h3 className="text-[16px] font-bold text-slate-900 mb-1">Evolución financiera — 12 meses</h3>
-      <p className="text-xs text-slate-400 mb-5">Cobrado, Ingresos Totales y MRR en el tiempo</p>
+    <div className="rounded-2xl border border-border bg-card p-6">
+      <h3 className="text-[16px] font-bold text-foreground mb-1">Evolución financiera — 12 meses</h3>
+      <p className="text-xs text-muted-foreground mb-5">Cobrado, Ingresos Totales y MRR en el tiempo</p>
       <div className="flex flex-wrap gap-5 mb-4">
         {[
           { label: "Cobrado", color: "#E42D2C" },
@@ -168,7 +168,7 @@ function RollingTrend({ reports }: { reports: any[] }) {
         ].map(l => (
           <div key={l.label} className="flex items-center gap-1.5">
             <span className="h-[3px] w-5 rounded-full" style={{ backgroundColor: l.color }} />
-            <span className="text-[11px] text-slate-500">{l.label}</span>
+            <span className="text-[11px] text-muted-foreground">{l.label}</span>
           </div>
         ))}
       </div>
@@ -308,8 +308,8 @@ export function MetricsView() {
     <div className="space-y-12">
       {/* Header */}
       <div>
-        <h2 className="text-xl font-bold text-slate-900">Todas las Métricas</h2>
-        <p suppressHydrationWarning className="text-[13px] text-slate-400 mt-0.5">
+        <h2 className="text-xl font-bold text-foreground">Todas las Métricas</h2>
+        <p suppressHydrationWarning className="text-[13px] text-muted-foreground mt-0.5">
           {selectedMonth} · {annualRange ? `Últimos 12 meses: ${annualRange.label}` : "—"}
         </p>
       </div>
@@ -317,7 +317,7 @@ export function MetricsView() {
       {/* 1. Summary KPI strip */}
       {(curReport || metrics) && (
         <section className="space-y-3">
-          <h3 className="text-base font-bold text-slate-900">Snapshot del mes</h3>
+          <h3 className="text-base font-bold text-foreground">Snapshot del mes</h3>
           <SummaryStrip current={curReport ?? metrics} previous={prevReport} />
         </section>
       )}
@@ -337,13 +337,13 @@ export function MetricsView() {
         <section className="grid gap-5 md:grid-cols-2">
           <HealthRadar reports={reports} />
           {/* Texto explicativo */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 flex flex-col justify-center gap-4">
-            <h3 className="text-[16px] font-bold text-slate-900">¿Cómo leer el radar?</h3>
-            <div className="space-y-3 text-sm text-slate-500 leading-relaxed">
-              <p>Cada eje representa una métrica clave. <span className="text-slate-600 font-medium">100 = tu mejor mes histórico</span> en esa categoría.</p>
+          <div className="rounded-2xl border border-border bg-card p-6 flex flex-col justify-center gap-4">
+            <h3 className="text-[16px] font-bold text-foreground">¿Cómo leer el radar?</h3>
+            <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+              <p>Cada eje representa una métrica clave. <span className="text-muted-foreground font-medium">100 = tu mejor mes histórico</span> en esa categoría.</p>
               <p>Un radar balanceado y grande → negocio saludable en todos los frentes.</p>
               <p>Un eje caído → ahí está el problema. Si Instagram cae y el cash cae, la correlación es clara.</p>
-              <p className="text-slate-400 text-xs">Los valores se normalizan automáticamente cada vez que hay un nuevo máximo histórico.</p>
+              <p className="text-muted-foreground text-xs">Los valores se normalizan automáticamente cada vez que hay un nuevo máximo histórico.</p>
             </div>
           </div>
         </section>
@@ -352,8 +352,8 @@ export function MetricsView() {
       {/* 5. Tabla completa de métricas */}
       <section className="space-y-4">
         <div>
-          <h3 className="text-base font-bold text-slate-900">Tabla completa</h3>
-          <p className="text-xs text-slate-400 mt-0.5">Todos los campos del reporte mensual + acumulado 12 meses</p>
+          <h3 className="text-base font-bold text-foreground">Tabla completa</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">Todos los campos del reporte mensual + acumulado 12 meses</p>
         </div>
         <MetricsSection
           metrics={metrics}

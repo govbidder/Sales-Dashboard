@@ -60,7 +60,7 @@ export function MetricsHubView() {
   return (
     <div className="space-y-6">
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white">
+      <div className="relative overflow-hidden rounded-3xl border border-border bg-card">
         {/* Gradient mesh decoration */}
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute -top-32 -right-32 h-[400px] w-[400px] rounded-full bg-[#1e3a8a]/[0.08] blur-[100px]" />
@@ -76,15 +76,15 @@ export function MetricsHubView() {
               Performance
             </span>
           </div>
-          <h1 className="text-[28px] sm:text-[36px] font-bold tracking-tight text-slate-900 leading-[1.05]">
+          <h1 className="text-[28px] sm:text-[36px] font-bold tracking-tight text-foreground leading-[1.05]">
             Métricas
           </h1>
-          <p className="text-sm text-slate-500 mt-2 max-w-prose">
+          <p className="text-sm text-muted-foreground mt-2 max-w-prose">
             KPIs, conversión y carga de reportes en un solo lugar. Cambiá de tab abajo.
           </p>
 
           {/* Tab bar */}
-          <div className="mt-6 -mb-px flex gap-1 overflow-x-auto border-b border-slate-200">
+          <div className="mt-6 -mb-px flex gap-1 overflow-x-auto border-b border-border">
             {TABS.map(t => {
               const active = t.key === tab
               const Icon = t.icon
@@ -98,10 +98,10 @@ export function MetricsHubView() {
                     "after:transition-all after:duration-300",
                     active
                       ? "text-[#1e3a8a] after:bg-[#1e3a8a] after:shadow-[0_0_12px_rgba(30,58,138,0.40)]"
-                      : "text-slate-500 hover:text-slate-900 after:bg-transparent",
+                      : "text-muted-foreground hover:text-foreground after:bg-transparent",
                   )}
                 >
-                  <Icon className={cn("h-4 w-4", active ? "text-[#1e3a8a]" : "text-slate-400")} />
+                  <Icon className={cn("h-4 w-4", active ? "text-[#1e3a8a]" : "text-muted-foreground")} />
                   {t.label}
                 </button>
               )

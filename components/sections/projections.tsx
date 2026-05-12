@@ -62,16 +62,16 @@ function KPI({
   hint?: string | null
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5">
+    <div className="rounded-2xl border border-border bg-card p-5">
       <div className="mb-3 flex items-center justify-between">
         <span className="flex h-9 w-9 items-center justify-center rounded-xl"
           style={{ backgroundColor: `${accent}15`, boxShadow: `0 0 0 1px ${accent}25` }}>
           <Icon className="h-4 w-4" style={{ color: accent }} />
         </span>
       </div>
-      <p className="text-2xl font-bold tracking-tight text-slate-900 tabular-nums">{value}</p>
+      <p className="text-2xl font-bold tracking-tight text-foreground tabular-nums">{value}</p>
       <p className="mt-1 text-[11px] font-bold uppercase tracking-widest text-[#1e3a8a]/80">{label}</p>
-      {hint && <p className="mt-1 text-[11px] text-slate-400">{hint}</p>}
+      {hint && <p className="mt-1 text-[11px] text-muted-foreground">{hint}</p>}
     </div>
   )
 }
@@ -155,15 +155,15 @@ export function Projections() {
     return (
       <section>
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-slate-900">Proyecciones</h2>
-          <p className="text-[13px] text-slate-400 mt-0.5">
+          <h2 className="text-xl font-bold text-foreground">Proyecciones</h2>
+          <p className="text-[13px] text-muted-foreground mt-0.5">
             Forecast lineal sobre los últimos meses · pace anual · YoY
           </p>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center">
-          <p className="text-sm text-slate-400">
+        <div className="rounded-2xl border border-border bg-card p-10 text-center">
+          <p className="text-sm text-muted-foreground">
             Necesitamos al menos 2 meses de datos para generar proyecciones.
-            Cargá métricas en <span className="text-slate-800">Cargar Métricas</span>.
+            Cargá métricas en <span className="text-foreground">Cargar Métricas</span>.
           </p>
         </div>
       </section>
@@ -173,8 +173,8 @@ export function Projections() {
   return (
     <section>
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-slate-900">Proyecciones</h2>
-        <p className="text-[13px] text-slate-400 mt-0.5">
+        <h2 className="text-xl font-bold text-foreground">Proyecciones</h2>
+        <p className="text-[13px] text-muted-foreground mt-0.5">
           Forecast lineal sobre los últimos {data.monthsAvailable} meses · pace anual · YoY
         </p>
       </div>
@@ -214,10 +214,10 @@ export function Projections() {
       </div>
 
       {/* Chart */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-5">
+      <div className="rounded-2xl border border-border bg-card p-5">
         <div className="mb-4 flex items-center gap-2">
           <TrendingUp className="h-4 w-4 text-[#E42D2C]" />
-          <h3 className="text-[12px] font-bold uppercase tracking-widest text-slate-600">
+          <h3 className="text-[12px] font-bold uppercase tracking-widest text-muted-foreground">
             Revenue · Cash · MRR — histórico + forecast 3 meses
           </h3>
         </div>
@@ -282,7 +282,7 @@ export function Projections() {
           </ResponsiveContainer>
         </div>
 
-        <p className="mt-3 text-[11px] text-slate-400 text-center">
+        <p className="mt-3 text-[11px] text-muted-foreground text-center">
           Línea punteada vertical = mes actual · A partir de ahí, datos proyectados (regresión lineal sobre histórico)
         </p>
       </div>
