@@ -227,13 +227,13 @@ export function AuditLogView() {
                     <p className="text-[12.5px] font-semibold text-slate-900 truncate">
                       {e.real_user_name ?? "—"}
                     </p>
-                    <p className="text-[11px] text-slate-400 truncate">{e.real_user_email ?? "—"}</p>
+                    <p className="text-xs text-slate-500 truncate">{e.real_user_email ?? "—"}</p>
                   </div>
                   <div className="min-w-0">
                     <p className="text-[12.5px] font-semibold text-amber-800 truncate">
                       ↳ {e.impersonated_user_name ?? "—"}
                     </p>
-                    <p className="text-[11px] text-slate-400 truncate">{e.impersonated_user_email ?? "—"}</p>
+                    <p className="text-xs text-slate-500 truncate">{e.impersonated_user_email ?? "—"}</p>
                   </div>
                   <div className="min-w-0 flex items-center gap-2">
                     <span className={`shrink-0 inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-mono font-bold ${
@@ -320,14 +320,14 @@ export function AuditLogView() {
                       {e.entity}
                     </span>
                     {e.entity_id && (
-                      <span className="font-mono text-[10.5px] text-slate-400">
+                      <span className="font-mono text-xs text-slate-500">
                         {e.entity_id.slice(0, 8)}
                       </span>
                     )}
                   </div>
                   {Object.keys(e.payload ?? {}).length > 0 && (
                     <details className="mt-1 group">
-                      <summary className="cursor-pointer text-[10.5px] text-slate-400 group-hover:text-slate-600">
+                      <summary className="cursor-pointer text-xs text-slate-500 group-hover:text-slate-700">
                         Ver payload
                       </summary>
                       <pre className="mt-1 rounded-md bg-slate-50 px-2 py-1.5 text-[10.5px] text-slate-600 overflow-x-auto">
@@ -335,7 +335,7 @@ export function AuditLogView() {
                       </pre>
                     </details>
                   )}
-                  <div className="flex items-center gap-2 mt-1 text-[10.5px] text-slate-400">
+                  <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
                     <span>{fmtRelative(e.created_at)}</span>
                     {e.ip && <><span>·</span><span className="font-mono">{e.ip}</span></>}
                   </div>

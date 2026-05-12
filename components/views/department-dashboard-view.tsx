@@ -338,7 +338,7 @@ export function DepartmentDashboardView({ departmentId }: { departmentId: string
                     )}
                   </div>
                   <p className="text-[24px] font-bold tabular-nums text-slate-900 leading-none">{value}</p>
-                  <p className="mt-1.5 text-[11px] text-slate-500">{kpi.label}</p>
+                  <p className="mt-1.5 text-xs text-slate-500">{kpi.label}</p>
                 </div>
               )
             })}
@@ -359,7 +359,7 @@ export function DepartmentDashboardView({ departmentId }: { departmentId: string
           <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent" />
           <Link
             href={`/admin/tasks?department=${departmentId}`}
-            className="text-[11px] font-semibold text-[#1e3a8a] hover:text-[#152978] inline-flex items-center gap-1"
+            className="text-xs font-semibold text-[#1e3a8a] hover:text-[#152978] inline-flex items-center gap-1"
           >
             Ver kanban
             <ArrowRight className="h-3 w-3" />
@@ -386,12 +386,12 @@ export function DepartmentDashboardView({ departmentId }: { departmentId: string
                       <p className="text-[13px] font-medium text-slate-900 truncate">{t.title}</p>
                       <div className="flex items-center gap-2 mt-0.5">
                         {t.due_at && (
-                          <p className={`text-[11px] ${overdueTask ? "text-[#E42D2C] font-semibold" : "text-slate-400"}`}>
+                          <p className={`text-xs ${overdueTask ? "text-[#E42D2C] font-semibold" : "text-slate-500"}`}>
                             {overdueTask ? "Vencida " : "Vence "}{fmtRelative(t.due_at)}
                           </p>
                         )}
                         {t.owner && (
-                          <span className="text-[11px] text-slate-500 truncate">· {t.owner}</span>
+                          <span className="text-xs text-slate-500 truncate">· {t.owner}</span>
                         )}
                       </div>
                     </div>
@@ -402,7 +402,7 @@ export function DepartmentDashboardView({ departmentId }: { departmentId: string
               {pending.length > 10 && (
                 <Link
                   href={`/admin/tasks?department=${departmentId}`}
-                  className="flex items-center justify-center gap-1.5 px-5 py-2.5 text-[11px] font-semibold text-slate-500 hover:text-[#1e3a8a] hover:bg-slate-50"
+                  className="flex items-center justify-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-slate-500 hover:text-[#1e3a8a] hover:bg-slate-50"
                 >
                   Ver las {pending.length - 10} restantes
                   <ArrowRight className="h-3 w-3" />
@@ -442,7 +442,7 @@ export function DepartmentDashboardView({ departmentId }: { departmentId: string
                     <p className="text-[13px] font-semibold text-slate-900 truncate">
                       {m.full_name ?? "Sin nombre"}
                     </p>
-                    <p className="text-[11px] text-slate-400 truncate">{m.email ?? "—"}</p>
+                    <p className="text-xs text-slate-500 truncate">{m.email ?? "—"}</p>
                   </div>
                 </div>
               )
