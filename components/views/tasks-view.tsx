@@ -35,183 +35,26 @@ import {
   Sparkles, Layers, Download, SlidersHorizontal, GripVertical, Upload,
 } from "lucide-react"
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ─── Module imports (split de tasks-view) ────────────────────────────────────
+// Types + constants + helpers + AvatarStack viven en components/views/tasks/.
+// Reduces este archivo de 2613 → ~2470 líneas y permite que otros archivos
+// del módulo (board-column, drawers, bulk-bar) los compartan sin importar
+// el monolito.
 
-const PRIORITY_OPTIONS  = ["baja", "media", "alta", "urgente"] as const
-
-// Status is now dynamic — driven by the active TaskStatusSet from the API.
-// We keep these as a fallback when the migration hasn't been applied yet.
-const FALLBACK_STATUSES = ["pendiente", "en_progreso", "completada", "cancelada"] as const
-
-type Status   = string
-type Priority = typeof PRIORITY_OPTIONS[number]
-
-interface StatusDef {
-  key:      string
-  label:    string
-  color:    string
-  terminal: boolean
-}
-
-interface StatusSet {
-  id:          string
-  name:        string
-  description: string | null
-  is_default:  boolean
-  statuses:    StatusDef[]
-}
-type ViewMode = "board" | "list" | "calendar"
-type GroupBy  = "status" | "assignee" | "priority" | "tag" | "department" | "none"
-type SortBy   = "due_at" | "priority" | "created_at" | "title"
-
-interface Task {
-  id:           string
-  title:        string
-  description:  string | null
-  status:       Status
-  priority:     Priority
-  owner:        string | null
-  assignees:    string[]
-  tags:         string[]
-  due_at:       string | null
-  completed_at: string | null
-  persona_id:   string | null
-  parent_id:    string | null
-  created_by:   string | null
-  created_at:   string
-  updated_at:   string
-  department_id: string | null
-}
-
-interface TaskComment {
-  id:         string
-  task_id:    string
-  author:     string | null
-  content:    string
-  kind:       "comment" | "system"
-  created_at: string
-}
-
-interface PersonaLite { id: string; name: string }
-
-interface SavedView {
-  id:               string
-  name:             string
-  search:           string
-  filterPriority:   string
-  filterAssignee:   string
-  filterTag:        string
-  filterDepartment: string
-  quickFilter:      string
-  sortBy:           string
-  view:             ViewMode
-}
-
-const SAVED_VIEWS_KEY = "tasksSavedViews_v1"
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function fmtDateTime(iso: string | null) {
-  if (!iso) return null
-  return new Date(iso).toLocaleString("es-AR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
-}
-function fmtRelative(iso: string) {
-  const d = new Date(iso).getTime()
-  const diff = Date.now() - d
-  const min = Math.floor(diff / 60_000)
-  if (min < 1)  return "ahora"
-  if (min < 60) return `hace ${min}m`
-  const hr = Math.floor(min / 60)
-  if (hr < 24)  return `hace ${hr}h`
-  const day = Math.floor(hr / 24)
-  if (day < 7)  return `hace ${day}d`
-  return new Date(iso).toLocaleDateString("es-AR", { day: "numeric", month: "short" })
-}
-function toLocalInputValue(iso: string | null) {
-  if (!iso) return ""
-  const d = new Date(iso)
-  const off = d.getTimezoneOffset() * 60_000
-  return new Date(d.getTime() - off).toISOString().slice(0, 16)
-}
-// Default terminal-status keys for fallback (when activeSet is the local default).
-// The actual terminal logic uses the active set's `terminal: true` flag.
-const FALLBACK_TERMINAL = new Set(["completada", "cancelada"])
-function isTerminal(status: string, terminalKeys: Set<string> = FALLBACK_TERMINAL) {
-  return terminalKeys.has(status)
-}
-function isOverdue(t: Task, terminalKeys: Set<string> = FALLBACK_TERMINAL) {
-  if (!t.due_at) return false
-  if (isTerminal(t.status, terminalKeys)) return false
-  return new Date(t.due_at).getTime() < Date.now()
-}
-function isDueThisWeek(t: Task, terminalKeys: Set<string> = FALLBACK_TERMINAL) {
-  if (!t.due_at) return false
-  if (isTerminal(t.status, terminalKeys)) return false
-  const d = new Date(t.due_at).getTime()
-  const now = Date.now()
-  const in7 = now + 7 * 24 * 3600_000
-  return d >= now && d <= in7
-}
-function initials(s: string) {
-  return s.split(/[\s@]/).map(p => p[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()
-}
-
-// Default fallback set used until the API responds (avoids flash of empty board)
-const DEFAULT_STATUS_SET: StatusSet = {
-  id:          "_default_local",
-  name:        "Default",
-  description: null,
-  is_default:  true,
-  statuses: [
-    { key: "pendiente",   label: "Pendiente",   color: "#94a3b8", terminal: false },
-    { key: "en_progreso", label: "En progreso", color: "#1e3a8a", terminal: false },
-    { key: "completada",  label: "Completada",  color: "#10b981", terminal: true  },
-    { key: "cancelada",   label: "Cancelada",   color: "#71717a", terminal: true  },
-  ],
-}
-
-const PRIORITY_STYLE: Record<Priority, { flag: string; pill: string; weight: number }> = {
-  baja:    { flag: "text-zinc-500",   pill: "text-zinc-700  border-zinc-300  bg-zinc-50",   weight: 1 },
-  media:   { flag: "text-amber-600",  pill: "text-amber-800 border-amber-300 bg-amber-50",  weight: 2 },
-  alta:    { flag: "text-orange-600", pill: "text-orange-800 border-orange-300 bg-orange-50", weight: 3 },
-  urgente: { flag: "text-[#E42D2C]",  pill: "text-[#E42D2C] border-red-300   bg-red-50",   weight: 4 },
-}
-
-// Inline style helper — turns a hex color into pill bg/text/border styles.
-function statusInlineStyle(color: string): React.CSSProperties {
-  return {
-    backgroundColor: color + "10",
-    borderColor:     color + "40",
-    color:           color,
-  }
-}
-
-// ─── Reusable input class ─────────────────────────────────────────────────────
-const inputCls = "w-full rounded-xl border border-border bg-card px-3 py-2.5 text-[13px] text-foreground placeholder:text-muted-foreground focus:border-[#1e3a8a]/40 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/10 transition-all"
-
-// ─── Avatar Stack ─────────────────────────────────────────────────────────────
-
-function AvatarStack({ users, size = "sm" }: { users: string[]; size?: "sm" | "md" }) {
-  const dim = size === "md" ? "h-7 w-7 text-[11px]" : "h-5 w-5 text-[9px]"
-  if (!users.length) return null
-  const visible = users.slice(0, 3)
-  const extra = users.length - visible.length
-  return (
-    <div className="flex -space-x-1.5">
-      {visible.map((u, i) => (
-        <div key={i} title={u}
-          className={`${dim} flex items-center justify-center rounded-full ring-2 ring-white bg-gradient-to-br from-[#E42D2C] to-[#1e3a8a] font-bold text-white`}>
-          {initials(u)}
-        </div>
-      ))}
-      {extra > 0 && (
-        <div className={`${dim} flex items-center justify-center rounded-full ring-2 ring-white bg-muted text-muted-foreground font-bold`}>
-          +{extra}
-        </div>
-      )}
-    </div>
-  )
-}
+import {
+  PRIORITY_OPTIONS, FALLBACK_STATUSES,
+  type Status, type Priority, type ViewMode, type GroupBy, type SortBy,
+  type StatusDef, type StatusSet, type Task, type TaskComment, type PersonaLite,
+  type SavedView,
+  SAVED_VIEWS_KEY, DEFAULT_STATUS_SET, PRIORITY_STYLE,
+  TASK_INPUT_CLS as inputCls,
+} from "@/components/views/tasks/_types"
+import {
+  fmtDateTime, fmtRelative, toLocalInputValue,
+  FALLBACK_TERMINAL, isTerminal, isOverdue, isDueThisWeek, initials,
+  statusInlineStyle,
+} from "@/components/views/tasks/_helpers"
+import { AvatarStack } from "@/components/views/tasks/avatar-stack"
 
 // ─── Tags inline editor ───────────────────────────────────────────────────────
 
