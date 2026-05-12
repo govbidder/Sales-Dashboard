@@ -638,8 +638,173 @@ function SOPModal({
 }
 
 // ─── Add Item Form ─────────────────────────────────────────────────────────────
+//
+// El form de creación cambia según la sección:
+//  - SOPs (sop-sistemas, sop-operativos): un SOP es un documento interno. El form
+//    pide solo título + descripción y un template opcional. No tiene URL ni tipo
+//    de archivo (siempre es type="doc").
+//  - Recursos/Accesos: ítems con link externo. Form clásico con URL + tipo.
 
 function AddItemForm({
+  sectionId,
+  onAdd,
+  onClose,
+}: {
+  sectionId: SectionId
+  onAdd: (item: Item) => void
+  onClose: () => void
+}) {
+  const isSOP = sectionId === "sop-sistemas" || sectionId === "sop-operativos"
+  return isSOP
+    ? <AddSOPForm sectionId={sectionId} onAdd={onAdd} onClose={onClose} />
+    : <AddResourceForm sectionId={sectionId} onAdd={onAdd} onClose={onClose} />
+}
+
+function AddSOPForm({
+  sectionId,
+  onAdd,
+  onClose,
+}: {
+  sectionId: SectionId
+  onAdd: (item: Item) => void
+  onClose: () => void
+}) {
+  const [title, setTitle] = useState("")
+  const [description, setDescription] = useState("")
+  const [templateIdx, setTemplateIdx] = useState<number | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const templates = TEMPLATES[sectionId] ?? []
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!title.trim()) { setError("El título es requerido"); return }
+    setLoading(true); setError("")
+    try {
+      const content = templateIdx !== null ? templates[templateIdx]?.content ?? null : null
+      const res = await fetch("/api/resources", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title:       title.trim(),
+          description: description.trim(),
+          url:         "",
+          type:        "doc",
+          content,
+          category:    sectionId,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setError(data.error || "Error al guardar"); return }
+      onAdd(data.resource)
+      onClose()
+    } catch { setError("Error de conexión") }
+    finally { setLoading(false) }
+  }
+
+  return (
+    <div className="rounded-2xl border border-[#E42D2C]/20 bg-card p-5 mb-5">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-semibold text-foreground">Nuevo SOP</h3>
+        <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-1.5 block">
+            Título del SOP <span className="text-[#E42D2C]">*</span>
+          </label>
+          <input
+            type="text"
+            placeholder='Ej. "SOP de onboarding de clientes"'
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            autoFocus
+            className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-[#E42D2C]/40"
+          />
+        </div>
+
+        <div>
+          <label className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-1.5 block">
+            Descripción <span className="text-muted-foreground/60">(opcional)</span>
+          </label>
+          <textarea
+            placeholder="Resumen corto del proceso: qué resuelve, cuándo se usa."
+            value={description}
+            rows={2}
+            onChange={e => setDescription(e.target.value)}
+            className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-[#E42D2C]/40 resize-none"
+          />
+        </div>
+
+        {templates.length > 0 && (
+          <div>
+            <label className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-1.5 block">
+              Empezar con template <span className="text-muted-foreground/60">(opcional)</span>
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setTemplateIdx(null)}
+                className={cn(
+                  "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium border transition-all",
+                  templateIdx === null
+                    ? "border-[#E42D2C]/40 bg-[#E42D2C]/10 text-[#E42D2C]"
+                    : "border-border bg-muted text-muted-foreground hover:text-foreground",
+                )}
+              >
+                En blanco
+              </button>
+              {templates.map((t, i) => (
+                <button
+                  key={t.label}
+                  type="button"
+                  onClick={() => setTemplateIdx(i)}
+                  className={cn(
+                    "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium border transition-all",
+                    templateIdx === i
+                      ? "border-[#E42D2C]/40 bg-[#E42D2C]/10 text-[#E42D2C]"
+                      : "border-border bg-muted text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <Copy className="h-3 w-3" />
+                  {t.label}
+                </button>
+              ))}
+            </div>
+            <p className="text-[10px] text-muted-foreground/70 mt-1.5 leading-relaxed">
+              Te creamos el SOP con la estructura básica para que vayas completando los campos.
+            </p>
+          </div>
+        )}
+
+        {error && <p className="text-xs text-red-600">{error}</p>}
+
+        <div className="flex justify-end gap-2 pt-1">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg px-3 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex items-center gap-2 rounded-xl bg-[#E42D2C] px-4 py-2 text-sm font-semibold text-white hover:bg-[#E42D2C]/90 transition-colors disabled:opacity-50"
+          >
+            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+            Crear SOP
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+function AddResourceForm({
   sectionId,
   onAdd,
   onClose,
@@ -679,8 +844,10 @@ function AddItemForm({
   return (
     <div className="rounded-2xl border border-[#E42D2C]/20 bg-card p-5 mb-5">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-foreground">Nuevo ítem</h3>
-        <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground transition-colors">
+        <h3 className="text-sm font-semibold text-foreground">
+          {isAccesos ? "Nuevo acceso" : "Nuevo recurso"}
+        </h3>
+        <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
           <X className="h-4 w-4" />
         </button>
       </div>
@@ -701,21 +868,22 @@ function AddItemForm({
           placeholder="Título *"
           value={form.title}
           onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-          className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm text-foreground placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40"
+          autoFocus
+          className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-[#E42D2C]/40"
         />
         <input
           type="text"
           placeholder={isAccesos ? "URL de la herramienta (opcional)" : "URL (opcional)"}
           value={form.url}
           onChange={e => setForm(f => ({ ...f, url: e.target.value }))}
-          className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm text-foreground placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40"
+          className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-[#E42D2C]/40"
         />
         <textarea
           placeholder="Descripción breve (opcional)"
           value={form.description}
           rows={2}
           onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-          className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm text-foreground placeholder-white/30 focus:outline-none focus:border-[#E42D2C]/40 resize-none"
+          className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-[#E42D2C]/40 resize-none"
         />
         <div className="flex gap-2 flex-wrap">
           {(Object.keys(TYPE_CONFIG) as ResourceType[]).map(t => {
@@ -728,7 +896,7 @@ function AddItemForm({
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium border transition-all ${
                   form.type === t
                     ? "border-[#E42D2C]/40 bg-[#E42D2C]/10 text-[#E42D2C]"
-                    : "border-border bg-muted text-muted-foreground hover:text-muted-foreground"
+                    : "border-border bg-muted text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <cfg.icon className="h-3 w-3" />
@@ -738,7 +906,14 @@ function AddItemForm({
           })}
         </div>
         {error && <p className="text-xs text-red-600">{error}</p>}
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg px-3 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Cancelar
+          </button>
           <button
             type="submit"
             disabled={loading}
@@ -814,6 +989,8 @@ function SectionPanel({
   const [activeItem, setActiveItem] = useState<Item | null>(null)
   const Icon = section.icon
   const isAccesos = section.id === "accesos"
+  const isSOP = section.id === "sop-sistemas" || section.id === "sop-operativos"
+  const addLabel = isSOP ? "Nuevo SOP" : isAccesos ? "Nuevo acceso" : "Nuevo recurso"
 
   const filtered = items.filter(
     i =>
@@ -866,7 +1043,7 @@ function SectionPanel({
           className="flex items-center gap-1.5 rounded-xl bg-[#E42D2C] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#E42D2C]/90 transition-colors whitespace-nowrap"
         >
           <Plus className="h-3.5 w-3.5" />
-          Agregar
+          {addLabel}
         </button>
       </div>
 
@@ -889,9 +1066,9 @@ function SectionPanel({
           {!showForm && !search && (
             <button
               onClick={() => setShowForm(true)}
-              className="text-xs text-[#E42D2C]/40 hover:text-[#E42D2C] transition-colors"
+              className="text-xs text-[#E42D2C]/70 hover:text-[#E42D2C] transition-colors"
             >
-              + Agregar el primero
+              + {isSOP ? "Crear el primer SOP" : "Agregar el primero"}
             </button>
           )}
         </div>
