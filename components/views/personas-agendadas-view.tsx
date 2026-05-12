@@ -14,6 +14,7 @@ import {
 import { AiEmailModal } from "@/components/views/personas/ai-email-modal"
 import { CsvImportModal } from "@/components/ui/csv-import-modal"
 import { TableRowSkeleton } from "@/components/ui/skeleton"
+import { useUrlFilterState } from "@/hooks/use-url-filter-state"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -616,8 +617,9 @@ export function PersonasAgendadasView() {
   const [loading,          setLoading]          = useState(true)
   const [selected,         setSelected]         = useState<Persona | null>(null)
   const [deletingId,       setDeletingId]       = useState<string | null>(null)
-  const [search,           setSearch]           = useState("")
-  const [filterCallStatus, setFilterCallStatus] = useState<CallStatus | "todas">("todas")
+  // Filtros persistidos en URL. Refrescar mantiene la vista; el link es compartible.
+  const [search,           setSearch]           = useUrlFilterState<string>("q",      "",      { debounce: 250 })
+  const [filterCallStatus, setFilterCallStatus] = useUrlFilterState<CallStatus | "todas">("status", "todas")
   const [showNewForm,      setShowNewForm]      = useState(false)
   const [showImport,       setShowImport]       = useState(false)
   const [creating,         setCreating]         = useState(false)
@@ -627,11 +629,15 @@ export function PersonasAgendadasView() {
   const searchParams = useSearchParams()
   const toast        = useToast()
 
-  // Quick-action: open "Nueva persona" modal when ?new=1 is present, then strip the param.
+  // Quick-action: open "Nueva persona" modal when ?new=1 is present.
+  // Removemos solo el param `new` para preservar filtros en URL.
   useEffect(() => {
     if (searchParams?.get("new") === "1") {
       setShowNewForm(true)
-      router.replace(pathname, { scroll: false })
+      const params = new URLSearchParams(searchParams.toString())
+      params.delete("new")
+      const qs = params.toString()
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
     }
   }, [searchParams, router, pathname])
 
