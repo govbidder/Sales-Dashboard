@@ -8,8 +8,9 @@ import {
   Loader2, AlertCircle, AlertTriangle, CheckCircle2, RefreshCw,
   Users2, ListTodo, FileBarChart, TrendingDown, TrendingUp,
   Activity, ArrowRight, Flag, Sparkles, BarChart3, Target,
-  Sun, Calendar as CalIcon,
+  Sun, Calendar as CalIcon, Layers,
 } from "lucide-react"
+import type { Department } from "@/lib/types/department"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -209,6 +210,8 @@ interface MyDayTask {
   overdue:   boolean
 }
 
+interface DeptStat { pending: number; overdue: number; members: number }
+
 export function InicioView() {
   const [data,         setData]         = useState<HealthData | null>(null)
   const [loading,      setLoading]      = useState(true)
@@ -216,6 +219,8 @@ export function InicioView() {
   const [myDay,        setMyDay]        = useState<MyDayTask[]>([])
   const [currentEmail, setCurrentEmail] = useState<string>("")
   const [showStandup,  setShowStandup]  = useState(false)
+  const [departments,  setDepartments]  = useState<Department[]>([])
+  const [deptStats,    setDeptStats]    = useState<Record<string, DeptStat>>({})
 
   const fetchHealth = useCallback(async () => {
     setLoading(true)
@@ -234,19 +239,23 @@ export function InicioView() {
       }
       setData(await res.json())
 
-      // Fetch user's "Mi día" tasks: assigned to current user, not completed, due ≤ end of today
-      const tasksRes = await fetch("/api/admin/tasks", {
-        headers: { Authorization: `Bearer ${session.access_token}` },
-      })
+      // Fetch in parallel: tasks (top-level only) + departments + team for the widget below.
+      const headers = { Authorization: `Bearer ${session.access_token}` }
+      const [tasksRes, deptRes, teamRes] = await Promise.all([
+        fetch("/api/admin/tasks?include_subtasks=false", { headers }),
+        fetch("/api/departments",                        { headers }),
+        fetch("/api/admin/team",                         { headers }),
+      ])
+
+      let allTasks: any[] = []
       if (tasksRes.ok) {
         const tasksJ = await tasksRes.json()
-        const all: any[] = tasksJ.tasks ?? []
+        allTasks = tasksJ.tasks ?? []
         const myEmail = session.user?.email ?? ""
         const now = Date.now()
         const endOfToday = new Date()
         endOfToday.setHours(23, 59, 59, 999)
-        const mine = all
-          .filter(t => !t.parent_id)
+        const mine = allTasks
           .filter(t => myEmail && (t.assignees ?? []).includes(myEmail))
           .filter(t => t.status !== "completada" && t.status !== "cancelada")
           .filter(t => {
@@ -264,6 +273,41 @@ export function InicioView() {
           })
         setMyDay(mine)
       }
+
+      // Departments overview (vista de comando para Cristian/Santo).
+      let depts: Department[] = []
+      if (deptRes.ok) {
+        const j = await deptRes.json()
+        depts = j.departments ?? []
+        setDepartments(depts)
+      }
+
+      let members: { department_id: string | null }[] = []
+      if (teamRes.ok) {
+        const j = await teamRes.json()
+        members = j.members ?? []
+      }
+
+      // Tasks pending = no terminales + tienen department_id; overdue = due_at < ahora.
+      // Members = profiles con department_id.
+      const TERMINAL = new Set(["completada", "cancelada"])
+      const now = Date.now()
+      const stats: Record<string, DeptStat> = {}
+      for (const d of depts) stats[d.id] = { pending: 0, overdue: 0, members: 0 }
+      for (const t of allTasks) {
+        if (!t.department_id || !stats[t.department_id]) continue
+        if (TERMINAL.has(t.status)) continue
+        stats[t.department_id].pending += 1
+        if (t.due_at && new Date(t.due_at).getTime() < now) {
+          stats[t.department_id].overdue += 1
+        }
+      }
+      for (const m of members) {
+        if (m.department_id && stats[m.department_id]) {
+          stats[m.department_id].members += 1
+        }
+      }
+      setDeptStats(stats)
     } catch (e: any) {
       setError(e?.message ?? "Error")
     } finally {
@@ -481,6 +525,69 @@ export function InicioView() {
           })}
         </div>
       </div>
+
+      {/* DEPARTAMENTOS — vista de comando: cada depto con tasks + miembros */}
+      {departments.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 px-1">
+            <Layers className="h-3.5 w-3.5 text-[#1e3a8a]" />
+            <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]">
+              Departamentos
+            </h2>
+            <span className="rounded-full bg-slate-100 px-1.5 text-[10px] font-bold text-slate-600 tabular-nums">
+              {departments.length}
+            </span>
+            <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent" />
+          </div>
+
+          <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            {departments.map(d => {
+              const s = deptStats[d.id] ?? { pending: 0, overdue: 0, members: 0 }
+              return (
+                <Link
+                  key={d.id}
+                  href={`/admin/tasks?department=${d.id}`}
+                  className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:border-slate-300 hover:shadow-[0_0_24px_rgba(15,23,42,0.04)]"
+                >
+                  {/* Top accent bar with department color */}
+                  <div
+                    className="absolute top-0 left-0 right-0 h-[2px]"
+                    style={{ backgroundColor: d.color }}
+                  />
+
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
+                    <h3 className="text-[13px] font-bold text-slate-900 truncate flex-1">{d.name}</h3>
+                    <ArrowRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all shrink-0" />
+                  </div>
+
+                  <div className="flex items-end justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-[26px] font-bold tabular-nums leading-none text-slate-900">
+                        {s.pending}
+                      </p>
+                      <p className="text-[11px] text-slate-400 mt-1">
+                        {s.pending === 1 ? "tarea pendiente" : "tareas pendientes"}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      {s.overdue > 0 && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-red-500/25 bg-red-500/10 px-2 py-0.5 text-[10px] font-bold text-[#E42D2C]">
+                          <AlertCircle className="h-2.5 w-2.5" />
+                          {s.overdue} venc{s.overdue === 1 ? "ida" : "idas"}
+                        </span>
+                      )}
+                      <span className="inline-flex items-center gap-1 text-[11px] text-slate-500" title="Miembros asignados al departamento">
+                        <Users2 className="h-3 w-3" /> {s.members}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* MI DÍA ───────────────────────────────────────────────────────────── */}
       {currentEmail && myDay.length > 0 && (
