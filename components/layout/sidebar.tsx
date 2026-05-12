@@ -32,8 +32,10 @@ interface NavItem {
 }
 
 interface NavGroup {
-  label: string
-  items: NavItem[]
+  label:    string
+  items:    NavItem[]
+  /** Si está, el grupo ENTERO solo se muestra cuando el predicado retorna true. */
+  visible?: (role: Role) => boolean
 }
 
 const adminOnly = (role: Role) => isAdminOrAbove(role)
@@ -64,10 +66,11 @@ const NAV_GROUPS: NavGroup[] = [
   },
   {
     label: "Equipo",
+    visible: adminOnly,
     items: [
-      { name: "Miembros",      href: "/admin/team",        icon: Users,  visible: adminOnly },
-      { name: "Departamentos", href: "/admin/departments", icon: Layers, visible: adminOnly },
-      { name: "Actividad",     href: "/admin/activity",    icon: Rss                       },
+      { name: "Miembros",      href: "/admin/team",        icon: Users  },
+      { name: "Departamentos", href: "/admin/departments", icon: Layers },
+      { name: "Actividad",     href: "/admin/activity",    icon: Rss    },
     ],
   },
   {
@@ -154,6 +157,8 @@ export function Sidebar({ open, onClose, collapsed, onToggleCollapse, role }: Si
           showLabels ? "px-3 space-y-5" : "px-2 space-y-4",
         )}>
           {NAV_GROUPS.map((group) => {
+            // Group-level gate first: si el grupo tiene `visible` y no pasa, se oculta entero.
+            if (group.visible && !group.visible(role)) return null
             const visibleItems = group.items.filter(i => !i.visible || i.visible(role))
             if (visibleItems.length === 0) return null
             return (
