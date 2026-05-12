@@ -11,6 +11,9 @@ import { AnnualMetricsProvider } from "@/contexts/annual-metrics-context"
 import { NavigationProgress } from "@/components/ui/navigation-progress"
 import { ToastProvider } from "@/components/ui/toast"
 import { AIAssistant } from "@/components/ai/ai-assistant"
+import { ViewAsProvider } from "@/lib/contexts/view-as-context"
+import { ViewAsBanner } from "@/components/layout/view-as-banner"
+import { useEffectiveRole } from "@/hooks/use-effective-role"
 import { createClient } from "@/lib/supabase"
 import type { Role } from "@/lib/types/role"
 
@@ -244,15 +247,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <ToastProvider>
+    <ViewAsProvider realRole={currentUser?.role ?? null}>
     <div className="min-h-screen bg-background">
       <NavigationProgress />
 
-      <Sidebar
+      <SidebarWithEffectiveRole
+        realRole={currentUser?.role ?? null}
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         collapsed={sidebarCollapsed}
         onToggleCollapse={handleToggleCollapse}
-        role={currentUser?.role ?? "user"}
       />
 
       <div
@@ -261,6 +265,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           (sidebarCollapsed ? "lg:ml-[80px]" : "lg:ml-[240px]")
         }
       >
+        {/* View-As banner — sticky, solo render para developers con viewAs activo. */}
+        <ViewAsBanner />
+
         <TopBar
           pageTitle={pageTitle}
           user={currentUser}
@@ -294,6 +301,26 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       <OnboardingTour />
     </div>
+    </ViewAsProvider>
     </ToastProvider>
   )
+}
+
+/**
+ * Wrapper que vive DENTRO de <ViewAsProvider> para poder consumir
+ * useEffectiveRole y pasarle al Sidebar el rol simulado (o el real si
+ * no hay view-as activo).
+ */
+function SidebarWithEffectiveRole({
+  realRole,
+  ...rest
+}: {
+  realRole: Role | null
+  open: boolean
+  onClose: () => void
+  collapsed: boolean
+  onToggleCollapse: () => void
+}) {
+  const effective = useEffectiveRole(realRole)
+  return <Sidebar {...rest} role={effective ?? "user"} />
 }

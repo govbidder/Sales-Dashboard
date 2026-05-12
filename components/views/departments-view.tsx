@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase"
 import { Portal } from "@/components/ui/portal"
 import type { Department } from "@/lib/types/department"
 import { isAdminOrAbove, type Role } from "@/lib/types/role"
+import { useEffectiveRole } from "@/hooks/use-effective-role"
 import {
   Loader2, Plus, X, Trash2, RefreshCw, Layers, Users2, ListTodo,
   GripVertical, AlertCircle,
@@ -301,9 +302,14 @@ export function DepartmentsView() {
   const [showNew,     setShowNew]     = useState(false)
   const [creating,    setCreating]    = useState(false)
   const [deletingId,  setDeletingId]  = useState<string | null>(null)
-  const [isAdmin,     setIsAdmin]     = useState(false)
+  // Rol REAL del caller — derivamos `isAdmin` con el effective role para
+  // que el view-as (milestone 2) afecte el gating visual.
+  const [realRole,    setRealRole]    = useState<Role | null>(null)
   const [counts,      setCounts]      = useState<Record<string, Counts>>({})
   const [error,       setError]       = useState<string | null>(null)
+
+  const effectiveRole = useEffectiveRole(realRole)
+  const isAdmin       = isAdminOrAbove(effectiveRole)
 
   const getSession = async () => {
     const supabase = createClient()
@@ -319,7 +325,7 @@ export function DepartmentsView() {
       const supabase = createClient()
       const { data: profile } = await supabase
         .from("profiles").select("role").eq("id", session.user.id).single()
-      setIsAdmin(isAdminOrAbove(profile?.role as Role | undefined))
+      setRealRole((profile?.role as Role | undefined) ?? null)
 
       const headers = { Authorization: `Bearer ${session.access_token}` }
       const [dRes, tRes, mRes] = await Promise.all([

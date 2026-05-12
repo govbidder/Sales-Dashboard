@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { ChevronDown, LogOut, Menu, Search, Command, Sun, Moon, Monitor, Sparkles } from "lucide-react"
 import { MonthSelector } from "@/components/layout/month-selector"
 import { NotificationsBell } from "@/components/layout/notifications-bell"
+import { ViewAsDropdown } from "@/components/layout/view-as-dropdown"
 import { useTheme } from "@/components/ui/theme-provider"
 import { type Role, ROLE_LABEL, isAdminOrAbove, isSuperAdmin, isDeveloper } from "@/lib/types/role"
 
@@ -127,6 +128,9 @@ export function TopBar({
             enabledMonths={[]}
           />
         </div>
+
+        {/* View-As dropdown (developers only — sin efecto para el resto) */}
+        <ViewAsDropdown realRole={user?.role ?? null} />
 
         {/* Notifications bell */}
         <NotificationsBell />
