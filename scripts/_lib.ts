@@ -64,11 +64,55 @@ export const DEMO_PROFILE_EMAIL_GLOB  = "demo-%@govbidder-demo.com"
 /** Password compartido para todos los usuarios demo (login en la presentación). */
 export const DEMO_PASSWORD = "DemoGovBidder2026!"
 
-/** Miembros demo del equipo. Se crean como usuarios auth + profile (rol=user, empleado). */
-export const DEMO_TEAM = [
-  { name: "Ana García",    email: "demo-ana@govbidder-demo.com",    department: "IA",           position: "Lead IA"             },
-  { name: "Luis Pérez",    email: "demo-luis@govbidder-demo.com",   department: "Marketing",    position: "Marketing Manager"   },
-  { name: "Sofía Ramírez", email: "demo-sofia@govbidder-demo.com",  department: "Anuncios",     position: "Ads Specialist"      },
-  { name: "Marcos López",  email: "demo-marcos@govbidder-demo.com", department: "Orgánico",     position: "Content Lead"        },
-  { name: "Elena Castro",  email: "demo-elena@govbidder-demo.com",  department: "Lanzamientos", position: "Launch Coordinator"  },
+/** Role values used in seeds (mantienen sincronizado con lib/types/role.ts). */
+type DemoRole = "super_admin" | "admin" | "user"
+
+/**
+ * Miembros demo del equipo (20 total). Mix de roles para mostrar en
+ * la presentación cómo cambia la vista según el rol:
+ * - 1 super_admin (ve todo + puede manejar admins)
+ * - 2 admins (vista operativa completa)
+ * - 5 leads + 12 miembros (rol user/empleado, scoped a su depto)
+ *
+ * Se crean como auth users con DEMO_PASSWORD; el trigger de profile los
+ * registra automáticamente y después el seed completa department_id + role.
+ */
+export const DEMO_TEAM: Array<{
+  name:       string
+  email:      string
+  position:   string
+  department: string | null  // null = sin depto (admins corporativos)
+  role:       DemoRole
+}> = [
+  // Top: super_admin + 2 admins (no dept — vista cross-empresa)
+  { name: "Cristóbal Mendoza", email: "demo-cristobal@govbidder-demo.com", department: null,           position: "Director General",   role: "super_admin" },
+  { name: "Diana Ruiz",        email: "demo-diana@govbidder-demo.com",    department: null,           position: "Directora Operaciones", role: "admin"   },
+  { name: "Marcelo Fontana",   email: "demo-marcelo@govbidder-demo.com",  department: null,           position: "CFO",                role: "admin"      },
+
+  // IA (3): lead + 2 miembros
+  { name: "Ana García",        email: "demo-ana@govbidder-demo.com",      department: "IA",           position: "Lead IA",            role: "user"       },
+  { name: "Diego Vásquez",     email: "demo-diego@govbidder-demo.com",    department: "IA",           position: "ML Engineer",        role: "user"       },
+  { name: "Camila Pérez",      email: "demo-camila@govbidder-demo.com",   department: "IA",           position: "Data Scientist",     role: "user"       },
+
+  // Marketing (3)
+  { name: "Luis Pérez",        email: "demo-luis@govbidder-demo.com",     department: "Marketing",    position: "Marketing Manager",  role: "user"       },
+  { name: "Florencia Vega",    email: "demo-florencia@govbidder-demo.com",department: "Marketing",    position: "Content Strategist", role: "user"       },
+  { name: "Tomás Sosa",        email: "demo-tomas@govbidder-demo.com",    department: "Marketing",    position: "Brand Designer",     role: "user"       },
+
+  // Anuncios (4 — más volumen porque ads requiere análisis constante)
+  { name: "Sofía Ramírez",     email: "demo-sofia@govbidder-demo.com",    department: "Anuncios",     position: "Ads Lead",           role: "user"       },
+  { name: "Hugo Cabrera",      email: "demo-hugo@govbidder-demo.com",     department: "Anuncios",     position: "Media Buyer",        role: "user"       },
+  { name: "Valentina Ortega",  email: "demo-valentina@govbidder-demo.com",department: "Anuncios",     position: "Performance Analyst",role: "user"       },
+  { name: "Mateo Salas",       email: "demo-mateo@govbidder-demo.com",    department: "Anuncios",     position: "Ads Creative",       role: "user"       },
+
+  // Orgánico (3)
+  { name: "Marcos López",      email: "demo-marcos@govbidder-demo.com",   department: "Orgánico",     position: "Content Lead",       role: "user"       },
+  { name: "Bianca Aguirre",    email: "demo-bianca@govbidder-demo.com",   department: "Orgánico",     position: "SEO Specialist",     role: "user"       },
+  { name: "Renata Espina",     email: "demo-renata@govbidder-demo.com",   department: "Orgánico",     position: "Social Media",       role: "user"       },
+
+  // Lanzamientos (4 — equipo grande porque coordina launches)
+  { name: "Elena Castro",      email: "demo-elena@govbidder-demo.com",    department: "Lanzamientos", position: "Launch Lead",        role: "user"       },
+  { name: "Joaquín Méndez",    email: "demo-joaquin@govbidder-demo.com",  department: "Lanzamientos", position: "Project Manager",    role: "user"       },
+  { name: "Lucía Romero",      email: "demo-lucia@govbidder-demo.com",    department: "Lanzamientos", position: "Sales Coordinator",  role: "user"       },
+  { name: "Iván Torres",       email: "demo-ivan@govbidder-demo.com",     department: "Lanzamientos", position: "Onboarding Manager", role: "user"       },
 ]
