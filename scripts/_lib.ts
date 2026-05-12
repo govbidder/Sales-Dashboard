@@ -61,11 +61,14 @@ export const DEMO_PERSONA_PREFIX      = "Demo - "
 export const DEMO_SEGUIMIENTO_PREFIX  = "Demo - "
 export const DEMO_PROFILE_EMAIL_GLOB  = "demo-%@govbidder-demo.com"
 
-/** Emails ficticios usados como owner/assignee en tasks y personas. */
+/** Password compartido para todos los usuarios demo (login en la presentación). */
+export const DEMO_PASSWORD = "DemoGovBidder2026!"
+
+/** Miembros demo del equipo. Se crean como usuarios auth + profile (rol=user, empleado). */
 export const DEMO_TEAM = [
-  { name: "Ana García",     email: "demo-ana@govbidder-demo.com",    department: "IA"           },
-  { name: "Luis Pérez",     email: "demo-luis@govbidder-demo.com",   department: "Marketing"    },
-  { name: "Sofía Ramírez",  email: "demo-sofia@govbidder-demo.com",  department: "Anuncios"     },
-  { name: "Marcos López",   email: "demo-marcos@govbidder-demo.com", department: "Orgánico"     },
-  { name: "Elena Castro",   email: "demo-elena@govbidder-demo.com",  department: "Lanzamientos" },
+  { name: "Ana García",    email: "demo-ana@govbidder-demo.com",    department: "IA",           position: "Lead IA"             },
+  { name: "Luis Pérez",    email: "demo-luis@govbidder-demo.com",   department: "Marketing",    position: "Marketing Manager"   },
+  { name: "Sofía Ramírez", email: "demo-sofia@govbidder-demo.com",  department: "Anuncios",     position: "Ads Specialist"      },
+  { name: "Marcos López",  email: "demo-marcos@govbidder-demo.com", department: "Orgánico",     position: "Content Lead"        },
+  { name: "Elena Castro",  email: "demo-elena@govbidder-demo.com",  department: "Lanzamientos", position: "Launch Coordinator"  },
 ]

@@ -17,6 +17,7 @@ import {
   DEMO_PERSONA_PREFIX,
   DEMO_SEGUIMIENTO_PREFIX,
   DEMO_TEAM,
+  DEMO_PASSWORD,
 } from "./_lib"
 
 const db = getServiceClient()
@@ -229,15 +230,71 @@ async function seedPersonasAndSeguimientos() {
   return { personas: created?.length ?? 0, seguimientos: segData?.length ?? 0 }
 }
 
-// ─── 4) Profiles — SKIP ──────────────────────────────────────────────────────
+// ─── 4) Profiles + auth users ────────────────────────────────────────────────
 
-async function noteAboutProfiles() {
-  console.log("\n[4/4] Profiles")
-  console.log("  ⊘ SKIPPED — la tabla profiles tiene FK a auth.users.")
-  console.log("    Crear usuarios demo requiere auth.admin.createUser, lo que")
-  console.log("    deja cuentas reales que podrían intentar loguearse. Las")
-  console.log("    tareas y personas usan emails ficticios como owner/assignee")
-  console.log("    sin necesidad de profile real.")
+async function seedProfiles() {
+  console.log("\n[4/4] Profiles + auth users")
+
+  // Fetch department UUIDs by name.
+  const { data: deps } = await db.from("departments").select("id, name")
+  const byName = new Map((deps ?? []).map((d: any) => [d.name, d.id as string]))
+
+  // Listar auth users existentes para idempotencia (no recrear).
+  const { data: existingUsers } = await db.auth.admin.listUsers({ perPage: 200 })
+  const existingByEmail = new Map(
+    (existingUsers?.users ?? []).map(u => [u.email ?? "", u])
+  )
+
+  let created = 0, updated = 0
+
+  for (const m of DEMO_TEAM) {
+    let userId: string
+
+    const existing = existingByEmail.get(m.email)
+    if (existing) {
+      userId = existing.id
+      // Reset password por si cambió DEMO_PASSWORD entre corridas.
+      await db.auth.admin.updateUserById(userId, { password: DEMO_PASSWORD })
+    } else {
+      const { data: newUser, error: createErr } = await db.auth.admin.createUser({
+        email:         m.email,
+        password:      DEMO_PASSWORD,
+        email_confirm: true,
+        user_metadata: { full_name: m.name, role: "user" },
+      })
+      if (createErr || !newUser.user) {
+        console.error(`  ✗ creando ${m.email}:`, createErr?.message ?? "sin user")
+        continue
+      }
+      userId = newUser.user.id
+      created++
+    }
+
+    // Upsert profile (el trigger on_auth_user_created lo creó al insertar el user,
+    // pero acá lo enriquecemos con department_id, position, status).
+    const { error: profileErr } = await db
+      .from("profiles")
+      .upsert(
+        {
+          id:            userId,
+          full_name:     m.name,
+          role:          "user",
+          position:      m.position,
+          status:        "activo",
+          department_id: byName.get(m.department) ?? null,
+        } as any,
+        { onConflict: "id" }
+      )
+    if (profileErr) {
+      console.error(`  ✗ profile ${m.email}:`, profileErr.message)
+      continue
+    }
+    if (existing) updated++
+  }
+
+  console.log(`  ✓ ${created} usuarios creados, ${updated} actualizados (total: ${DEMO_TEAM.length})`)
+  console.log(`  ℹ Password compartido para todos: ${DEMO_PASSWORD}`)
+  return { created, updated }
 }
 
 // ─── Main ────────────────────────────────────────────────────────────────────
@@ -248,17 +305,21 @@ async function main() {
   console.log("╚════════════════════════════════════════════════════════════╝")
 
   const reports = await seedMonthlyReports()
+  // Profiles antes que tasks/personas para que los emails owner/assignee
+  // referencien usuarios que ya existen (mejor UX en /admin/team y conteos).
+  const { created, updated } = await seedProfiles()
   const tasks = await seedTasks()
   const { personas, seguimientos } = await seedPersonasAndSeguimientos()
-  await noteAboutProfiles()
 
   console.log("\n────────────────────────────────────────────────────────────")
   console.log("Resumen:")
   console.log(`  monthly_reports:    ${reports}`)
+  console.log(`  profiles (auth):    ${created} creados, ${updated} actualizados`)
   console.log(`  tasks:              ${tasks}`)
   console.log(`  personas_agendadas: ${personas}`)
   console.log(`  seguimientos:       ${seguimientos}`)
-  console.log(`  profiles:           0 (skipped)`)
+  console.log(`\n  Login demo: cualquier email demo-*@govbidder-demo.com`)
+  console.log(`  Password:   ${DEMO_PASSWORD}`)
   console.log("\nPara borrar todo lo seedeado: pnpm cleanup:demo")
 }
 
