@@ -125,84 +125,6 @@ function buildNavGroups(
   ]
 }
 
-// ─── Department pills row ────────────────────────────────────────────────────
-
-function DeptPills({
-  departments,
-  pathname,
-  showLabels,
-  onClose,
-}: {
-  departments: DepartmentLite[]
-  pathname:    string
-  showLabels:  boolean
-  onClose:     () => void
-}) {
-  if (!departments.length) return null
-
-  return (
-    <div className={cn("pt-3 mt-3 border-t border-[#1e3a8a]/10", showLabels ? "px-3" : "px-2")}>
-      {showLabels && (
-        <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]/70">
-          Departamentos
-        </p>
-      )}
-      <div className={cn(
-        "flex gap-1.5",
-        showLabels ? "flex-wrap" : "flex-col items-center",
-      )}>
-        {departments.map(d => {
-          const active = pathname === `/admin/departments/${d.id}`
-          const initial = d.name.charAt(0).toUpperCase()
-
-          return (
-            <Link
-              key={d.id}
-              href={`/admin/departments/${d.id}`}
-              onClick={onClose}
-              title={d.name}
-              className={cn(
-                "group relative flex items-center overflow-hidden rounded-full",
-                "border transition-all duration-200 ease-out",
-                showLabels
-                  ? "h-7 max-w-[28px] hover:max-w-[140px]"
-                  : "h-7 w-7 justify-center",
-                active
-                  ? "border-transparent shadow-[0_0_0_2px_var(--dept-color)]"
-                  : "border-border hover:border-transparent hover:shadow-[0_0_0_2px_var(--dept-color)]",
-              )}
-              style={
-                {
-                  ["--dept-color" as any]: d.color,
-                  backgroundColor: active ? `${d.color}1a` : "white",
-                } as React.CSSProperties
-              }
-            >
-              <span
-                className="flex h-7 w-7 shrink-0 items-center justify-center text-[11px] font-bold text-white"
-                style={{ backgroundColor: d.color }}
-              >
-                {initial}
-              </span>
-              {showLabels && (
-                <span
-                  className={cn(
-                    "ml-1.5 mr-2.5 text-[12px] font-semibold whitespace-nowrap",
-                    "opacity-0 group-hover:opacity-100 transition-opacity",
-                    active ? "text-foreground" : "text-muted-foreground",
-                  )}
-                >
-                  {d.name}
-                </span>
-              )}
-            </Link>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
 export function Sidebar({
   open, onClose, collapsed, onToggleCollapse,
   role, userDepartmentId, departments,
@@ -218,7 +140,6 @@ export function Sidebar({
   }, [])
 
   const showLabels = !collapsed || isMobile
-  const isAdmin    = isAdminOrAbove(role)
 
   const navGroups = buildNavGroups(role, userDepartmentId, departments)
 
@@ -332,15 +253,6 @@ export function Sidebar({
             )
           })}
 
-          {/* Dept pills row — solo para admin+. Va abajo, separado por divisor. */}
-          {isAdmin && (
-            <DeptPills
-              departments={departments}
-              pathname={pathname}
-              showLabels={showLabels}
-              onClose={onClose}
-            />
-          )}
         </nav>
 
         {/* CRM portal trigger — separado por divisor, tratamiento visual
