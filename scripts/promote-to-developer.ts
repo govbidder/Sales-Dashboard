@@ -64,10 +64,12 @@ async function main() {
 
   // 3) Asegurar que existe profile (el trigger lo crea en signup, pero por
   //    si se borró manualmente, lo upserteamos con role=developer).
+  //    Solo seteamos `role` — el resto de los campos (status, position,
+  //    department_id, etc.) los maneja el usuario por la UI.
   const { error: upsertErr } = await db
     .from("profiles")
     .upsert(
-      { id: targetUser.id, role: "developer", status: "activo" },
+      { id: targetUser.id, role: "developer" },
       { onConflict: "id" }
     )
 
