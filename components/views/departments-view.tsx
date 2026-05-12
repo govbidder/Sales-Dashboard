@@ -2,6 +2,14 @@
 
 import { fetchWithViewAs } from "@/lib/api/fetch-with-view-as"
 import { useEffect, useState, useCallback, useMemo } from "react"
+import Link from "next/link"
+import {
+  DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors, closestCenter,
+} from "@dnd-kit/core"
+import {
+  SortableContext, useSortable, rectSortingStrategy, arrayMove,
+} from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 import { createClient } from "@/lib/supabase"
 import { Portal } from "@/components/ui/portal"
 import type { Department } from "@/lib/types/department"
@@ -168,6 +176,13 @@ function NewDeptModal({
 
 // ─── Department Card (inline editable) ────────────────────────────────────────
 
+// Inputs y botones interactivos dentro de la card. Detenemos la propagación
+// del click + pointer para evitar que el <Link> navegue al editar.
+const stopAll = {
+  onClick:        (e: React.SyntheticEvent) => e.stopPropagation(),
+  onPointerDown:  (e: React.SyntheticEvent) => e.stopPropagation(),
+}
+
 function DeptCard({
   dept, counts, isAdmin, onPatch, onDelete, deleting,
 }: {
@@ -180,8 +195,36 @@ function DeptCard({
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false)
 
-  return (
-    <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 transition-all hover:border-slate-300 hover:shadow-[0_0_30px_rgba(15,23,42,0.04)]">
+  const {
+    attributes, listeners, setNodeRef, transform, transition, isDragging,
+  } = useSortable({ id: dept.id })
+
+  const style: React.CSSProperties = {
+    transform:  CSS.Transform.toString(transform),
+    transition,
+    opacity:    isDragging ? 0.5 : 1,
+    zIndex:     isDragging ? 10 : "auto",
+  }
+
+  // Contenido visible de la card. Se envuelve dentro de <Link> si la card
+  // entera debe ser clickeable hacia el dashboard del depto.
+  const cardBody = (
+    <div className="relative p-5">
+      {/* Drag handle (admin only). El listener de pointerdown se queda con
+          dnd-kit; sin él el click llega al <Link> y navega. */}
+      {isAdmin && (
+        <button
+          {...attributes}
+          {...listeners}
+          onClick={(e) => e.preventDefault()}
+          aria-label="Arrastrar para reordenar"
+          title="Arrastrar para reordenar"
+          className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-slate-100 hover:text-slate-700 cursor-grab active:cursor-grabbing"
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+      )}
+
       <div className="flex items-start gap-3 mb-4">
         <div
           className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl font-bold text-white shadow-sm"
@@ -194,6 +237,7 @@ function DeptCard({
             <input
               type="text"
               defaultValue={dept.name}
+              {...stopAll}
               onBlur={e => {
                 const v = e.target.value.trim()
                 if (v && v !== dept.name) onPatch(dept.id, { name: v })
@@ -209,14 +253,15 @@ function DeptCard({
               defaultValue={dept.description ?? ""}
               placeholder="Sin descripción"
               rows={2}
+              {...stopAll}
               onBlur={e => {
                 const v = e.target.value.trim()
                 if (v !== (dept.description ?? "")) onPatch(dept.id, { description: v || null })
               }}
-              className="mt-1 w-full bg-transparent text-[12px] text-slate-500 placeholder:text-slate-300 outline-none resize-none border-b border-transparent hover:border-slate-200 focus:border-slate-300 transition-colors"
+              className="mt-1 w-full bg-transparent text-xs text-slate-500 placeholder:text-slate-400 outline-none resize-none border-b border-transparent hover:border-slate-200 focus:border-slate-300 transition-colors"
             />
           ) : (
-            <p className="text-[12px] text-slate-500 mt-0.5 line-clamp-2">{dept.description || "Sin descripción"}</p>
+            <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{dept.description || "Sin descripción"}</p>
           )}
         </div>
       </div>
@@ -240,20 +285,22 @@ function DeptCard({
       {isAdmin && (
         <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
           <div className="flex items-center gap-2">
-            <label className="flex items-center gap-1.5 text-[11px] text-slate-500">
-              <GripVertical className="h-3 w-3" /> Orden:
+            <label className="flex items-center gap-1.5 text-xs text-slate-500">
+              Orden:
               <input
                 type="number" min={0} defaultValue={dept.sort_order}
+                {...stopAll}
                 onBlur={e => {
                   const v = parseInt(e.target.value)
                   if (!Number.isNaN(v) && v !== dept.sort_order) onPatch(dept.id, { sort_order: v })
                 }}
-                className="w-14 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] text-slate-900 outline-none focus:border-slate-300"
+                className="w-14 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-xs text-slate-900 outline-none focus:border-slate-300"
               />
             </label>
             <input
               type="color"
               defaultValue={dept.color}
+              {...stopAll}
               onBlur={e => {
                 if (e.target.value !== dept.color && HEX_RE.test(e.target.value)) {
                   onPatch(dept.id, { color: e.target.value })
@@ -265,25 +312,26 @@ function DeptCard({
           </div>
 
           {confirmDelete ? (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1" {...stopAll}>
               <button
-                onClick={() => setConfirmDelete(false)}
-                className="rounded-lg px-2 py-1 text-[11px] text-slate-500 hover:bg-slate-100"
+                onClick={(e) => { e.stopPropagation(); setConfirmDelete(false) }}
+                className="rounded-lg px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
               >
                 Cancelar
               </button>
               <button
-                onClick={() => onDelete(dept.id)}
+                onClick={(e) => { e.stopPropagation(); onDelete(dept.id) }}
                 disabled={deleting}
-                className="rounded-lg bg-red-600 px-2 py-1 text-[11px] font-bold text-white hover:bg-red-700 disabled:opacity-40"
+                className="rounded-lg bg-red-600 px-2 py-1 text-xs font-bold text-white hover:bg-red-700 disabled:opacity-40"
               >
                 {deleting ? "..." : "Confirmar"}
               </button>
             </div>
           ) : (
             <button
-              onClick={() => setConfirmDelete(true)}
-              className="flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all"
+              {...stopAll}
+              onClick={(e) => { e.stopPropagation(); setConfirmDelete(true) }}
+              className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all"
               title="Eliminar departamento"
             >
               <Trash2 className="h-3.5 w-3.5" />
@@ -291,6 +339,21 @@ function DeptCard({
           )}
         </div>
       )}
+    </div>
+  )
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all hover:border-slate-300 hover:shadow-[0_0_30px_rgba(15,23,42,0.04)]"
+    >
+      <Link
+        href={`/admin/departments/${dept.id}`}
+        className="block cursor-pointer focus:outline-none"
+      >
+        {cardBody}
+      </Link>
     </div>
   )
 }
@@ -388,6 +451,49 @@ export function DepartmentsView() {
     if (!res.ok) {
       const j = await res.json().catch(() => ({}))
       setError(j?.error ?? "No se pudo guardar")
+      setDepartments(prev)
+    }
+  }
+
+  // Sensor con activationConstraint para evitar que un click accidental
+  // empiece un drag (necesario porque la card también es <Link>).
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+  )
+
+  const handleDragEnd = async (e: DragEndEvent) => {
+    const { active, over } = e
+    if (!over || active.id === over.id) return
+    const oldIdx = departments.findIndex(d => d.id === active.id)
+    const newIdx = departments.findIndex(d => d.id === over.id)
+    if (oldIdx < 0 || newIdx < 0) return
+
+    const reordered = arrayMove(departments, oldIdx, newIdx)
+      .map((d, i) => ({ ...d, sort_order: i + 1 }))
+
+    const prev = departments
+    setDepartments(reordered)
+    setError(null)
+
+    const session = await getSession()
+    if (!session) return
+
+    // Persistir sort_order de cada item afectado. Hacemos PATCH en paralelo;
+    // si alguno falla, rollback completo.
+    const changed = reordered.filter((d, i) => prev[i]?.id !== d.id || prev[i]?.sort_order !== d.sort_order)
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization:  `Bearer ${session.access_token}`,
+    }
+    const results = await Promise.all(
+      changed.map(d => fetchWithViewAs(`/api/departments/${d.id}`, {
+        method: "PATCH",
+        headers,
+        body:   JSON.stringify({ sort_order: d.sort_order }),
+      }))
+    )
+    if (results.some(r => !r.ok)) {
+      setError("No se pudo guardar el orden")
       setDepartments(prev)
     }
   }
@@ -538,19 +644,30 @@ export function DepartmentsView() {
             )}
           </div>
         ) : (
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {departments.map(d => (
-              <DeptCard
-                key={d.id}
-                dept={d}
-                counts={counts[d.id] ?? { tasks: 0, members: 0 }}
-                isAdmin={isAdmin}
-                onPatch={handlePatch}
-                onDelete={handleDelete}
-                deleting={deletingId === d.id}
-              />
-            ))}
-          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={departments.map(d => d.id)}
+              strategy={rectSortingStrategy}
+            >
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                {departments.map(d => (
+                  <DeptCard
+                    key={d.id}
+                    dept={d}
+                    counts={counts[d.id] ?? { tasks: 0, members: 0 }}
+                    isAdmin={isAdmin}
+                    onPatch={handlePatch}
+                    onDelete={handleDelete}
+                    deleting={deletingId === d.id}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         )}
       </div>
     </>
