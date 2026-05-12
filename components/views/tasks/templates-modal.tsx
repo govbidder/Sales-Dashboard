@@ -1,5 +1,6 @@
 "use client"
 
+import { fetchWithViewAs } from "@/lib/api/fetch-with-view-as"
 import { useEffect, useState, useCallback } from "react"
 import { Portal } from "@/components/ui/portal"
 import { createClient } from "@/lib/supabase"
@@ -63,7 +64,7 @@ export function TemplatesModal({ onClose, onApplied }: Props) {
     try {
       const session = await getSession()
       if (!session) return
-      const res = await fetch("/api/admin/task-templates", {
+      const res = await fetchWithViewAs("/api/admin/task-templates", {
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
       if (res.ok) {
@@ -85,7 +86,7 @@ export function TemplatesModal({ onClose, onApplied }: Props) {
     try {
       const session = await getSession()
       if (!session) return
-      const res = await fetch("/api/admin/task-templates", {
+      const res = await fetchWithViewAs("/api/admin/task-templates", {
         method:  "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
         body:    JSON.stringify({ templateId: selected.id, title: titleOverride || undefined }),

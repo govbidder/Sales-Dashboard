@@ -1,5 +1,6 @@
 "use client"
 
+import { fetchWithViewAs } from "@/lib/api/fetch-with-view-as"
 import { useEffect, useState, useCallback, useMemo } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { createClient } from "@/lib/supabase"
@@ -518,8 +519,8 @@ export function TeamView() {
       setCurrentRole((profile?.role as Role) ?? "user")
 
       const [res, dRes] = await Promise.all([
-        fetch("/api/admin/team",  { headers: { Authorization: `Bearer ${session.access_token}` } }),
-        fetch("/api/departments", { headers: { Authorization: `Bearer ${session.access_token}` } }),
+        fetchWithViewAs("/api/admin/team",  { headers: { Authorization: `Bearer ${session.access_token}` } }),
+        fetchWithViewAs("/api/departments", { headers: { Authorization: `Bearer ${session.access_token}` } }),
       ])
       if (res.ok) setMembers((await res.json()).members ?? [])
       if (dRes.ok) setDepartments((await dRes.json()).departments ?? [])
@@ -542,7 +543,7 @@ export function TeamView() {
     try {
       const session = await getSession()
       if (!session) return { error: "Sin sesión" }
-      const res = await fetch("/api/admin/team/invite", {
+      const res = await fetchWithViewAs("/api/admin/team/invite", {
         method:  "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
         body:    JSON.stringify(data),
@@ -560,7 +561,7 @@ export function TeamView() {
     if (selected?.id === id) setSelected(prev => prev ? { ...prev, ...updates } : prev)
     const session = await getSession()
     if (!session) return
-    await fetch("/api/admin/team", {
+    await fetchWithViewAs("/api/admin/team", {
       method:  "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body:    JSON.stringify({ id, ...updates }),

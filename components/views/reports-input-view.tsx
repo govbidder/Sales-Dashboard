@@ -1,5 +1,6 @@
 "use client"
 
+import { fetchWithViewAs } from "@/lib/api/fetch-with-view-as"
 import { useEffect, useState, useCallback, useMemo } from "react"
 import { createClient } from "@/lib/supabase"
 import { exportToCSV } from "@/lib/export-csv"
@@ -131,7 +132,7 @@ function ReportForm({
       const supabase = createClient()
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) return
-      const res = await fetch(`/api/admin/reports?month=${m}`, {
+      const res = await fetchWithViewAs(`/api/admin/reports?month=${m}`, {
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
       if (res.ok) {
@@ -178,7 +179,7 @@ function ReportForm({
         }
       }
 
-      const res = await fetch("/api/admin/reports", {
+      const res = await fetchWithViewAs("/api/admin/reports", {
         method:  "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
         body:    JSON.stringify(payload),
@@ -428,7 +429,7 @@ export function ReportsInputView() {
     try {
       const session = await getSession()
       if (!session) return
-      const res = await fetch("/api/admin/reports", {
+      const res = await fetchWithViewAs("/api/admin/reports", {
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
       if (res.ok) setReports((await res.json()).reports ?? [])
@@ -453,7 +454,7 @@ export function ReportsInputView() {
     setDeletingId(id)
     const session = await getSession()
     if (!session) return
-    await fetch("/api/admin/reports", {
+    await fetchWithViewAs("/api/admin/reports", {
       method:  "DELETE",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body:    JSON.stringify({ id }),
@@ -473,7 +474,7 @@ export function ReportsInputView() {
   const handleBulkImport = async (rows: Record<string, any>[]) => {
     const session = await getSession()
     if (!session) return { inserted: 0, failed: rows.length, errors: ["Sesión expirada"] }
-    const res = await fetch("/api/admin/reports/bulk", {
+    const res = await fetchWithViewAs("/api/admin/reports/bulk", {
       method:  "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body:    JSON.stringify({ reports: rows }),

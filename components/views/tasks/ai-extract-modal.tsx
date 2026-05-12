@@ -1,5 +1,6 @@
 "use client"
 
+import { fetchWithViewAs } from "@/lib/api/fetch-with-view-as"
 import { useState } from "react"
 import { Portal } from "@/components/ui/portal"
 import { createClient } from "@/lib/supabase"
@@ -57,7 +58,7 @@ export function AiExtractModal({ onClose, onApplied }: Props) {
     try {
       const session = await getSession()
       if (!session) { setErr("Sesión expirada."); return }
-      const res = await fetch("/api/admin/tasks/extract", {
+      const res = await fetchWithViewAs("/api/admin/tasks/extract", {
         method:  "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
         body:    JSON.stringify({ text, persist: false }),
@@ -102,7 +103,7 @@ export function AiExtractModal({ onClose, onApplied }: Props) {
     try {
       const session = await getSession()
       if (!session) { setErr("Sesión expirada."); return }
-      const res = await fetch("/api/admin/tasks/extract", {
+      const res = await fetchWithViewAs("/api/admin/tasks/extract", {
         method:  "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
         // Re-extract from the same text but with persist=true. Edge-case:
@@ -115,7 +116,7 @@ export function AiExtractModal({ onClose, onApplied }: Props) {
       // not re-run the model. Use the batch insert via /api/admin/tasks.
       const created: any[] = []
       for (const t of tasks) {
-        const r = await fetch("/api/admin/tasks", {
+        const r = await fetchWithViewAs("/api/admin/tasks", {
           method:  "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${session!.access_token}` },
           body:    JSON.stringify({

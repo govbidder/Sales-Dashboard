@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useCallback, useMemo } from "react"
 import { createClient } from "@/lib/supabase"
+import { fetchWithViewAs } from "@/lib/api/fetch-with-view-as"
 import {
-  Shield, Loader2, RefreshCw, AlertCircle, Info, Search, Filter,
+  Shield, Loader2, RefreshCw, AlertCircle, Info, Search, Filter, Eye,
 } from "lucide-react"
 
 interface AuditEntry {
@@ -17,6 +18,19 @@ interface AuditEntry {
   ip:         string | null
   user_agent: string | null
   created_at: string
+}
+
+interface ImpersonationEntry {
+  id:                       string
+  real_user_id:             string
+  real_user_name:           string | null
+  real_user_email:          string | null
+  impersonated_user_id:     string
+  impersonated_user_name:   string | null
+  impersonated_user_email:  string | null
+  endpoint:                 string
+  method:                   string
+  created_at:               string
 }
 
 const ENTITY_COLOR: Record<string, string> = {
@@ -44,7 +58,10 @@ function initials(s: string) {
 }
 
 export function AuditLogView() {
+  const [tab,         setTab]         = useState<"audit" | "impersonations">("audit")
   const [entries,     setEntries]     = useState<AuditEntry[]>([])
+  const [imps,        setImps]        = useState<ImpersonationEntry[]>([])
+  const [impsUnavailable, setImpsUnavailable] = useState(false)
   const [loading,     setLoading]     = useState(true)
   const [unavailable, setUnavailable] = useState(false)
   const [search,      setSearch]      = useState("")
@@ -69,7 +86,29 @@ export function AuditLogView() {
     } finally { setLoading(false) }
   }, [filterEnt])
 
-  useEffect(() => { fetchEntries() }, [fetchEntries])
+  const fetchImpersonations = useCallback(async () => {
+    setLoading(true)
+    try {
+      const { data: { session } } = await createClient().auth.getSession()
+      if (!session) return
+      const res = await fetchWithViewAs("/api/admin/impersonation-log?limit=300", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      })
+      const j = await res.json()
+      if (res.ok) {
+        setImps(j.entries ?? [])
+        setImpsUnavailable(Boolean(j.unavailable))
+      } else if (res.status === 403) {
+        setImps([])
+        setImpsUnavailable(true)
+      }
+    } finally { setLoading(false) }
+  }, [])
+
+  useEffect(() => {
+    if (tab === "audit") fetchEntries()
+    else fetchImpersonations()
+  }, [tab, fetchEntries, fetchImpersonations])
 
   const filtered = useMemo(() => {
     if (!search.trim()) return entries
@@ -93,23 +132,46 @@ export function AuditLogView() {
         <div>
           <h1 className="text-2xl font-bold text-[#1e3a8a] tracking-tight flex items-center gap-2">
             <Shield className="h-5 w-5" />
-            Audit log
+            Auditoría
           </h1>
           <p className="text-sm text-slate-400 mt-0.5">
-            Solo admins · {entries.length} acciones registradas
+            Solo admins · {tab === "audit" ? `${entries.length} acciones registradas` : `${imps.length} impersonations`}
           </p>
         </div>
-        <button
-          onClick={fetchEntries}
-          disabled={loading}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40"
-        >
-          <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Tabs */}
+          <div className="inline-flex h-9 rounded-xl border border-slate-200 bg-slate-50 p-0.5">
+            <button
+              onClick={() => setTab("audit")}
+              className={`flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium transition-all ${
+                tab === "audit" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-900"
+              }`}
+            >
+              <Shield className="h-3.5 w-3.5" />
+              Audit log
+            </button>
+            <button
+              onClick={() => setTab("impersonations")}
+              className={`flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium transition-all ${
+                tab === "impersonations" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-900"
+              }`}
+            >
+              <Eye className="h-3.5 w-3.5" />
+              Impersonations
+            </button>
+          </div>
+          <button
+            onClick={tab === "audit" ? fetchEntries : fetchImpersonations}
+            disabled={loading}
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          </button>
+        </div>
       </div>
 
-      {/* Migration warning */}
-      {unavailable && (
+      {/* Migration warning (audit tab) */}
+      {tab === "audit" && unavailable && (
         <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[12.5px] text-amber-800">
           <Info className="h-4 w-4 mt-0.5 shrink-0" />
           <div>
@@ -119,6 +181,85 @@ export function AuditLogView() {
         </div>
       )}
 
+      {/* Migration warning (impersonations tab) */}
+      {tab === "impersonations" && impsUnavailable && (
+        <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[12.5px] text-amber-800">
+          <Info className="h-4 w-4 mt-0.5 shrink-0" />
+          <div>
+            <p className="font-bold">El log de impersonations requiere migration o permisos.</p>
+            <p className="mt-0.5">Aplicá <code className="bg-amber-100 px-1 rounded text-[11px]">supabase/migrations/20250513000001_impersonation_log.sql</code>. Solo super_admin/developer pueden leer este log.</p>
+          </div>
+        </div>
+      )}
+
+      {/* IMPERSONATIONS TAB ─────────────────────────────────────────── */}
+      {tab === "impersonations" && (
+        loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-6 w-6 animate-spin text-[#E42D2C]/40" />
+          </div>
+        ) : imps.length === 0 ? (
+          <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-3xl border border-slate-200 bg-white py-20 text-center">
+            <div className="pointer-events-none absolute -top-24 -right-24 h-[300px] w-[300px] rounded-full bg-amber-400/[0.06] blur-[100px]" />
+            <span className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-400/15 ring-1 ring-amber-400/40 mb-4">
+              <Eye className="h-6 w-6 text-amber-700" />
+            </span>
+            <h3 className="relative text-[16px] font-bold text-slate-900 mb-1">
+              Sin impersonations registradas
+            </h3>
+            <p className="relative max-w-sm text-[13px] text-slate-500 px-4">
+              Cuando un developer use View-As con un usuario simulado, cada request
+              quedará registrada acá.
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+            <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3 px-5 py-2.5 bg-slate-50 border-b border-slate-100 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">
+              <div>Developer real</div>
+              <div>Usuario impersonado</div>
+              <div>Endpoint</div>
+              <div className="text-right">Cuándo</div>
+            </div>
+            <div className="divide-y divide-slate-100">
+              {imps.map(e => (
+                <div key={e.id} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3 px-5 py-3 hover:bg-slate-50 transition-colors items-center">
+                  <div className="min-w-0">
+                    <p className="text-[12.5px] font-semibold text-slate-900 truncate">
+                      {e.real_user_name ?? "—"}
+                    </p>
+                    <p className="text-[11px] text-slate-400 truncate">{e.real_user_email ?? "—"}</p>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[12.5px] font-semibold text-amber-800 truncate">
+                      ↳ {e.impersonated_user_name ?? "—"}
+                    </p>
+                    <p className="text-[11px] text-slate-400 truncate">{e.impersonated_user_email ?? "—"}</p>
+                  </div>
+                  <div className="min-w-0 flex items-center gap-2">
+                    <span className={`shrink-0 inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-mono font-bold ${
+                      e.method === "GET"    ? "border-blue-200 bg-blue-50 text-blue-700" :
+                      e.method === "POST"   ? "border-emerald-200 bg-emerald-50 text-emerald-700" :
+                      e.method === "PATCH"  ? "border-amber-200 bg-amber-50 text-amber-700" :
+                      e.method === "DELETE" ? "border-red-200 bg-red-50 text-red-700" :
+                      "border-slate-200 bg-slate-50 text-slate-600"
+                    }`}>
+                      {e.method}
+                    </span>
+                    <span className="font-mono text-[11px] text-slate-600 truncate">{e.endpoint}</span>
+                  </div>
+                  <div className="text-right text-[11px] text-slate-400 shrink-0">
+                    {fmtRelative(e.created_at)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      )}
+
+      {/* AUDIT TAB: toolbar + lista (original) ────────────────────────── */}
+      {tab === "audit" && (
+      <>
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-2.5 border-b border-slate-200 pb-4">
         <div className="relative flex-1 min-w-[220px] max-w-sm">
@@ -203,6 +344,8 @@ export function AuditLogView() {
             ))}
           </div>
         </div>
+      )}
+      </>
       )}
     </div>
   )

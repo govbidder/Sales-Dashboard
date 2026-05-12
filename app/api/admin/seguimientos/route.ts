@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase"
 import { createServiceClient } from "@/lib/supabase-service"
-
-async function getUser(req: NextRequest) {
-  const token = req.headers.get("authorization")?.replace("Bearer ", "")
-  if (!token) return null
-  const { data: { user } } = await createClient().auth.getUser(token)
-  return user
-}
+import { getEffectiveUser } from "@/lib/auth/get-effective-user"
 
 // GET /api/admin/seguimientos?persona_id=xxx → list for a persona
 // GET /api/admin/seguimientos                 → all seguimientos
 export async function GET(req: NextRequest) {
-  const user = await getUser(req)
+  const auth = await getEffectiveUser(req); const user = auth?.effectiveUser ?? null
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 
   const personaId = req.nextUrl.searchParams.get("persona_id")
@@ -31,7 +24,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getUser(req)
+  const auth = await getEffectiveUser(req); const user = auth?.effectiveUser ?? null
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 
   const body = await req.json()
@@ -55,7 +48,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const user = await getUser(req)
+  const auth = await getEffectiveUser(req); const user = auth?.effectiveUser ?? null
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 
   const body = await req.json()
@@ -80,7 +73,7 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const user = await getUser(req)
+  const auth = await getEffectiveUser(req); const user = auth?.effectiveUser ?? null
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 
   const { id } = await req.json()

@@ -1,5 +1,6 @@
 "use client"
 
+import { fetchWithViewAs } from "@/lib/api/fetch-with-view-as"
 import { useEffect, useState, useCallback } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { createClient } from "@/lib/supabase"
@@ -647,8 +648,8 @@ export function PersonasAgendadasView() {
       if (!session) return
       const headers = { Authorization: `Bearer ${session.access_token}` }
       const [pRes, sRes] = await Promise.all([
-        fetch("/api/admin/personas", { headers }),
-        fetch("/api/admin/seguimientos", { headers }),
+        fetchWithViewAs("/api/admin/personas", { headers }),
+        fetchWithViewAs("/api/admin/seguimientos", { headers }),
       ])
       if (pRes.ok) {
         const json = await pRes.json()
@@ -668,7 +669,7 @@ export function PersonasAgendadasView() {
     try {
       const session = await getSession()
       if (!session) return
-      const res = await fetch("/api/admin/personas", {
+      const res = await fetchWithViewAs("/api/admin/personas", {
         method:  "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
         body:    JSON.stringify(data),
@@ -689,7 +690,7 @@ export function PersonasAgendadasView() {
     if (selected?.id === id) setSelected(prev => prev ? { ...prev, ...updates } : prev)
     const session = await getSession()
     if (!session) return
-    await fetch("/api/admin/personas", {
+    await fetchWithViewAs("/api/admin/personas", {
       method:  "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body:    JSON.stringify({ id, ...updates }),
@@ -700,7 +701,7 @@ export function PersonasAgendadasView() {
     setDeletingId(id)
     const session = await getSession()
     if (!session) return
-    const res = await fetch("/api/admin/personas", {
+    const res = await fetchWithViewAs("/api/admin/personas", {
       method:  "DELETE",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body:    JSON.stringify({ id }),
@@ -719,7 +720,7 @@ export function PersonasAgendadasView() {
   const addSeguimiento = async (data: Partial<Seguimiento>) => {
     const session = await getSession()
     if (!session) return
-    const res = await fetch("/api/admin/seguimientos", {
+    const res = await fetchWithViewAs("/api/admin/seguimientos", {
       method:  "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body:    JSON.stringify(data),
@@ -734,7 +735,7 @@ export function PersonasAgendadasView() {
     setSeguimientos(prev => prev.map(s => s.id === id ? { ...s, ...updates, ...(("completed" in updates) ? { completed_at: updates.completed ? new Date().toISOString() : null } : {}) } : s))
     const session = await getSession()
     if (!session) return
-    await fetch("/api/admin/seguimientos", {
+    await fetchWithViewAs("/api/admin/seguimientos", {
       method:  "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body:    JSON.stringify({ id, ...updates }),
@@ -745,7 +746,7 @@ export function PersonasAgendadasView() {
     setSeguimientos(prev => prev.filter(s => s.id !== id))
     const session = await getSession()
     if (!session) return
-    await fetch("/api/admin/seguimientos", {
+    await fetchWithViewAs("/api/admin/seguimientos", {
       method:  "DELETE",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body:    JSON.stringify({ id }),
@@ -819,7 +820,7 @@ export function PersonasAgendadasView() {
             const errors: string[] = []
             for (const row of rowsToInsert) {
               try {
-                const res = await fetch("/api/admin/personas", {
+                const res = await fetchWithViewAs("/api/admin/personas", {
                   method:  "POST",
                   headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
                   body:    JSON.stringify(row),

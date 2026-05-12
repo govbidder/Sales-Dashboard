@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase"
 import { createServiceClient } from "@/lib/supabase-service"
-
-async function getUser(req: NextRequest) {
-  const token = req.headers.get("authorization")?.replace("Bearer ", "")
-  if (!token) return null
-  const { data: { user } } = await createClient().auth.getUser(token)
-  return user
-}
+import { getEffectiveUser } from "@/lib/auth/get-effective-user"
 
 // Returns an aggregated "health snapshot" of the whole dashboard.
 // Used by the Inicio page to show what needs attention.
 export async function GET(req: NextRequest) {
-  const user = await getUser(req)
+  const auth = await getEffectiveUser(req); const user = auth?.effectiveUser ?? null
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 
   const db = createServiceClient()

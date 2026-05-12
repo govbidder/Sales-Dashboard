@@ -1,5 +1,6 @@
 "use client"
 
+import { fetchWithViewAs } from "@/lib/api/fetch-with-view-as"
 import { useState, useEffect } from "react"
 import { Portal } from "@/components/ui/portal"
 import { createClient } from "@/lib/supabase"
@@ -24,7 +25,7 @@ export function AiStandupModal({ onClose }: Props) {
     try {
       const { data: { session } } = await createClient().auth.getSession()
       if (!session) { setErr("Sesión expirada."); return }
-      const res = await fetch("/api/admin/ai-standup", {
+      const res = await fetchWithViewAs("/api/admin/ai-standup", {
         method:  "POST",
         headers: { Authorization: `Bearer ${session.access_token}` },
       })

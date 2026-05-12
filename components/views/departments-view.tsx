@@ -1,5 +1,6 @@
 "use client"
 
+import { fetchWithViewAs } from "@/lib/api/fetch-with-view-as"
 import { useEffect, useState, useCallback, useMemo } from "react"
 import { createClient } from "@/lib/supabase"
 import { Portal } from "@/components/ui/portal"
@@ -329,9 +330,9 @@ export function DepartmentsView() {
 
       const headers = { Authorization: `Bearer ${session.access_token}` }
       const [dRes, tRes, mRes] = await Promise.all([
-        fetch("/api/departments",  { headers }),
-        fetch("/api/admin/tasks?include_subtasks=true", { headers }),
-        fetch("/api/admin/team",   { headers }),
+        fetchWithViewAs("/api/departments",  { headers }),
+        fetchWithViewAs("/api/admin/tasks?include_subtasks=true", { headers }),
+        fetchWithViewAs("/api/admin/team",   { headers }),
       ])
 
       const depts: Department[] = dRes.ok ? (await dRes.json()).departments ?? [] : []
@@ -356,7 +357,7 @@ export function DepartmentsView() {
     try {
       const session = await getSession()
       if (!session) return { error: "Sin sesión" }
-      const res = await fetch("/api/departments", {
+      const res = await fetchWithViewAs("/api/departments", {
         method:  "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
         body:    JSON.stringify(data),
@@ -379,7 +380,7 @@ export function DepartmentsView() {
     setError(null)
     const session = await getSession()
     if (!session) return
-    const res = await fetch(`/api/departments/${id}`, {
+    const res = await fetchWithViewAs(`/api/departments/${id}`, {
       method:  "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body:    JSON.stringify(updates),
@@ -397,7 +398,7 @@ export function DepartmentsView() {
     try {
       const session = await getSession()
       if (!session) return
-      const res = await fetch(`/api/departments/${id}`, {
+      const res = await fetchWithViewAs(`/api/departments/${id}`, {
         method:  "DELETE",
         headers: { Authorization: `Bearer ${session.access_token}` },
       })

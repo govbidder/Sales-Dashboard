@@ -1,5 +1,6 @@
 "use client"
 
+import { fetchWithViewAs } from "@/lib/api/fetch-with-view-as"
 import { useEffect, useState, useCallback, useMemo, useRef } from "react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase"
@@ -71,7 +72,7 @@ export function ActivityView() {
     try {
       const { data: { session } } = await createClient().auth.getSession()
       if (!session) return
-      const res = await fetch("/api/admin/activity?days=30&limit=200", {
+      const res = await fetchWithViewAs("/api/admin/activity?days=30&limit=200", {
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
       if (res.ok) {

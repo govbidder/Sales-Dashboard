@@ -1,5 +1,6 @@
 "use client"
 
+import { fetchWithViewAs } from "@/lib/api/fetch-with-view-as"
 import { useState } from "react"
 import { Portal } from "@/components/ui/portal"
 import { createClient } from "@/lib/supabase"
@@ -47,7 +48,7 @@ export function AiEmailModal({ personaId, personaName, personaEmail, onClose }: 
     try {
       const { data: { session } } = await createClient().auth.getSession()
       if (!session) { setErr("Sesión expirada."); return }
-      const res = await fetch("/api/admin/ai-email", {
+      const res = await fetchWithViewAs("/api/admin/ai-email", {
         method:  "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
         body:    JSON.stringify({ personaId, intent, tone, language, notes: notes || undefined }),

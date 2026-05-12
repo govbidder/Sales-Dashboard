@@ -1,28 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase"
 import { createServiceClient } from "@/lib/supabase-service"
-import { isAdminOrAbove, type Role } from "@/lib/types/role"
-
-async function getUser(req: NextRequest) {
-  const token = req.headers.get("authorization")?.replace("Bearer ", "")
-  if (!token) return null
-  const { data: { user } } = await createClient().auth.getUser(token)
-  return user
-}
-
-/** Fetch caller profile (role + department) for scoping decisions. */
-async function getCallerProfile(userId: string) {
-  const db = createServiceClient()
-  const { data } = await db
-    .from("profiles")
-    .select("role, department_id")
-    .eq("id", userId)
-    .single()
-  return {
-    role: (data?.role as Role | undefined) ?? "user",
-    departmentId: ((data as any)?.department_id as string | null) ?? null,
-  }
-}
+import { isAdminOrAbove } from "@/lib/types/role"
+import { getEffectiveUser } from "@/lib/auth/get-effective-user"
 
 // GET /api/admin/tasks
 //   ?persona_id=xxx     filter by persona
@@ -32,8 +11,9 @@ async function getCallerProfile(userId: string) {
 //   ?parent_id=xxx      get subtasks of a parent
 //   ?include_subtasks=true  default behavior returns top-level only; set true to also return all
 export async function GET(req: NextRequest) {
-  const user = await getUser(req)
-  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  const auth = await getEffectiveUser(req)
+  if (!auth) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  const { effectiveUser } = auth
 
   const personaId       = req.nextUrl.searchParams.get("persona_id")
   const owner           = req.nextUrl.searchParams.get("owner")
@@ -46,13 +26,14 @@ export async function GET(req: NextRequest) {
   let query = db.from("tasks").select("*")
 
   // Scoping para empleados: ven solo tasks de su depto + las que tienen asignadas
-  // por owner/assignees. Admins y super_admin ven todo.
-  const caller = await getCallerProfile(user.id)
-  if (!isAdminOrAbove(caller.role)) {
-    const email = user.email ?? ""
-    if (caller.departmentId) {
+  // por owner/assignees. Admins/super_admin/developer ven todo.
+  // Si el caller real es developer Y simula un empleado, effectiveUser refleja
+  // los datos del simulado — así el scoping aplica desde la perspectiva simulada.
+  if (!isAdminOrAbove(effectiveUser.role)) {
+    const email = effectiveUser.email ?? ""
+    if (effectiveUser.department_id) {
       query = query.or(
-        `department_id.eq.${caller.departmentId},owner.eq.${email},assignees.cs.{${email}}`
+        `department_id.eq.${effectiveUser.department_id},owner.eq.${email},assignees.cs.{${email}}`
       )
     } else {
       // Empleado sin depto asignado: solo ve tasks suyas (owner o assignee).
@@ -76,8 +57,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getUser(req)
-  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  const auth = await getEffectiveUser(req)
+  if (!auth) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  const { effectiveUser, realUser } = auth
 
   const body = await req.json()
   if (!body?.title?.trim()) {
@@ -99,17 +81,19 @@ export async function POST(req: NextRequest) {
       persona_id:  body.persona_id || null,
       parent_id:     body.parent_id    || null,
       department_id: body.department_id || null,
-      created_by:    user.email || user.id,
+      // created_by registra el ACTOR REAL (audit), no el simulado.
+      created_by:    realUser.email || realUser.id,
     })
     .select()
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Auto-log creation as a system comment
+  // Auto-log creation as a system comment — autor = quien LA UI piensa que está
+  // actuando (effectiveUser). Para audit real, ver impersonation_log.
   await db.from("task_comments").insert({
     task_id: data.id,
-    author:  user.email || user.id,
+    author:  effectiveUser.email || effectiveUser.id,
     kind:    "system",
     content: "Tarea creada",
   })
@@ -118,8 +102,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const user = await getUser(req)
-  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  const auth = await getEffectiveUser(req)
+  if (!auth) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  const { effectiveUser } = auth
 
   const body = await req.json()
   const { id, ...updates } = body
@@ -147,7 +132,7 @@ export async function PATCH(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   // Log meaningful changes
-  const author = user.email || user.id
+  const author = effectiveUser.email || effectiveUser.id
   const events: string[] = []
   if (prev && updates.status && prev.status !== updates.status) {
     events.push(`Estado: ${prev.status} → ${updates.status}`)
@@ -163,8 +148,9 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const user = await getUser(req)
-  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  const auth = await getEffectiveUser(req)
+  if (!auth) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  const { realUser } = auth
 
   const { id } = await req.json()
   if (!id) return NextResponse.json({ error: "id requerido" }, { status: 400 })
@@ -177,10 +163,10 @@ export async function DELETE(req: NextRequest) {
   const { error } = await db.from("tasks").delete().eq("id", id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Audit (fire and forget)
+  // Audit — actor SIEMPRE es el REAL (no el simulado) para preservar trail.
   const { audit } = await import("@/lib/audit")
   await audit(req, {
-    actor:     user.email ?? null,
+    actor:     realUser.email ?? null,
     action:    "task.delete",
     entity:    "task",
     entity_id: id,

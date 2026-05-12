@@ -1,35 +1,25 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase"
 import { createServiceClient } from "@/lib/supabase-service"
-import { isAdminOrAbove, type Role } from "@/lib/types/role"
-
-async function getUser(req: NextRequest) {
-  const token = req.headers.get("authorization")?.replace("Bearer ", "")
-  if (!token) return null
-  const { data: { user } } = await createClient().auth.getUser(token)
-  return user
-}
+import { isAdminOrAbove } from "@/lib/types/role"
+import { getEffectiveUser } from "@/lib/auth/get-effective-user"
 
 export async function GET(req: NextRequest) {
-  const user = await getUser(req)
-  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  const auth = await getEffectiveUser(req)
+  if (!auth) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  const { effectiveUser } = auth
 
   const db = createServiceClient()
 
   // Scoping para empleados: ven sólo las personas que tienen asignadas (owner = email).
-  // Admins y super_admin ven todo.
-  const { data: callerProfile } = await db
-    .from("profiles").select("role").eq("id", user.id).single()
-  const callerRole = (callerProfile?.role as Role | undefined) ?? "user"
-
+  // Admins/super_admin/developer ven todo.
   let query = db
     .from("personas_agendadas")
     .select("*")
     .order("scheduled_at", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false })
 
-  if (!isAdminOrAbove(callerRole)) {
-    query = query.eq("owner", user.email ?? "")
+  if (!isAdminOrAbove(effectiveUser.role)) {
+    query = query.eq("owner", effectiveUser.email ?? "")
   }
 
   const { data, error } = await query
@@ -43,8 +33,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getUser(req)
-  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  const auth = await getEffectiveUser(req)
+  if (!auth) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 
   const body = await req.json()
   if (!body?.name?.trim()) {
@@ -75,8 +65,8 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const user = await getUser(req)
-  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  const auth = await getEffectiveUser(req)
+  if (!auth) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 
   const body = await req.json()
   const { id, ...updates } = body
@@ -95,8 +85,8 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const user = await getUser(req)
-  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  const auth = await getEffectiveUser(req)
+  if (!auth) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 
   const { id } = await req.json()
   if (!id) return NextResponse.json({ error: "id requerido" }, { status: 400 })

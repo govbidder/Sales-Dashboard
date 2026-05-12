@@ -1,14 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
-import { createClient } from "@/lib/supabase"
+import { getEffectiveUser } from "@/lib/auth/get-effective-user"
 import { createServiceClient } from "@/lib/supabase-service"
-
-async function getUser(req: NextRequest) {
-  const token = req.headers.get("authorization")?.replace("Bearer ", "")
-  if (!token) return null
-  const { data: { user } } = await createClient().auth.getUser(token)
-  return user
-}
 
 interface ExtractRequest {
   text:        string
@@ -99,7 +92,7 @@ Output: { "tasks": [] }
 `
 
 export async function POST(req: NextRequest) {
-  const user = await getUser(req)
+  const auth = await getEffectiveUser(req); const user = auth?.effectiveUser ?? null
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 
   const apiKey = process.env.ANTHROPIC_API_KEY

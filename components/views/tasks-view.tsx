@@ -1,5 +1,6 @@
 "use client"
 
+import { fetchWithViewAs } from "@/lib/api/fetch-with-view-as"
 import { useEffect, useState, useCallback, useMemo, useRef } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { createClient } from "@/lib/supabase"
@@ -299,7 +300,7 @@ function CommentsSection({ taskId }: { taskId: string }) {
     try {
       const session = await getSession()
       if (!session) return
-      const res = await fetch(`/api/admin/task-comments?task_id=${taskId}`, {
+      const res = await fetchWithViewAs(`/api/admin/task-comments?task_id=${taskId}`, {
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
       if (res.ok) setComments((await res.json()).comments ?? [])
@@ -315,7 +316,7 @@ function CommentsSection({ taskId }: { taskId: string }) {
     try {
       const session = await getSession()
       if (!session) return
-      const res = await fetch("/api/admin/task-comments", {
+      const res = await fetchWithViewAs("/api/admin/task-comments", {
         method:  "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
         body:    JSON.stringify({ task_id: taskId, content: draft }),
@@ -332,7 +333,7 @@ function CommentsSection({ taskId }: { taskId: string }) {
     setComments(prev => prev.filter(c => c.id !== id))
     const session = await getSession()
     if (!session) return
-    await fetch("/api/admin/task-comments", {
+    await fetchWithViewAs("/api/admin/task-comments", {
       method:  "DELETE",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body:    JSON.stringify({ id }),
@@ -793,7 +794,7 @@ function NewTaskModal({
     try {
       const { data: { session } } = await createClient().auth.getSession()
       if (!session) return
-      const res = await fetch("/api/admin/tasks/suggest", {
+      const res = await fetchWithViewAs("/api/admin/tasks/suggest", {
         method:  "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
         body:    JSON.stringify({ title, description }),
@@ -1397,10 +1398,10 @@ export function TasksView() {
       setCurrentEmail(session.user?.email ?? "")
       const headers = { Authorization: `Bearer ${session.access_token}` }
       const [tRes, pRes, sRes, dRes] = await Promise.all([
-        fetch("/api/admin/tasks?include_subtasks=true", { headers }),
-        fetch("/api/admin/personas",                     { headers }),
-        fetch("/api/admin/task-status-sets",             { headers }),
-        fetch("/api/departments",                        { headers }),
+        fetchWithViewAs("/api/admin/tasks?include_subtasks=true", { headers }),
+        fetchWithViewAs("/api/admin/personas",                     { headers }),
+        fetchWithViewAs("/api/admin/task-status-sets",             { headers }),
+        fetchWithViewAs("/api/departments",                        { headers }),
       ])
       if (tRes.ok) setTasks((await tRes.json()).tasks ?? [])
       if (dRes.ok) setDepartments((await dRes.json()).departments ?? [])
@@ -1500,7 +1501,7 @@ export function TasksView() {
     try {
       const session = await getSession()
       if (!session) return
-      const res = await fetch("/api/admin/tasks", {
+      const res = await fetchWithViewAs("/api/admin/tasks", {
         method:  "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
         body:    JSON.stringify(data),
@@ -1517,7 +1518,7 @@ export function TasksView() {
   const quickCreate = async (title: string, status: Status) => {
     const session = await getSession()
     if (!session) return
-    const res = await fetch("/api/admin/tasks", {
+    const res = await fetchWithViewAs("/api/admin/tasks", {
       method:  "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body:    JSON.stringify({ title, status }),
@@ -1529,7 +1530,7 @@ export function TasksView() {
   const createSubtask = async (parentId: string, title: string) => {
     const session = await getSession()
     if (!session) return
-    const res = await fetch("/api/admin/tasks", {
+    const res = await fetchWithViewAs("/api/admin/tasks", {
       method:  "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body:    JSON.stringify({ title, parent_id: parentId }),
@@ -1543,7 +1544,7 @@ export function TasksView() {
     setSelected(prev => prev && prev.id === id ? { ...prev, ...updates } : prev)
     const session = await getSession()
     if (!session) return
-    await fetch("/api/admin/tasks", {
+    await fetchWithViewAs("/api/admin/tasks", {
       method:  "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body:    JSON.stringify({ id, ...updates }),
@@ -1554,7 +1555,7 @@ export function TasksView() {
     setDeletingId(id)
     const session = await getSession()
     if (!session) return
-    await fetch("/api/admin/tasks", {
+    await fetchWithViewAs("/api/admin/tasks", {
       method:  "DELETE",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body:    JSON.stringify({ id }),
@@ -1570,7 +1571,7 @@ export function TasksView() {
     setTasks(prev => prev.map(t => ids.includes(t.id) ? { ...t, ...updates } : t))
     const session = await getSession()
     if (!session) return
-    await Promise.all(ids.map(id => fetch("/api/admin/tasks", {
+    await Promise.all(ids.map(id => fetchWithViewAs("/api/admin/tasks", {
       method: "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body: JSON.stringify({ id, ...updates }),
@@ -1583,7 +1584,7 @@ export function TasksView() {
     setSelectedIds(new Set())
     const session = await getSession()
     if (!session) return
-    await Promise.all(ids.map(id => fetch("/api/admin/tasks", {
+    await Promise.all(ids.map(id => fetchWithViewAs("/api/admin/tasks", {
       method: "DELETE",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body: JSON.stringify({ id }),
@@ -1642,15 +1643,18 @@ export function TasksView() {
       if (filterPriority !== "todos" && t.priority !== filterPriority) return false
       if (filterDepartment !== "todos" && t.department_id !== filterDepartment) return false
 
-      // View-As: filtro extra por depto simulado (se aplica además del UI filter).
-      if (simulatedDeptId && t.department_id !== simulatedDeptId) return false
+      // NOTA: el filtro client por simulatedDeptId fue removido en milestone 4.
+      // Ahora el server respeta X-View-As-User-Id y devuelve solo las tareas
+      // que el user simulado debería ver (depto + owner + assignee). El chip
+      // "Solo X (simulación)" en la toolbar (abajo) sigue mostrándose como
+      // disclaimer informativo.
 
       // Free-text search
       if (!q) return true
       return [t.title, t.description, ...(t.assignees ?? []), ...(t.tags ?? [])]
         .some(v => v?.toLowerCase().includes(q))
     })
-  }, [topLevel, search, filterAssignee, filterTag, filterPriority, filterDepartment, simulatedDeptId, quickFilter, effectiveEmail, terminalKeys])
+  }, [topLevel, search, filterAssignee, filterTag, filterPriority, filterDepartment, quickFilter, effectiveEmail, terminalKeys])
 
   // Sort
   const sorted = useMemo(() => {
@@ -1955,7 +1959,7 @@ export function TasksView() {
             const errors: string[] = []
             for (const row of rowsToInsert) {
               try {
-                const res = await fetch("/api/admin/tasks", {
+                const res = await fetchWithViewAs("/api/admin/tasks", {
                   method:  "POST",
                   headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
                   body:    JSON.stringify(row),

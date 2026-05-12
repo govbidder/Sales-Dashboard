@@ -1,17 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase"
 import { createServiceClient } from "@/lib/supabase-service"
-
-async function getUser(req: NextRequest) {
-  const token = req.headers.get("authorization")?.replace("Bearer ", "")
-  if (!token) return null
-  const { data: { user } } = await createClient().auth.getUser(token)
-  return user
-}
+import { getEffectiveUser } from "@/lib/auth/get-effective-user"
 
 // GET — list all forms with submission counts
 export async function GET(req: NextRequest) {
-  const user = await getUser(req)
+  const auth = await getEffectiveUser(req); const user = auth?.effectiveUser ?? null
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 
   const db = createServiceClient()
@@ -25,7 +18,7 @@ export async function GET(req: NextRequest) {
 
 // POST — create a new form
 export async function POST(req: NextRequest) {
-  const user = await getUser(req)
+  const auth = await getEffectiveUser(req); const user = auth?.effectiveUser ?? null
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 
   let body: any
@@ -69,7 +62,7 @@ export async function POST(req: NextRequest) {
 
 // PATCH — update an existing form
 export async function PATCH(req: NextRequest) {
-  const user = await getUser(req)
+  const auth = await getEffectiveUser(req); const user = auth?.effectiveUser ?? null
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 
   const body = await req.json()
@@ -95,7 +88,7 @@ export async function PATCH(req: NextRequest) {
 
 // DELETE — remove a form (cascades to submissions)
 export async function DELETE(req: NextRequest) {
-  const user = await getUser(req)
+  const auth = await getEffectiveUser(req); const user = auth?.effectiveUser ?? null
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 
   const { id } = await req.json()
