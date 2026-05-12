@@ -55,6 +55,7 @@ import {
   statusInlineStyle,
 } from "@/components/views/tasks/_helpers"
 import { AvatarStack } from "@/components/views/tasks/avatar-stack"
+import { BulkBar } from "@/components/views/tasks/bulk-bar"
 
 // ─── Tags inline editor ───────────────────────────────────────────────────────
 
@@ -1013,87 +1014,9 @@ function TaskCard({
   )
 }
 
-// ─── Multi-select bottom bar ─────────────────────────────────────────────────
-
-function BulkBar({
-  count, onClear, onSetStatus, onDelete, onSetPriority, statuses,
-}: {
-  count:         number
-  onClear:       () => void
-  onSetStatus:   (s: Status) => void
-  onSetPriority: (p: Priority) => void
-  onDelete:      () => void
-  statuses:      StatusDef[]
-}) {
-  return (
-    <Portal>
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[120] animate-in slide-in-from-bottom-4">
-        <div className="flex items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2 shadow-[0_20px_40px_rgba(15,23,42,0.15)]">
-          <div className="flex items-center gap-2 pr-2 border-r border-border">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#1e3a8a] text-[12px] font-bold text-white">
-              {count}
-            </span>
-            <span className="text-[12px] font-medium text-muted-foreground">seleccionadas</span>
-          </div>
-
-          {/* Status selector */}
-          <div className="relative group">
-            <button className="flex items-center gap-1.5 h-8 rounded-lg border border-border bg-card px-2.5 text-[12px] font-medium text-muted-foreground hover:border-[#1e3a8a]/30 transition-colors">
-              <Circle className="h-3 w-3" /> Estado <ChevronDown className="h-3 w-3" />
-            </button>
-            <div className="absolute bottom-full mb-1 left-0 hidden group-hover:block min-w-[180px] rounded-lg border border-border bg-card shadow-lg overflow-hidden">
-              {statuses.map(s => (
-                <button
-                  key={s.key}
-                  onClick={() => onSetStatus(s.key)}
-                  className="flex w-full items-center gap-2 text-left px-3 py-2 text-[12px] text-muted-foreground hover:bg-muted"
-                >
-                  <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: s.color }} />
-                  {s.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Priority selector */}
-          <div className="relative group">
-            <button className="flex items-center gap-1.5 h-8 rounded-lg border border-border bg-card px-2.5 text-[12px] font-medium text-muted-foreground hover:border-[#1e3a8a]/30 transition-colors">
-              <Flag className="h-3 w-3" /> Prioridad <ChevronDown className="h-3 w-3" />
-            </button>
-            <div className="absolute bottom-full mb-1 left-0 hidden group-hover:block min-w-[120px] rounded-lg border border-border bg-card shadow-lg overflow-hidden">
-              {PRIORITY_OPTIONS.map(p => (
-                <button
-                  key={p}
-                  onClick={() => onSetPriority(p)}
-                  className="block w-full text-left px-3 py-2 text-[12px] capitalize hover:bg-muted flex items-center gap-2"
-                >
-                  <Flag className={`h-3 w-3 ${PRIORITY_STYLE[p].flag}`} /> {p}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <button
-            onClick={onDelete}
-            className="flex items-center gap-1.5 h-8 rounded-lg border border-red-200 bg-red-50 px-2.5 text-[12px] font-medium text-red-700 hover:bg-red-100 transition-colors"
-          >
-            <Trash2 className="h-3 w-3" /> Borrar
-          </button>
-
-          <div className="border-l border-border pl-2">
-            <button
-              onClick={onClear}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-muted-foreground transition-colors"
-              title="Cancelar (Esc)"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-    </Portal>
-  )
-}
+// BulkBar extraído a components/views/tasks/bulk-bar.tsx (PR 8) — ahora con
+// soporte para asignar usuario y mover de departamento + popovers
+// click-controlled (más estables que los hover-dropdowns originales).
 
 // ─── Keyboard shortcuts help modal ───────────────────────────────────────────
 
@@ -1943,8 +1866,12 @@ export function TasksView() {
           onClear={clearSelection}
           onSetStatus={s => bulkPatch({ status: s })}
           onSetPriority={p => bulkPatch({ priority: p })}
+          onSetAssignees={emails => bulkPatch({ assignees: emails })}
+          onSetDepartment={id => bulkPatch({ department_id: id } as Partial<Task>)}
           onDelete={bulkDelete}
           statuses={activeSet.statuses}
+          knownAssignees={allAssignees}
+          departments={departments}
         />
       )}
 
