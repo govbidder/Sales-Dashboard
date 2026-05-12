@@ -30,18 +30,41 @@ Inserta data ficticia identificable:
 | Tabla              | Cantidad | Identificación |
 |--------------------|----------|----------------|
 | `monthly_reports`  | 12       | meses mayo 2025 → abril 2026, números con curva ascendente coherente |
+| `profiles` + `auth.users` | 5 | emails `demo-*@govbidder-demo.com`, rol `user` (empleado), uno por departamento |
 | `tasks`            | 26       | titulo con prefijo `Demo - `, 5-6 por departamento |
 | `personas_agendadas` | 12     | name con prefijo `Demo - ` (`John Doe`, `Acme Corp`, etc.) |
 | `seguimientos`     | 8        | content con prefijo `Demo - ` |
-| `profiles`         | 0        | **SKIPPED** — la tabla tiene FK a `auth.users`, crear users demo deja cuentas reales |
 
 **Idempotencia**: correr 2 veces no duplica. `monthly_reports` hace upsert
-sobre `month`. `tasks` y `personas_agendadas` borran lo previo identificado
+sobre `month`. `profiles` hace upsert sobre `id` y resetea el password si
+cambió. `tasks` y `personas_agendadas` borran lo previo identificado
 por prefijo antes de insertar.
 
 ```bash
 pnpm seed:demo
 ```
+
+### Credenciales demo
+
+Los 5 usuarios se crean con un **password compartido**:
+
+```
+Password: DemoGovBidder2026!
+```
+
+Emails:
+
+| Email                                  | Nombre         | Departamento  |
+|----------------------------------------|----------------|---------------|
+| demo-ana@govbidder-demo.com            | Ana García     | IA            |
+| demo-luis@govbidder-demo.com           | Luis Pérez     | Marketing     |
+| demo-sofia@govbidder-demo.com          | Sofía Ramírez  | Anuncios      |
+| demo-marcos@govbidder-demo.com         | Marcos López   | Orgánico      |
+| demo-elena@govbidder-demo.com          | Elena Castro   | Lanzamientos  |
+
+Todos con rol `user` (empleado) — útil para mostrar en la presentación
+la diferencia visual entre la vista admin (Cristián/Santo/Gabriela) y
+la vista empleado (sidebar reducido, scoping de tareas al propio depto).
 
 ### `pnpm cleanup:demo` — borrar TODA la data demo
 
@@ -57,18 +80,24 @@ Pide confirmación interactiva (escribir `yes`). Borra:
 pnpm cleanup:demo
 ```
 
-## Sobre profiles
+## Sobre profiles + auth users
 
-El seed deliberadamente NO crea perfiles. La tabla `profiles` tiene FK a
-`auth.users`, así que crear miembros de equipo demo requeriría crear
-usuarios reales en Supabase Auth — esos podrían intentar loguearse y
-generar ruido. Las tareas y personas usan emails ficticios como
-`owner`/`assignees` (campos `text` sin FK), suficiente para que la UI
-muestre datos coherentes en la demo.
+El seed crea **5 usuarios reales en Supabase Auth** con la misma contraseña
+compartida (ver tabla de credenciales arriba). Cada uno tiene su perfil
+con `full_name`, `position`, `department_id` y rol `user` (empleado).
 
-Si necesitás perfiles reales:
-1. Invitá manualmente desde `/admin/team` usando la UI.
-2. O extendé `seed-demo-data.ts` para usar `db.auth.admin.createUser(...)`.
+⚠ **Estos usuarios pueden loguearse.** Considerá:
+- El dominio `@govbidder-demo.com` es ficticio (no recibe emails reales).
+- Los 5 emails son fácilmente identificables por prefijo `demo-`.
+- `pnpm cleanup:demo` borra los `auth.users` (cascade a profiles) cuando
+  termina la presentación.
+- Si querés rotar el password después del demo, cambialo en
+  `scripts/_lib.ts` y volvé a correr `pnpm seed:demo` — el seed
+  actualiza la contraseña por idempotencia.
+
+Si en algún momento querés crear un admin de demo (vs estos empleados),
+ajustá `role: "admin"` en la llamada `auth.admin.createUser` y en el
+upsert de profile en `seed-demo-data.ts`.
 
 ## Archivos
 
