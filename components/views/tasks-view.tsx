@@ -1643,18 +1643,19 @@ export function TasksView() {
       if (filterPriority !== "todos" && t.priority !== filterPriority) return false
       if (filterDepartment !== "todos" && t.department_id !== filterDepartment) return false
 
-      // NOTA: el filtro client por simulatedDeptId fue removido en milestone 4.
-      // Ahora el server respeta X-View-As-User-Id y devuelve solo las tareas
-      // que el user simulado debería ver (depto + owner + assignee). El chip
-      // "Solo X (simulación)" en la toolbar (abajo) sigue mostrándose como
-      // disclaimer informativo.
+      // View-As por depto solo (sin viewAsUser): el server NO filtra por
+      // dept (X-View-As-User-Id está vacío), así que aplicamos el filtro
+      // client-side acá para que el chip "Solo X (simulación)" diga la verdad.
+      // Si hay viewAsUser, el server ya filtró arriba y este filtro no
+      // descarta nada nuevo. Decisión documentada en CLAUDE.md.
+      if (simulatedDeptId && t.department_id !== simulatedDeptId) return false
 
       // Free-text search
       if (!q) return true
       return [t.title, t.description, ...(t.assignees ?? []), ...(t.tags ?? [])]
         .some(v => v?.toLowerCase().includes(q))
     })
-  }, [topLevel, search, filterAssignee, filterTag, filterPriority, filterDepartment, quickFilter, effectiveEmail, terminalKeys])
+  }, [topLevel, search, filterAssignee, filterTag, filterPriority, filterDepartment, quickFilter, effectiveEmail, terminalKeys, simulatedDeptId])
 
   // Sort
   const sorted = useMemo(() => {
