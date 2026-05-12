@@ -12,6 +12,8 @@ import { exportToCSV, csvDate } from "@/lib/export-csv"
 import type { Department } from "@/lib/types/department"
 import { CsvImportModal } from "@/components/ui/csv-import-modal"
 import { useViewAs } from "@/lib/contexts/view-as-context"
+import { useRealtimeTable } from "@/hooks/use-realtime-table"
+import { useToast } from "@/components/ui/toast"
 import {
   DndContext, DragEndEvent, DragOverlay, DragStartEvent,
   PointerSensor, useDraggable, useDroppable, useSensor, useSensors,
@@ -1360,6 +1362,38 @@ export function TasksView() {
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
   )
 
+  const toast = useToast()
+
+  // ─── Realtime subscription a `tasks` ─────────────────────────────────────
+  // El servidor publica INSERT / UPDATE / DELETE vía Supabase Realtime; los
+  // mergeamos en el state local. Para evitar clobbering durante un drag
+  // activo, ignoramos eventos sobre tasks que el user esté arrastrando.
+  //
+  // Reconciliación con optimistic: cuando hicimos un patch local y el
+  // server confirma, el evento UPDATE llega con los mismos valores → el
+  // merge es idempotente. Si otro user cambió la tarea, el merge trae
+  // SUS cambios automáticamente.
+  const draggingIdRef = useRef<string | null>(null)
+  useEffect(() => { draggingIdRef.current = draggingId }, [draggingId])
+
+  useRealtimeTable<Task>({
+    table: "tasks",
+    onChange: (payload) => {
+      const { eventType, new: newRow, old: oldRow } = payload
+      if (eventType === "INSERT" && newRow) {
+        setTasks(prev => prev.some(t => t.id === newRow.id) ? prev : [newRow, ...prev])
+      } else if (eventType === "UPDATE" && newRow) {
+        // Skip si el user está arrastrando esta task — evita parpadeo.
+        if (draggingIdRef.current === newRow.id) return
+        setTasks(prev => prev.map(t => t.id === newRow.id ? { ...t, ...newRow } : t))
+        setSelected(prev => prev && prev.id === newRow.id ? { ...prev, ...newRow } : prev)
+      } else if (eventType === "DELETE" && oldRow) {
+        setTasks(prev => prev.filter(t => t.id !== oldRow.id && t.parent_id !== oldRow.id))
+        setSelected(prev => prev?.id === oldRow.id ? null : prev)
+      }
+    },
+  })
+
   const router       = useRouter()
   const pathname     = usePathname()
   const searchParams = useSearchParams()
@@ -1539,56 +1573,116 @@ export function TasksView() {
     if (res.ok && json.task) setTasks(prev => [json.task, ...prev])
   }
 
+  // ─── Mutations con optimistic UI + rollback ──────────────────────────────
+  // Pattern: aplico el cambio local inmediato, mando al server en background.
+  // Si el server rechaza, revierto el state local y muestro toast de error.
+  // Si todo va bien, no mostramos toast (silencio = éxito — regla Linear).
   const patch = useCallback(async (id: string, updates: Partial<Task>) => {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t))
+    // Snapshot del valor previo de cada campo para poder revertir.
+    let previousTask: Task | null = null
+    setTasks(prev => {
+      const found = prev.find(t => t.id === id)
+      if (found) previousTask = { ...found }
+      return prev.map(t => t.id === id ? { ...t, ...updates } : t)
+    })
     setSelected(prev => prev && prev.id === id ? { ...prev, ...updates } : prev)
+
     const session = await getSession()
     if (!session) return
-    await fetchWithViewAs("/api/admin/tasks", {
-      method:  "PATCH",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
-      body:    JSON.stringify({ id, ...updates }),
-    })
-  }, [])
+    try {
+      const res = await fetchWithViewAs("/api/admin/tasks", {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+        body:    JSON.stringify({ id, ...updates }),
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    } catch (e) {
+      // Rollback al snapshot.
+      if (previousTask) {
+        const snapshot = previousTask
+        setTasks(prev => prev.map(t => t.id === id ? snapshot : t))
+        setSelected(prev => prev && prev.id === id ? snapshot : prev)
+      }
+      toast.error("No se pudo guardar el cambio. Reintentá en un momento.")
+    }
+  }, [toast])
 
   const handleDelete = useCallback(async (id: string) => {
     setDeletingId(id)
+    // Snapshot para rollback.
+    let removed: Task[] = []
+    setTasks(prev => {
+      removed = prev.filter(t => t.id === id || t.parent_id === id)
+      return prev.filter(t => t.id !== id && t.parent_id !== id)
+    })
+    setSelected(prev => prev?.id === id ? null : prev)
+
     const session = await getSession()
     if (!session) return
-    await fetchWithViewAs("/api/admin/tasks", {
-      method:  "DELETE",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
-      body:    JSON.stringify({ id }),
-    })
-    setTasks(prev => prev.filter(t => t.id !== id && t.parent_id !== id))
-    setSelected(prev => prev?.id === id ? null : prev)
-    setDeletingId(null)
-  }, [])
+    try {
+      const res = await fetchWithViewAs("/api/admin/tasks", {
+        method:  "DELETE",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+        body:    JSON.stringify({ id }),
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    } catch {
+      setTasks(prev => [...removed, ...prev])
+      toast.error("No se pudo borrar la tarea.")
+    } finally {
+      setDeletingId(null)
+    }
+  }, [toast])
 
   // Bulk actions
   const bulkPatch = async (updates: Partial<Task>) => {
     const ids = Array.from(selectedIds)
-    setTasks(prev => prev.map(t => ids.includes(t.id) ? { ...t, ...updates } : t))
+    let snapshot: Task[] = []
+    setTasks(prev => {
+      snapshot = prev.filter(t => ids.includes(t.id)).map(t => ({ ...t }))
+      return prev.map(t => ids.includes(t.id) ? { ...t, ...updates } : t)
+    })
     const session = await getSession()
     if (!session) return
-    await Promise.all(ids.map(id => fetchWithViewAs("/api/admin/tasks", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
-      body: JSON.stringify({ id, ...updates }),
-    })))
+    try {
+      const results = await Promise.all(ids.map(id => fetchWithViewAs("/api/admin/tasks", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ id, ...updates }),
+      })))
+      const failed = results.filter(r => !r.ok).length
+      if (failed > 0) throw new Error(`${failed} fallaron`)
+    } catch {
+      // Rollback al snapshot.
+      const byId = new Map(snapshot.map(t => [t.id, t]))
+      setTasks(prev => prev.map(t => byId.get(t.id) ?? t))
+      toast.error(`No se pudo actualizar ${ids.length} tarea${ids.length === 1 ? "" : "s"}.`)
+    }
   }
   const bulkDelete = async () => {
     const ids = Array.from(selectedIds)
     if (!confirm(`¿Borrar ${ids.length} tarea${ids.length === 1 ? "" : "s"}?`)) return
-    setTasks(prev => prev.filter(t => !ids.includes(t.id) && (t.parent_id ? !ids.includes(t.parent_id) : true)))
+    let removed: Task[] = []
+    setTasks(prev => {
+      removed = prev.filter(t => ids.includes(t.id) || (t.parent_id ? ids.includes(t.parent_id) : false))
+      return prev.filter(t => !ids.includes(t.id) && (t.parent_id ? !ids.includes(t.parent_id) : true))
+    })
     setSelectedIds(new Set())
     const session = await getSession()
     if (!session) return
-    await Promise.all(ids.map(id => fetchWithViewAs("/api/admin/tasks", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
-      body: JSON.stringify({ id }),
-    })))
+    try {
+      const results = await Promise.all(ids.map(id => fetchWithViewAs("/api/admin/tasks", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ id }),
+      })))
+      const failed = results.filter(r => !r.ok).length
+      if (failed > 0) throw new Error(`${failed} fallaron`)
+    } catch {
+      // Restaurar todas las tasks removidas.
+      setTasks(prev => [...removed, ...prev])
+      toast.error(`No se pudo borrar ${ids.length} tarea${ids.length === 1 ? "" : "s"}.`)
+    }
   }
 
   // Top-level tasks only for board / list (subtasks live inside drawer)
