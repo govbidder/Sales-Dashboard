@@ -64,7 +64,18 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed,  setSidebarCollapsed]  = useState(false)
   const [departments,       setDepartments]       = useState<Array<{ id: string; name: string; color: string }>>([])
 
-  const pageTitle = PAGE_TITLES[pathname] ?? "GovBidder"
+  // Title estático del map, con override dinámico para rutas /admin/departments/[id]
+  // (resolvemos el nombre del depto desde el cache de departments cargado abajo).
+  const deptDetailMatch = pathname.match(/^\/admin\/departments\/([^/]+)$/)
+  const pageTitle = (() => {
+    if (PAGE_TITLES[pathname]) return PAGE_TITLES[pathname]
+    if (deptDetailMatch) {
+      const id = deptDetailMatch[1]
+      const dept = departments.find(d => d.id === id)
+      return dept ? `Departamento — ${dept.name}` : "Departamento"
+    }
+    return "GovBidder"
+  })()
 
   // Auth check
   useEffect(() => {
