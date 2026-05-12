@@ -12,6 +12,7 @@ import { NavigationProgress } from "@/components/ui/navigation-progress"
 import { ToastProvider } from "@/components/ui/toast"
 import { AIAssistant } from "@/components/ai/ai-assistant"
 import { ViewAsProvider } from "@/lib/contexts/view-as-context"
+import { fetchWithViewAs } from "@/lib/api/fetch-with-view-as"
 import { ViewAsBanner } from "@/components/layout/view-as-banner"
 import { useEffectiveRole } from "@/hooks/use-effective-role"
 import { createClient } from "@/lib/supabase"
@@ -145,7 +146,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     ;(async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) return
-      const res = await fetch("/api/departments", {
+      const res = await fetchWithViewAs("/api/departments", {
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
       if (res.ok && mounted) {
