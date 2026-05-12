@@ -8,7 +8,7 @@ import {
   X, LayoutGrid,
   Users2, ListTodo, Users, Layers, Wrench, BookOpen, CalendarDays,
   Home, ChevronLeft, ChevronRight, Rss, FormInput, Shield, LayoutTemplate,
-  Folder, Settings,
+  Folder, Settings, Sparkles,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { type Role, isAdminOrAbove } from "@/lib/types/role"
@@ -343,7 +343,47 @@ export function Sidebar({
           )}
         </nav>
 
-        {/* SLOT — botón CRM se inyecta acá en PR #4 */}
+        {/* CRM portal trigger — separado por divisor, tratamiento visual
+            distinto para anticipar que abre "otro mundo" (la puerta de Narnia).
+            Cmd+Shift+C también lo abre desde cualquier parte del dashboard. */}
+        <div className={cn("shrink-0 border-t-2 border-[#1e3a8a]/10", showLabels ? "px-3 py-3" : "px-2 py-3")}>
+          <Link
+            href="/crm"
+            onClick={onClose}
+            title={!showLabels ? "Abrir CRM (⌘⇧C)" : undefined}
+            className={cn(
+              "group relative flex items-center overflow-hidden rounded-xl transition-all duration-300",
+              "bg-gradient-to-br from-[#1e3a8a] to-[#0f1f5c] text-white",
+              "shadow-[0_8px_24px_-8px_rgba(30,58,138,0.55)]",
+              "hover:shadow-[0_12px_32px_-8px_rgba(30,58,138,0.75)] hover:-translate-y-0.5",
+              showLabels ? "gap-3 px-3 py-2.5" : "justify-center h-10 w-12 mx-auto",
+            )}
+          >
+            {/* Glow that animates on hover */}
+            <span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#E42D2C]/0 via-[#E42D2C]/0 to-[#E42D2C]/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+            <Sparkles className={cn(
+              "relative shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12",
+              showLabels ? "h-[18px] w-[18px]" : "h-[20px] w-[20px]",
+            )} />
+            {showLabels && (
+              <>
+                <span className="relative flex-1 min-w-0">
+                  <span className="block text-[13px] font-bold leading-none tracking-tight">
+                    Abrir CRM
+                  </span>
+                  <span className="block text-[10px] font-medium leading-none mt-1 text-white/60">
+                    Nuevo módulo · Beta
+                  </span>
+                </span>
+                <kbd className="relative shrink-0 hidden lg:inline-flex items-center gap-0.5 rounded border border-white/15 bg-white/[0.08] px-1.5 py-0.5 text-[9px] font-mono text-white/70">
+                  ⌘⇧C
+                </kbd>
+              </>
+            )}
+          </Link>
+        </div>
+
 
         {/* Floating collapse toggle */}
         <button
