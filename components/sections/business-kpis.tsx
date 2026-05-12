@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
-import { TrendingDown, TrendingUp, DollarSign, Wallet, Repeat, Megaphone, Phone, UserPlus } from "lucide-react"
+import { TrendingDown, TrendingUp, DollarSign, Wallet, Repeat, Megaphone, Phone, UserPlus, CalendarClock, CheckCircle2, MessageCircle } from "lucide-react"
 import { useSelectedMonth } from "@/components/layout/dashboard-layout"
 import { useMonthlyReports } from "@/hooks/use-monthly-reports"
 import { useMarkPageReady } from "@/hooks/use-mark-page-ready"
@@ -54,13 +54,19 @@ function fmtNumber(v: any) {
 
 // ─── KPI definitions ──────────────────────────────────────────────────────────
 
+// Orden por funnel de ventas. Los 4 primeros son los KPIs core que Cristian
+// pidió ver explícitamente en el discovery (facturación, agendadas, cerradas,
+// conversaciones abiertas).
 const KPI_DEFS = [
-  { key: "cash_collected",  label: "Cobrado",            money: true,  icon: Wallet,     color: "#1e3a8a" },
-  { key: "total_revenue",   label: "Ingresos Totales",   money: true,  icon: DollarSign, color: "#E42D2C" },
-  { key: "mrr",             label: "MRR",                money: true,  icon: Repeat,     color: "#1e3a8a" },
-  { key: "ad_spend",        label: "Gasto en Ads",       money: true,  icon: Megaphone,  color: "#E42D2C" },
-  { key: "attended_calls",  label: "Llamadas Atendidas", money: false, icon: Phone,      color: "#1e3a8a" },
-  { key: "new_clients",     label: "Nuevos Clientes",    money: false, icon: UserPlus,   color: "#059669" },
+  { key: "total_revenue",        label: "Facturación",            money: true,  icon: DollarSign,    color: "#E42D2C" },
+  { key: "scheduled_calls",      label: "Llamadas Agendadas",     money: false, icon: CalendarClock, color: "#1e3a8a" },
+  { key: "cierres_por_offerdoc", label: "Cerradas",               money: false, icon: CheckCircle2,  color: "#059669" },
+  { key: "open_conversations",   label: "Conversaciones Abiertas", money: false, icon: MessageCircle, color: "#8b5cf6" },
+  { key: "cash_collected",       label: "Cobrado",                money: true,  icon: Wallet,        color: "#1e3a8a" },
+  { key: "attended_calls",       label: "Llamadas Atendidas",     money: false, icon: Phone,         color: "#1e3a8a" },
+  { key: "new_clients",          label: "Nuevos Clientes",        money: false, icon: UserPlus,      color: "#059669" },
+  { key: "mrr",                  label: "MRR",                    money: true,  icon: Repeat,        color: "#1e3a8a" },
+  { key: "ad_spend",             label: "Gasto en Ads",           money: true,  icon: Megaphone,     color: "#E42D2C" },
 ]
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -115,7 +121,7 @@ export function BusinessKPIs({ selectedMonth: propMonth }: { selectedMonth?: str
       <section>
         <SectionHeaderSkeleton />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => <KpiCardSkeleton key={i} />)}
+          {KPI_DEFS.map((_, i) => <KpiCardSkeleton key={i} />)}
         </div>
       </section>
     )
