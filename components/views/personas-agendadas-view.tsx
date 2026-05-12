@@ -15,6 +15,7 @@ import { AiEmailModal } from "@/components/views/personas/ai-email-modal"
 import { CsvImportModal } from "@/components/ui/csv-import-modal"
 import { TableRowSkeleton } from "@/components/ui/skeleton"
 import { useUrlFilterState } from "@/hooks/use-url-filter-state"
+import { InlineEdit } from "@/components/ui/inline-edit"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -978,7 +979,15 @@ export function PersonasAgendadasView() {
                       className="border-b border-border cursor-pointer transition-colors group hover:bg-muted">
 
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="text-[14px] font-semibold text-foreground">{p.name}</div>
+                        <div className="text-[14px] font-semibold text-foreground">
+                          <InlineEdit
+                            value={p.name}
+                            onSave={(next) => patchPersona(p.id, { name: next })}
+                            placeholder="Sin nombre"
+                            ariaLabel="Editar nombre de la persona"
+                            displayClassName="text-[14px] font-semibold w-full"
+                          />
+                        </div>
                         <div className="text-[11px] text-muted-foreground mt-0.5">{p.email ?? "—"}</div>
                       </td>
 
