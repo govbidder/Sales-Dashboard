@@ -12,6 +12,7 @@ import { exportToCSV, csvDate } from "@/lib/export-csv"
 import type { Department } from "@/lib/types/department"
 import { CsvImportModal } from "@/components/ui/csv-import-modal"
 import { KanbanBoardSkeleton, TableSkeleton } from "@/components/ui/skeleton"
+import { InlineEdit } from "@/components/ui/inline-edit"
 import { useViewAs } from "@/lib/contexts/view-as-context"
 import { useRealtimeTable } from "@/hooks/use-realtime-table"
 import { useUrlFilterState } from "@/hooks/use-url-filter-state"
@@ -1028,7 +1029,7 @@ function QuickAddRow({
 function TaskCard({
   task, persona, department, subtaskCount, completedSubs, onClick, onToggleStatus,
   selected, onToggleSelect, selectionMode, draggable = false, ghost = false,
-  isTerminal = false,
+  isTerminal = false, onPatch,
 }: {
   task: Task
   persona: PersonaLite | null
@@ -1043,26 +1044,32 @@ function TaskCard({
   draggable?: boolean
   ghost?: boolean
   isTerminal?: boolean
+  /** Patch optimista del parent. Si está, el title es inline-editable. */
+  onPatch?: (id: string, updates: Partial<Task>) => void
 }) {
+  // Inline edit mode: bloquea el drag mientras se edita y previene que el
+  // click en el input dispare el onClick del card (que abre el drawer).
+  const [titleEditing, setTitleEditing] = useState(false)
   const overdue = isOverdue(task)
   const due = fmtDateTime(task.due_at)
 
+  const dragActive = draggable && !titleEditing
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: task.id,
-    disabled: !draggable,
+    disabled: !dragActive,
   })
 
-  const dragStyle = transform && draggable
+  const dragStyle = transform && dragActive
     ? { transform: `translate(${transform.x}px, ${transform.y}px)` }
     : undefined
 
   return (
     <div
-      ref={draggable ? setNodeRef : undefined}
+      ref={dragActive ? setNodeRef : undefined}
       style={dragStyle}
-      {...(draggable ? listeners : {})}
-      {...(draggable ? attributes : {})}
-      onClick={onClick}
+      {...(dragActive ? listeners : {})}
+      {...(dragActive ? attributes : {})}
+      onClick={() => { if (!titleEditing) onClick() }}
       className={`group rounded-xl border bg-card transition-all p-3 space-y-2 ${
         ghost
           ? "opacity-50 border-border"
@@ -1095,11 +1102,23 @@ function TaskCard({
               : "border-border hover:border-foreground/30"
           }`}
         />
-        <p className={`flex-1 text-[13px] font-medium leading-snug ${
+        <div className={`flex-1 min-w-0 text-[13px] font-medium leading-snug ${
           isTerminal ? "text-muted-foreground line-through" : "text-foreground"
         }`}>
-          {task.title}
-        </p>
+          {onPatch ? (
+            <InlineEdit
+              value={task.title}
+              onSave={(next) => onPatch(task.id, { title: next })}
+              placeholder="Sin título"
+              ariaLabel="Editar título de la tarea"
+              displayClassName="text-[13px] font-medium leading-snug w-full"
+              onEditStart={() => setTitleEditing(true)}
+              onEditEnd={() => setTitleEditing(false)}
+            />
+          ) : (
+            task.title
+          )}
+        </div>
         <Flag className={`shrink-0 h-3 w-3 ${PRIORITY_STYLE[task.priority].flag}`} />
       </div>
 
@@ -2496,6 +2515,7 @@ export function TasksView() {
                               selectionMode={selectedIds.size > 0}
                               draggable
                               isTerminal={terminalKeys.has(t.status)}
+                              onPatch={patch}
                             />
                           )
                         })}
