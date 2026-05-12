@@ -64,7 +64,7 @@ const STATUS_LABEL: Record<FeatureCard["status"], string> = {
 const STATUS_STYLES: Record<FeatureCard["status"], string> = {
   next:  "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
   soon:  "border-amber-500/30 bg-amber-500/10 text-amber-300",
-  later: "border-slate-500/30 bg-slate-500/10 text-slate-300",
+  later: "border-slate-500/30 bg-slate-500/10 text-muted-foreground/70",
 }
 
 export function CrmPortalView() {
@@ -102,11 +102,11 @@ export function CrmPortalView() {
         <div className="flex items-center justify-between mb-10">
           <Link
             href="/inicio"
-            className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-[12px] font-semibold text-slate-300 hover:bg-white/[0.08] hover:border-white/20 hover:text-white transition-all"
+            className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-[12px] font-semibold text-muted-foreground/70 hover:bg-white/[0.08] hover:border-white/20 hover:text-white transition-all"
           >
             <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-0.5 transition-transform" />
             Volver al dashboard
-            <kbd className="ml-1 hidden sm:inline-flex items-center gap-0.5 rounded border border-white/15 bg-white/[0.06] px-1.5 text-[10px] font-mono text-slate-400">
+            <kbd className="ml-1 hidden sm:inline-flex items-center gap-0.5 rounded border border-white/15 bg-white/[0.06] px-1.5 text-[10px] font-mono text-muted-foreground">
               ESC
             </kbd>
           </Link>
@@ -119,14 +119,14 @@ export function CrmPortalView() {
 
         {/* Hero */}
         <div className="mb-14">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400 mb-5">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground mb-5">
             <Sparkles className="h-3 w-3 text-[#E42D2C]" />
             GovBidder
           </div>
           <h1 className="text-[56px] sm:text-[80px] font-bold leading-[0.95] tracking-tight bg-gradient-to-br from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
             CRM
           </h1>
-          <p className="mt-4 text-[15px] sm:text-[17px] text-slate-400 max-w-[640px] leading-relaxed">
+          <p className="mt-4 text-[15px] sm:text-[17px] text-muted-foreground max-w-[640px] leading-relaxed">
             Clientes activos, conversaciones, pipeline y forecasting de revenue. Un módulo entero dentro del dashboard,
             con su propia identidad. Lo estamos construyendo — esto es la puerta.
           </p>
@@ -135,7 +135,7 @@ export function CrmPortalView() {
         {/* Features grid */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-6">
-            <h2 className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">
+            <h2 className="text-[11px] font-bold uppercase tracking-[0.22em] text-muted-foreground">
               Roadmap
             </h2>
             <div className="flex-1 h-px bg-gradient-to-r from-white/15 to-transparent" />
@@ -167,7 +167,7 @@ export function CrmPortalView() {
                   <h3 className="relative text-[18px] font-bold text-slate-100 mb-2 tracking-tight">
                     {f.title}
                   </h3>
-                  <p className="relative text-[13px] text-slate-400 leading-relaxed">
+                  <p className="relative text-[13px] text-muted-foreground leading-relaxed">
                     {f.description}
                   </p>
                 </div>
@@ -177,7 +177,7 @@ export function CrmPortalView() {
         </div>
 
         {/* Footer note */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.02] px-6 py-4 text-[12px] text-slate-400 leading-relaxed">
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] px-6 py-4 text-[12px] text-muted-foreground leading-relaxed">
           Cuando una feature esté lista, su card pasa de "Próximamente" a interactiva sin tocar la estructura del módulo.
           Si querés priorizar una específica, avisanos.
         </div>

@@ -100,14 +100,14 @@ function BidCalculator() {
         <BreakdownRow label="+ Contingencia"   amount={fmt(contingencyAmt)} sub={`${contingency}%`} />
         <BreakdownRow label="Subtotal"         amount={fmt(subtotal)} bold />
         <BreakdownRow label="+ Profit"         amount={fmt(profitAmt)} sub={`${profit}%`} />
-        <div className="border-t border-slate-200 pt-3 mt-2 flex items-end justify-between">
+        <div className="border-t border-border pt-3 mt-2 flex items-end justify-between">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/70">Bid total</p>
             <p className="text-[28px] font-bold text-[#1e3a8a] tabular-nums leading-none">{fmt(total)}</p>
           </div>
           <div className="text-right">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Markup</p>
-            <p className="text-[16px] font-bold text-slate-700 tabular-nums">{markup.toFixed(1)}%</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Markup</p>
+            <p className="text-[16px] font-bold text-muted-foreground tabular-nums">{markup.toFixed(1)}%</p>
           </div>
         </div>
       </div>
@@ -131,7 +131,7 @@ function Field({
       </label>
       <div className="relative">
         {type === "currency" && (
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-slate-400">$</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-muted-foreground">$</span>
         )}
         <input
           type="number"
@@ -139,12 +139,12 @@ function Field({
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder ?? "0"}
           inputMode="decimal"
-          className={`h-10 w-full rounded-xl border border-slate-200 bg-white text-[13px] text-slate-900 outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10 transition-all ${
+          className={`h-10 w-full rounded-xl border border-border bg-card text-[13px] text-foreground outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10 transition-all ${
             type === "currency" ? "pl-7 pr-3" : type === "percent" ? "pl-3 pr-8" : "px-3"
           }`}
         />
         {type === "percent" && (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-slate-400">%</span>
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-muted-foreground">%</span>
         )}
       </div>
     </div>
@@ -156,11 +156,11 @@ function BreakdownRow({
 }: { label: string; amount: string; sub?: string; bold?: boolean }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className={`text-[12.5px] ${bold ? "font-bold text-slate-900" : "text-slate-600"}`}>
+      <span className={`text-[12.5px] ${bold ? "font-bold text-foreground" : "text-muted-foreground"}`}>
         {label}
-        {sub && <span className="ml-1.5 text-[10.5px] text-slate-400">({sub})</span>}
+        {sub && <span className="ml-1.5 text-[10.5px] text-muted-foreground">({sub})</span>}
       </span>
-      <span className={`tabular-nums text-[13px] ${bold ? "font-bold text-slate-900" : "text-slate-700"}`}>
+      <span className={`tabular-nums text-[13px] ${bold ? "font-bold text-foreground" : "text-muted-foreground"}`}>
         {amount}
       </span>
     </div>
@@ -175,23 +175,23 @@ function ResourceCard({ link }: { link: ResourceLink }) {
       href={link.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-3.5 transition-all hover:border-[#1e3a8a]/30 hover:shadow-[0_4px_14px_rgba(15,23,42,0.06)]"
+      className="group flex items-start gap-3 rounded-xl border border-border bg-card p-3.5 transition-all hover:border-[#1e3a8a]/30 hover:shadow-[0_4px_14px_rgba(15,23,42,0.06)]"
     >
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 ring-1 ring-slate-200 group-hover:bg-[#1e3a8a]/[0.06] group-hover:ring-[#1e3a8a]/20 transition-all">
-        <Globe2 className="h-4 w-4 text-slate-500 group-hover:text-[#1e3a8a] transition-colors" />
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted ring-1 ring-border group-hover:bg-[#1e3a8a]/[0.06] group-hover:ring-[#1e3a8a]/20 transition-all">
+        <Globe2 className="h-4 w-4 text-muted-foreground group-hover:text-[#1e3a8a] transition-colors" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <p className="text-[13px] font-bold text-slate-900 truncate">{link.name}</p>
+          <p className="text-[13px] font-bold text-foreground truncate">{link.name}</p>
           {link.badge && (
             <span className="rounded-full border border-[#E42D2C]/25 bg-[#E42D2C]/[0.08] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#E42D2C]">
               {link.badge}
             </span>
           )}
         </div>
-        <p className="text-[11.5px] text-slate-500 mt-0.5 leading-snug line-clamp-2">{link.desc}</p>
+        <p className="text-[11.5px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{link.desc}</p>
       </div>
-      <ExternalLink className="h-3.5 w-3.5 shrink-0 text-slate-300 group-hover:text-[#1e3a8a] transition-colors mt-1" />
+      <ExternalLink className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70 group-hover:text-[#1e3a8a] transition-colors mt-1" />
     </a>
   )
 }
@@ -213,8 +213,8 @@ function Section({
           <Icon className="h-3.5 w-3.5 text-[#1e3a8a]" />
         </div>
         <div>
-          <h2 className="text-[15px] font-bold text-slate-900 leading-none">{title}</h2>
-          {subtitle && <p className="text-[11.5px] text-slate-500 mt-0.5">{subtitle}</p>}
+          <h2 className="text-[15px] font-bold text-foreground leading-none">{title}</h2>
+          {subtitle && <p className="text-[11.5px] text-muted-foreground mt-0.5">{subtitle}</p>}
         </div>
       </div>
       {children}
@@ -229,7 +229,7 @@ export function ToolsView() {
     <div className="space-y-8">
 
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 sm:p-8" style={{ boxShadow: "0 1px 2px rgba(15,23,42,0.04), 0 16px 40px -16px rgba(15,23,42,0.10)" }}>
+      <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-6 sm:p-8" style={{ boxShadow: "0 1px 2px rgba(15,23,42,0.04), 0 16px 40px -16px rgba(15,23,42,0.10)" }}>
         <div className="pointer-events-none absolute -top-32 -right-32 h-[400px] w-[400px] rounded-full bg-[#E42D2C]/[0.06] blur-[100px]" />
         <div className="pointer-events-none absolute -bottom-24 -left-24 h-[300px] w-[300px] rounded-full bg-[#1e3a8a]/[0.06] blur-[100px]" />
 
@@ -242,10 +242,10 @@ export function ToolsView() {
           </span>
         </div>
 
-        <h1 className="relative text-[28px] sm:text-[32px] font-bold tracking-tight text-slate-900 leading-tight">
+        <h1 className="relative text-[28px] sm:text-[32px] font-bold tracking-tight text-foreground leading-tight">
           Tu caja de herramientas para gov contracting.
         </h1>
-        <p className="relative text-[13.5px] text-slate-500 mt-2 max-w-xl">
+        <p className="relative text-[13.5px] text-muted-foreground mt-2 max-w-xl">
           Portales oficiales, registraciones obligatorias, calculadoras internas y plantillas. Todo a un click.
         </p>
       </div>
@@ -298,12 +298,12 @@ export function ToolsView() {
         title="Plantillas internas"
         subtitle="Capability statements, propuestas técnicas, past performance. (Próximamente)"
       >
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 px-5 py-8 text-center">
-          <BookOpen className="h-5 w-5 text-slate-400 mx-auto mb-2" />
-          <p className="text-[13px] text-slate-500">
+        <div className="rounded-2xl border border-dashed border-border bg-muted/50 px-5 py-8 text-center">
+          <BookOpen className="h-5 w-5 text-muted-foreground mx-auto mb-2" />
+          <p className="text-[13px] text-muted-foreground">
             Pronto: capability statement template, technical proposal skeleton, pricing matrix.
           </p>
-          <p className="text-[11px] text-slate-400 mt-1">
+          <p className="text-[11px] text-muted-foreground mt-1">
             Para empezar, subí los archivos en <span className="text-[#1e3a8a] font-semibold">Recursos</span>.
           </p>
         </div>

@@ -64,7 +64,7 @@ export function PublicFormView({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-6 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-card flex items-center justify-center px-6 py-12 relative overflow-hidden">
 
       {/* Subtle ambient backdrop */}
       <div className="pointer-events-none absolute inset-0">
@@ -105,18 +105,18 @@ export function PublicFormView({ slug }: { slug: string }) {
             </p>
           </div>
         ) : (
-          <div className="rounded-2xl border border-slate-200 bg-white p-7 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+          <div className="rounded-2xl border border-border bg-card p-7 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
             <div className="mb-6 text-center">
-              <h1 className="text-[22px] font-bold tracking-tight text-slate-900">{form.title}</h1>
+              <h1 className="text-[22px] font-bold tracking-tight text-foreground">{form.title}</h1>
               {form.description && (
-                <p className="mt-1.5 text-[13px] text-slate-500 leading-relaxed">{form.description}</p>
+                <p className="mt-1.5 text-[13px] text-muted-foreground leading-relaxed">{form.description}</p>
               )}
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {form.fields.map(f => (
                 <div key={f.key} className="space-y-1.5">
-                  <label className="block text-[11px] font-semibold uppercase tracking-widest text-slate-500">
+                  <label className="block text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
                     {f.label} {f.required && <span className="text-[#E42D2C]">*</span>}
                   </label>
                   {f.type === "longtext" ? (
@@ -126,14 +126,14 @@ export function PublicFormView({ slug }: { slug: string }) {
                       placeholder={f.placeholder}
                       required={f.required}
                       rows={4}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none placeholder:text-slate-400 transition-all focus:border-[#E42D2C] focus:ring-2 focus:ring-[#E42D2C]/15 resize-none"
+                      className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground outline-none placeholder:text-muted-foreground transition-all focus:border-[#E42D2C] focus:ring-2 focus:ring-[#E42D2C]/15 resize-none"
                     />
                   ) : f.type === "select" ? (
                     <select
                       value={values[f.key] ?? ""}
                       onChange={e => handleChange(f.key, e.target.value)}
                       required={f.required}
-                      className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none focus:border-[#E42D2C] focus:ring-2 focus:ring-[#E42D2C]/15"
+                      className="h-12 w-full rounded-xl border border-border bg-card px-4 text-sm text-foreground outline-none focus:border-[#E42D2C] focus:ring-2 focus:ring-[#E42D2C]/15"
                     >
                       <option value="">— Elegir —</option>
                       {(f.options ?? []).map(o => <option key={o} value={o}>{o}</option>)}
@@ -145,7 +145,7 @@ export function PublicFormView({ slug }: { slug: string }) {
                       onChange={e => handleChange(f.key, e.target.value)}
                       placeholder={f.placeholder}
                       required={f.required}
-                      className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none placeholder:text-slate-400 transition-all focus:border-[#E42D2C] focus:ring-2 focus:ring-[#E42D2C]/15"
+                      className="h-12 w-full rounded-xl border border-border bg-card px-4 text-sm text-foreground outline-none placeholder:text-muted-foreground transition-all focus:border-[#E42D2C] focus:ring-2 focus:ring-[#E42D2C]/15"
                     />
                   )}
                 </div>
@@ -171,7 +171,7 @@ export function PublicFormView({ slug }: { slug: string }) {
           </div>
         )}
 
-        <p className="mt-8 text-center text-[10px] uppercase tracking-[0.22em] text-slate-300">
+        <p className="mt-8 text-center text-[10px] uppercase tracking-[0.22em] text-muted-foreground/70">
           Powered by GovBidder
         </p>
       </div>
