@@ -8,7 +8,7 @@ import { AiStandupModal } from "@/components/views/inicio/ai-standup-modal"
 import {
   Loader2, AlertCircle, AlertTriangle, CheckCircle2, RefreshCw,
   Users2, ListTodo, FileBarChart, TrendingDown, TrendingUp,
-  Activity, ArrowRight, Flag, Sparkles, BarChart3, Target,
+  ArrowRight, Flag, Sparkles,
   Sun, Calendar as CalIcon, Layers,
 } from "lucide-react"
 import type { Department } from "@/lib/types/department"
@@ -381,178 +381,156 @@ export function InicioView() {
   const circumference = 2 * Math.PI * 42
   const offset = circumference * (1 - healthScore / 100)
 
+  // Status line narrativo — frase que comunica decisión (no número abstracto).
+  const statusLine = (() => {
+    if (allClear) return "Todo al día. Sin tareas vencidas, métricas al día."
+    const pieces: string[] = []
+    if (counts.overdueTasks > 0) {
+      pieces.push(`${counts.overdueTasks} ${counts.overdueTasks === 1 ? "tarea vencida" : "tareas vencidas"}`)
+    }
+    if (counts.stalePersonas > 0) {
+      pieces.push(`${counts.stalePersonas} sin seguimiento`)
+    }
+    if (missingCurrentReport) {
+      pieces.push(`métricas de ${fmtMonthLabel(currentMonth)} pendientes`)
+    }
+    if (declining.length > 0) {
+      pieces.push(`${declining.length} ${declining.length === 1 ? "métrica" : "métricas"} en caída`)
+    }
+    if (pieces.length === 0) return `${issuesCount} cosas pidiendo atención.`
+    if (pieces.length === 1) return `Hoy: ${pieces[0]}.`
+    return `Hoy: ${pieces.slice(0, -1).join(", ")} y ${pieces.slice(-1)}.`
+  })()
+
+  // Departamentos rankeados por urgencia (overdue DESC, luego pending DESC).
+  // Los OK quedan al final con visual sutil.
+  const rankedDepts = [...departments].sort((a, b) => {
+    const sa = deptStats[a.id] ?? { pending: 0, overdue: 0, members: 0 }
+    const sb = deptStats[b.id] ?? { pending: 0, overdue: 0, members: 0 }
+    if (sb.overdue !== sa.overdue) return sb.overdue - sa.overdue
+    return sb.pending - sa.pending
+  })
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
 
       {showStandup && <AiStandupModal onClose={() => setShowStandup(false)} />}
 
-      {/* HERO ─────────────────────────────────────────────────────────────── */}
-      <div
-        className="relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-[#1e3a8a]/30 bg-card dark:bg-[#0d1745]"
-        style={{ boxShadow: "0 1px 2px rgba(15,23,42,0.04), 0 16px 40px -16px rgba(15,23,42,0.10)" }}
-      >
-        {/* Ambient glow background — más sutil */}
+      {/* STATUS LINE — sentence-first + score chico al costado ─────────────── */}
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-card px-5 py-4 sm:px-6 sm:py-5">
         <div className="pointer-events-none absolute inset-0">
           <div
-            className="absolute -top-32 -right-32 h-[420px] w-[420px] rounded-full blur-[100px]"
+            className="absolute -top-20 -right-20 h-[220px] w-[220px] rounded-full blur-[80px]"
             style={{
               backgroundColor:
-                heroState === "good"     ? "rgba(16,185,129,0.07)" :
-                heroState === "critical" ? "rgba(228,45,44,0.10)"  :
-                                           "rgba(251,191,36,0.07)",
-            }}
-          />
-          <div
-            className="absolute -bottom-32 -left-32 h-[380px] w-[380px] rounded-full blur-[120px]"
-            style={{ backgroundColor: "rgba(30,58,138,0.07)" }}
-          />
-          {/* Grid pattern muy sutil */}
-          <div
-            className="absolute inset-0 opacity-[0.025]"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(15,23,42,1) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,1) 1px, transparent 1px)",
-              backgroundSize: "32px 32px",
+                heroState === "good"     ? "rgba(16,185,129,0.06)" :
+                heroState === "critical" ? "rgba(228,45,44,0.08)"  :
+                                           "rgba(251,191,36,0.06)",
             }}
           />
         </div>
 
-        <div className="relative grid lg:grid-cols-[1fr_auto] gap-8 p-7 sm:p-9 items-center">
+        <div className="relative flex items-center gap-4 sm:gap-6">
+          {/* Status icon */}
+          <span className={`shrink-0 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl ${
+            heroState === "good"     ? "bg-emerald-500/15"  :
+            heroState === "critical" ? "bg-[#E42D2C]/15"    :
+                                        "bg-amber-500/15"
+          }`}>
+            {heroState === "good"     ? <CheckCircle2  className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-700" /> :
+             heroState === "critical" ? <AlertCircle   className="h-4 w-4 sm:h-5 sm:w-5 text-[#E42D2C]"   /> :
+                                        <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-amber-700"  />}
+          </span>
 
-          {/* LEFT — title + message */}
-          <div className="min-w-0">
-            <div className="inline-flex items-center gap-2 mb-4 rounded-full border border-slate-200/80 bg-white/70 backdrop-blur-sm pl-1.5 pr-3 py-1">
-              <span className={`flex h-5 w-5 items-center justify-center rounded-full ${
-                heroState === "good"     ? "bg-emerald-500/15" :
-                heroState === "critical" ? "bg-[#E42D2C]/15"   :
-                                           "bg-amber-500/15"
-              }`}>
-                {heroState === "good"     ? <CheckCircle2  className="h-3 w-3 text-emerald-700" /> :
-                 heroState === "critical" ? <AlertCircle   className="h-3 w-3 text-[#E42D2C]"   /> :
-                                            <AlertTriangle className="h-3 w-3 text-amber-700"  />}
-              </span>
-              <span className="text-[10px] font-bold uppercase tracking-[0.20em] text-[#1e3a8a]">
-                Estado del Dashboard
-              </span>
-            </div>
-
-            <h1 className="text-[30px] sm:text-[38px] font-bold tracking-tight text-foreground leading-[1.08]">
-              {allClear ? (
-                <>Todo en orden.</>
-              ) : (
-                <>
-                  <span className={heroState === "critical" ? "text-[#E42D2C]" : "text-amber-600"}>
-                    {issuesCount}
-                  </span>{" "}
-                  <span className="text-foreground">{issuesCount === 1 ? "ítem requiere" : "ítems requieren"}</span>
-                  <br className="hidden sm:block" />
-                  <span className="text-muted-foreground font-semibold"> tu atención.</span>
-                </>
-              )}
-            </h1>
-
-            <p className="text-[13.5px] text-muted-foreground mt-3 max-w-xl leading-relaxed">
-              {allClear
-                ? "Sin tareas vencidas, métricas al día, equipo activo. Buen trabajo."
-                : "Revisá los puntos críticos abajo para mantener el dashboard saludable."}
+          {/* Sentence */}
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-[0.20em] text-[#1e3a8a]/80 mb-1">
+              Estado del Dashboard
             </p>
-
-            <div className="mt-5 flex flex-wrap items-center gap-2">
-              <button
-                onClick={() => setShowStandup(true)}
-                className="inline-flex items-center gap-2 h-9 rounded-full border border-[#1e3a8a]/25 bg-gradient-to-br from-[#E42D2C]/[0.05] to-[#1e3a8a]/[0.05] px-3.5 text-[12px] font-bold text-[#1e3a8a] hover:border-[#1e3a8a]/40 hover:from-[#E42D2C]/[0.08] hover:to-[#1e3a8a]/[0.08] hover:shadow-[0_2px_8px_rgba(30,58,138,0.10)] transition-all"
-                title="Generar resumen de las últimas 24h con IA"
-              >
-                <Sparkles className="h-3.5 w-3.5" />
-                Generar standup
-              </button>
-              <button
-                onClick={fetchHealth}
-                disabled={loading}
-                className="inline-flex items-center gap-2 h-9 rounded-full border border-border bg-card px-3.5 text-[12px] font-semibold text-muted-foreground hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] hover:shadow-[0_2px_8px_rgba(30,58,138,0.10)] transition-all disabled:opacity-40"
-              >
-                <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-                Actualizar estado
-              </button>
-            </div>
+            <p className="text-[15px] sm:text-[17px] font-semibold text-foreground leading-snug">
+              {statusLine}
+            </p>
           </div>
 
-          {/* RIGHT — health ring */}
-          <div className="flex items-center justify-center lg:justify-end">
-            <div className="relative">
-              <svg width="148" height="148" viewBox="0 0 100 100" className="-rotate-90 drop-shadow-[0_4px_16px_rgba(15,23,42,0.06)]">
-                <circle cx="50" cy="50" r="42" strokeWidth="6" fill="none" className={ringBgColor} />
-                <circle
-                  cx="50" cy="50" r="42"
-                  strokeWidth="6"
-                  fill="none"
-                  className={ringColor}
-                  strokeDasharray={circumference}
-                  strokeDashoffset={offset}
-                  strokeLinecap="round"
-                  style={{ transition: "stroke-dashoffset 800ms cubic-bezier(0.22,1,0.36,1)" }}
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <CountUp
-                  value={healthScore}
-                  duration={1200}
-                  className={`text-[36px] font-bold leading-none ${scoreColor}`}
-                />
-                <p className="text-[9px] font-bold uppercase tracking-[0.20em] text-muted-foreground mt-1.5">
-                  Salud
-                </p>
-              </div>
-            </div>
+          {/* Score chico */}
+          <div className="shrink-0 hidden sm:flex flex-col items-center gap-0.5 border-l border-border pl-5">
+            <CountUp
+              value={healthScore}
+              duration={1000}
+              className={`text-[28px] font-bold leading-none ${scoreColor}`}
+            />
+            <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+              Salud
+            </p>
           </div>
         </div>
 
-        {/* STATS STRIP at bottom of hero */}
-        <div className="relative border-t border-border bg-muted/40 grid grid-cols-2 sm:grid-cols-4">
-          {[
-            { label: "Tareas vencidas",  val: counts.overdueTasks,      icon: ListTodo, accent: counts.overdueTasks > 0 ? "red" as const : "neutral" as const },
-            { label: "Sin seguimiento",  val: counts.stalePersonas,     icon: Users2,   accent: counts.stalePersonas > 0 ? "amber" as const : "neutral" as const },
-            { label: "Personas activas", val: counts.activePersonas,    icon: Target,   accent: "navy" as const },
-            { label: "Equipo",           val: counts.teamMembers,       icon: Users2,   accent: "navy" as const },
-          ].map((s, i) => {
-            const StatIcon = s.icon
-            const accentText =
-              s.accent === "red"   ? "text-[#E42D2C]" :
-              s.accent === "amber" ? "text-amber-700" :
-              s.accent === "navy"  ? "text-[#1e3a8a]" :
-              "text-foreground"
-            const dotColor =
-              s.accent === "red"   ? "bg-[#E42D2C]" :
-              s.accent === "amber" ? "bg-amber-500" :
-              s.accent === "navy"  ? "bg-[#1e3a8a]" :
-              "bg-slate-300"
-            return (
-              <div
-                key={s.label}
-                className={`relative px-5 py-4 ${i < 3 ? "sm:border-r border-slate-200/70" : ""} ${i < 2 ? "border-b sm:border-b-0 border-slate-200/70" : ""}`}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <span className={`h-1.5 w-1.5 rounded-full ${dotColor}`} />
-                  <StatIcon className="h-3 w-3 text-muted-foreground" />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
-                    {s.label}
-                  </span>
-                </div>
-                <CountUp
-                  value={s.val}
-                  duration={900 + i * 150}
-                  format
-                  className={`text-[24px] font-bold leading-none ${accentText}`}
-                />
-              </div>
-            )
-          })}
+        {/* Quick actions */}
+        <div className="relative mt-3 flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => setShowStandup(true)}
+            className="inline-flex items-center gap-1.5 h-8 rounded-full border border-[#1e3a8a]/25 bg-[#1e3a8a]/[0.04] px-3 text-[11.5px] font-bold text-[#1e3a8a] hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/[0.08] transition-all"
+          >
+            <Sparkles className="h-3 w-3" />
+            Generar standup
+          </button>
+          <button
+            onClick={fetchHealth}
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 h-8 rounded-full border border-border bg-card px-3 text-[11.5px] font-semibold text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all disabled:opacity-40"
+          >
+            <RefreshCw className={`h-3 w-3 ${loading ? "animate-spin" : ""}`} />
+            Actualizar
+          </button>
         </div>
       </div>
 
-      {/* DEPARTAMENTOS — vista de comando cross-empresa. Solo founder/admin.
-          Team users solo ven su área desde el sidebar. */}
-      {isAdmin && departments.length > 0 && (
+      {/* 3 CRITICAL CARDS — top-left = más urgente ─────────────────────────── */}
+      {isAdmin && (
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
+          {/* 1. Tareas vencidas (top-left = más urgente) */}
+          <CriticalCard
+            icon={AlertCircle}
+            label="Tareas vencidas"
+            value={counts.overdueTasks}
+            tone={counts.overdueTasks > 0 ? "danger" : "ok"}
+            sub={counts.overdueTasks > 0
+              ? `${counts.overdueTasks === 1 ? "Una tarea pide" : "Varias tareas piden"} acción.`
+              : "Al día. Buen trabajo."}
+            ctaLabel={counts.overdueTasks > 0 ? "Ver kanban" : "Ver tareas"}
+            ctaHref="/admin/tasks"
+          />
+
+          {/* 2. Personas sin seguimiento */}
+          <CriticalCard
+            icon={Users2}
+            label="Personas sin seguimiento"
+            value={counts.stalePersonas}
+            tone={counts.stalePersonas > 0 ? "warning" : "ok"}
+            sub={counts.stalePersonas > 0
+              ? `${counts.stalePersonas === 1 ? "Una persona" : `${counts.stalePersonas} personas`} sin contactar hace 7+ días.`
+              : "Todas con seguimiento reciente."}
+            ctaLabel="Ver personas"
+            ctaHref="/admin/personas"
+          />
+
+          {/* 3. Métricas del mes */}
+          <CriticalCard
+            icon={FileBarChart}
+            label="Métricas del mes"
+            value={missingCurrentReport ? "—" : "✓"}
+            tone={missingCurrentReport ? "info" : "ok"}
+            sub={missingCurrentReport
+              ? `${fmtMonthLabel(currentMonth)} pendiente de carga.`
+              : `${fmtMonthLabel(currentMonth)} cargado.`}
+            ctaLabel={missingCurrentReport ? "Cargar reporte" : "Ver métricas"}
+            ctaHref={missingCurrentReport ? "/admin/reports" : "/metrics"}
+          />
+        </div>
+      )}
+
+      {/* DEPARTAMENTOS — lista rankeada por urgencia ─────────────────────── */}
+      {isAdmin && rankedDepts.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center gap-2 px-1">
             <Layers className="h-3.5 w-3.5 text-[#1e3a8a]" />
@@ -560,62 +538,64 @@ export function InicioView() {
               Departamentos
             </h2>
             <span className="rounded-full bg-muted px-1.5 text-[10px] font-bold text-muted-foreground tabular-nums">
-              {departments.length}
+              {rankedDepts.length}
             </span>
-            <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent" />
+            <div className="flex-1 h-px bg-gradient-to-r from-border to-transparent" />
           </div>
 
-          <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-            {departments.map(d => {
+          <div className="overflow-hidden rounded-2xl border border-border bg-card divide-y divide-border">
+            {rankedDepts.map(d => {
               const s = deptStats[d.id] ?? { pending: 0, overdue: 0, members: 0 }
-              // View-As: si hay depto simulado, destacamos solo ese y dimeamos los otros.
-              const isSimulatedHighlight = simulatedDeptId && simulatedDeptId === d.id
-              const isSimulatedDimmed    = simulatedDeptId && simulatedDeptId !== d.id
+              const isOk        = s.overdue === 0
+              const isSimHigh   = simulatedDeptId && simulatedDeptId === d.id
+              const isSimDim    = simulatedDeptId && simulatedDeptId !== d.id
+
               return (
                 <Link
                   key={d.id}
                   href={`/admin/departments/${d.id}`}
-                  className={`group relative overflow-hidden rounded-2xl border bg-card p-4 transition-all hover:-translate-y-0.5 ${
-                    isSimulatedHighlight
-                      ? "border-amber-400 ring-2 ring-amber-400/40 shadow-[0_0_24px_rgba(245,158,11,0.20)]"
-                      : isSimulatedDimmed
-                      ? "border-border opacity-40 hover:opacity-70"
-                      : "border-border hover:border-border hover:shadow-[0_0_24px_rgba(15,23,42,0.04)]"
-                  }`}
+                  className={`group flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-3 transition-all ${
+                    isSimHigh
+                      ? "bg-amber-500/[0.05] ring-1 ring-inset ring-amber-400/40"
+                      : "hover:bg-muted"
+                  } ${isSimDim ? "opacity-40 hover:opacity-70" : ""} ${isOk && !isSimHigh ? "opacity-75 hover:opacity-100" : ""}`}
                 >
-                  {/* Top accent bar with department color */}
-                  <div
-                    className="absolute top-0 left-0 right-0 h-[2px]"
+                  {/* Color dot */}
+                  <span
+                    className="h-3 w-3 rounded-full shrink-0 ring-2 ring-background"
                     style={{ backgroundColor: d.color }}
                   />
 
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
-                    <h3 className="text-[13px] font-bold text-foreground truncate flex-1">{d.name}</h3>
-                    <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/70 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all shrink-0" />
+                  {/* Name */}
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-[14px] truncate ${isOk ? "font-semibold text-muted-foreground" : "font-bold text-foreground"}`}>
+                      {d.name}
+                    </p>
                   </div>
 
-                  <div className="flex items-end justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="text-[26px] font-bold tabular-nums leading-none text-foreground">
-                        {s.pending}
-                      </p>
-                      <p className="text-[11px] text-muted-foreground mt-1">
-                        {s.pending === 1 ? "tarea pendiente" : "tareas pendientes"}
-                      </p>
-                    </div>
-                    <div className="flex flex-col items-end gap-1 shrink-0">
-                      {s.overdue > 0 && (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-red-500/25 bg-red-500/10 px-2 py-0.5 text-[10px] font-bold text-[#E42D2C]">
-                          <AlertCircle className="h-2.5 w-2.5" />
-                          {s.overdue} venc{s.overdue === 1 ? "ida" : "idas"}
-                        </span>
-                      )}
-                      <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground" title="Miembros asignados al departamento">
-                        <Users2 className="h-3 w-3" /> {s.members}
+                  {/* Stats inline */}
+                  <div className="flex items-center gap-3 sm:gap-4 shrink-0 text-[12px] tabular-nums">
+                    <span className="hidden sm:inline text-muted-foreground">
+                      {s.pending} {s.pending === 1 ? "pendiente" : "pendientes"}
+                    </span>
+                    {s.overdue > 0 ? (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-red-500/25 bg-red-500/10 px-2 py-0.5 font-bold text-[#E42D2C]">
+                        <AlertCircle className="h-3 w-3" />
+                        {s.overdue} venc{s.overdue === 1 ? "ida" : "idas"}
                       </span>
-                    </div>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-emerald-700 font-semibold">
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                        Al día
+                      </span>
+                    )}
+                    <span className="hidden sm:inline-flex items-center gap-1 text-muted-foreground" title="Miembros del depto">
+                      <Users2 className="h-3 w-3" />
+                      {s.members}
+                    </span>
                   </div>
+
+                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/70 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all shrink-0" />
                 </Link>
               )
             })}
@@ -684,15 +664,15 @@ export function InicioView() {
         </div>
       )}
 
-      {/* ALERTS GRID ──────────────────────────────────────────────────────── */}
-      {(overdueTasks.length > 0 || stalePersonas.length > 0 || missingCurrentReport || declining.length > 0) ? (
+      {/* DRILL-DOWN — detalle de issues (overdue + stale + declining) ─────── */}
+      {isAdmin && (overdueTasks.length > 0 || stalePersonas.length > 0 || declining.length > 0) && (
         <div className="space-y-2">
           <div className="flex items-center gap-2 px-1">
             <AlertCircle className="h-3.5 w-3.5 text-red-700/80" />
             <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]">
-              Requieren Atención
+              Detalle de lo que falta resolver
             </h2>
-            <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent" />
+            <div className="flex-1 h-px bg-gradient-to-r from-border to-transparent" />
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
@@ -769,41 +749,13 @@ export function InicioView() {
               </IssueSection>
             )}
 
-            {/* Missing current month report */}
-            {missingCurrentReport && (
-              <IssueSection
-                icon={FileBarChart}
-                title="Métricas del mes"
-                count={1}
-                href="/admin/reports"
-                accent="navy"
-                severity="medium"
-              >
-                <div className="px-5 py-5 space-y-4">
-                  <p className="text-[13px] text-muted-foreground leading-relaxed">
-                    No hay reporte cargado para{" "}
-                    <span className="font-semibold text-foreground">{fmtMonthLabel(currentMonth)}</span>.
-                    {" "}Sin datos del mes actual los KPIs y proyecciones quedan ciegos.
-                  </p>
-                  <Link
-                    href="/admin/reports"
-                    className="inline-flex items-center gap-2 h-10 rounded-xl bg-[#E42D2C] px-4 text-[12px] font-bold text-white hover:bg-[#c42423] hover:shadow-[0_8px_24px_rgba(228,45,44,0.30)] transition-all"
-                  >
-                    <FileBarChart className="h-3.5 w-3.5" />
-                    Cargar Métricas
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </div>
-              </IssueSection>
-            )}
-
             {/* Declining metrics */}
             {declining.length > 0 && (
               <IssueSection
                 icon={TrendingDown}
                 title="Métricas en caída"
                 count={declining.length}
-                href="/dashboard"
+                href="/metrics"
                 accent="red"
                 severity={declining.length > 2 ? "high" : "medium"}
               >
@@ -829,9 +781,9 @@ export function InicioView() {
             )}
           </div>
         </div>
-      ) : null}
+      )}
 
-      {/* IMPROVEMENTS / WHAT'S GOOD ───────────────────────────────────────── */}
+      {/* IMPROVEMENTS / WHAT'S GOOD — condicional ──────────────────────────── */}
       {improving.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center gap-2 px-1">
@@ -839,12 +791,12 @@ export function InicioView() {
             <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]">
               Lo que está mejorando
             </h2>
-            <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent" />
+            <div className="flex-1 h-px bg-gradient-to-r from-border to-transparent" />
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {improving.map(m => (
-              <div key={m.key} className="rounded-2xl border border-emerald-500/15 bg-gradient-to-br from-emerald-500/[0.04] via-white to-white p-4 hover:border-emerald-500/25 transition-colors">
+              <div key={m.key} className="rounded-2xl border border-emerald-500/15 bg-gradient-to-br from-emerald-500/[0.04] via-card to-card p-4 hover:border-emerald-500/25 transition-colors">
                 <div className="flex items-center justify-between gap-3 mb-2">
                   <p className="text-[12px] font-medium text-foreground truncate">{m.label}</p>
                   <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold tabular-nums text-emerald-700 shrink-0 flex items-center gap-0.5">
@@ -864,47 +816,62 @@ export function InicioView() {
         </div>
       )}
 
-      {/* QUICK NAV ────────────────────────────────────────────────────────── */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2 px-1">
-          <Activity className="h-3.5 w-3.5 text-[#1e3a8a]" />
-          <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]">
-            Atajos rápidos
-          </h2>
-          <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent" />
-        </div>
+    </div>
+  )
+}
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {[
-            { href: "/dashboard",       label: "Panel",              desc: "KPIs y proyecciones",  icon: BarChart3 },
-            { href: "/admin/personas",  label: "Personas Agendadas", desc: "Pipeline + seguimientos", icon: Users2 },
-            { href: "/admin/tasks",     label: "Tareas",             desc: "Gestión de pendientes", icon: ListTodo },
-            { href: "/admin/reports",   label: "Cargar Métricas",    desc: "Form mensual",         icon: FileBarChart },
-          ].map(s => {
-            const Icon = s.icon
-            return (
-              <Link
-                key={s.href}
-                href={s.href}
-                className="group relative overflow-hidden rounded-2xl border border-border bg-card hover:border-[#1e3a8a]/30 hover:shadow-[0_4px_20px_rgba(30,58,138,0.10)] transition-all p-4"
-              >
-                <div className="pointer-events-none absolute -top-12 -right-12 h-24 w-24 rounded-full bg-[#1e3a8a]/[0.08] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+// ─── Critical Card ────────────────────────────────────────────────────────────
+// 3-up grid en la parte superior del dashboard. Cada card representa una
+// dimensión del estado del negocio: tareas vencidas, personas sin segto,
+// métricas del mes. Patrón "decision-driven" (Linear/Stripe): número grande
+// + status + sub-frase + CTA.
 
-                <div className="relative flex items-start justify-between gap-3 mb-3">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted ring-1 ring-border group-hover:bg-[#1e3a8a]/10 group-hover:ring-[#1e3a8a]/25 transition-colors">
-                    <Icon className="h-4 w-4 text-muted-foreground group-hover:text-[#1e3a8a] transition-colors" />
-                  </span>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground/70 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all" />
-                </div>
+function CriticalCard({
+  icon: Icon, label, value, tone, sub, ctaLabel, ctaHref,
+}: {
+  icon:     any
+  label:    string
+  value:    number | string
+  tone:     "danger" | "warning" | "info" | "ok"
+  sub:      string
+  ctaLabel: string
+  ctaHref:  string
+}) {
+  const palette = {
+    danger:  { iconBg: "bg-[#E42D2C]/12 ring-[#E42D2C]/25", iconColor: "text-[#E42D2C]",  valueColor: "text-[#E42D2C]" },
+    warning: { iconBg: "bg-amber-500/12 ring-amber-500/25", iconColor: "text-amber-700",  valueColor: "text-amber-700" },
+    info:    { iconBg: "bg-[#1e3a8a]/12 ring-[#1e3a8a]/25", iconColor: "text-[#1e3a8a]",  valueColor: "text-[#1e3a8a]" },
+    ok:      { iconBg: "bg-emerald-500/12 ring-emerald-500/25", iconColor: "text-emerald-700", valueColor: "text-emerald-700" },
+  }[tone]
 
-                <p className="relative text-[13px] font-bold text-foreground">{s.label}</p>
-                <p className="relative text-[11px] text-muted-foreground mt-0.5">{s.desc}</p>
-              </Link>
-            )
-          })}
-        </div>
+  return (
+    <Link
+      href={ctaHref}
+      className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-8px_rgba(15,23,42,0.10)] hover:border-foreground/15"
+    >
+      <div className="flex items-start justify-between gap-3 mb-4">
+        <span className={`flex h-9 w-9 items-center justify-center rounded-xl ring-1 ${palette.iconBg}`}>
+          <Icon className={`h-4 w-4 ${palette.iconColor}`} />
+        </span>
+        <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/70 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all" />
       </div>
 
-    </div>
+      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground mb-2">
+        {label}
+      </p>
+
+      <p className={`text-[36px] sm:text-[40px] font-bold tabular-nums leading-none ${palette.valueColor}`}>
+        {typeof value === "number" ? <CountUp value={value} duration={900} /> : value}
+      </p>
+
+      <p className="text-[12px] text-muted-foreground mt-3 leading-relaxed">
+        {sub}
+      </p>
+
+      <p className="text-[11.5px] font-semibold text-[#1e3a8a] mt-3 inline-flex items-center gap-1 group-hover:gap-1.5 transition-all">
+        {ctaLabel}
+        <ArrowRight className="h-3 w-3" />
+      </p>
+    </Link>
   )
 }
