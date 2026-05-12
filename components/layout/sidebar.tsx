@@ -68,12 +68,17 @@ function buildNavGroups(
 
     const myAreaItems: NavItem[] = []
     if (myDept) {
-      // Tareas del depto: query param activa el filtro pre-aplicado.
+      // Dashboard del depto: KPIs + tareas + miembros, todo en una vista.
       myAreaItems.push({
-        name:      "Tareas",
+        name:      "Dashboard",
+        href:      `/admin/departments/${myDept.id}`,
+        icon:      Folder,
+        iconColor: myDept.color,
+      })
+      myAreaItems.push({
+        name:      "Kanban",
         href:      `/admin/tasks?department=${myDept.id}`,
         icon:      ListTodo,
-        iconColor: myDept.color,
       })
     } else {
       // Sin depto asignado: lleva al kanban general (servidor seguirá scopeando
@@ -103,9 +108,11 @@ function buildNavGroups(
   }
 
   // ── ADMIN / FOUNDER / DEVELOPER — vista cross-empresa completa ────────────
+  // Cada item de depto lleva al DASHBOARD del depto (KPIs + tareas + miembros),
+  // no al kanban filtrado. Desde ahí se puede saltar al kanban si hace falta.
   const deptItems: NavItem[] = departments.map(d => ({
     name:      d.name,
-    href:      `/admin/tasks?department=${d.id}`,
+    href:      `/admin/departments/${d.id}`,
     icon:      Folder,
     iconColor: d.color,
   }))
@@ -241,14 +248,11 @@ export function Sidebar({
                 )}
                 <div className="space-y-0.5">
                   {group.items.map((item) => {
-                    // Para matching de "active": comparamos pathname + el href base
-                    // (ignorando query string), porque varios items de depto comparten /admin/tasks.
+                    // Active match: exacto en pathname. Si el item tiene query string,
+                    // ignoramos el match porque varios items pueden compartir base
+                    // path (ej: /admin/tasks?department=A vs ?department=B).
                     const itemBase = item.href.split("?")[0]
-                    const isExactBase = pathname === itemBase
-                    // Si el item tiene query param de depto, el active es exacto (con el dept en URL).
-                    const isActive = item.href.includes("?")
-                      ? false // links con query no se "match-activan" salvo navegación explícita
-                      : isExactBase || pathname?.startsWith(itemBase + "/")
+                    const isActive = !item.href.includes("?") && pathname === itemBase
                     const Icon = item.icon
 
                     return (
