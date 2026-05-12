@@ -9,7 +9,7 @@ import { useMarkPageReady } from "@/hooks/use-mark-page-ready"
 import { useMinLoading } from "@/hooks/use-min-loading"
 import { useMonthlyReports } from "@/hooks/use-monthly-reports"
 import { StatCardSkeleton, SectionHeaderSkeleton } from "@/components/ui/skeleton"
-import { TrendingUp, TrendingDown, Minus } from "lucide-react"
+import { TrendingUp, TrendingDown } from "lucide-react"
 import {
   ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, Radar,
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
