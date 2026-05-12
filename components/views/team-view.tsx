@@ -450,7 +450,7 @@ function MemberCard({ member, department, isSimulated, onClick }: { member: Memb
                 ? "border-purple-400/30 bg-purple-400/10 text-purple-700"
                 : "border-amber-400/25 bg-amber-400/10 text-amber-700"
             }`}>
-              {isDev ? "Developer" : isSuper ? "Super admin" : "Admin"}
+              {isDev ? ROLE_LABEL.developer : isSuper ? ROLE_LABEL.super_admin : ROLE_LABEL.admin}
             </span>
           )}
           {department && (

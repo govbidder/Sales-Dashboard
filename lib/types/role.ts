@@ -8,12 +8,18 @@
  */
 export type Role = "developer" | "super_admin" | "admin" | "user" | "viewer"
 
-/** Label mostrado en UI por rol. */
+/**
+ * Label mostrado en UI por rol. NO afecta valores en DB — solo presentación.
+ *
+ * Cambios de labels (decisión de producto):
+ * - "Super admin" → "Founder" (mejor refleja a Cristián como dueño/visión)
+ * - "Empleado" → "Team" (suena más horizontal, menos jerárquico)
+ */
 export const ROLE_LABEL: Record<Role, string> = {
   developer:   "Developer",
-  super_admin: "Super admin",
+  super_admin: "Founder",
   admin:       "Admin",
-  user:        "Empleado",
+  user:        "Team",
   viewer:      "Solo lectura",
 }
 
