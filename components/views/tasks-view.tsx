@@ -1371,6 +1371,17 @@ export function TasksView() {
     }
   }, [searchParams, router, pathname])
 
+  // Pre-filter por departamento cuando viene ?department=<id> desde otra vista
+  // (ej: cards de "Departamentos" en /inicio). Limpia el param después de aplicar
+  // para que el resto de la navegación no quede pegada al filtro.
+  useEffect(() => {
+    const deptId = searchParams?.get("department")
+    if (deptId) {
+      setFilterDepartment(deptId)
+      router.replace(pathname, { scroll: false })
+    }
+  }, [searchParams, router, pathname])
+
   const getSession = async () => {
     const supabase = createClient()
     const { data: { session } } = await supabase.auth.getSession()
