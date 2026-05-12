@@ -78,7 +78,7 @@ const CALL_STATUS_STYLE: Record<CallStatus, string> = {
   reagendada: "bg-amber-500/10  text-amber-700  border-amber-500/25",
 }
 const SALES_STATUS_STYLE: Record<SalesStatus, string> = {
-  pendiente: "bg-slate-100   text-slate-600    border-slate-200",
+  pendiente: "bg-muted   text-muted-foreground    border-border",
   propuesta: "bg-amber-500/10   text-amber-700   border-amber-500/25",
   cerrada:   "bg-emerald-500/10 text-emerald-700 border-emerald-500/25",
   perdida:   "bg-red-500/10     text-red-700     border-red-500/25",
@@ -108,7 +108,7 @@ function StarRating({
           className="transition-transform hover:scale-110 focus:outline-none"
         >
           <Star className={`${dim} transition-colors ${
-            star <= active ? "fill-amber-400 text-amber-600" : "fill-transparent text-slate-300"
+            star <= active ? "fill-amber-400 text-amber-600" : "fill-transparent text-muted-foreground/70"
           }`} />
         </button>
       ))}
@@ -164,7 +164,7 @@ function ContactActions({ persona }: { persona: Persona }) {
           </a>
           <button
             onClick={() => copy(persona.phone!, "Teléfono")}
-            className="flex items-center gap-1.5 h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-[12px] font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+            className="flex items-center gap-1.5 h-8 rounded-lg border border-border bg-muted px-3 text-[12px] font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
             title="Copiar teléfono"
           >
             <Phone className="h-3.5 w-3.5" />
@@ -184,7 +184,7 @@ function ContactActions({ persona }: { persona: Persona }) {
           </a>
           <button
             onClick={() => copy(persona.email!, "Email")}
-            className="flex items-center gap-1.5 h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-[12px] font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+            className="flex items-center gap-1.5 h-8 rounded-lg border border-border bg-muted px-3 text-[12px] font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
             title="Copiar email"
           >
             <Copy className="h-3.5 w-3.5" />
@@ -247,26 +247,26 @@ function DetailDrawer({
     setSavingSeg(false)
   }
 
-  const inputCls = "w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none transition-all"
+  const inputCls = "w-full rounded-xl border border-border bg-muted px-3 py-2.5 text-[13px] text-foreground placeholder:text-muted-foreground focus:border-[#1e3a8a]/40 focus:outline-none transition-all"
 
   return (
     <Portal>
       <div className="fixed inset-0 z-[100] bg-slate-900/30" onClick={onClose} />
-      <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[480px] flex-col border-l border-slate-200 shadow-2xl" style={{ backgroundColor: "#ffffff" }}>
+      <div className="fixed right-0 top-0 bottom-0 z-[110] flex w-full max-w-[480px] flex-col border-l border-border shadow-2xl" style={{ backgroundColor: "#ffffff" }}>
 
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5">
+        <div className="flex items-start justify-between gap-4 border-b border-border px-6 py-5">
           <div className="min-w-0">
-            <h2 className="text-lg font-bold text-slate-900 truncate">{persona.name}</h2>
-            <p className="text-[12px] text-slate-400 mt-0.5">Agregada {fmtDate(persona.created_at)}</p>
+            <h2 className="text-lg font-bold text-foreground truncate">{persona.name}</h2>
+            <p className="text-[12px] text-muted-foreground mt-0.5">Agregada {fmtDate(persona.created_at)}</p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button onClick={() => onDelete(persona.id)} disabled={deleting}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-300 hover:text-red-600 hover:bg-red-500/10 transition-all disabled:opacity-40">
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground/70 hover:text-red-600 hover:bg-red-500/10 transition-all disabled:opacity-40">
               {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             </button>
             <button onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -275,7 +275,7 @@ function DetailDrawer({
         <div className="flex-1 overflow-y-auto">
 
           {/* Status pills + rating row */}
-          <div className="border-b border-slate-200 px-6 py-4 space-y-3">
+          <div className="border-b border-border px-6 py-4 space-y-3">
             <div className="flex items-center justify-between flex-wrap gap-3">
               <StarRating size="md" value={persona.rating}
                 onChange={n => onPatch(persona.id, { rating: n || null })} />
@@ -287,7 +287,7 @@ function DetailDrawer({
                 className={`rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-wide outline-none cursor-pointer ${CALL_STATUS_STYLE[persona.call_status]}`}
               >
                 {CALL_STATUS_OPTIONS.map(s => (
-                  <option key={s} value={s} className="bg-white text-slate-900">{s}</option>
+                  <option key={s} value={s} className="bg-card text-foreground">{s}</option>
                 ))}
               </select>
               <select
@@ -296,7 +296,7 @@ function DetailDrawer({
                 className={`rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-wide outline-none cursor-pointer ${SALES_STATUS_STYLE[persona.sales_status]}`}
               >
                 {SALES_STATUS_OPTIONS.map(s => (
-                  <option key={s} value={s} className="bg-white text-slate-900">{s}</option>
+                  <option key={s} value={s} className="bg-card text-foreground">{s}</option>
                 ))}
               </select>
             </div>
@@ -407,29 +407,29 @@ function DetailDrawer({
           </div>
 
           {/* Seguimientos timeline */}
-          <div className="border-t border-slate-200 px-6 py-5 space-y-4">
+          <div className="border-t border-border px-6 py-5 space-y-4">
             <div className="flex items-center gap-2">
               <span className="h-3 w-[3px] rounded-full bg-[#E42D2C]" />
-              <h3 className="text-[12px] font-bold uppercase tracking-widest text-slate-600">Seguimientos</h3>
-              <span className="text-[11px] text-slate-400">({seguimientos.length})</span>
+              <h3 className="text-[12px] font-bold uppercase tracking-widest text-muted-foreground">Seguimientos</h3>
+              <span className="text-[11px] text-muted-foreground">({seguimientos.length})</span>
             </div>
 
             {/* Add seguimiento form */}
-            <form onSubmit={submitSeg} className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <form onSubmit={submitSeg} className="space-y-2 rounded-xl border border-border bg-muted p-3">
               <div className="flex items-center gap-2">
                 <select
                   value={newSegType}
                   onChange={e => setNewSegType(e.target.value as SegType)}
-                  className="h-8 rounded-lg border border-slate-200 bg-slate-50 px-2 text-[12px] text-slate-900 outline-none capitalize"
+                  className="h-8 rounded-lg border border-border bg-muted px-2 text-[12px] text-foreground outline-none capitalize"
                 >
-                  {SEGUIMIENTO_TYPES.map(t => <option key={t} value={t} className="bg-white">{t}</option>)}
+                  {SEGUIMIENTO_TYPES.map(t => <option key={t} value={t} className="bg-card">{t}</option>)}
                 </select>
                 <input
                   type="datetime-local"
                   value={newSegDue}
                   onChange={e => setNewSegDue(e.target.value)}
                   placeholder="Vence el..."
-                  className="h-8 flex-1 rounded-lg border border-slate-200 bg-slate-50 px-2 text-[12px] text-slate-700 outline-none"
+                  className="h-8 flex-1 rounded-lg border border-border bg-muted px-2 text-[12px] text-muted-foreground outline-none"
                 />
               </div>
               <div className="flex gap-2">
@@ -437,7 +437,7 @@ function DetailDrawer({
                   value={newSegContent}
                   onChange={e => setNewSegContent(e.target.value)}
                   placeholder="¿Qué hay que hacer / qué pasó?"
-                  className="h-9 flex-1 rounded-lg border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 outline-none"
+                  className="h-9 flex-1 rounded-lg border border-border bg-muted px-3 text-[13px] text-foreground placeholder:text-muted-foreground outline-none"
                 />
                 <button
                   type="submit"
@@ -452,11 +452,11 @@ function DetailDrawer({
 
             {/* List */}
             {seguimientos.length === 0 ? (
-              <p className="py-4 text-center text-[12px] text-slate-400">Sin seguimientos todavía.</p>
+              <p className="py-4 text-center text-[12px] text-muted-foreground">Sin seguimientos todavía.</p>
             ) : (
               <div className="space-y-2">
                 {seguimientos.map(s => (
-                  <div key={s.id} className={`rounded-xl border px-3 py-2.5 transition-all ${s.completed ? "border-slate-100 bg-slate-50 opacity-60" : "border-slate-200 bg-slate-50"}`}>
+                  <div key={s.id} className={`rounded-xl border px-3 py-2.5 transition-all ${s.completed ? "border-border bg-muted opacity-60" : "border-border bg-muted"}`}>
                     <div className="flex items-start gap-2.5">
                       <button
                         onClick={() => onPatchSeguimiento(s.id, { completed: !s.completed })}
@@ -464,26 +464,26 @@ function DetailDrawer({
                       >
                         {s.completed
                           ? <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                          : <Circle className="h-4 w-4 text-slate-400 hover:text-slate-600" />}
+                          : <Circle className="h-4 w-4 text-muted-foreground hover:text-muted-foreground" />}
                       </button>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 capitalize">
+                          <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground capitalize">
                             {s.type}
                           </span>
                           {s.due_at && (
-                            <span className="flex items-center gap-1 text-[11px] text-slate-400">
+                            <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                               <CalIcon className="h-3 w-3" /> {fmtDateTime(s.due_at)}
                             </span>
                           )}
                         </div>
-                        <p className={`mt-1 text-[13px] leading-snug ${s.completed ? "text-slate-400 line-through" : "text-slate-800"}`}>
-                          {s.content || <span className="text-slate-400 italic">Sin contenido</span>}
+                        <p className={`mt-1 text-[13px] leading-snug ${s.completed ? "text-muted-foreground line-through" : "text-foreground"}`}>
+                          {s.content || <span className="text-muted-foreground italic">Sin contenido</span>}
                         </p>
                       </div>
                       <button
                         onClick={() => onDeleteSeguimiento(s.id)}
-                        className="shrink-0 text-slate-300 hover:text-red-600 transition-colors"
+                        className="shrink-0 text-muted-foreground/70 hover:text-red-600 transition-colors"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -533,7 +533,7 @@ function NewPersonaModal({
     })
   }
 
-  const inputCls = "w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:outline-none transition-all"
+  const inputCls = "w-full rounded-xl border border-border bg-muted px-3 py-2.5 text-[13px] text-foreground placeholder:text-muted-foreground focus:border-[#1e3a8a]/40 focus:outline-none transition-all"
 
   return (
     <Portal>
@@ -541,13 +541,13 @@ function NewPersonaModal({
       <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-md rounded-2xl border border-slate-200 shadow-2xl p-6 space-y-3.5 max-h-[90vh] overflow-y-auto"
+          className="w-full max-w-md rounded-2xl border border-border shadow-2xl p-6 space-y-3.5 max-h-[90vh] overflow-y-auto"
           style={{ backgroundColor: "#ffffff" }}
         >
           <div className="flex items-center justify-between mb-1">
-            <h3 className="text-base font-bold text-slate-900">Nueva persona agendada</h3>
+            <h3 className="text-base font-bold text-foreground">Nueva persona agendada</h3>
             <button type="button" onClick={onClose}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -860,22 +860,22 @@ export function PersonasAgendadasView() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-[#1e3a8a] tracking-tight">Personas Agendadas</h1>
-            <p className="text-sm text-slate-400 mt-0.5">
+            <p className="text-sm text-muted-foreground mt-0.5">
               {personas.length} {personas.length === 1 ? "persona" : "personas"} en pipeline
             </p>
           </div>
           <div className="flex items-center gap-2">
             <button onClick={fetchAll} disabled={loading}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40">
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-muted text-muted-foreground hover:text-foreground hover:border-border transition-all disabled:opacity-40">
               <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             </button>
             <button onClick={() => setShowImport(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-400 hover:text-[#1e3a8a] hover:border-[#1e3a8a]/30 transition-all"
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-muted text-muted-foreground hover:text-[#1e3a8a] hover:border-[#1e3a8a]/30 transition-all"
               title="Importar CSV">
               <Upload className="h-4 w-4" />
             </button>
             <button onClick={exportCsv} disabled={!filtered.length}
-              className="flex items-center gap-2 h-9 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-500 hover:text-slate-900 hover:border-slate-300 transition-all disabled:opacity-40">
+              className="flex items-center gap-2 h-9 rounded-xl border border-border bg-muted px-4 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-border transition-all disabled:opacity-40">
               <Download className="h-3.5 w-3.5" />
               CSV
             </button>
@@ -895,7 +895,7 @@ export function PersonasAgendadasView() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar por nombre, email, instagram, owner..."
-            className="h-9 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 placeholder:text-slate-300 focus:border-[#1e3a8a]/40 focus:outline-none flex-1 min-w-[220px] max-w-sm"
+            className="h-9 rounded-xl border border-border bg-muted px-4 text-sm text-foreground placeholder:text-muted-foreground/70 focus:border-[#1e3a8a]/40 focus:outline-none flex-1 min-w-[220px] max-w-sm"
           />
           <div className="flex items-center gap-1.5 flex-wrap">
             <button
@@ -903,7 +903,7 @@ export function PersonasAgendadasView() {
               className={`h-8 rounded-xl border px-3 text-[12px] font-medium transition-all ${
                 filterCallStatus === "todas"
                   ? "border-[#E42D2C]/40 bg-[#E42D2C]/10 text-[#E42D2C]"
-                  : "border-slate-200 text-slate-400 hover:text-slate-900 hover:border-slate-300"
+                  : "border-border text-muted-foreground hover:text-foreground hover:border-border"
               }`}>
               Todas
             </button>
@@ -914,7 +914,7 @@ export function PersonasAgendadasView() {
                 className={`h-8 rounded-xl border px-3 text-[12px] font-medium transition-all capitalize ${
                   filterCallStatus === s
                     ? CALL_STATUS_STYLE[s].replace(/border-/g, "border-").replace(/\/25/g, "/40")
-                    : "border-slate-200 text-slate-400 hover:text-slate-900 hover:border-slate-300"
+                    : "border-border text-muted-foreground hover:text-foreground hover:border-border"
                 }`}>
                 {s}
               </button>
@@ -923,20 +923,20 @@ export function PersonasAgendadasView() {
         </div>
 
         {/* Table */}
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div className="overflow-hidden rounded-2xl border border-border bg-card">
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <Loader2 className="h-6 w-6 animate-spin text-[#E42D2C]/40" />
             </div>
           ) : !filtered.length ? (
             <div className="flex flex-col items-center justify-center py-20 text-center px-6">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50 ring-1 ring-slate-200 mb-4">
-                <Users2 className="h-6 w-6 text-slate-400" />
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted ring-1 ring-border mb-4">
+                <Users2 className="h-6 w-6 text-muted-foreground" />
               </div>
-              <p className="text-[15px] font-semibold text-slate-700">
+              <p className="text-[15px] font-semibold text-muted-foreground">
                 {personas.length ? "Sin coincidencias" : "Todavía no hay personas"}
               </p>
-              <p className="text-[13px] text-slate-400 mt-1 max-w-sm">
+              <p className="text-[13px] text-muted-foreground mt-1 max-w-sm">
                 {personas.length
                   ? "Probá ajustar los filtros o limpiar la búsqueda."
                   : "Las personas agendadas son tus prospectos: leads que viste en demos, llamadas, etc. Empezá creando la primera."}
@@ -955,9 +955,9 @@ export function PersonasAgendadasView() {
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50">
+                  <tr className="border-b border-border bg-muted">
                     {["Nombre","Llamada","Llamada","Venta","Owner","Source","Rating","Contacto",""].map((h, i) => (
-                      <th key={i} className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 whitespace-nowrap">{h}</th>
+                      <th key={i} className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -965,14 +965,14 @@ export function PersonasAgendadasView() {
                   {filtered.map(p => (
                     <tr key={p.id}
                       onClick={() => setSelected(p)}
-                      className="border-b border-slate-100 cursor-pointer transition-colors group hover:bg-slate-50">
+                      className="border-b border-border cursor-pointer transition-colors group hover:bg-muted">
 
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="text-[14px] font-semibold text-slate-900">{p.name}</div>
-                        <div className="text-[11px] text-slate-400 mt-0.5">{p.email ?? "—"}</div>
+                        <div className="text-[14px] font-semibold text-foreground">{p.name}</div>
+                        <div className="text-[11px] text-muted-foreground mt-0.5">{p.email ?? "—"}</div>
                       </td>
 
-                      <td className="px-4 py-4 whitespace-nowrap text-[12px] text-slate-600">
+                      <td className="px-4 py-4 whitespace-nowrap text-[12px] text-muted-foreground">
                         {fmtDateTime(p.scheduled_at)}
                       </td>
 
@@ -988,12 +988,12 @@ export function PersonasAgendadasView() {
                         </span>
                       </td>
 
-                      <td className="px-4 py-4 whitespace-nowrap text-[13px] text-slate-600">
-                        {p.owner ?? <span className="text-slate-400">—</span>}
+                      <td className="px-4 py-4 whitespace-nowrap text-[13px] text-muted-foreground">
+                        {p.owner ?? <span className="text-muted-foreground">—</span>}
                       </td>
 
-                      <td className="px-4 py-4 whitespace-nowrap text-[13px] text-slate-600">
-                        {p.source ?? <span className="text-slate-400">—</span>}
+                      <td className="px-4 py-4 whitespace-nowrap text-[13px] text-muted-foreground">
+                        {p.source ?? <span className="text-muted-foreground">—</span>}
                       </td>
 
                       <td className="px-4 py-4 whitespace-nowrap" onClick={e => e.stopPropagation()}>
@@ -1004,7 +1004,7 @@ export function PersonasAgendadasView() {
                       <td className="px-4 py-4 whitespace-nowrap" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center gap-2">
                           {p.phone && (
-                            <a href={`tel:${p.phone}`} className="text-slate-400 hover:text-slate-900 transition-colors" title={p.phone}>
+                            <a href={`tel:${p.phone}`} className="text-muted-foreground hover:text-foreground transition-colors" title={p.phone}>
                               <Phone className="h-3.5 w-3.5" />
                             </a>
                           )}
@@ -1018,7 +1018,7 @@ export function PersonasAgendadasView() {
                       </td>
 
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-slate-600 transition-colors" />
+                        <ChevronRight className="h-4 w-4 text-muted-foreground/70 group-hover:text-muted-foreground transition-colors" />
                       </td>
                     </tr>
                   ))}

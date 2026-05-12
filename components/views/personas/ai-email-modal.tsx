@@ -88,17 +88,17 @@ export function AiEmailModal({ personaId, personaName, personaEmail, onClose }: 
     <Portal>
       <div className="fixed inset-0 z-[100] bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
       <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-        <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl flex flex-col max-h-[90vh]">
+        <div className="w-full max-w-2xl rounded-2xl border border-border bg-card shadow-2xl flex flex-col max-h-[90vh]">
 
           {/* Header */}
-          <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-6 py-4">
+          <div className="flex items-center justify-between gap-3 border-b border-border px-6 py-4">
             <div className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#E42D2C]/10 to-[#1e3a8a]/10 ring-1 ring-[#1e3a8a]/15">
                 <Mail className="h-4 w-4 text-[#1e3a8a]" />
               </div>
               <div>
-                <h3 className="text-[15px] font-bold text-slate-900">Email para {personaName}</h3>
-                <p className="text-[11px] text-slate-500">
+                <h3 className="text-[15px] font-bold text-foreground">Email para {personaName}</h3>
+                <p className="text-[11px] text-muted-foreground">
                   {phase === "input"
                     ? "Configurá el intent y la IA redacta personalizado."
                     : personaEmail ?? "(sin email registrado)"}
@@ -106,7 +106,7 @@ export function AiEmailModal({ personaId, personaName, personaEmail, onClose }: 
               </div>
             </div>
             <button onClick={onClose}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -121,7 +121,7 @@ export function AiEmailModal({ personaId, personaName, personaEmail, onClose }: 
                   <select
                     value={intent}
                     onChange={e => setIntent(e.target.value)}
-                    className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-[13px] text-slate-900 outline-none cursor-pointer hover:border-slate-300 focus:border-[#1e3a8a]/40"
+                    className="h-10 w-full rounded-xl border border-border bg-card px-3 text-[13px] text-foreground outline-none cursor-pointer hover:border-border focus:border-[#1e3a8a]/40"
                   >
                     {INTENTS.map(i => <option key={i.value} value={i.value}>{i.label}</option>)}
                   </select>
@@ -130,13 +130,13 @@ export function AiEmailModal({ personaId, personaName, personaEmail, onClose }: 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Tono</p>
-                    <div className="inline-flex h-10 w-full rounded-xl border border-slate-200 bg-white p-0.5">
+                    <div className="inline-flex h-10 w-full rounded-xl border border-border bg-card p-0.5">
                       {TONES.map(t => (
                         <button
                           key={t.value}
                           onClick={() => setTone(t.value)}
                           className={`flex flex-1 items-center justify-center rounded-lg text-[12px] font-medium transition-all ${
-                            tone === t.value ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-900"
+                            tone === t.value ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"
                           }`}
                         >
                           {t.label}
@@ -146,17 +146,17 @@ export function AiEmailModal({ personaId, personaName, personaEmail, onClose }: 
                   </div>
                   <div className="space-y-1.5">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Idioma</p>
-                    <div className="inline-flex h-10 w-full rounded-xl border border-slate-200 bg-white p-0.5">
+                    <div className="inline-flex h-10 w-full rounded-xl border border-border bg-card p-0.5">
                       <button
                         onClick={() => setLanguage("es")}
                         className={`flex flex-1 items-center justify-center rounded-lg text-[12px] font-medium transition-all ${
-                          language === "es" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-900"
+                          language === "es" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"
                         }`}
                       >Español</button>
                       <button
                         onClick={() => setLanguage("en")}
                         className={`flex flex-1 items-center justify-center rounded-lg text-[12px] font-medium transition-all ${
-                          language === "en" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-900"
+                          language === "en" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"
                         }`}
                       >English</button>
                     </div>
@@ -170,7 +170,7 @@ export function AiEmailModal({ personaId, personaName, personaEmail, onClose }: 
                     onChange={e => setNotes(e.target.value)}
                     rows={3}
                     placeholder="Ej: avisarle que la propuesta del bid 2024-007 está lista y mandar en archivo adjunto."
-                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[13px] text-slate-900 outline-none placeholder:text-slate-400 focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10 resize-none"
+                    className="w-full rounded-xl border border-border bg-card px-3 py-2 text-[13px] text-foreground outline-none placeholder:text-muted-foreground focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10 resize-none"
                   />
                 </div>
 
@@ -190,7 +190,7 @@ export function AiEmailModal({ personaId, personaName, personaEmail, onClose }: 
                     <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Subject</p>
                     <button
                       onClick={() => copy("subject")}
-                      className="inline-flex items-center gap-1 text-[10.5px] font-medium text-slate-500 hover:text-[#1e3a8a]"
+                      className="inline-flex items-center gap-1 text-[10.5px] font-medium text-muted-foreground hover:text-[#1e3a8a]"
                     >
                       {copied === "subject"
                         ? <><Check className="h-2.5 w-2.5" /> Copiado</>
@@ -201,7 +201,7 @@ export function AiEmailModal({ personaId, personaName, personaEmail, onClose }: 
                     type="text"
                     value={subject}
                     onChange={e => setSubject(e.target.value)}
-                    className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-900 outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10"
+                    className="h-10 w-full rounded-xl border border-border bg-card px-3 text-[13px] font-medium text-foreground outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10"
                   />
                 </div>
 
@@ -210,7 +210,7 @@ export function AiEmailModal({ personaId, personaName, personaEmail, onClose }: 
                     <p className="text-[10px] font-bold uppercase tracking-widest text-[#1e3a8a]/60">Body</p>
                     <button
                       onClick={() => copy("body")}
-                      className="inline-flex items-center gap-1 text-[10.5px] font-medium text-slate-500 hover:text-[#1e3a8a]"
+                      className="inline-flex items-center gap-1 text-[10.5px] font-medium text-muted-foreground hover:text-[#1e3a8a]"
                     >
                       {copied === "body"
                         ? <><Check className="h-2.5 w-2.5" /> Copiado</>
@@ -221,7 +221,7 @@ export function AiEmailModal({ personaId, personaName, personaEmail, onClose }: 
                     value={bodyText}
                     onChange={e => setBodyText(e.target.value)}
                     rows={14}
-                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-[13px] text-slate-700 leading-relaxed outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10 resize-none font-mono"
+                    className="w-full rounded-xl border border-border bg-card px-3 py-2.5 text-[13px] text-muted-foreground leading-relaxed outline-none focus:border-[#1e3a8a]/40 focus:ring-2 focus:ring-[#1e3a8a]/10 resize-none font-mono"
                   />
                 </div>
 
@@ -236,10 +236,10 @@ export function AiEmailModal({ personaId, personaName, personaEmail, onClose }: 
           </div>
 
           {/* Footer */}
-          <div className="border-t border-slate-200 px-6 py-3 flex items-center justify-between gap-3">
+          <div className="border-t border-border px-6 py-3 flex items-center justify-between gap-3">
             {phase === "input" ? (
               <>
-                <button onClick={onClose} className="text-[12px] text-slate-500 hover:text-slate-900 px-2 py-1.5">
+                <button onClick={onClose} className="text-[12px] text-muted-foreground hover:text-foreground px-2 py-1.5">
                   Cancelar
                 </button>
                 <button
@@ -256,14 +256,14 @@ export function AiEmailModal({ personaId, personaName, personaEmail, onClose }: 
               <>
                 <button
                   onClick={() => setPhase("input")}
-                  className="text-[12px] text-slate-500 hover:text-slate-900 px-2 py-1.5"
+                  className="text-[12px] text-muted-foreground hover:text-foreground px-2 py-1.5"
                 >
                   ← Regenerar
                 </button>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={openInMailto}
-                    className="inline-flex items-center gap-1.5 h-9 rounded-xl border border-slate-200 bg-white px-3 text-[12px] font-semibold text-slate-700 hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors"
+                    className="inline-flex items-center gap-1.5 h-9 rounded-xl border border-border bg-card px-3 text-[12px] font-semibold text-muted-foreground hover:border-[#1e3a8a]/30 hover:text-[#1e3a8a] transition-colors"
                   >
                     Abrir en cliente local
                   </button>
