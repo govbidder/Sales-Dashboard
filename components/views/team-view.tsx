@@ -19,6 +19,7 @@ import {
   isDeveloper,
 } from "@/lib/types/role"
 import { useEffectiveRole } from "@/hooks/use-effective-role"
+import { useViewAs } from "@/lib/contexts/view-as-context"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -389,7 +390,7 @@ function InviteModal({
 
 // ─── Member Card ──────────────────────────────────────────────────────────────
 
-function MemberCard({ member, department, onClick }: { member: Member; department: Department | null; onClick: () => void }) {
+function MemberCard({ member, department, isSimulated, onClick }: { member: Member; department: Department | null; isSimulated: boolean; onClick: () => void }) {
   const displayName = member.full_name || member.email || "Sin nombre"
   const isAdmin   = isAdminOrAbove(member.role)
   const isDev     = isDeveloper(member.role)
@@ -400,7 +401,9 @@ function MemberCard({ member, department, onClick }: { member: Member; departmen
     <button
       onClick={onClick}
       className={`group relative overflow-hidden rounded-2xl border bg-white text-left transition-all p-5 ${
-        isInactive
+        isSimulated
+          ? "border-amber-400 ring-2 ring-amber-400/40 shadow-[0_0_24px_rgba(245,158,11,0.20)]"
+          : isInactive
           ? "border-slate-100 opacity-60 hover:opacity-90"
           : "border-slate-200 hover:border-slate-300 hover:shadow-[0_0_30px_rgba(228,45,44,0.06)]"
       }`}
@@ -493,6 +496,9 @@ export function TeamView() {
   // Effective role para gates de UI (respeta view-as si está activo).
   // El rol real (currentRole) sigue siendo la fuente para API calls.
   const effectiveRole = useEffectiveRole(currentRole)
+
+  // View-As: id del user simulado, para destacar visualmente su MemberCard.
+  const { viewAsUserId: simulatedUserId } = useViewAs()
 
   const getSession = async () => {
     const supabase = createClient()
@@ -750,7 +756,13 @@ export function TeamView() {
         ) : (
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map(m => (
-              <MemberCard key={m.id} member={m} department={m.department_id ? deptMap.get(m.department_id) ?? null : null} onClick={() => setSelected(m)} />
+              <MemberCard
+                key={m.id}
+                member={m}
+                department={m.department_id ? deptMap.get(m.department_id) ?? null : null}
+                isSimulated={simulatedUserId === m.id}
+                onClick={() => setSelected(m)}
+              />
             ))}
           </div>
         )}

@@ -2,10 +2,14 @@
 
 /**
  * Banner sticky en el top del dashboard cuando hay View-As activo.
- * Solo se renderiza para developers con viewAs distinto de null.
+ * Refleja qué se está simulando:
+ *  - viewAsUser → "Viendo como [Nombre]"
+ *  - viewAsRole + dept → "Viendo como [Rol] de [Depto]"
+ *  - viewAsRole solo → "Viendo como [Rol]"
+ *  - solo dept → "Viendo solo el depto [Depto]"
  *
  * Color ámbar intencional — no usa theme vars porque el objetivo es
- * que NO se confunda con la app real. Es una señal de "estás simulando".
+ * que NO se confunda con la app real.
  */
 
 import { Eye, X } from "lucide-react"
@@ -13,21 +17,50 @@ import { useViewAs } from "@/lib/contexts/view-as-context"
 import { ROLE_LABEL } from "@/lib/types/role"
 
 export function ViewAsBanner() {
-  const { viewAsRole, clearViewAs, isViewing } = useViewAs()
+  const {
+    viewAsRole, viewAsDepartmentId, viewAsUser,
+    departments, clearViewAs, isViewing,
+  } = useViewAs()
 
-  if (!isViewing || !viewAsRole) return null
+  if (!isViewing) return null
+
+  const deptName = viewAsDepartmentId
+    ? (departments.find(d => d.id === viewAsDepartmentId)?.name ?? null)
+    : null
+
+  // Compose label
+  let title = ""
+  let extra = ""
+  if (viewAsUser) {
+    const name = viewAsUser.full_name || viewAsUser.email || "Usuario"
+    title = `Viendo como ${name}`
+    extra = `${ROLE_LABEL[viewAsUser.role]}${deptName ? ` · ${deptName}` : ""}`
+  } else if (viewAsRole && deptName) {
+    title = `Viendo como ${ROLE_LABEL[viewAsRole]} de ${deptName}`
+  } else if (viewAsRole) {
+    title = `Viendo como ${ROLE_LABEL[viewAsRole]}`
+  } else if (deptName) {
+    title = `Filtrado al depto ${deptName}`
+  }
 
   return (
     <div className="sticky top-0 z-[60] w-full bg-amber-400 text-amber-950 shadow-[0_2px_8px_rgba(180,83,9,0.25)]">
       <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-3 px-4 py-2 sm:px-6">
         <div className="flex items-center gap-2 min-w-0">
           <Eye className="h-4 w-4 shrink-0" />
-          <p className="text-[13px] font-semibold truncate">
-            Viendo como <span className="font-bold underline underline-offset-2">{ROLE_LABEL[viewAsRole]}</span>
-            <span className="ml-2 hidden sm:inline text-[12px] font-medium text-amber-950/80">
-              · Esto es solo visual — el servidor sigue tratándote como Developer.
-            </span>
-          </p>
+          <div className="min-w-0">
+            <p className="text-[13px] font-bold leading-tight truncate">
+              {title}
+              {extra && (
+                <span className="ml-2 text-[11px] font-semibold text-amber-950/75">
+                  ({extra})
+                </span>
+              )}
+            </p>
+            <p className="hidden sm:block text-[11px] text-amber-950/75 leading-tight truncate">
+              Esto es solo visual — el servidor sigue tratándote como Developer.
+            </p>
+          </div>
         </div>
         <button
           onClick={clearViewAs}
