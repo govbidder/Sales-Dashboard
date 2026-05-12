@@ -1,19 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase"
 import { createServiceClient } from "@/lib/supabase-service"
 import { isAdminOrAbove, isSuperAdminOrAbove, type Role } from "@/lib/types/role"
-
-async function getUser(req: NextRequest) {
-  const token = req.headers.get("authorization")?.replace("Bearer ", "")
-  if (!token) return null
-  const { data: { user } } = await createClient().auth.getUser(token)
-  return user
-}
+import { getEffectiveUser } from "@/lib/auth/get-effective-user"
 
 // GET /api/admin/team — list all team members (profiles enriched with auth data)
 export async function GET(req: NextRequest) {
-  const user = await getUser(req)
-  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  const auth = await getEffectiveUser(req)
+  if (!auth) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 
   const db = createServiceClient()
 
@@ -50,8 +43,8 @@ export async function GET(req: NextRequest) {
   }
 
   const members = profiles.map(p => {
-    const auth = authById.get(p.id)
-    const email = auth?.email ?? null
+    const authU = authById.get(p.id)
+    const email = authU?.email ?? null
     return {
       id:               p.id,
       email,
@@ -63,7 +56,7 @@ export async function GET(req: NextRequest) {
       avatar_url:       (p as any).avatar_url ?? null,
       notes:            (p as any).notes ?? null,
       department_id:    (p as any).department_id ?? null,
-      last_sign_in_at:  auth?.last_sign_in_at ?? null,
+      last_sign_in_at:  authU?.last_sign_in_at ?? null,
       created_at:       p.created_at,
       personas_owned:   email ? (personasCount.get(email) ?? 0) : 0,
       tasks_assigned:   email ? (tasksCount.get(email)    ?? 0) : 0,
@@ -74,8 +67,10 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const user = await getUser(req)
-  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  const auth = await getEffectiveUser(req)
+  if (!auth) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  const { effectiveUser } = auth
+  const callerRole = effectiveUser.role
 
   const body = await req.json()
   const { id, ...updates } = body
@@ -83,10 +78,8 @@ export async function PATCH(req: NextRequest) {
 
   const db = createServiceClient()
 
-  // Verify caller is admin or above; only super_admin can change role to/from super_admin.
-  const { data: callerProfile } = await db
-    .from("profiles").select("role").eq("id", user.id).single()
-  const callerRole = callerProfile?.role as Role | undefined
+  // Verify caller is admin or above (usando el rol EFFECTIVE — si developer
+  // está simulando un empleado, no debería poder modificar miembros).
   if (!isAdminOrAbove(callerRole)) {
     return NextResponse.json({ error: "Solo admins pueden modificar miembros" }, { status: 403 })
   }

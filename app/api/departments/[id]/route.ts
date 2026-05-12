@@ -1,33 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase"
 import { createServiceClient } from "@/lib/supabase-service"
-import { isAdminOrAbove, type Role } from "@/lib/types/role"
+import { isAdminOrAbove } from "@/lib/types/role"
+import { getEffectiveUser } from "@/lib/auth/get-effective-user"
 
 const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/
 
-async function getUser(req: NextRequest) {
-  const token = req.headers.get("authorization")?.replace("Bearer ", "")
-  if (!token) return null
-  const { data: { user } } = await createClient().auth.getUser(token)
-  return user
-}
-
 async function requireAdmin(req: NextRequest) {
-  const user = await getUser(req)
-  if (!user) return { error: "No autorizado", status: 401, user: null }
-
-  const db = createServiceClient()
-  const { data: profile } = await db
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single()
-
-  if (!isAdminOrAbove(profile?.role as Role | undefined)) {
-    return { error: "Solo admins pueden modificar departamentos", status: 403, user: null }
+  const auth = await getEffectiveUser(req)
+  if (!auth) return { error: "No autorizado", status: 401 }
+  if (!isAdminOrAbove(auth.effectiveUser.role)) {
+    return { error: "Solo admins pueden modificar departamentos", status: 403 }
   }
-
-  return { error: null, status: 0, user }
+  return { error: null, status: 0 }
 }
 
 // PATCH /api/departments/[id] — update a department (admin only)
@@ -35,8 +19,8 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = await requireAdmin(req)
-  if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status })
+  const gate = await requireAdmin(req)
+  if (gate.error) return NextResponse.json({ error: gate.error }, { status: gate.status })
 
   const { id } = await params
 
@@ -79,8 +63,8 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = await requireAdmin(req)
-  if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status })
+  const gate = await requireAdmin(req)
+  if (gate.error) return NextResponse.json({ error: gate.error }, { status: gate.status })
 
   const { id } = await params
 

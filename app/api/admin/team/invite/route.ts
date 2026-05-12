@@ -1,34 +1,20 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase"
 import { createServiceClient } from "@/lib/supabase-service"
 import { isAdminOrAbove, isSuperAdminOrAbove, type Role } from "@/lib/types/role"
-
-async function getUser(req: NextRequest) {
-  const token = req.headers.get("authorization")?.replace("Bearer ", "")
-  if (!token) return null
-  const { data: { user } } = await createClient().auth.getUser(token)
-  return user
-}
+import { getEffectiveUser } from "@/lib/auth/get-effective-user"
 
 // POST /api/admin/team/invite — invite a new team member by email
 // Only admins can invite.
 export async function POST(req: NextRequest) {
-  const user = await getUser(req)
-  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  const auth = await getEffectiveUser(req)
+  if (!auth) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  const callerRole = auth.effectiveUser.role
 
-  const db = createServiceClient()
-
-  // Verify caller is admin
-  const { data: callerProfile } = await db
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single()
-
-  const callerRole = callerProfile?.role as Role | undefined
   if (!isAdminOrAbove(callerRole)) {
     return NextResponse.json({ error: "Solo admins pueden invitar al equipo" }, { status: 403 })
   }
+
+  const db = createServiceClient()
 
   const body = await req.json()
   const email    = body?.email?.trim()

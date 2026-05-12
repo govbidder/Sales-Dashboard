@@ -1,17 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
-import { createClient } from "@/lib/supabase"
+import { getEffectiveUser } from "@/lib/auth/get-effective-user"
 
 // Edge runtime: latencia más baja, ideal para llamadas cortas a la IA
 // (este endpoint solo recibe título+descripción y devuelve JSON).
 export const runtime = "edge"
-
-async function getUser(req: NextRequest) {
-  const token = req.headers.get("authorization")?.replace("Bearer ", "")
-  if (!token) return null
-  const { data: { user } } = await createClient().auth.getUser(token)
-  return user
-}
 
 const SYSTEM_PROMPT = `Sos un asistente que ayuda a llenar campos de una tarea de gov contracting a partir del título y descripción.
 
@@ -37,7 +30,7 @@ REGLAS:
 6. Solo el JSON. Nada más.`
 
 export async function POST(req: NextRequest) {
-  const user = await getUser(req)
+  const auth = await getEffectiveUser(req); const user = auth?.effectiveUser ?? null
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 
   const apiKey = process.env.ANTHROPIC_API_KEY

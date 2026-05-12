@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase"
 import { createServiceClient } from "@/lib/supabase-service"
-import { isAdminOrAbove, type Role } from "@/lib/types/role"
+import { isAdminOrAbove } from "@/lib/types/role"
+import { getEffectiveUser } from "@/lib/auth/get-effective-user"
 import { z } from "zod"
 
 // =============================================================================
@@ -35,19 +35,14 @@ const Body = z.object({
 })
 
 export async function POST(req: NextRequest) {
-  // Auth
-  const token = req.headers.get("authorization")?.replace("Bearer ", "")
-  if (!token) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
-  const { data: { user } } = await createClient().auth.getUser(token)
-  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  const auth = await getEffectiveUser(req)
+  if (!auth) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 
-  // Admin gate
-  const db = createServiceClient()
-  const { data: profile } = await db
-    .from("profiles").select("role").eq("id", user.id).single()
-  if (!isAdminOrAbove(profile?.role as Role | undefined)) {
+  if (!isAdminOrAbove(auth.effectiveUser.role)) {
     return NextResponse.json({ error: "Solo admins pueden importar reportes" }, { status: 403 })
   }
+
+  const db = createServiceClient()
 
   // Parse body
   let raw: unknown
