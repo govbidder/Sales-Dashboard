@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation"
 import {
   X, BarChart3, DollarSign, LayoutGrid, FileBarChart,
   Users2, ListTodo, Users, Layers, Wrench, BookOpen, CalendarDays,
-  Activity, ChevronLeft, ChevronRight, Rss, FormInput, Shield,
+  Home, ChevronLeft, ChevronRight, Rss, FormInput, Shield, LayoutTemplate,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { type Role, isAdminOrAbove } from "@/lib/types/role"
@@ -42,38 +42,43 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: "Inicio",
     items: [
-      { name: "Página Principal", href: "/inicio", icon: Activity },
+      { name: "Hoy", href: "/inicio", icon: Home },
     ],
   },
   {
-    label: "General",
+    label: "Performance",
     items: [
-      { name: "Panel",            href: "/dashboard",      icon: BarChart3   },
-      { name: "Ingresos",         href: "/sales",          icon: DollarSign,   visible: adminOnly },
-      { name: "Métricas",         href: "/metrics",        icon: LayoutGrid,   visible: adminOnly },
-      { name: "Cargar Métricas",  href: "/admin/reports",  icon: FileBarChart, visible: adminOnly },
+      { name: "Panel",          href: "/dashboard",     icon: BarChart3   },
+      { name: "Ventas",         href: "/sales",         icon: DollarSign,   visible: adminOnly },
+      { name: "Métricas",       href: "/metrics",       icon: LayoutGrid,   visible: adminOnly },
+      { name: "Cargar reporte", href: "/admin/reports", icon: FileBarChart, visible: adminOnly },
     ],
   },
   {
-    label: "Operación",
+    label: "Día a día",
     items: [
-      { name: "Personas Agendadas", href: "/admin/personas",         icon: Users2   },
-      { name: "Tareas",             href: "/admin/tasks",            icon: ListTodo },
-      { name: "Equipo",             href: "/admin/team",             icon: Users,    visible: adminOnly },
-      { name: "Departamentos",      href: "/admin/departments",      icon: Layers,   visible: adminOnly },
-      { name: "Centro Operativo",   href: "/admin/centro-operativo", icon: Layers   },
-      { name: "Actividad",          href: "/admin/activity",         icon: Rss      },
-      { name: "Forms",              href: "/admin/forms",            icon: FormInput, visible: adminOnly },
-      { name: "Templates",          href: "/admin/task-templates",   icon: Layers,    visible: adminOnly },
-      { name: "Audit log",          href: "/admin/audit-log",        icon: Shield,    visible: adminOnly },
+      { name: "Personas Agendadas", href: "/admin/personas", icon: Users2       },
+      { name: "Tareas",             href: "/admin/tasks",    icon: ListTodo     },
+      { name: "Agenda",             href: "/calendar",       icon: CalendarDays },
     ],
   },
   {
-    label: "Programa",
+    label: "Equipo",
     items: [
-      { name: "Herramientas", href: "/tools",    icon: Wrench       },
-      { name: "Recursos",     href: "/recursos", icon: BookOpen     },
-      { name: "Agenda",       href: "/calendar", icon: CalendarDays },
+      { name: "Miembros",      href: "/admin/team",        icon: Users,  visible: adminOnly },
+      { name: "Departamentos", href: "/admin/departments", icon: Layers, visible: adminOnly },
+      { name: "Actividad",     href: "/admin/activity",    icon: Rss                       },
+    ],
+  },
+  {
+    label: "Configuración",
+    items: [
+      { name: "Plantillas",       href: "/admin/task-templates",   icon: LayoutTemplate, visible: adminOnly },
+      { name: "Formularios",      href: "/admin/forms",            icon: FormInput,      visible: adminOnly },
+      { name: "Centro Operativo", href: "/admin/centro-operativo", icon: Layers,         visible: adminOnly },
+      { name: "Auditoría",        href: "/admin/audit-log",        icon: Shield,         visible: adminOnly },
+      { name: "Herramientas",     href: "/tools",                  icon: Wrench,         visible: adminOnly },
+      { name: "Biblioteca",       href: "/recursos",               icon: BookOpen,       visible: adminOnly },
     ],
   },
 ]
