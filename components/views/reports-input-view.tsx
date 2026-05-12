@@ -35,6 +35,7 @@ const SECTIONS: Section[] = [
       { key: "attended_calls",       label: "Llamadas Atendidas",      type: "number" },
       { key: "qualified_calls",      label: "Calls Calificadas",    type: "number" },
       { key: "no_show",              label: "No Shows",             type: "number" },
+      { key: "open_conversations",   label: "Conversaciones Abiertas", type: "number" },
       { key: "aplications",          label: "Aplicaciones",         type: "number" },
       { key: "inbound_messages",     label: "Mensajes Inbound",     type: "number" },
       { key: "offer_docs_sent",      label: "Offer Docs Enviados",  type: "number" },

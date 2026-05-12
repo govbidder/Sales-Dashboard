@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase"
 import { createServiceClient } from "@/lib/supabase-service"
+import { isAdminOrAbove, type Role } from "@/lib/types/role"
 
 async function getUser(req: NextRequest) {
   const token = req.headers.get("authorization")?.replace("Bearer ", "")
@@ -14,11 +15,24 @@ export async function GET(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 
   const db = createServiceClient()
-  const { data, error } = await db
+
+  // Scoping para empleados: ven sólo las personas que tienen asignadas (owner = email).
+  // Admins y super_admin ven todo.
+  const { data: callerProfile } = await db
+    .from("profiles").select("role").eq("id", user.id).single()
+  const callerRole = (callerProfile?.role as Role | undefined) ?? "user"
+
+  let query = db
     .from("personas_agendadas")
     .select("*")
     .order("scheduled_at", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false })
+
+  if (!isAdminOrAbove(callerRole)) {
+    query = query.eq("owner", user.email ?? "")
+  }
+
+  const { data, error } = await query
 
   if (error) {
     console.error("[admin/personas GET]", error)

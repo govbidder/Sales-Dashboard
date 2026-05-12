@@ -12,11 +12,13 @@ import { NavigationProgress } from "@/components/ui/navigation-progress"
 import { ToastProvider } from "@/components/ui/toast"
 import { AIAssistant } from "@/components/ai/ai-assistant"
 import { createClient } from "@/lib/supabase"
+import type { Role } from "@/lib/types/role"
 
 type CurrentUser = {
   email: string
   name: string
-  role: "admin" | "user"
+  role: Role
+  department_id: string | null
   clientId: string
 }
 
@@ -73,26 +75,30 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       const user = session.user
       let name = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split("@")[0] || "Usuario"
-      let role: "admin" | "user" = "user"
+      let role: Role = "user"
+      let departmentId: string | null = null
       let clientId = user.id
 
       try {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("role, full_name, client_id")
+          .select("role, full_name, client_id, department_id")
           .eq("id", user.id)
           .single()
 
         if (profile) {
-          if (profile.role === "admin") role = "admin"
-          if (profile.full_name)        name = profile.full_name
-          if (profile.client_id)        clientId = profile.client_id
+          if (profile.role === "super_admin" || profile.role === "admin" || profile.role === "user" || profile.role === "viewer") {
+            role = profile.role
+          }
+          if (profile.full_name)         name = profile.full_name
+          if (profile.client_id)         clientId = profile.client_id
+          if ((profile as any).department_id) departmentId = (profile as any).department_id
         }
       } catch { /* fallback to metadata */ }
 
       if (!mounted) return
 
-      setCurrentUser({ email: user.email ?? "", name, role, clientId })
+      setCurrentUser({ email: user.email ?? "", name, role, department_id: departmentId, clientId })
       setActiveClientId(clientId)
       setAuthChecked(true)
     }
@@ -240,6 +246,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         onClose={() => setSidebarOpen(false)}
         collapsed={sidebarCollapsed}
         onToggleCollapse={handleToggleCollapse}
+        role={currentUser?.role ?? "user"}
       />
 
       <div

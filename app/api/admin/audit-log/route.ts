@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase"
 import { createServiceClient } from "@/lib/supabase-service"
+import { type Role, isAdminOrAbove } from "@/lib/types/role"
 
 async function getUserAndRole(req: NextRequest) {
   const token = req.headers.get("authorization")?.replace("Bearer ", "")
@@ -10,13 +11,13 @@ async function getUserAndRole(req: NextRequest) {
   if (!user) return { user: null, role: null }
   const db = createServiceClient()
   const { data: profile } = await db.from("profiles").select("role").eq("id", user.id).maybeSingle()
-  return { user, role: profile?.role ?? "user" }
+  return { user, role: (profile?.role as Role | null | undefined) ?? "user" }
 }
 
 export async function GET(req: NextRequest) {
   const { user, role } = await getUserAndRole(req)
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 })
-  if (role !== "admin") return NextResponse.json({ error: "Solo admins" }, { status: 403 })
+  if (!isAdminOrAbove(role)) return NextResponse.json({ error: "Solo admins" }, { status: 403 })
 
   const url = new URL(req.url)
   const limit  = Math.min(parseInt(url.searchParams.get("limit") ?? "200", 10) || 200, 1000)
