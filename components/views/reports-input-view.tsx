@@ -2,9 +2,13 @@
 
 import { useEffect, useState, useCallback, useMemo } from "react"
 import { createClient } from "@/lib/supabase"
+import { exportToCSV } from "@/lib/export-csv"
+import { CsvImportModal } from "@/components/ui/csv-import-modal"
+import { useToast } from "@/components/ui/toast"
 import {
   Loader2, Save, RefreshCw, Trash2, ChevronDown, ChevronUp,
   DollarSign, TrendingUp, Megaphone, FileSearch, Check, AlertCircle,
+  Download, Upload,
 } from "lucide-react"
 
 // ─── Schema (must match API NUMERIC_FIELDS + TEXT_FIELDS) ─────────────────────
@@ -388,12 +392,31 @@ function HistoryView({ reports, onPick, onDelete, deletingId }: {
 
 // ─── Main View ────────────────────────────────────────────────────────────────
 
+// CSV template content — todos los campos requeridos + 1 fila de ejemplo coherente.
+// IMPORTANT: si cambiás los headers acá, sincronizá los aliases del CsvImportModal abajo
+// y los campos del Zod schema en /api/admin/reports/bulk.
+const CSV_TEMPLATE_HEADERS = [
+  "month", "year",
+  "scheduled_calls", "attended_calls", "aplications", "new_clients",
+  "offer_docs_sent", "offer_docs_responded", "cierres_por_offerdoc",
+  "cash_collected", "total_revenue", "mrr",
+] as const
+
+const CSV_TEMPLATE_EXAMPLE_ROW = {
+  month: 1, year: 2026,
+  scheduled_calls: 45, attended_calls: 38, aplications: 120, new_clients: 12,
+  offer_docs_sent: 25, offer_docs_responded: 15, cierres_por_offerdoc: 6,
+  cash_collected: 18000, total_revenue: 22000, mrr: 12000,
+}
+
 export function ReportsInputView() {
   const [tab,        setTab]        = useState<"form" | "history">("form")
   const [month,      setMonth]      = useState(getCurrentMonth())
   const [reports,    setReports]    = useState<any[]>([])
   const [loading,    setLoading]    = useState(true)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [showImport, setShowImport] = useState(false)
+  const toast = useToast()
 
   const getSession = async () => {
     const { data: { session } } = await createClient().auth.getSession()
@@ -439,8 +462,127 @@ export function ReportsInputView() {
     setDeletingId(null)
   }
 
+  // ─── CSV template + bulk import ─────────────────────────────────────────────
+
+  const handleDownloadTemplate = () => {
+    exportToCSV([CSV_TEMPLATE_EXAMPLE_ROW], "monthly_reports_template.csv", {
+      columns: CSV_TEMPLATE_HEADERS.map(h => ({ key: h, header: h })),
+    })
+  }
+
+  const handleBulkImport = async (rows: Record<string, any>[]) => {
+    const session = await getSession()
+    if (!session) return { inserted: 0, failed: rows.length, errors: ["Sesión expirada"] }
+    const res = await fetch("/api/admin/reports/bulk", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+      body:    JSON.stringify({ reports: rows }),
+    })
+    const j = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      return { inserted: 0, failed: rows.length, errors: [j?.error ?? "Error en el servidor"] }
+    }
+    const inserted: number = j.inserted ?? 0
+    const updated:  number = j.updated  ?? 0
+    const serverErrors: { index: number; error: string }[] = j.errors ?? []
+    await fetchReports()
+    toast.success(`${inserted} reportes importados, ${updated} actualizados`)
+    return {
+      inserted: inserted + updated,
+      failed:   serverErrors.length,
+      errors:   serverErrors.map(e => `Fila ${e.index + 1}: ${e.error}`),
+    }
+  }
+
   return (
     <div className="space-y-6">
+
+      {showImport && (
+        <CsvImportModal
+          title="Importar reportes mensuales"
+          description="Cada fila se inserta como un reporte. Si ya existe uno para ese mes, se actualiza."
+          templateCSV={
+            CSV_TEMPLATE_HEADERS.join(",") + "\n" +
+            CSV_TEMPLATE_HEADERS.map(h => (CSV_TEMPLATE_EXAMPLE_ROW as any)[h]).join(",") + "\n"
+          }
+          columns={[
+            // Required
+            { field: "month", label: "Mes (1-12)", required: true,
+              aliases: ["mes"],
+              transform: v => parseInt(v.trim(), 10) },
+            { field: "year",  label: "Año",         required: true,
+              aliases: ["ano", "año"],
+              transform: v => parseInt(v.trim(), 10) },
+            // Optional numerics
+            { field: "scheduled_calls",      label: "Llamadas agendadas",
+              aliases: ["llamadas_agendadas", "agendadas"],
+              transform: v => Number(v) },
+            { field: "attended_calls",       label: "Llamadas atendidas",
+              aliases: ["llamadas_atendidas", "atendidas"],
+              transform: v => Number(v) },
+            { field: "aplications",          label: "Aplicaciones",
+              transform: v => Number(v) },
+            { field: "new_clients",          label: "Nuevos clientes",
+              transform: v => Number(v) },
+            { field: "offer_docs_sent",      label: "Offer docs enviados",
+              transform: v => Number(v) },
+            { field: "offer_docs_responded", label: "Offer docs respondidos",
+              transform: v => Number(v) },
+            { field: "cierres_por_offerdoc", label: "Cierres por offer doc",
+              transform: v => Number(v) },
+            { field: "cash_collected",       label: "Cobrado",
+              aliases: ["ingresos"],
+              transform: v => Number(v) },
+            { field: "total_revenue",        label: "Facturación",
+              aliases: ["facturacion", "revenue"],
+              transform: v => Number(v) },
+            { field: "mrr",                  label: "MRR",
+              transform: v => Number(v) },
+          ]}
+          onClose={() => setShowImport(false)}
+          onImport={async (rows) => {
+            // Validación cliente: month 1-12, year 2020-2030, métricas >= 0.
+            const errors: string[] = []
+            const validRows: Record<string, any>[] = []
+            rows.forEach((r, i) => {
+              const monthN = Number(r.month)
+              const yearN  = Number(r.year)
+              if (!Number.isInteger(monthN) || monthN < 1 || monthN > 12) {
+                errors.push(`Fila ${i + 1}: mes inválido (${r.month}). Debe ser 1-12.`); return
+              }
+              if (!Number.isInteger(yearN) || yearN < 2020 || yearN > 2030) {
+                errors.push(`Fila ${i + 1}: año inválido (${r.year}). Debe ser 2020-2030.`); return
+              }
+              const clean: Record<string, any> = { month: monthN, year: yearN }
+              let rowBad = false
+              for (const k of Object.keys(r)) {
+                if (k === "month" || k === "year") continue
+                const v = r[k]
+                if (v == null || v === "") continue
+                const n = Number(v)
+                if (!Number.isFinite(n) || n < 0) {
+                  errors.push(`Fila ${i + 1}: ${k} inválido (${v}). Debe ser número >= 0.`)
+                  rowBad = true
+                  break
+                }
+                clean[k] = n
+              }
+              if (!rowBad) validRows.push(clean)
+            })
+
+            if (validRows.length === 0) {
+              return { inserted: 0, failed: rows.length, errors }
+            }
+
+            const serverRes = await handleBulkImport(validRows)
+            return {
+              inserted: serverRes.inserted,
+              failed:   rows.length - serverRes.inserted,
+              errors:   [...errors, ...serverRes.errors],
+            }
+          }}
+        />
+      )}
 
       {/* Header + tabs */}
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -451,21 +593,39 @@ export function ReportsInputView() {
           </p>
         </div>
 
-        <div className="inline-flex h-9 rounded-xl border border-slate-200 bg-slate-50 p-0.5">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
-            onClick={() => setTab("form")}
-            className={`flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium transition-all ${
-              tab === "form" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-900"
-            }`}>
-            Cargar
+            onClick={handleDownloadTemplate}
+            className="flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[12px] font-semibold text-slate-700 hover:border-slate-300 hover:text-slate-900 transition-all"
+            title="Descargar CSV template con los campos esperados"
+          >
+            <Download className="h-3.5 w-3.5" />
+            Descargar template
           </button>
           <button
-            onClick={() => setTab("history")}
-            className={`flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium transition-all ${
-              tab === "history" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-900"
-            }`}>
-            Historial ({reports.length})
+            onClick={() => setShowImport(true)}
+            className="flex h-9 items-center gap-1.5 rounded-xl border border-[#1e3a8a]/30 bg-[#1e3a8a]/[0.06] px-3 text-[12px] font-semibold text-[#1e3a8a] hover:border-[#1e3a8a]/50 hover:bg-[#1e3a8a]/[0.10] transition-all"
+          >
+            <Upload className="h-3.5 w-3.5" />
+            Importar CSV
           </button>
+
+          <div className="inline-flex h-9 rounded-xl border border-slate-200 bg-slate-50 p-0.5">
+            <button
+              onClick={() => setTab("form")}
+              className={`flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium transition-all ${
+                tab === "form" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-900"
+              }`}>
+              Cargar
+            </button>
+            <button
+              onClick={() => setTab("history")}
+              className={`flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium transition-all ${
+                tab === "history" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-900"
+              }`}>
+              Historial ({reports.length})
+            </button>
+          </div>
         </div>
       </div>
 
