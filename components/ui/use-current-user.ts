@@ -5,10 +5,11 @@ import { createClient } from "@/lib/supabase"
 import { type Role, isAdminOrAbove, isDeveloper } from "@/lib/types/role"
 
 export interface CurrentUser {
-  id:    string
-  email: string
-  name:  string
-  role:  Role
+  id:            string
+  email:         string
+  name:          string
+  role:          Role
+  department_id: string | null
 }
 
 /**
@@ -31,14 +32,15 @@ export function useCurrentUser() {
         if (!session?.user) { setUser(null); return }
         const u = session.user
         const { data: profile } = await sb.from("profiles")
-          .select("role,full_name")
+          .select("role,full_name,department_id")
           .eq("id", u.id)
           .maybeSingle()
         setUser({
-          id:    u.id,
-          email: u.email ?? "",
-          name:  (profile?.full_name as string) ?? u.email?.split("@")[0] ?? "",
-          role:  ((profile?.role as string) ?? "user") as CurrentUser["role"],
+          id:            u.id,
+          email:         u.email ?? "",
+          name:          (profile?.full_name as string) ?? u.email?.split("@")[0] ?? "",
+          role:          ((profile?.role as string) ?? "user") as CurrentUser["role"],
+          department_id: ((profile as any)?.department_id as string | null) ?? null,
         })
       } finally { setLoading(false) }
     }

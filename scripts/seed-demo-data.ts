@@ -76,16 +76,28 @@ async function seedMonthlyReports() {
     })
   }
 
-  const { error } = await db
-    .from("monthly_reports")
-    .upsert(rows, { onConflict: "month" })
-
-  if (error) {
-    console.error("  ✗", error.message)
-    return 0
+  // Per-row upsert manual: tras la migración per-dept los índices únicos son
+  // parciales (separados global vs dept), así que el upsert nativo no aplica.
+  // Acá seedeamos solo filas GLOBALES (department_id = NULL).
+  let upserted = 0
+  for (const r of rows) {
+    const { data: existing } = await db
+      .from("monthly_reports")
+      .select("id")
+      .eq("month", r.month)
+      .is("department_id", null)
+      .maybeSingle()
+    if (existing) {
+      const { error } = await db.from("monthly_reports").update(r).eq("id", existing.id)
+      if (error) { console.error("  ✗", error.message); continue }
+    } else {
+      const { error } = await db.from("monthly_reports").insert({ ...r, department_id: null })
+      if (error) { console.error("  ✗", error.message); continue }
+    }
+    upserted++
   }
-  console.log(`  ✓ ${rows.length} reportes upserted`)
-  return rows.length
+  console.log(`  ✓ ${upserted} reportes upserted (global)`)
+  return upserted
 }
 
 // ─── 2) tasks ────────────────────────────────────────────────────────────────

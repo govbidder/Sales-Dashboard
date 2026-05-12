@@ -8,11 +8,15 @@ import { z } from "zod"
 // POST /api/admin/reports/bulk
 //
 // Bulk upsert de monthly_reports a partir de filas con `month` (1-12) +
-// `year` (2020-2030) separados (UX-friendly para CSV). El server combina
-// ambos en formato `YYYY-MM-01` que es lo que espera la tabla.
+// `year` (2020-2030) separados (UX-friendly para CSV).
 //
-// Upsert con onConflict: "month" — el constraint UNIQUE actual es sobre
-// la columna `month` (date) singular (single-tenant, una fila por mes).
+// Body: { reports: [...], department_id?: string | null }
+// - department_id ausente o null → todas las filas son GLOBAL.
+// - department_id presente → todas las filas son de ese depto.
+//
+// Como los índices únicos son parciales (separados para global vs dept),
+// el upsert nativo de Supabase no funciona — hacemos check + insert/update
+// por fila.
 // =============================================================================
 
 const ReportRow = z.object({
@@ -31,7 +35,8 @@ const ReportRow = z.object({
 })
 
 const Body = z.object({
-  reports: z.array(z.unknown()),
+  reports:       z.array(z.unknown()),
+  department_id: z.string().nullable().optional(),
 })
 
 export async function POST(req: NextRequest) {
@@ -44,7 +49,6 @@ export async function POST(req: NextRequest) {
 
   const db = createServiceClient()
 
-  // Parse body
   let raw: unknown
   try { raw = await req.json() }
   catch { return NextResponse.json({ error: "JSON inválido" }, { status: 400 }) }
@@ -54,9 +58,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Body inválido — esperaba { reports: [...] }" }, { status: 400 })
   }
 
-  // Validate each row
+  const targetDept: string | null = parsed.data.department_id ?? null
+
   const errors: { index: number; error: string }[] = []
-  const valid: Record<string, unknown>[] = []
+  const valid: Array<{ month: string; metrics: Record<string, unknown> }> = []
 
   parsed.data.reports.forEach((row, i) => {
     const res = ReportRow.safeParse(row)
@@ -72,36 +77,41 @@ export async function POST(req: NextRequest) {
     const r = res.data
     const monthDate = `${r.year}-${String(r.month).padStart(2, "0")}-01`
     const { month: _m, year: _y, ...metrics } = r
-    valid.push({ month: monthDate, ...metrics })
+    valid.push({ month: monthDate, metrics: metrics as Record<string, unknown> })
   })
 
   if (valid.length === 0) {
     return NextResponse.json({ inserted: 0, updated: 0, errors })
   }
 
-  // Count existing months to distinguish inserted vs updated.
-  const months = valid.map(r => r.month as string)
-  const { data: existing } = await db
-    .from("monthly_reports")
-    .select("month")
-    .in("month", months)
-  const existingSet = new Set(
-    (existing ?? []).map((r: { month: string }) => String(r.month).slice(0, 10))
-  )
+  // Per-row upsert manual: el schema tiene índices únicos parciales separados
+  // (global vs dept) que la API nativa de upsert no maneja.
+  let inserted = 0
+  let updated  = 0
 
-  const { error } = await db
-    .from("monthly_reports")
-    .upsert(valid, { onConflict: "month" })
+  for (let i = 0; i < valid.length; i++) {
+    const v = valid[i]
+    try {
+      const existingQ = db.from("monthly_reports").select("id").eq("month", v.month)
+      const { data: existing } = targetDept
+        ? await existingQ.eq("department_id", targetDept).maybeSingle()
+        : await existingQ.is("department_id", null).maybeSingle()
 
-  if (error) {
-    return NextResponse.json(
-      { error: error.message, inserted: 0, updated: 0, errors },
-      { status: 500 }
-    )
+      if (existing) {
+        const { error } = await db.from("monthly_reports").update(v.metrics).eq("id", existing.id)
+        if (error) throw new Error(error.message)
+        updated++
+      } else {
+        const { error } = await db.from("monthly_reports").insert({
+          month: v.month, department_id: targetDept, ...v.metrics,
+        })
+        if (error) throw new Error(error.message)
+        inserted++
+      }
+    } catch (e: any) {
+      errors.push({ index: i, error: e?.message ?? "Error al guardar" })
+    }
   }
-
-  const updated = valid.filter(r => existingSet.has(String(r.month))).length
-  const inserted = valid.length - updated
 
   return NextResponse.json({ inserted, updated, errors })
 }

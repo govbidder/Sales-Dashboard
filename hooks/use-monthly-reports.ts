@@ -4,7 +4,9 @@ import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase"
 
 export interface MonthlyReport {
+  id?:                 string
   month:               string
+  department_id:       string | null
   cash_collected:      number
   total_revenue:       number
   mrr:                 number
@@ -23,7 +25,18 @@ export interface MonthlyReport {
   email_subscribers:   number
 }
 
-export function useMonthlyReports() {
+/**
+ * useMonthlyReports — fetch reports filtrados por departamento.
+ *
+ * @param departmentScope
+ *   - `undefined` (default) o `"global"` → solo filas globales (department_id IS NULL)
+ *   - `"all"` → todas (global + todos los deptos)
+ *   - `<uuid>` → solo ese depto
+ *
+ * Backwards compat: si llamás sin parámetro, devuelve solo filas globales,
+ * que es el comportamiento histórico (cuando todas las filas eran globales).
+ */
+export function useMonthlyReports(departmentScope?: "global" | "all" | string) {
   const [reports, setReports] = useState<MonthlyReport[]>([])
   const [loading, setLoading] = useState(true)
   const [error,   setError]   = useState<string | null>(null)
@@ -35,16 +48,23 @@ export function useMonthlyReports() {
       try {
         if (mounted) { setLoading(true); setError(null) }
         const supabase = createClient()
-        const { data, error: err } = await supabase
+        let q = supabase
           .from("monthly_reports")
           .select("*")
           .order("month", { ascending: true })
 
+        const scope = departmentScope ?? "global"
+        if (scope === "global") q = q.is("department_id", null)
+        else if (scope !== "all") q = q.eq("department_id", scope)
+
+        const { data, error: err } = await q
         if (err) throw err
 
         if (mounted) setReports(
           ((data ?? []) as any[]).map((r: any) => ({
+            id:                   r.id,
             month:                String(r.month).slice(0, 7),
+            department_id:        r.department_id ?? null,
             cash_collected:       Number(r.cash_collected)       || 0,
             total_revenue:        Number(r.total_revenue)        || 0,
             mrr:                  Number(r.mrr)                  || 0,
@@ -72,7 +92,7 @@ export function useMonthlyReports() {
 
     load()
     return () => { mounted = false }
-  }, [])
+  }, [departmentScope])
 
   return { reports, loading, error }
 }
