@@ -24,7 +24,7 @@ const ReportRow = z.object({
   year:                 z.number().int().min(2020).max(2030),
   scheduled_calls:      z.number().nonnegative().optional(),
   attended_calls:       z.number().nonnegative().optional(),
-  aplications:          z.number().nonnegative().optional(),
+  applications:         z.number().nonnegative().optional(),
   new_clients:          z.number().nonnegative().optional(),
   offer_docs_sent:      z.number().nonnegative().optional(),
   offer_docs_responded: z.number().nonnegative().optional(),

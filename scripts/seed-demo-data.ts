@@ -64,7 +64,7 @@ async function seedMonthlyReports() {
       qualified_calls:      Math.round(attended * 0.65),
       no_show:              Math.max(0, scheduled - attended - 2),
       open_conversations:   lerpInt(35, 120, t),
-      aplications:          lerpInt(50, 150, t),
+      applications:         lerpInt(50, 150, t),
       new_clients:          lerpInt(5, 15, t),
       offer_docs_sent:      sent,
       offer_docs_responded: responded,

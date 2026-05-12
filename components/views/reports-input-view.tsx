@@ -41,7 +41,7 @@ const SECTIONS: Section[] = [
       { key: "qualified_calls",      label: "Calls Calificadas",    type: "number" },
       { key: "no_show",              label: "No Shows",             type: "number" },
       { key: "open_conversations",   label: "Conversaciones Abiertas", type: "number" },
-      { key: "aplications",          label: "Aplicaciones",         type: "number" },
+      { key: "applications",         label: "Aplicaciones",         type: "number" },
       { key: "inbound_messages",     label: "Mensajes Inbound",     type: "number" },
       { key: "offer_docs_sent",      label: "Offer Docs Enviados",  type: "number" },
       { key: "offer_docs_responded", label: "Offer Docs Respondidos", type: "number" },
@@ -401,14 +401,14 @@ function HistoryView({ reports, onPick, onDelete, deletingId }: {
 // y los campos del Zod schema en /api/admin/reports/bulk.
 const CSV_TEMPLATE_HEADERS = [
   "month", "year",
-  "scheduled_calls", "attended_calls", "aplications", "new_clients",
+  "scheduled_calls", "attended_calls", "applications", "new_clients",
   "offer_docs_sent", "offer_docs_responded", "cierres_por_offerdoc",
   "cash_collected", "total_revenue", "mrr",
 ] as const
 
 const CSV_TEMPLATE_EXAMPLE_ROW = {
   month: 1, year: 2026,
-  scheduled_calls: 45, attended_calls: 38, aplications: 120, new_clients: 12,
+  scheduled_calls: 45, attended_calls: 38, applications: 120, new_clients: 12,
   offer_docs_sent: 25, offer_docs_responded: 15, cierres_por_offerdoc: 6,
   cash_collected: 18000, total_revenue: 22000, mrr: 12000,
 }
@@ -548,7 +548,8 @@ export function ReportsInputView() {
             { field: "attended_calls",       label: "Llamadas atendidas",
               aliases: ["llamadas_atendidas", "atendidas"],
               transform: v => Number(v) },
-            { field: "aplications",          label: "Aplicaciones",
+            { field: "applications",         label: "Aplicaciones",
+              aliases: ["aplications"], // alias del typo histórico — soporta CSVs viejos
               transform: v => Number(v) },
             { field: "new_clients",          label: "Nuevos clientes",
               transform: v => Number(v) },

@@ -107,7 +107,7 @@ create table if not exists public.monthly_reports (
   scheduled_calls       int,
   attended_calls        int,
   qualified_calls       int,
-  aplications           int,
+  applications          int,
   inbound_messages      int,
   offer_docs_sent       int,
   offer_docs_responded  int,
