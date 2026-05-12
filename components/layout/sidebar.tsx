@@ -10,6 +10,7 @@ import {
   Activity, ChevronLeft, ChevronRight, Rss, FormInput, Shield,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { type Role, isAdminOrAbove } from "@/lib/types/role"
 
 interface SidebarProps {
   /** Whether the sidebar is open (mobile) */
@@ -18,18 +19,24 @@ interface SidebarProps {
   /** Whether the sidebar is collapsed to icon-only mode (desktop) */
   collapsed:   boolean
   onToggleCollapse: () => void
+  /** Caller's role — gates which items are visible. */
+  role:        Role
 }
 
 interface NavItem {
-  name:  string
-  href:  string
-  icon:  any
+  name:     string
+  href:     string
+  icon:     any
+  /** Si está, item visible solo cuando el predicado retorna true. */
+  visible?: (role: Role) => boolean
 }
 
 interface NavGroup {
   label: string
   items: NavItem[]
 }
+
+const adminOnly = (role: Role) => isAdminOrAbove(role)
 
 const NAV_GROUPS: NavGroup[] = [
   {
@@ -42,9 +49,9 @@ const NAV_GROUPS: NavGroup[] = [
     label: "General",
     items: [
       { name: "Panel",            href: "/dashboard",      icon: BarChart3   },
-      { name: "Ingresos",         href: "/sales",          icon: DollarSign  },
-      { name: "Métricas",         href: "/metrics",        icon: LayoutGrid  },
-      { name: "Cargar Métricas",  href: "/admin/reports",  icon: FileBarChart },
+      { name: "Ingresos",         href: "/sales",          icon: DollarSign,   visible: adminOnly },
+      { name: "Métricas",         href: "/metrics",        icon: LayoutGrid,   visible: adminOnly },
+      { name: "Cargar Métricas",  href: "/admin/reports",  icon: FileBarChart, visible: adminOnly },
     ],
   },
   {
@@ -52,13 +59,13 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { name: "Personas Agendadas", href: "/admin/personas",         icon: Users2   },
       { name: "Tareas",             href: "/admin/tasks",            icon: ListTodo },
-      { name: "Equipo",             href: "/admin/team",             icon: Users    },
-      { name: "Departamentos",      href: "/admin/departments",      icon: Layers   },
+      { name: "Equipo",             href: "/admin/team",             icon: Users,    visible: adminOnly },
+      { name: "Departamentos",      href: "/admin/departments",      icon: Layers,   visible: adminOnly },
       { name: "Centro Operativo",   href: "/admin/centro-operativo", icon: Layers   },
       { name: "Actividad",          href: "/admin/activity",         icon: Rss      },
-      { name: "Forms",              href: "/admin/forms",            icon: FormInput },
-      { name: "Templates",          href: "/admin/task-templates",   icon: Layers   },
-      { name: "Audit log",          href: "/admin/audit-log",        icon: Shield   },
+      { name: "Forms",              href: "/admin/forms",            icon: FormInput, visible: adminOnly },
+      { name: "Templates",          href: "/admin/task-templates",   icon: Layers,    visible: adminOnly },
+      { name: "Audit log",          href: "/admin/audit-log",        icon: Shield,    visible: adminOnly },
     ],
   },
   {
@@ -71,7 +78,7 @@ const NAV_GROUPS: NavGroup[] = [
   },
 ]
 
-export function Sidebar({ open, onClose, collapsed, onToggleCollapse }: SidebarProps) {
+export function Sidebar({ open, onClose, collapsed, onToggleCollapse, role }: SidebarProps) {
   const pathname = usePathname()
 
   // On mobile, show all labels even when "collapsed" prop is true.
@@ -141,7 +148,10 @@ export function Sidebar({ open, onClose, collapsed, onToggleCollapse }: SidebarP
           "flex-1 overflow-y-auto overflow-x-hidden py-4",
           showLabels ? "px-3 space-y-5" : "px-2 space-y-4",
         )}>
-          {NAV_GROUPS.map((group) => (
+          {NAV_GROUPS.map((group) => {
+            const visibleItems = group.items.filter(i => !i.visible || i.visible(role))
+            if (visibleItems.length === 0) return null
+            return (
             <div key={group.label}>
               {showLabels && (
                 <p className="px-3 mb-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]/70">
@@ -149,7 +159,7 @@ export function Sidebar({ open, onClose, collapsed, onToggleCollapse }: SidebarP
                 </p>
               )}
               <div className="space-y-0.5">
-                {group.items.map((item) => {
+                {visibleItems.map((item) => {
                   const isActive = pathname === item.href || pathname?.startsWith(item.href + "/")
                   const Icon = item.icon
 
@@ -194,7 +204,8 @@ export function Sidebar({ open, onClose, collapsed, onToggleCollapse }: SidebarP
                 })}
               </div>
             </div>
-          ))}
+            )
+          })}
         </nav>
 
         {/* Floating collapse toggle on right edge — desktop only.

@@ -318,7 +318,7 @@ export function DepartmentsView() {
       const supabase = createClient()
       const { data: profile } = await supabase
         .from("profiles").select("role").eq("id", session.user.id).single()
-      setIsAdmin(profile?.role === "admin")
+      setIsAdmin(profile?.role === "admin" || profile?.role === "super_admin")
 
       const headers = { Authorization: `Bearer ${session.access_token}` }
       const [dRes, tRes, mRes] = await Promise.all([

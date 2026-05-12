@@ -9,11 +9,18 @@ import {
 } from "lucide-react"
 import { Portal } from "@/components/ui/portal"
 import type { Department } from "@/lib/types/department"
+import {
+  type Role,
+  ROLE_LABEL,
+  ROLES_ASSIGNABLE_BY_ADMIN,
+  ROLES_ASSIGNABLE_BY_SUPER_ADMIN,
+  isAdminOrAbove,
+  isSuperAdmin,
+} from "@/lib/types/role"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Status = "activo" | "inactivo"
-type Role   = "admin" | "user"
 
 interface Member {
   id:               string
@@ -48,15 +55,17 @@ const inputCls = "w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-
 // ─── Detail Drawer ────────────────────────────────────────────────────────────
 
 function DetailDrawer({
-  member, departments, onClose, onPatch, isAdmin,
+  member, departments, onClose, onPatch, isAdmin, isSuper,
 }: {
   member: Member
   departments: Department[]
   onClose: () => void
   onPatch: (id: string, updates: Partial<Member>) => void
   isAdmin: boolean
+  isSuper: boolean
 }) {
   const displayName = member.full_name || member.email || "Sin nombre"
+  const roleOptions = isSuper ? ROLES_ASSIGNABLE_BY_SUPER_ADMIN : ROLES_ASSIGNABLE_BY_ADMIN
 
   return (
     <Portal>
@@ -127,9 +136,16 @@ function DetailDrawer({
                   defaultValue={member.role}
                   onChange={e => onPatch(member.id, { role: e.target.value as Role })}
                   className={inputCls}
+                  disabled={member.role === "super_admin" && !isSuper}
                 >
-                  <option value="user"  className="bg-white">Miembro</option>
-                  <option value="admin" className="bg-white">Admin</option>
+                  {/* Si el miembro es super_admin y yo no soy super_admin, no puedo cambiarle el rol. */}
+                  {member.role === "super_admin" && !isSuper ? (
+                    <option value="super_admin" className="bg-white">{ROLE_LABEL.super_admin}</option>
+                  ) : (
+                    roleOptions.map(r => (
+                      <option key={r} value={r} className="bg-white">{ROLE_LABEL[r]}</option>
+                    ))
+                  )}
                 </select>
               </div>
               <div className="space-y-1.5">
@@ -206,13 +222,15 @@ function DetailDrawer({
 // ─── Invite Modal ─────────────────────────────────────────────────────────────
 
 function InviteModal({
-  onClose, onInvite, inviting, departments,
+  onClose, onInvite, inviting, departments, isSuper,
 }: {
   onClose:  () => void
   onInvite: (data: { email: string; full_name: string; position: string; role: Role; department_id: string | null }) => Promise<{ error?: string }>
   inviting: boolean
   departments: Department[]
+  isSuper: boolean
 }) {
+  const roleOptions = isSuper ? ROLES_ASSIGNABLE_BY_SUPER_ADMIN : ROLES_ASSIGNABLE_BY_ADMIN
   const [email,        setEmail]        = useState("")
   const [fullName,     setFullName]     = useState("")
   const [position,     setPosition]     = useState("")
@@ -306,8 +324,9 @@ function InviteModal({
                   onChange={e => setRole(e.target.value as Role)}
                   className={inputCls + " cursor-pointer"}
                 >
-                  <option value="user"  className="bg-white">Miembro</option>
-                  <option value="admin" className="bg-white">Admin</option>
+                  {roleOptions.map(r => (
+                    <option key={r} value={r} className="bg-white">{ROLE_LABEL[r]}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -364,7 +383,8 @@ function InviteModal({
 
 function MemberCard({ member, department, onClick }: { member: Member; department: Department | null; onClick: () => void }) {
   const displayName = member.full_name || member.email || "Sin nombre"
-  const isAdmin = member.role === "admin"
+  const isAdmin = isAdminOrAbove(member.role)
+  const isSuper = isSuperAdmin(member.role)
   const isInactive = member.status === "inactivo"
 
   return (
@@ -408,8 +428,12 @@ function MemberCard({ member, department, onClick }: { member: Member; departmen
             </span>
           )}
           {isAdmin && (
-            <span className="rounded-full border border-amber-400/25 bg-amber-400/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-700">
-              Admin
+            <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
+              isSuper
+                ? "border-purple-400/30 bg-purple-400/10 text-purple-700"
+                : "border-amber-400/25 bg-amber-400/10 text-amber-700"
+            }`}>
+              {isSuper ? "Super admin" : "Admin"}
             </span>
           )}
           {department && (
@@ -486,7 +510,7 @@ export function TeamView() {
   useEffect(() => {
     if (searchParams?.get("invite") !== "1") return
     if (loading) return
-    if (currentRole === "admin") setShowInvite(true)
+    if (isAdminOrAbove(currentRole)) setShowInvite(true)
     router.replace(pathname, { scroll: false })
   }, [searchParams, loading, currentRole, router, pathname])
 
@@ -530,17 +554,18 @@ export function TeamView() {
     return [m.full_name, m.email, m.position].some(v => v?.toLowerCase().includes(q))
   }), [members, search, filterStatus, filterDepartment])
 
-  const isAdmin       = currentRole === "admin"
+  const isAdmin       = isAdminOrAbove(currentRole)
+  const isSuper       = isSuperAdmin(currentRole)
   const activeCount   = members.filter(m => m.status === "activo").length
   const inactiveCount = members.length - activeCount
-  const adminCount    = members.filter(m => m.role === "admin").length
+  const adminCount    = members.filter(m => isAdminOrAbove(m.role)).length
   const totalPersonas = members.reduce((s, m) => s + (m.personas_owned ?? 0), 0)
   const totalTasks    = members.reduce((s, m) => s + (m.tasks_assigned ?? 0), 0)
 
   return (
     <>
       {showInvite && (
-        <InviteModal onClose={() => setShowInvite(false)} onInvite={handleInvite} inviting={inviting} departments={departments} />
+        <InviteModal onClose={() => setShowInvite(false)} onInvite={handleInvite} inviting={inviting} departments={departments} isSuper={isSuper} />
       )}
 
       {selected && (
@@ -550,6 +575,7 @@ export function TeamView() {
           onClose={() => setSelected(null)}
           onPatch={patch}
           isAdmin={isAdmin}
+          isSuper={isSuper}
         />
       )}
 

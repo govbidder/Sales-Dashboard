@@ -6,10 +6,11 @@ import { ChevronDown, LogOut, Menu, Search, Command, Sun, Moon, Monitor } from "
 import { MonthSelector } from "@/components/layout/month-selector"
 import { NotificationsBell } from "@/components/layout/notifications-bell"
 import { useTheme } from "@/components/ui/theme-provider"
+import { type Role, ROLE_LABEL, isAdminOrAbove, isSuperAdmin } from "@/lib/types/role"
 
 interface TopBarProps {
   pageTitle:        string
-  user:             { email: string; name: string; role: "admin" | "user" } | null
+  user:             { email: string; name: string; role: Role } | null
   selectedMonth:    string
   onMonthChange:    (m: string) => void
   onOpenPalette:    () => void
@@ -156,9 +157,13 @@ export function TopBar({
                     <p className="text-[11px] text-slate-500 truncate">{user?.email}</p>
                   </div>
                 </div>
-                {user?.role === "admin" && (
-                  <span className="mt-2.5 inline-flex items-center gap-1 rounded-full border border-[#1e3a8a]/20 bg-[#1e3a8a]/[0.06] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#1e3a8a]">
-                    ★ Admin
+                {user?.role && isAdminOrAbove(user.role) && (
+                  <span className={`mt-2.5 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                    isSuperAdmin(user.role)
+                      ? "border-purple-400/30 bg-purple-400/10 text-purple-700"
+                      : "border-[#1e3a8a]/20 bg-[#1e3a8a]/[0.06] text-[#1e3a8a]"
+                  }`}>
+                    ★ {ROLE_LABEL[user.role]}
                   </span>
                 )}
               </div>
