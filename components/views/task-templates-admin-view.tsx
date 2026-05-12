@@ -1,5 +1,6 @@
 "use client"
 
+import { fetchWithViewAs } from "@/lib/api/fetch-with-view-as"
 import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase"
 import { Portal } from "@/components/ui/portal"
@@ -319,7 +320,7 @@ export function TaskTemplatesAdminView() {
     try {
       const { data: { session } } = await createClient().auth.getSession()
       if (!session) return
-      const res = await fetch("/api/admin/task-templates", {
+      const res = await fetchWithViewAs("/api/admin/task-templates", {
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
       if (res.ok) setTemplates((await res.json()).templates ?? [])
@@ -345,7 +346,7 @@ export function TaskTemplatesAdminView() {
     }
     const { data: { session } } = await createClient().auth.getSession()
     if (!session) return
-    const res = await fetch(`/api/admin/task-templates/${t.id}`, {
+    const res = await fetchWithViewAs(`/api/admin/task-templates/${t.id}`, {
       method:  "DELETE",
       headers: { Authorization: `Bearer ${session.access_token}` },
     })

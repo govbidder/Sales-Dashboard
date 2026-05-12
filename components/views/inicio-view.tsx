@@ -1,5 +1,6 @@
 "use client"
 
+import { fetchWithViewAs } from "@/lib/api/fetch-with-view-as"
 import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase"
@@ -234,7 +235,7 @@ export function InicioView() {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) return
       setCurrentEmail(session.user?.email ?? "")
-      const res = await fetch("/api/admin/health", {
+      const res = await fetchWithViewAs("/api/admin/health", {
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
       if (!res.ok) {
@@ -246,9 +247,9 @@ export function InicioView() {
       // Fetch in parallel: tasks (top-level only) + departments + team for the widget below.
       const headers = { Authorization: `Bearer ${session.access_token}` }
       const [tasksRes, deptRes, teamRes] = await Promise.all([
-        fetch("/api/admin/tasks?include_subtasks=false", { headers }),
-        fetch("/api/departments",                        { headers }),
-        fetch("/api/admin/team",                         { headers }),
+        fetchWithViewAs("/api/admin/tasks?include_subtasks=false", { headers }),
+        fetchWithViewAs("/api/departments",                        { headers }),
+        fetchWithViewAs("/api/admin/team",                         { headers }),
       ])
 
       let allTasks: any[] = []

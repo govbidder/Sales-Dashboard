@@ -1,5 +1,6 @@
 "use client"
 
+import { fetchWithViewAs } from "@/lib/api/fetch-with-view-as"
 import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase"
 import { Portal } from "@/components/ui/portal"
@@ -476,7 +477,7 @@ function SubmissionsPanel({
       try {
         const { data: { session } } = await createClient().auth.getSession()
         if (!session) return
-        const res = await fetch(`/api/admin/forms/${form.id}/submissions`, {
+        const res = await fetchWithViewAs(`/api/admin/forms/${form.id}/submissions`, {
           headers: { Authorization: `Bearer ${session.access_token}` },
         })
         if (res.ok) setItems((await res.json()).submissions ?? [])
@@ -561,7 +562,7 @@ export function FormsAdminView() {
     try {
       const { data: { session } } = await createClient().auth.getSession()
       if (!session) return
-      const res = await fetch("/api/admin/forms", {
+      const res = await fetchWithViewAs("/api/admin/forms", {
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
       if (res.ok) setForms((await res.json()).forms ?? [])
@@ -583,7 +584,7 @@ export function FormsAdminView() {
     if (!confirm(`¿Borrar el form "${f.title}"? Esto también borra todos sus submissions.`)) return
     const { data: { session } } = await createClient().auth.getSession()
     if (!session) return
-    const res = await fetch("/api/admin/forms", {
+    const res = await fetchWithViewAs("/api/admin/forms", {
       method:  "DELETE",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body:    JSON.stringify({ id: f.id }),
@@ -596,7 +597,7 @@ export function FormsAdminView() {
     if (!session) return
     const next = !f.is_active
     setForms(prev => prev.map(x => x.id === f.id ? { ...x, is_active: next } : x))
-    await fetch("/api/admin/forms", {
+    await fetchWithViewAs("/api/admin/forms", {
       method:  "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       body:    JSON.stringify({ id: f.id, is_active: next }),

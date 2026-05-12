@@ -1,5 +1,6 @@
 "use client"
 
+import { fetchWithViewAs } from "@/lib/api/fetch-with-view-as"
 import { useEffect, useMemo, useState, useCallback } from "react"
 import Link from "next/link"
 import {
@@ -261,8 +262,8 @@ export function CalendarView() {
       const headers = { Authorization: `Bearer ${session.access_token}` }
 
       const [tasksRes, personasRes] = await Promise.all([
-        fetch("/api/admin/tasks", { headers }),
-        fetch("/api/admin/personas", { headers }),
+        fetchWithViewAs("/api/admin/tasks", { headers }),
+        fetchWithViewAs("/api/admin/personas", { headers }),
       ])
 
       const out: AgendaItem[] = []
