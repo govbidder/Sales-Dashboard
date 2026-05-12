@@ -148,16 +148,17 @@ export function AuditLogView() {
           <Loader2 className="h-6 w-6 animate-spin text-[#E42D2C]/40" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50 ring-1 ring-slate-200 mb-4">
-            <Shield className="h-6 w-6 text-slate-400" />
-          </div>
-          <p className="text-[15px] font-semibold text-slate-700">
-            {entries.length === 0 ? "Sin actividad todavía" : "Sin coincidencias"}
-          </p>
-          <p className="text-[13px] text-slate-400 mt-1">
+        <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-3xl border border-slate-200 bg-white py-20 text-center">
+          <div className="pointer-events-none absolute -top-24 -right-24 h-[300px] w-[300px] rounded-full bg-[#E42D2C]/[0.06] blur-[100px]" />
+          <span className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-[#E42D2C]/10 ring-1 ring-[#E42D2C]/25 mb-4">
+            <Shield className="h-6 w-6 text-[#ff6b6a]" />
+          </span>
+          <h3 className="relative text-[16px] font-bold text-slate-900 mb-1">
+            {entries.length === 0 ? "No hay actividad registrada" : "Sin coincidencias"}
+          </h3>
+          <p className="relative max-w-sm text-[13px] text-slate-500 px-4">
             {entries.length === 0
-              ? "Las acciones administrativas (borrar, actualizar, crear) se registran acá."
+              ? "Las acciones del equipo aparecerán acá."
               : "Probá ajustar el filtro o búsqueda."}
           </p>
         </div>
