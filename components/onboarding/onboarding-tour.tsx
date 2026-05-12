@@ -20,7 +20,7 @@ interface Step {
 const STEPS: Step[] = [
   {
     icon:  Sparkles,
-    title: "Bienvenido a GovBidder",
+    title: "Bienvenido al GovBidder General Dashboard",
     body:  "Tu dashboard interno para gestionar bids, leads, equipo y métricas. En 60 segundos te muestro lo esencial.",
   },
   {
