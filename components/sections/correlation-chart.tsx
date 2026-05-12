@@ -31,13 +31,14 @@ function fmtNum(v: number) {
 
 const tooltipBase = {
   contentStyle: {
-    backgroundColor: "#ffffff",
-    border: "1px solid #e2e8f0",
+    backgroundColor: "var(--chart-tooltip-bg)",
+    border: "1px solid var(--chart-tooltip-border)",
     borderRadius: "14px",
     boxShadow: "0 8px 24px rgba(15,23,42,0.10)",
     padding: "12px 16px",
+    color: "var(--chart-tooltip-fg)",
   },
-  labelStyle: { color: "#0f172a", fontWeight: 700, marginBottom: 6, fontSize: 12 },
+  labelStyle: { color: "var(--chart-tooltip-fg)", fontWeight: 700, marginBottom: 6, fontSize: 12 },
 }
 
 // ─── Single Correlation Card ──────────────────────────────────────────────────
@@ -96,11 +97,11 @@ function CorrCard({
                 <stop offset="100%" stopColor={barColor}  stopOpacity={0.6} />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} stroke="#e2e8f0" />
+            <CartesianGrid vertical={false} stroke="var(--chart-grid)" />
             <XAxis
               dataKey="month"
               stroke="transparent"
-              tick={{ fill: "#94a3b8", fontSize: 11 }}
+              tick={{ fill: "var(--chart-axis)", fontSize: 11 }}
               tickLine={false}
               axisLine={false}
             />
@@ -108,7 +109,7 @@ function CorrCard({
             <YAxis
               yAxisId="bar"
               stroke="transparent"
-              tick={{ fill: "#94a3b8", fontSize: 10 }}
+              tick={{ fill: "var(--chart-axis)", fontSize: 10 }}
               tickLine={false}
               axisLine={false}
               tickFormatter={fmtBar}
@@ -119,7 +120,7 @@ function CorrCard({
               yAxisId="line"
               orientation="right"
               stroke="transparent"
-              tick={{ fill: "#94a3b8", fontSize: 10 }}
+              tick={{ fill: "var(--chart-axis)", fontSize: 10 }}
               tickLine={false}
               axisLine={false}
               tickFormatter={fmtLine}
