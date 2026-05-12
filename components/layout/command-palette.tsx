@@ -345,7 +345,7 @@ export function CommandPalette({ open, onClose, onSignOut }: CommandPaletteProps
           </div>
           <span className="flex items-center gap-1 text-[10px] text-slate-400">
             <Command className="h-3 w-3" />
-            <span className="font-semibold tracking-wider">GovBidder</span>
+            <span className="font-semibold tracking-wider">GovBidder General Dashboard</span>
           </span>
         </div>
       </div>

@@ -75,7 +75,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       const dept = departments.find(d => d.id === id)
       return dept ? `Departamento — ${dept.name}` : "Departamento"
     }
-    return "GovBidder"
+    return "GovBidder General Dashboard"
   })()
 
   // Auth check

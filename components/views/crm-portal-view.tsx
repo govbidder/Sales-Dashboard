@@ -121,7 +121,7 @@ export function CrmPortalView() {
         <div className="mb-14">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400 mb-5">
             <Sparkles className="h-3 w-3 text-[#E42D2C]" />
-            GovBidder
+            GovBidder General Dashboard
           </div>
           <h1 className="text-[56px] sm:text-[80px] font-bold leading-[0.95] tracking-tight bg-gradient-to-br from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
             CRM
