@@ -17,6 +17,7 @@ import { useEffectiveRole } from "@/hooks/use-effective-role"
 import { isAdminOrAbove, type Role } from "@/lib/types/role"
 import { CountUp } from "@/components/ui/count-up"
 import { InicioSkeleton } from "@/components/ui/skeleton"
+import { useLastSeen, countNewSince } from "@/hooks/use-last-seen"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -227,6 +228,11 @@ export function InicioView() {
   const [showStandup,  setShowStandup]  = useState(false)
   const [departments,  setDepartments]  = useState<Department[]>([])
   const [deptStats,    setDeptStats]    = useState<Record<string, DeptStat>>({})
+  // Tracking de cambios desde la última visita. previousSeen se captura al
+  // mount; markSeen se llama al final del fetch exitoso para que la próxima
+  // visita compare contra ESTE timestamp.
+  const { previousSeen, markSeen } = useLastSeen("inicio")
+  const [updatedTasksCount, setUpdatedTasksCount] = useState<number>(0)
   // Rol real del caller (de profiles). Lo usamos para decidir qué secciones
   // se renderizan — Team users no ven la grilla cross-empresa.
   const [realRole,     setRealRole]     = useState<Role | null>(null)
@@ -328,14 +334,29 @@ export function InicioView() {
         }
       }
       setDeptStats(stats)
+
+      // Cuántas tareas se modificaron desde la última visita.
+      // previousSeen viene del hook (captured al mount → no se mueve durante
+      // este render). markSeen abajo escribe el timestamp de AHORA para que
+      // la próxima visita compare contra este punto.
+      setUpdatedTasksCount(countNewSince(allTasks, previousSeen))
     } catch (e: any) {
       setError(e?.message ?? "Error")
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [previousSeen])
 
   useEffect(() => { fetchHealth() }, [fetchHealth])
+
+  // Marcar "visto" después del primer load exitoso. Solo una vez por mount
+  // del componente — si refetchás manualmente, el contador no se resetea
+  // porque previousSeen está capturado al mount.
+  useEffect(() => {
+    if (!data || loading) return
+    markSeen()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, loading])
 
   if (loading && !data) {
     return <InicioSkeleton deptCount={5} />
@@ -447,6 +468,21 @@ export function InicioView() {
             <p className="text-[15px] sm:text-[17px] font-semibold text-foreground leading-snug">
               {statusLine}
             </p>
+            {/* "Desde tu última visita" — solo aparece si hay baseline previa
+                Y hay >0 cambios. La primera vez que abrís el dashboard NO se
+                muestra (no tiene contra qué comparar). */}
+            {previousSeen && updatedTasksCount > 0 && (
+              <p className="mt-1.5 inline-flex items-center gap-1.5 text-[11.5px] text-[#1e3a8a]/80">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-[#1e3a8a]/40 animate-ping" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#1e3a8a]" />
+                </span>
+                <span>
+                  <span className="font-bold">{updatedTasksCount}</span>{" "}
+                  {updatedTasksCount === 1 ? "tarea cambió" : "tareas cambiaron"} desde tu última visita
+                </span>
+              </p>
+            )}
           </div>
 
           {/* Score chico */}
