@@ -25,15 +25,15 @@ El script lee las variables desde `.env.local` con prioridad sobre `.env`.
 
 ### `pnpm seed:demo` — llenar con data demo
 
-Inserta data ficticia identificable:
+Inserta data ficticia "grande" identificable (presentación-ready):
 
 | Tabla              | Cantidad | Identificación |
 |--------------------|----------|----------------|
-| `monthly_reports`  | 12       | meses mayo 2025 → abril 2026, números con curva ascendente coherente |
-| `profiles` + `auth.users` | 5 | emails `demo-*@govbidder-demo.com`, rol `user` (empleado), uno por departamento |
-| `tasks`            | 26       | titulo con prefijo `Demo - `, 5-6 por departamento |
-| `personas_agendadas` | 12     | name con prefijo `Demo - ` (`John Doe`, `Acme Corp`, etc.) |
-| `seguimientos`     | 8        | content con prefijo `Demo - ` |
+| `monthly_reports`  | 12       | meses mayo 2025 → abril 2026, curva ascendente realista (revenue 8k→25k, scheduled_calls 30→80, etc.) |
+| `profiles` + `auth.users` | 20 | 1 super_admin + 2 admins (sin depto) + 5 leads + 12 miembros distribuidos en los 5 deptos |
+| `tasks`            | 60       | 12 por departamento — mix de status, priority, due dates (pasado/futuro), tags relevantes, owners rotativos |
+| `personas_agendadas` | 30     | Mix de call_status (atendida/no_show/agendada/reagendada) y sales_status (cerrada/propuesta/pendiente/perdida) |
+| `seguimientos`     | 25       | Mix de tipos (nota/llamada/mensaje/email/reunion), unos completos otros pendientes |
 
 **Idempotencia**: correr 2 veces no duplica. `monthly_reports` hace upsert
 sobre `month`. `profiles` hace upsert sobre `id` y resetea el password si
@@ -46,25 +46,43 @@ pnpm seed:demo
 
 ### Credenciales demo
 
-Los 5 usuarios se crean con un **password compartido**:
+Los 20 usuarios se crean con un **password compartido**:
 
 ```
 Password: DemoGovBidder2026!
 ```
 
-Emails:
+**Admins** (sin depto, vista completa cross-empresa):
 
-| Email                                  | Nombre         | Departamento  |
-|----------------------------------------|----------------|---------------|
-| demo-ana@govbidder-demo.com            | Ana García     | IA            |
-| demo-luis@govbidder-demo.com           | Luis Pérez     | Marketing     |
-| demo-sofia@govbidder-demo.com          | Sofía Ramírez  | Anuncios      |
-| demo-marcos@govbidder-demo.com         | Marcos López   | Orgánico      |
-| demo-elena@govbidder-demo.com          | Elena Castro   | Lanzamientos  |
+| Email                                       | Nombre               | Rol           |
+|---------------------------------------------|----------------------|---------------|
+| demo-cristobal@govbidder-demo.com           | Cristóbal Mendoza    | super_admin   |
+| demo-diana@govbidder-demo.com               | Diana Ruiz           | admin         |
+| demo-marcelo@govbidder-demo.com             | Marcelo Fontana      | admin         |
 
-Todos con rol `user` (empleado) — útil para mostrar en la presentación
-la diferencia visual entre la vista admin (Cristián/Santo/Gabriela) y
-la vista empleado (sidebar reducido, scoping de tareas al propio depto).
+**Empleados por departamento** (rol `user`, scoping al propio depto):
+
+| Email                                       | Nombre               | Depto         |
+|---------------------------------------------|----------------------|---------------|
+| demo-ana@govbidder-demo.com                 | Ana García (Lead)    | IA            |
+| demo-diego@govbidder-demo.com               | Diego Vásquez        | IA            |
+| demo-camila@govbidder-demo.com              | Camila Pérez         | IA            |
+| demo-luis@govbidder-demo.com                | Luis Pérez (Lead)    | Marketing     |
+| demo-florencia@govbidder-demo.com           | Florencia Vega       | Marketing     |
+| demo-tomas@govbidder-demo.com               | Tomás Sosa           | Marketing     |
+| demo-sofia@govbidder-demo.com               | Sofía Ramírez (Lead) | Anuncios      |
+| demo-hugo@govbidder-demo.com                | Hugo Cabrera         | Anuncios      |
+| demo-valentina@govbidder-demo.com           | Valentina Ortega     | Anuncios      |
+| demo-mateo@govbidder-demo.com               | Mateo Salas          | Anuncios      |
+| demo-marcos@govbidder-demo.com              | Marcos López (Lead)  | Orgánico      |
+| demo-bianca@govbidder-demo.com              | Bianca Aguirre       | Orgánico      |
+| demo-renata@govbidder-demo.com              | Renata Espina        | Orgánico      |
+| demo-elena@govbidder-demo.com               | Elena Castro (Lead)  | Lanzamientos  |
+| demo-joaquin@govbidder-demo.com             | Joaquín Méndez       | Lanzamientos  |
+| demo-lucia@govbidder-demo.com               | Lucía Romero         | Lanzamientos  |
+| demo-ivan@govbidder-demo.com                | Iván Torres          | Lanzamientos  |
+
+Útil para la presentación: logueate como `demo-cristobal` (super_admin) y mostrá la vista cross-empresa; después como `demo-ana` (user/empleado) para ver el scoping del sidebar y de las tasks al depto IA.
 
 ### `pnpm cleanup:demo` — borrar TODA la data demo
 
@@ -82,22 +100,29 @@ pnpm cleanup:demo
 
 ## Sobre profiles + auth users
 
-El seed crea **5 usuarios reales en Supabase Auth** con la misma contraseña
-compartida (ver tabla de credenciales arriba). Cada uno tiene su perfil
-con `full_name`, `position`, `department_id` y rol `user` (empleado).
+El seed crea **20 usuarios reales en Supabase Auth** con la misma contraseña
+compartida (ver tablas de credenciales arriba). Cada uno tiene su perfil con
+`full_name`, `position`, `department_id` y un rol acorde:
+- 1 `super_admin` (vista completa + manage admins)
+- 2 `admin` (vista completa, sin manage super_admins)
+- 17 `user` (5 leads + 12 miembros, scoping por depto)
 
 ⚠ **Estos usuarios pueden loguearse.** Considerá:
 - El dominio `@govbidder-demo.com` es ficticio (no recibe emails reales).
-- Los 5 emails son fácilmente identificables por prefijo `demo-`.
+- Todos los emails son fácilmente identificables por prefijo `demo-`.
 - `pnpm cleanup:demo` borra los `auth.users` (cascade a profiles) cuando
   termina la presentación.
 - Si querés rotar el password después del demo, cambialo en
   `scripts/_lib.ts` y volvé a correr `pnpm seed:demo` — el seed
-  actualiza la contraseña por idempotencia.
+  actualiza la contraseña por idempotencia (también resetea metadata).
 
-Si en algún momento querés crear un admin de demo (vs estos empleados),
-ajustá `role: "admin"` en la llamada `auth.admin.createUser` y en el
-upsert de profile en `seed-demo-data.ts`.
+### Sobre `status` y `position`
+
+El seed setea `status: "activo"` y `position` en best-effort. Si la
+migración `20250504000004_team_profiles.sql` no está aplicada (o
+PostgREST tiene cache stale), se ignora silenciosamente — el resto del
+seed sigue funcionando con los campos base (id / full_name / role /
+department_id).
 
 ### `pnpm promote:developer <email>` — promover a developer
 
