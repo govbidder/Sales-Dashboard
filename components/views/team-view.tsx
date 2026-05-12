@@ -5,7 +5,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { createClient } from "@/lib/supabase"
 import {
   Loader2, Plus, X, RefreshCw, Mail, Users2, ChevronRight,
-  Crown, Shield, ListTodo, Clock, UserPlus, CheckCircle2,
+  Crown, Shield, ListTodo, Clock, UserPlus, CheckCircle2, Sparkles,
 } from "lucide-react"
 import { Portal } from "@/components/ui/portal"
 import type { Department } from "@/lib/types/department"
@@ -15,7 +15,8 @@ import {
   ROLES_ASSIGNABLE_BY_ADMIN,
   ROLES_ASSIGNABLE_BY_SUPER_ADMIN,
   isAdminOrAbove,
-  isSuperAdmin,
+  isSuperAdminOrAbove,
+  isDeveloper,
 } from "@/lib/types/role"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -136,10 +137,16 @@ function DetailDrawer({
                   defaultValue={member.role}
                   onChange={e => onPatch(member.id, { role: e.target.value as Role })}
                   className={inputCls}
-                  disabled={member.role === "super_admin" && !isSuper}
+                  disabled={
+                    member.role === "developer" ||
+                    (member.role === "super_admin" && !isSuper)
+                  }
                 >
-                  {/* Si el miembro es super_admin y yo no soy super_admin, no puedo cambiarle el rol. */}
-                  {member.role === "super_admin" && !isSuper ? (
+                  {/* Developer: nadie puede modificarlo desde la UI (solo via script). */}
+                  {member.role === "developer" ? (
+                    <option value="developer" className="bg-white">{ROLE_LABEL.developer}</option>
+                  ) : member.role === "super_admin" && !isSuper ? (
+                    /* Super_admin solo lo modifica super_admin o developer. */
                     <option value="super_admin" className="bg-white">{ROLE_LABEL.super_admin}</option>
                   ) : (
                     roleOptions.map(r => (
@@ -383,8 +390,9 @@ function InviteModal({
 
 function MemberCard({ member, department, onClick }: { member: Member; department: Department | null; onClick: () => void }) {
   const displayName = member.full_name || member.email || "Sin nombre"
-  const isAdmin = isAdminOrAbove(member.role)
-  const isSuper = isSuperAdmin(member.role)
+  const isAdmin   = isAdminOrAbove(member.role)
+  const isDev     = isDeveloper(member.role)
+  const isSuper   = member.role === "super_admin"
   const isInactive = member.status === "inactivo"
 
   return (
@@ -404,7 +412,9 @@ function MemberCard({ member, department, onClick }: { member: Member; departmen
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
             <h3 className="font-semibold text-slate-900 truncate">{displayName}</h3>
-            {isAdmin && <Crown className="h-3 w-3 text-amber-600 shrink-0" />}
+            {isDev
+              ? <Sparkles className="h-3 w-3 text-cyan-600 shrink-0" />
+              : isAdmin && <Crown className="h-3 w-3 text-amber-600 shrink-0" />}
           </div>
           {member.position && (
             <p className="text-[12px] text-slate-500 truncate">{member.position}</p>
@@ -429,11 +439,13 @@ function MemberCard({ member, department, onClick }: { member: Member; departmen
           )}
           {isAdmin && (
             <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
-              isSuper
+              isDev
+                ? "border-cyan-400/40 bg-cyan-400/15 text-cyan-700"
+                : isSuper
                 ? "border-purple-400/30 bg-purple-400/10 text-purple-700"
                 : "border-amber-400/25 bg-amber-400/10 text-amber-700"
             }`}>
-              {isSuper ? "Super admin" : "Admin"}
+              {isDev ? "Developer" : isSuper ? "Super admin" : "Admin"}
             </span>
           )}
           {department && (
@@ -555,7 +567,9 @@ export function TeamView() {
   }), [members, search, filterStatus, filterDepartment])
 
   const isAdmin       = isAdminOrAbove(currentRole)
-  const isSuper       = isSuperAdmin(currentRole)
+  // Variable se llama `isSuper` por compat — semánticamente es "super_admin o
+  // por encima" (incluye developer). Developer pasa todos los gates de super.
+  const isSuper       = isSuperAdminOrAbove(currentRole)
   const activeCount   = members.filter(m => m.status === "activo").length
   const inactiveCount = members.length - activeCount
   const adminCount    = members.filter(m => isAdminOrAbove(m.role)).length

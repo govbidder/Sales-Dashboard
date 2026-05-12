@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "start": "next start",
     "seed:demo": "tsx scripts/seed-demo-data.ts",
-    "cleanup:demo": "tsx scripts/cleanup-demo-data.ts"
+    "cleanup:demo": "tsx scripts/cleanup-demo-data.ts",
+    "promote:developer": "tsx scripts/promote-to-developer.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.82.0",

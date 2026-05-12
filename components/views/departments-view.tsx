@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useMemo } from "react"
 import { createClient } from "@/lib/supabase"
 import { Portal } from "@/components/ui/portal"
 import type { Department } from "@/lib/types/department"
+import { isAdminOrAbove, type Role } from "@/lib/types/role"
 import {
   Loader2, Plus, X, Trash2, RefreshCw, Layers, Users2, ListTodo,
   GripVertical, AlertCircle,
@@ -318,7 +319,7 @@ export function DepartmentsView() {
       const supabase = createClient()
       const { data: profile } = await supabase
         .from("profiles").select("role").eq("id", session.user.id).single()
-      setIsAdmin(profile?.role === "admin" || profile?.role === "super_admin")
+      setIsAdmin(isAdminOrAbove(profile?.role as Role | undefined))
 
       const headers = { Authorization: `Bearer ${session.access_token}` }
       const [dRes, tRes, mRes] = await Promise.all([

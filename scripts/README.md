@@ -99,10 +99,32 @@ Si en algún momento querés crear un admin de demo (vs estos empleados),
 ajustá `role: "admin"` en la llamada `auth.admin.createUser` y en el
 upsert de profile en `seed-demo-data.ts`.
 
+### `pnpm promote:developer <email>` — promover a developer
+
+Promueve un usuario existente al rol `developer` (máximo nivel jerárquico,
+arriba de super_admin). Pensado para el owner del repo / testing interno.
+
+```bash
+pnpm promote:developer juampiacosta158@gmail.com
+```
+
+Reglas:
+- El usuario tiene que existir previamente en `auth.users` (signup hecho).
+- Solo se espera UN developer. Si ya hay otro, el script avisa y NO procede.
+- Para forzar (agregar un segundo): agregar `--force`.
+- Para demotar manualmente: SQL directo:
+  ```sql
+  update public.profiles set role = 'admin' where role = 'developer';
+  ```
+
+El rol `developer` pasa todos los gates de admin / super_admin. NO es
+asignable desde la UI bajo ninguna circunstancia — solo este script.
+
 ## Archivos
 
-| Archivo                  | Rol |
-|--------------------------|---|
-| `_lib.ts`                | Helpers compartidos (env loader, service client, constantes) |
-| `seed-demo-data.ts`      | Seed principal |
-| `cleanup-demo-data.ts`   | Cleanup con confirmación |
+| Archivo                       | Rol |
+|-------------------------------|---|
+| `_lib.ts`                     | Helpers compartidos (env loader, service client, constantes) |
+| `seed-demo-data.ts`           | Seed principal |
+| `cleanup-demo-data.ts`        | Cleanup con confirmación |
+| `promote-to-developer.ts`     | Promover usuario a rol developer (máximo nivel) |

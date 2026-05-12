@@ -87,7 +87,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           .single()
 
         if (profile) {
-          if (profile.role === "super_admin" || profile.role === "admin" || profile.role === "user" || profile.role === "viewer") {
+          if (
+            profile.role === "developer"   ||
+            profile.role === "super_admin" ||
+            profile.role === "admin"       ||
+            profile.role === "user"        ||
+            profile.role === "viewer"
+          ) {
             role = profile.role
           }
           if (profile.full_name)         name = profile.full_name
