@@ -3,14 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
+import { translateAuthError } from "@/lib/auth/translate-error";
 
 function isAlreadyRegisteredError(error: any) {
-  const msg = String(error?.message ?? "");
-  const code = String(error?.code ?? "");
-  if (["user_already_exists", "email_exists", "email_already_exists"].includes(code)) return true;
-  return /already\s*(registered|been\s*registered)|user\s*already\s*registered|email\s*already\s*(registered|in\s*use)|duplicate/i.test(
-    msg
-  );
+  // Delegamos a translateAuthError para no duplicar la lógica.
+  return translateAuthError(error, { log: false }).code === "already_registered";
 }
 
 export default function SignupPage() {
@@ -81,16 +78,14 @@ export default function SignupPage() {
           return;
         }
 
-        setErr(
-          `No pude crear la cuenta. Supabase devolvió un error de duplicado, pero no pude reenviar el mail de confirmación. Detalle: ${String(
-            resendErr.message ?? resendErr
-          )}`
-        );
+        const t = translateAuthError(resendErr, { context: "signup" });
+        setErr(`No pude reenviar el email de confirmación: ${t.message}`);
         return;
       }
 
       setLoading(false);
-      setErr(String(error.message ?? error));
+      const t = translateAuthError(error, { context: "signup" });
+      setErr(t.message);
       return;
     }
 
@@ -141,7 +136,8 @@ export default function SignupPage() {
     setResendLoading(false);
 
     if (resendErr) {
-      setErr(`No pude reenviar el email de confirmación. Detalle: ${String(resendErr.message ?? resendErr)}`);
+      const t = translateAuthError(resendErr, { context: "signup" });
+      setErr(`No pude reenviar el email: ${t.message}`);
       return;
     }
 
