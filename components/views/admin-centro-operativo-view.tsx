@@ -6,6 +6,7 @@ import {
   Plus, ExternalLink, Trash2, Loader2, FolderOpen,
   Search, AlertTriangle, Link2, FileText, Video, File, X,
   ChevronRight, ArrowRight, Check, Copy, Pencil, Save,
+  CheckCircle2, Circle,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Portal } from "@/components/ui/portal"
@@ -39,6 +40,15 @@ interface Department {
 // Sentinel para "Sin asignar" en el filtro/selector (chip clickeable que
 // representa el null en department_id).
 const NO_DEPT_ID = "__no_dept__"
+// Sentinel para el filtro "No leídos".
+const UNREAD_FILTER = "__unread__"
+
+// Un item es "no leído" si el caller nunca lo marcó como leído.
+// (Una versión futura podría re-marcar si updated_at > read_at; por ahora
+// mantenemos simple: una vez leído, queda leído hasta que se desmarque.)
+function isUnread(itemId: string, readState: Record<string, string>): boolean {
+  return !readState[itemId]
+}
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
@@ -425,6 +435,8 @@ function SOPModal({
   item,
   sectionId,
   canEdit,
+  isRead,
+  onToggleRead,
   onClose,
   onUpdate,
   onDelete,
@@ -432,6 +444,8 @@ function SOPModal({
   item: Item
   sectionId: SectionId
   canEdit: boolean
+  isRead: boolean
+  onToggleRead: () => void
   onClose: () => void
   onUpdate: (updated: Item) => void
   onDelete: (id: string) => void
@@ -617,6 +631,22 @@ function SOPModal({
               >
                 {copied ? <Check className="h-3.5 w-3.5 text-green-400" /> : <Copy className="h-3.5 w-3.5" />}
                 {copied ? "Copiado" : "Copiar"}
+              </button>
+            )}
+            {!editing && (
+              <button
+                onClick={onToggleRead}
+                className={cn(
+                  "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs border transition-all",
+                  isRead
+                    ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15"
+                    : "border-transparent text-muted-foreground hover:text-blue-600 hover:bg-blue-500/5 hover:border-blue-500/15",
+                )}
+                title={isRead ? "Click para marcar como no leído" : "Click para marcar como leído"}
+              >
+                {isRead
+                  ? <><CheckCircle2 className="h-3.5 w-3.5" /> Marcado como leído</>
+                  : <><Circle className="h-3.5 w-3.5" /> Marcar como leído</>}
               </button>
             )}
             {!canEdit && (
@@ -1058,10 +1088,12 @@ function AddResourceForm({
 function ItemRow({
   item,
   department,
+  isUnread,
   onClick,
 }: {
   item: Item
   department?: Department
+  isUnread?: boolean
   onClick: () => void
 }) {
   const cfg = TYPE_CONFIG[item.type] ?? TYPE_CONFIG.link
@@ -1073,12 +1105,21 @@ function ItemRow({
       onClick={onClick}
       className="w-full group flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 hover:border-border hover:bg-muted transition-all text-left"
     >
+      {/* Dot azul de "no leído" (Slack/Notion-style). Reserva espacio cuando
+          está leído para que la columna no salte. */}
+      <span className="w-1.5 flex-shrink-0 flex justify-center" aria-hidden>
+        {isUnread && <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />}
+      </span>
+
       <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted flex-shrink-0">
         <Icon className={`h-4 w-4 ${cfg.color}`} />
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-foreground truncate">{item.title}</p>
+        <p className={cn(
+          "text-sm truncate",
+          isUnread ? "font-bold text-foreground" : "font-semibold text-foreground",
+        )}>{item.title}</p>
         {item.description && (
           <p className="text-xs text-muted-foreground truncate mt-0.5">{item.description}</p>
         )}
@@ -1165,6 +1206,8 @@ function SectionPanel({
   departments,
   callerRole,
   callerDeptId,
+  readState,
+  onToggleRead,
   onAdd,
   onUpdate,
   onDelete,
@@ -1174,6 +1217,8 @@ function SectionPanel({
   departments: Department[]
   callerRole: Role | null
   callerDeptId: string | null
+  readState: Record<string, string>
+  onToggleRead: (id: string) => void
   onAdd: (item: Item) => void
   onUpdate: (item: Item) => void
   onDelete: (id: string) => void
@@ -1209,14 +1254,20 @@ function SectionPanel({
   )
   const filtered = isSOP && activeDeptFilter !== null
     ? searchFiltered.filter(i =>
-        activeDeptFilter === NO_DEPT_ID ? !i.department_id : i.department_id === activeDeptFilter,
+        activeDeptFilter === UNREAD_FILTER
+          ? isUnread(i.id, readState)
+          : activeDeptFilter === NO_DEPT_ID
+            ? !i.department_id
+            : i.department_id === activeDeptFilter,
       )
     : searchFiltered
 
   // Conteos por depto para los chips (sobre `items`, no `filtered`).
   const countByDept = new Map<string, number>()
   let noDeptCount = 0
+  let unreadCount = 0
   for (const it of items) {
+    if (isUnread(it.id, readState)) unreadCount++
     if (!it.department_id) noDeptCount++
     else countByDept.set(it.department_id, (countByDept.get(it.department_id) ?? 0) + 1)
   }
@@ -1337,6 +1388,27 @@ function SectionPanel({
               dimmed
             />
           )}
+          {unreadCount > 0 && (
+            <button
+              type="button"
+              onClick={() => setActiveDeptFilter(UNREAD_FILTER)}
+              className={cn(
+                "flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-all ml-auto",
+                activeDeptFilter === UNREAD_FILTER
+                  ? "border-blue-500/40 bg-blue-500/15 text-blue-700"
+                  : "border-border bg-muted text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <span className="h-2 w-2 rounded-full bg-blue-500" />
+              No leídos
+              <span className={cn(
+                "text-[10px] rounded-full px-1.5 py-0.5",
+                activeDeptFilter === UNREAD_FILTER ? "bg-foreground/10" : "bg-muted-foreground/10",
+              )}>
+                {unreadCount}
+              </span>
+            </button>
+          )}
         </div>
       )}
 
@@ -1362,15 +1434,19 @@ function SectionPanel({
       {/* Items list */}
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-14 gap-3">
-          <FolderOpen className="h-8 w-8 text-muted-foreground/70" />
+          {activeDeptFilter === UNREAD_FILTER
+            ? <CheckCircle2 className="h-8 w-8 text-emerald-600/70" />
+            : <FolderOpen className="h-8 w-8 text-muted-foreground/70" />}
           <p className="text-xs text-muted-foreground/70">
             {search
               ? "Sin resultados"
-              : isSOP && activeDeptFilter !== null
-                ? "No hay SOPs en esta área todavía"
-                : "Todavía no hay ítems en esta sección"}
+              : activeDeptFilter === UNREAD_FILTER
+                ? "Pusiste todo al día. No quedan SOPs sin leer."
+                : isSOP && activeDeptFilter !== null
+                  ? "No hay SOPs en esta área todavía"
+                  : "Todavía no hay ítems en esta sección"}
           </p>
-          {!showForm && !search && (
+          {!showForm && !search && activeDeptFilter !== UNREAD_FILTER && (
             <button
               onClick={() => setShowForm(true)}
               className="text-xs text-[#E42D2C]/70 hover:text-[#E42D2C] transition-colors"
@@ -1398,6 +1474,7 @@ function SectionPanel({
                     key={item.id}
                     item={item}
                     department={item.department_id ? deptById.get(item.department_id) : undefined}
+                    isUnread={isUnread(item.id, readState)}
                     onClick={() => setActiveItem(item)}
                   />
                 ))}
@@ -1412,6 +1489,7 @@ function SectionPanel({
               key={item.id}
               item={item}
               department={item.department_id ? deptById.get(item.department_id) : undefined}
+              isUnread={isUnread(item.id, readState)}
               onClick={() => setActiveItem(item)}
             />
           ))}
@@ -1427,6 +1505,8 @@ function SectionPanel({
             category:      activeItem.category,
             department_id: activeItem.department_id,
           })}
+          isRead={!isUnread(activeItem.id, readState)}
+          onToggleRead={() => onToggleRead(activeItem.id)}
           onClose={() => setActiveItem(null)}
           onUpdate={updated => {
             onUpdate(updated)
@@ -1452,6 +1532,8 @@ export function AdminCentroOperativoView() {
   // Role + depto del user actual — gobierna qué acciones puede ejecutar.
   const [callerRole, setCallerRole]     = useState<Role | null>(null)
   const [callerDeptId, setCallerDeptId] = useState<string | null>(null)
+  // Map { resource_id → read_at ISO } — items que el caller marcó como leídos.
+  const [readState, setReadState] = useState<Record<string, string>>({})
 
   useEffect(() => {
     const supabase = createClient()
@@ -1471,9 +1553,10 @@ export function AdminCentroOperativoView() {
     Promise.all([
       fetch("/api/resources").then(r => r.json()).catch(() => ({ resources: [] })),
       fetch("/api/departments").then(r => r.json()).catch(() => ({ departments: [] })),
+      fetch("/api/resources/read-state").then(r => r.json()).catch(() => ({ readState: {} })),
       profilePromise,
     ])
-      .then(([resData, deptData, profile]) => {
+      .then(([resData, deptData, rsData, profile]) => {
         const fetched: Item[] = (resData.resources ?? []).map((r: any) => ({
           ...r,
           department_id: r.department_id ?? null,
@@ -1492,6 +1575,7 @@ export function AdminCentroOperativoView() {
           setItems(fetched)
         }
         setDepartments(deptData.departments ?? [])
+        setReadState(rsData.readState ?? {})
         setCallerRole(profile.role)
         setCallerDeptId(profile.department_id)
       })
@@ -1504,6 +1588,35 @@ export function AdminCentroOperativoView() {
   const handleAdd    = (item: Item)   => setItems(prev => [item, ...prev])
   const handleUpdate = (item: Item)   => setItems(prev => prev.map(i => i.id === item.id ? item : i))
   const handleDelete = (id: string)   => setItems(prev => prev.filter(i => i.id !== id))
+
+  // Toggle de read-state. Optimistic update con rollback en error (incluye
+  // 503 cuando la migration aún no se aplicó).
+  const handleToggleRead = async (resourceId: string) => {
+    const wasRead = !!readState[resourceId]
+    const prevReadAt = readState[resourceId]
+    setReadState(prev => {
+      const next = { ...prev }
+      if (wasRead) delete next[resourceId]; else next[resourceId] = new Date().toISOString()
+      return next
+    })
+    try {
+      const res = wasRead
+        ? await fetch(`/api/resources/read-state?resource_id=${resourceId}`, { method: "DELETE" })
+        : await fetch("/api/resources/read-state", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ resource_id: resourceId }),
+          })
+      if (!res.ok) throw new Error(`${res.status}`)
+    } catch {
+      setReadState(prev => {
+        const next = { ...prev }
+        if (wasRead && prevReadAt) next[resourceId] = prevReadAt
+        else delete next[resourceId]
+        return next
+      })
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -1560,6 +1673,8 @@ export function AdminCentroOperativoView() {
           departments={departments}
           callerRole={callerRole}
           callerDeptId={callerDeptId}
+          readState={readState}
+          onToggleRead={handleToggleRead}
           onAdd={handleAdd}
           onUpdate={handleUpdate}
           onDelete={handleDelete}
