@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Lock, ArrowLeft, AlertCircle, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase";
+import { translateAuthError } from "@/lib/auth/translate-error";
 
 function parseHashParams(hash: string) {
   const out: Record<string, string> = {};
@@ -18,18 +19,17 @@ function parseHashParams(hash: string) {
 }
 
 function friendlyAuthError(hashParams: Record<string, string>) {
-  const code = hashParams["error_code"];
+  const code = hashParams["error_code"] ?? "";
   const desc = hashParams["error_description"]
     ? decodeURIComponent(hashParams["error_description"])
     : "";
-
-  if (code === "otp_expired") {
-    return "El link expiró o ya fue usado. Pedí uno nuevo desde Forgot password.";
-  }
-  if (code === "access_denied") {
-    return "Acceso denegado. Pedí un nuevo link desde Forgot password y abrilo apenas llegue.";
-  }
-  return desc || "Link inválido o rechazado.";
+  // Reutilizamos el traductor central — soporta los mismos códigos que vienen
+  // por error normal de Supabase. Pasamos desc como raw message.
+  const t = translateAuthError(
+    { code, message: desc || code || "auth_error" },
+    { context: "reset-password" },
+  );
+  return t.code === "unknown" ? (desc || "Link inválido o rechazado.") : t.message;
 }
 
 export default function ResetPasswordPage() {
@@ -245,7 +245,8 @@ export default function ResetPasswordPage() {
     setLoading(false);
 
     if (error) {
-      setErr(error.message);
+      const t = translateAuthError(error, { context: "reset-password" });
+      setErr(t.message);
       return;
     }
 

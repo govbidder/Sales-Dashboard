@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Mail, ArrowLeft, AlertCircle, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase";
+import { translateAuthError } from "@/lib/auth/translate-error";
 
 export default function ForgotPasswordPage() {
   const supabase = useMemo(() => createClient(), []);
@@ -20,14 +21,22 @@ export default function ForgotPasswordPage() {
     setMsg(null);
     setErr(null);
 
+    // El redirectTo prioriza NEXT_PUBLIC_APP_URL si está seteado — útil cuando
+    // el user abre el form en un host distinto al de producción (ej. preview
+    // de Vercel) pero queremos que el email lleve al dominio canónico.
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || window.location.origin;
+
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${baseUrl.replace(/\/$/, "")}/reset-password`,
     });
 
     setLoading(false);
 
     if (error) {
-      setErr("No pudimos enviar el email. Verificá que la dirección sea correcta.");
+      // Surface el error REAL traducido (en lugar del genérico anterior que
+      // escondía la causa). El helper también loggea a console para debugging.
+      const t = translateAuthError(error, { context: "forgot-password" });
+      setErr(t.message);
       return;
     }
 

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
+import { translateAuthError } from "@/lib/auth/translate-error";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,12 +25,19 @@ export default function LoginPage() {
     e.preventDefault();
     setErrorMsg(null);
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
     setLoading(false);
-    if (error) { setErrorMsg(error.message); return; }
+    if (error) {
+      const t = translateAuthError(error, { context: "login" });
+      setErrorMsg(t.message);
+      return;
+    }
     const { data } = await supabase.auth.getSession();
     if (data.session) router.replace("/inicio");
-    else setErrorMsg("No se pudo obtener la sesión. Intenta nuevamente.");
+    else setErrorMsg("La sesión no se pudo iniciar. Refrescá la página e intentá de nuevo.");
   }
 
   return (
