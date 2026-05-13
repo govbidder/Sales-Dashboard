@@ -10,6 +10,7 @@ import {
   Users2, ListTodo, FileBarChart, TrendingDown, TrendingUp,
   ArrowRight, Flag, Sparkles,
   Sun, Calendar as CalIcon, Layers,
+  KanbanSquare, BookMarked, Briefcase, Bell,
 } from "lucide-react"
 import type { Department } from "@/lib/types/department"
 import { useViewAs } from "@/lib/contexts/view-as-context"
@@ -230,6 +231,9 @@ export function InicioView() {
   // Rol real del caller (de profiles). Lo usamos para decidir qué secciones
   // se renderizan — Team users no ven la grilla cross-empresa.
   const [realRole,     setRealRole]     = useState<Role | null>(null)
+  // Department_id del caller — gobierna las cards contextuales para team users
+  // ("Mi área", atajos, etc.). null = sin depto asignado todavía.
+  const [myDeptId,     setMyDeptId]     = useState<string | null>(null)
   const effectiveRole = useEffectiveRole(realRole)
   const isAdmin       = isAdminOrAbove(effectiveRole)
 
@@ -245,10 +249,12 @@ export function InicioView() {
       if (!session) return
       setCurrentEmail(session.user?.email ?? "")
 
-      // Cargar el rol REAL del caller — afecta qué secciones se renderizan.
+      // Cargar el rol REAL + depto del caller. El rol afecta qué secciones se
+      // renderizan; el depto se usa en las cards contextuales para team users.
       const { data: profile } = await supabase
-        .from("profiles").select("role").eq("id", session.user.id).single()
+        .from("profiles").select("role, department_id").eq("id", session.user.id).single()
       setRealRole((profile?.role as Role | undefined) ?? null)
+      setMyDeptId((profile?.department_id as string | null | undefined) ?? null)
 
       const res = await fetchWithViewAs("/api/admin/health", {
         headers: { Authorization: `Bearer ${session.access_token}` },
@@ -378,8 +384,30 @@ export function InicioView() {
   const circumference = 2 * Math.PI * 42
   const offset = circumference * (1 - healthScore / 100)
 
+  // Conteo de tareas mías de hoy (ya filtradas por owner=currentEmail en myDay).
+  // Definidos arriba del statusLine porque éste los usa para team users.
+  const myOverdueCount  = myDay.filter(t => t.overdue).length
+  const myDueTodayCount = myDay.length - myOverdueCount
+
   // Status line narrativo — frase que comunica decisión (no número abstracto).
+  // Para admin: mira el estado global de la empresa.
+  // Para team user: enfoque personal — sus tareas, no las del resto.
   const statusLine = (() => {
+    if (!isAdmin) {
+      // Team view: hablamos al usuario directo. Si tiene cosas asignadas, las
+      // priorizamos por urgencia. Sino, mensaje de "estás al día".
+      if (myOverdueCount > 0 && myDueTodayCount > 0) {
+        return `Tenés ${myOverdueCount} ${myOverdueCount === 1 ? "tarea vencida" : "tareas vencidas"} y ${myDueTodayCount} que ${myDueTodayCount === 1 ? "vence" : "vencen"} hoy.`
+      }
+      if (myOverdueCount > 0) {
+        return `Tenés ${myOverdueCount} ${myOverdueCount === 1 ? "tarea vencida" : "tareas vencidas"}. Empezá por ahí.`
+      }
+      if (myDueTodayCount > 0) {
+        return `Tenés ${myDueTodayCount} ${myDueTodayCount === 1 ? "tarea para hacer hoy" : "tareas para hacer hoy"}.`
+      }
+      return "Estás al día. Sin tareas vencidas ni pendientes para hoy."
+    }
+    // Admin view (original).
     if (allClear) return "Todo al día. Sin tareas vencidas, métricas al día."
     const pieces: string[] = []
     if (counts.overdueTasks > 0) {
@@ -399,6 +427,10 @@ export function InicioView() {
     return `Hoy: ${pieces.slice(0, -1).join(", ")} y ${pieces.slice(-1)}.`
   })()
 
+  // Estado narrativo para el ícono del status line cuando es team user.
+  const teamHeroState = myOverdueCount > 0 ? "critical" : myDueTodayCount > 0 ? "warning" : "good"
+  const effectiveHeroState = isAdmin ? heroState : teamHeroState
+
   // Departamentos rankeados por urgencia (overdue DESC, luego pending DESC).
   // Los OK quedan al final con visual sutil.
   const rankedDepts = [...departments].sort((a, b) => {
@@ -407,6 +439,10 @@ export function InicioView() {
     if (sb.overdue !== sa.overdue) return sb.overdue - sa.overdue
     return sb.pending - sa.pending
   })
+
+  // Depto del caller — alimenta las cards contextuales para team users.
+  const myDept      = myDeptId ? departments.find(d => d.id === myDeptId) ?? null : null
+  const myDeptStat  = myDeptId ? deptStats[myDeptId] ?? { pending: 0, overdue: 0, members: 0 } : null
 
   return (
     <div className="space-y-5">
@@ -420,9 +456,9 @@ export function InicioView() {
             className="absolute -top-20 -right-20 h-[220px] w-[220px] rounded-full blur-[80px]"
             style={{
               backgroundColor:
-                heroState === "good"     ? "rgba(16,185,129,0.06)" :
-                heroState === "critical" ? "rgba(228,45,44,0.08)"  :
-                                           "rgba(251,191,36,0.06)",
+                effectiveHeroState === "good"     ? "rgba(16,185,129,0.06)" :
+                effectiveHeroState === "critical" ? "rgba(228,45,44,0.08)"  :
+                                                    "rgba(251,191,36,0.06)",
             }}
           />
         </div>
@@ -430,47 +466,59 @@ export function InicioView() {
         <div className="relative flex items-center gap-4 sm:gap-6">
           {/* Status icon */}
           <span className={`shrink-0 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl ${
-            heroState === "good"     ? "bg-emerald-500/15"  :
-            heroState === "critical" ? "bg-[#E42D2C]/15"    :
-                                        "bg-amber-500/15"
+            effectiveHeroState === "good"     ? "bg-emerald-500/15"  :
+            effectiveHeroState === "critical" ? "bg-[#E42D2C]/15"    :
+                                                "bg-amber-500/15"
           }`}>
-            {heroState === "good"     ? <CheckCircle2  className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-700" /> :
-             heroState === "critical" ? <AlertCircle   className="h-4 w-4 sm:h-5 sm:w-5 text-[#E42D2C]"   /> :
-                                        <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-amber-700"  />}
+            {effectiveHeroState === "good"     ? <CheckCircle2  className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-700" /> :
+             effectiveHeroState === "critical" ? <AlertCircle   className="h-4 w-4 sm:h-5 sm:w-5 text-[#E42D2C]"   /> :
+                                                  <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-amber-700"  />}
           </span>
 
           {/* Sentence */}
           <div className="flex-1 min-w-0">
             <p className="text-[10px] font-bold uppercase tracking-[0.20em] text-[#1e3a8a]/80 mb-1">
-              Estado del Dashboard
+              {isAdmin ? "Estado del Dashboard" : "Tu día"}
             </p>
             <p className="text-[15px] sm:text-[17px] font-semibold text-foreground leading-snug">
               {statusLine}
             </p>
           </div>
 
-          {/* Score chico */}
-          <div className="shrink-0 hidden sm:flex flex-col items-center gap-0.5 border-l border-border pl-5">
-            <CountUp
-              value={healthScore}
-              duration={1000}
-              className={`text-[28px] font-bold leading-none ${scoreColor}`}
-            />
-            <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-              Salud
-            </p>
-          </div>
+          {/* Score chico — solo admin (los team users no necesitan ver salud global) */}
+          {isAdmin && (
+            <div className="shrink-0 hidden sm:flex flex-col items-center gap-0.5 border-l border-border pl-5">
+              <CountUp
+                value={healthScore}
+                duration={1000}
+                className={`text-[28px] font-bold leading-none ${scoreColor}`}
+              />
+              <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                Salud
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Quick actions */}
         <div className="relative mt-3 flex flex-wrap items-center gap-2">
-          <button
-            onClick={() => setShowStandup(true)}
-            className="inline-flex items-center gap-1.5 h-8 rounded-full border border-[#1e3a8a]/25 bg-[#1e3a8a]/[0.04] px-3 text-[11.5px] font-bold text-[#1e3a8a] hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/[0.08] transition-all"
-          >
-            <Sparkles className="h-3 w-3" />
-            Generar standup
-          </button>
+          {isAdmin ? (
+            <button
+              onClick={() => setShowStandup(true)}
+              className="inline-flex items-center gap-1.5 h-8 rounded-full border border-[#1e3a8a]/25 bg-[#1e3a8a]/[0.04] px-3 text-[11.5px] font-bold text-[#1e3a8a] hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/[0.08] transition-all"
+            >
+              <Sparkles className="h-3 w-3" />
+              Generar standup
+            </button>
+          ) : (
+            <Link
+              href="/admin/tasks"
+              className="inline-flex items-center gap-1.5 h-8 rounded-full border border-[#1e3a8a]/25 bg-[#1e3a8a]/[0.04] px-3 text-[11.5px] font-bold text-[#1e3a8a] hover:border-[#1e3a8a]/40 hover:bg-[#1e3a8a]/[0.08] transition-all"
+            >
+              <KanbanSquare className="h-3 w-3" />
+              Ir a mi kanban
+            </Link>
+          )}
           <button
             onClick={fetchHealth}
             disabled={loading}
@@ -481,6 +529,32 @@ export function InicioView() {
           </button>
         </div>
       </div>
+
+      {/* MI ÁREA + ATAJOS — solo para team users (no admin) ────────────────── */}
+      {!isAdmin && (
+        <div className="grid gap-3 lg:grid-cols-3">
+          {/* Mi área card (ocupa 2/3 en desktop) */}
+          {myDept ? (
+            <MyAreaCard dept={myDept} stats={myDeptStat!} />
+          ) : (
+            <div className="lg:col-span-2 flex items-start gap-3 rounded-2xl border border-amber-400/25 bg-amber-50/40 dark:bg-amber-500/[0.04] px-5 py-4">
+              <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-[13px] font-semibold text-foreground mb-1">
+                  Todavía no tenés un departamento asignado.
+                </p>
+                <p className="text-[12px] text-muted-foreground leading-relaxed">
+                  Pedile a un admin que te asigne uno desde <span className="font-mono text-[11px]">/admin/team</span>.
+                  Sin esto no vas a ver tu Kanban filtrado ni vas a poder crear SOPs en tu área.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Atajos: 4 botones laterales en 1 columna lg, grid 2x2 en mobile */}
+          <QuickLinksGrid deptId={myDeptId} />
+        </div>
+      )}
 
       {/* 3 CRITICAL CARDS — top-left = más urgente ─────────────────────────── */}
       {isAdmin && (
@@ -596,6 +670,32 @@ export function InicioView() {
                 </Link>
               )
             })}
+          </div>
+        </div>
+      )}
+
+      {/* MI DÍA — empty state amigable para team users cuando no hay tareas ─ */}
+      {currentEmail && myDay.length === 0 && !isAdmin && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 px-1">
+            <Sun className="h-3.5 w-3.5 text-amber-500" />
+            <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#1e3a8a]">
+              Mi día
+            </h2>
+            <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent" />
+          </div>
+          <div className="rounded-2xl border border-border bg-card px-5 py-6 flex items-center gap-4">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 flex-shrink-0">
+              <CheckCircle2 className="h-5 w-5 text-emerald-700" />
+            </span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[14px] font-semibold text-foreground">
+                No tenés tareas asignadas para hoy.
+              </p>
+              <p className="text-[12px] text-muted-foreground mt-0.5 leading-relaxed">
+                Cuando un admin te asigne tareas con due hoy o vencidas, las vas a ver acá. Mientras tanto, podés mirar tu kanban completo o el centro operativo.
+              </p>
+            </div>
           </div>
         </div>
       )}
@@ -870,5 +970,145 @@ function CriticalCard({
         <ArrowRight className="h-3 w-3" />
       </p>
     </Link>
+  )
+}
+
+// ─── My Area Card (team users) ───────────────────────────────────────────────
+//
+// Card prominente que muestra al team user el estado actual de SU área. Color
+// del depto al lado izquierdo, stats inline, y CTAs para entrar al detalle.
+// Reemplaza la "vista de empresa" que solo ven los admins.
+
+function MyAreaCard({
+  dept,
+  stats,
+}: {
+  dept:  Department
+  stats: DeptStat
+}) {
+  const isOverloaded = stats.overdue > 0
+  const isHealthy    = stats.overdue === 0 && stats.pending <= 5
+  const accentBg     = `${dept.color}14`   // 8% opacity en hex
+  const accentBorder = `${dept.color}3d`   // 24% opacity
+
+  return (
+    <div
+      className="lg:col-span-2 relative overflow-hidden rounded-2xl border p-5 sm:p-6"
+      style={{ borderColor: accentBorder, backgroundColor: accentBg }}
+    >
+      {/* Color accent bar */}
+      <span
+        className="absolute left-0 top-0 bottom-0 w-[3px]"
+        style={{ backgroundColor: dept.color }}
+      />
+
+      <div className="flex items-start gap-4">
+        <span
+          className="flex h-10 w-10 items-center justify-center rounded-xl flex-shrink-0"
+          style={{ backgroundColor: `${dept.color}26` }}
+        >
+          <Briefcase className="h-5 w-5" style={{ color: dept.color }} />
+        </span>
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] font-bold uppercase tracking-[0.20em] mb-1" style={{ color: dept.color }}>
+            Mi área
+          </p>
+          <h3 className="text-[18px] sm:text-[20px] font-bold text-foreground leading-tight">
+            {dept.name}
+          </h3>
+          <p className="text-[12px] text-muted-foreground mt-1">
+            {isOverloaded
+              ? `Hay ${stats.overdue} ${stats.overdue === 1 ? "tarea vencida" : "tareas vencidas"} en el área — coordinen para destrabar.`
+              : isHealthy
+                ? "El área está al día. Buen ritmo."
+                : `${stats.pending} pendientes activas en el área.`}
+          </p>
+        </div>
+      </div>
+
+      {/* Stats inline */}
+      <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-4">
+        <div className="rounded-xl bg-card/60 border border-border/40 px-3 py-2.5">
+          <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-muted-foreground mb-1">
+            Pendientes
+          </p>
+          <p className="text-[20px] font-bold tabular-nums text-foreground leading-none">
+            <CountUp value={stats.pending} duration={700} />
+          </p>
+        </div>
+        <div className="rounded-xl bg-card/60 border border-border/40 px-3 py-2.5">
+          <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-muted-foreground mb-1">
+            Vencidas
+          </p>
+          <p className={`text-[20px] font-bold tabular-nums leading-none ${stats.overdue > 0 ? "text-[#E42D2C]" : "text-foreground"}`}>
+            <CountUp value={stats.overdue} duration={700} />
+          </p>
+        </div>
+        <div className="rounded-xl bg-card/60 border border-border/40 px-3 py-2.5">
+          <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-muted-foreground mb-1">
+            Miembros
+          </p>
+          <p className="text-[20px] font-bold tabular-nums text-foreground leading-none">
+            <CountUp value={stats.members} duration={700} />
+          </p>
+        </div>
+      </div>
+
+      {/* CTAs */}
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Link
+          href={`/admin/departments/${dept.id}`}
+          className="inline-flex items-center gap-1.5 h-8 rounded-full border border-border bg-card/80 px-3 text-[11.5px] font-semibold text-foreground hover:bg-card transition-all"
+        >
+          <Layers className="h-3 w-3" />
+          Ver detalle del área
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+        <Link
+          href="/admin/tasks"
+          className="inline-flex items-center gap-1.5 h-8 rounded-full px-3 text-[11.5px] font-semibold text-white transition-all hover:opacity-90"
+          style={{ backgroundColor: dept.color }}
+        >
+          <KanbanSquare className="h-3 w-3" />
+          Kanban del área
+        </Link>
+      </div>
+    </div>
+  )
+}
+
+// ─── Quick Links Grid (team users) ───────────────────────────────────────────
+//
+// 4 atajos rápidos en una columna lateral (desktop) o 2x2 grid (mobile).
+// Los links son context-aware: si el user tiene depto, "SOPs" lleva con filtro
+// pre-seleccionado por su área.
+
+function QuickLinksGrid({ deptId }: { deptId: string | null }) {
+  const links = [
+    { href: "/admin/tasks",            label: "Mis tareas",      icon: ListTodo,     accent: "text-[#1e3a8a]" },
+    { href: "/admin/centro-operativo", label: "SOPs y recursos", icon: BookMarked,   accent: "text-emerald-700" },
+    { href: "/admin/personas",         label: "Personas",        icon: Users2,       accent: "text-purple-700" },
+    { href: "/calendar",               label: "Calendario",      icon: CalIcon,      accent: "text-amber-700" },
+  ]
+
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
+      {links.map(l => {
+        const Icon = l.icon
+        return (
+          <Link
+            key={l.href}
+            href={l.href}
+            className="group flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 hover:border-foreground/20 hover:bg-muted transition-all"
+          >
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted flex-shrink-0">
+              <Icon className={`h-4 w-4 ${l.accent}`} />
+            </span>
+            <span className="flex-1 text-[13px] font-semibold text-foreground truncate">{l.label}</span>
+            <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/70 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+          </Link>
+        )
+      })}
+    </div>
   )
 }
