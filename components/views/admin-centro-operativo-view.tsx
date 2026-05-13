@@ -7,6 +7,7 @@ import {
   Search, AlertTriangle, Link2, FileText, Video, File, X,
   ChevronRight, ArrowRight, Check, Copy, Pencil, Save,
   CheckCircle2, Circle,
+  Clock,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Portal } from "@/components/ui/portal"
@@ -48,6 +49,26 @@ const UNREAD_FILTER = "__unread__"
 // mantenemos simple: una vez leído, queda leído hasta que se desmarque.)
 function isUnread(itemId: string, readState: Record<string, string>): boolean {
   return !readState[itemId]
+}
+
+// Persistencia local (per-browser) de items recientemente abiertos. No usamos
+// DB para esto — es un convenience feature, está bien que sea por dispositivo.
+const RECENT_LS_KEY = "centroOperativo:recent"
+const RECENT_MAX    = 10
+
+function loadRecent(): string[] {
+  if (typeof window === "undefined") return []
+  try {
+    const raw = window.localStorage.getItem(RECENT_LS_KEY)
+    if (!raw) return []
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === "string") : []
+  } catch { return [] }
+}
+
+function saveRecent(ids: string[]) {
+  if (typeof window === "undefined") return
+  try { window.localStorage.setItem(RECENT_LS_KEY, JSON.stringify(ids)) } catch {}
 }
 
 // ─── Config ───────────────────────────────────────────────────────────────────
@@ -1208,6 +1229,8 @@ function SectionPanel({
   callerDeptId,
   readState,
   onToggleRead,
+  recentIds,
+  onMarkRecent,
   onAdd,
   onUpdate,
   onDelete,
@@ -1219,6 +1242,8 @@ function SectionPanel({
   callerDeptId: string | null
   readState: Record<string, string>
   onToggleRead: (id: string) => void
+  recentIds: string[]
+  onMarkRecent: (id: string) => void
   onAdd: (item: Item) => void
   onUpdate: (item: Item) => void
   onDelete: (id: string) => void
@@ -1295,6 +1320,21 @@ function SectionPanel({
     if (noDept?.length) ordered.push({ id: NO_DEPT_ID, label: "Sin asignar", items: noDept })
     return ordered
   })()
+
+  // Items recientes que pertenecen a esta sección, en orden de últimos abiertos.
+  // Solo mostramos cuando NO hay búsqueda activa (la sección "Recientes" sería
+  // ruido encima de los resultados de búsqueda).
+  const itemById = new Map(items.map(i => [i.id, i]))
+  const recentItems = search === ""
+    ? recentIds.map(id => itemById.get(id)).filter((x): x is Item => !!x).slice(0, 4)
+    : []
+
+  // Handler combinado: registra como reciente + abre el modal. Lo usan todos los
+  // ItemRow del panel (incluyendo los del grid de Recientes).
+  const openItem = (item: Item) => {
+    onMarkRecent(item.id)
+    setActiveItem(item)
+  }
 
   return (
     <div className="space-y-4">
@@ -1431,6 +1471,49 @@ function SectionPanel({
         />
       )}
 
+      {/* Recientes — items recientemente abiertos en esta sección.
+          Solo cuando no hay búsqueda activa y hay al menos 1 reciente. */}
+      {recentItems.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 px-1">
+            <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+            <h3 className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Recientes
+            </h3>
+            <span className="text-[10px] text-muted-foreground/70">· {recentItems.length}</span>
+          </div>
+          <div className="grid gap-2 grid-cols-1 sm:grid-cols-2">
+            {recentItems.map(item => {
+              const cfg = TYPE_CONFIG[item.type] ?? TYPE_CONFIG.link
+              const RIcon = cfg.icon
+              const dept = item.department_id ? deptById.get(item.department_id) : undefined
+              return (
+                <button
+                  key={`recent-${item.id}`}
+                  type="button"
+                  onClick={() => openItem(item)}
+                  className="group flex items-center gap-3 rounded-xl border border-border bg-card px-3 py-2.5 hover:border-foreground/20 hover:bg-muted transition-all text-left"
+                >
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted flex-shrink-0">
+                    <RIcon className={`h-3.5 w-3.5 ${cfg.color}`} />
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-semibold text-foreground truncate">{item.title}</p>
+                    {dept && (
+                      <p className="text-[10px] mt-0.5 flex items-center gap-1" style={{ color: dept.color }}>
+                        <span className="h-1 w-1 rounded-full" style={{ backgroundColor: dept.color }} />
+                        {dept.name}
+                      </p>
+                    )}
+                  </div>
+                  <ArrowRight className="h-3 w-3 text-muted-foreground/60 group-hover:text-foreground group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Items list */}
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-14 gap-3">
@@ -1475,7 +1558,7 @@ function SectionPanel({
                     item={item}
                     department={item.department_id ? deptById.get(item.department_id) : undefined}
                     isUnread={isUnread(item.id, readState)}
-                    onClick={() => setActiveItem(item)}
+                    onClick={() => openItem(item)}
                   />
                 ))}
               </div>
@@ -1490,7 +1573,7 @@ function SectionPanel({
               item={item}
               department={item.department_id ? deptById.get(item.department_id) : undefined}
               isUnread={isUnread(item.id, readState)}
-              onClick={() => setActiveItem(item)}
+              onClick={() => openItem(item)}
             />
           ))}
         </div>
@@ -1534,6 +1617,20 @@ export function AdminCentroOperativoView() {
   const [callerDeptId, setCallerDeptId] = useState<string | null>(null)
   // Map { resource_id → read_at ISO } — items que el caller marcó como leídos.
   const [readState, setReadState] = useState<Record<string, string>>({})
+  // Lista de IDs de items abiertos recientemente (más reciente primero).
+  // Persistido en localStorage, scoped al browser. Sin sync entre dispositivos —
+  // es un convenience feature, no critical state.
+  const [recentIds, setRecentIds] = useState<string[]>([])
+  useEffect(() => { setRecentIds(loadRecent()) }, [])
+
+  // Marca un item como recientemente abierto. Dedupe + slice + persist.
+  const markRecent = (id: string) => {
+    setRecentIds(prev => {
+      const next = [id, ...prev.filter(x => x !== id)].slice(0, RECENT_MAX)
+      saveRecent(next)
+      return next
+    })
+  }
 
   useEffect(() => {
     const supabase = createClient()
@@ -1675,6 +1772,8 @@ export function AdminCentroOperativoView() {
           callerDeptId={callerDeptId}
           readState={readState}
           onToggleRead={handleToggleRead}
+          recentIds={recentIds}
+          onMarkRecent={markRecent}
           onAdd={handleAdd}
           onUpdate={handleUpdate}
           onDelete={handleDelete}
