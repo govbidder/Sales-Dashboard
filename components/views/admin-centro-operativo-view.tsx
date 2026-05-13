@@ -7,6 +7,7 @@ import {
   Search, AlertTriangle, Link2, FileText, Video, File, X,
   ChevronRight, ArrowRight, Check, Copy, Pencil, Save,
   CheckCircle2, Circle,
+  CornerDownLeft,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Portal } from "@/components/ui/portal"
@@ -1208,6 +1209,8 @@ function SectionPanel({
   callerDeptId,
   readState,
   onToggleRead,
+  pendingOpenId,
+  onPendingConsumed,
   onAdd,
   onUpdate,
   onDelete,
@@ -1219,6 +1222,8 @@ function SectionPanel({
   callerDeptId: string | null
   readState: Record<string, string>
   onToggleRead: (id: string) => void
+  pendingOpenId?: string | null
+  onPendingConsumed?: () => void
   onAdd: (item: Item) => void
   onUpdate: (item: Item) => void
   onDelete: (id: string) => void
@@ -1228,6 +1233,17 @@ function SectionPanel({
   const [activeItem, setActiveItem] = useState<Item | null>(null)
   // Filtro de departamento (solo en SOPs). `null` = todos. `NO_DEPT_ID` = sin asignar.
   const [activeDeptFilter, setActiveDeptFilter] = useState<string | null>(null)
+
+  // Cuando el palette de búsqueda selecciona un item, el padre cambia la
+  // sección activa y pone su id en `pendingOpenId`. Cuando los `items` de esta
+  // sección incluyen ese id, abrimos el modal automáticamente.
+  useEffect(() => {
+    if (!pendingOpenId) return
+    const target = items.find(i => i.id === pendingOpenId)
+    if (!target) return
+    setActiveItem(target)
+    onPendingConsumed?.()
+  }, [pendingOpenId, items, onPendingConsumed])
   const Icon = section.icon
   const isAccesos = section.id === "accesos"
   const isSOP = section.id === "sop-sistemas" || section.id === "sop-operativos"
@@ -1522,6 +1538,188 @@ function SectionPanel({
   )
 }
 
+// ─── Search Palette (Cmd+K) ───────────────────────────────────────────────────
+//
+// Overlay de búsqueda fulltext cross-section. El user aprieta Cmd+K (Mac) o
+// Ctrl+K (Windows) y aparece un input con resultados live. Match contra title,
+// description y content. Keyboard nav con ↑↓ Enter. Esc cierra.
+//
+// Cuando se selecciona un resultado, se llama `onSelect(item)` para que el
+// parent decida qué hacer — típicamente cambiar de sección y abrir el modal.
+
+function SearchPalette({
+  open,
+  items,
+  departments,
+  onClose,
+  onSelect,
+}: {
+  open:        boolean
+  items:       Item[]
+  departments: Department[]
+  onClose:     () => void
+  onSelect:    (item: Item) => void
+}) {
+  const [query, setQuery]   = useState("")
+  const [active, setActive] = useState(0)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const deptById = new Map(departments.map(d => [d.id, d]))
+  const sectionLabel = (cat: string) =>
+    (SECTIONS as readonly { id: string; label: string }[]).find(s => s.id === cat)?.label ?? cat
+
+  // Resetear query y selección cuando abre. Focus al input.
+  useEffect(() => {
+    if (!open) return
+    setQuery("")
+    setActive(0)
+    requestAnimationFrame(() => inputRef.current?.focus())
+  }, [open])
+
+  // Resultados: fulltext sobre title + description + content. Score simple
+  // (title > description > content) para que matches en title aparezcan primero.
+  const results = (() => {
+    if (!open) return []
+    const q = query.trim().toLowerCase()
+    if (q === "") return items.slice(0, 8) // sin query, mostrar primeros 8 (recientes)
+    const scored: { item: Item; score: number }[] = []
+    for (const it of items) {
+      const title = it.title.toLowerCase()
+      const desc  = (it.description ?? "").toLowerCase()
+      const cont  = (it.content ?? "").toLowerCase()
+      let score = 0
+      if (title.includes(q))  score += 100
+      if (desc.includes(q))   score += 30
+      if (cont.includes(q))   score += 10
+      // Bonus si el query matchea palabra inicial del título.
+      if (title.startsWith(q)) score += 50
+      if (score > 0) scored.push({ item: it, score })
+    }
+    scored.sort((a, b) => b.score - a.score)
+    return scored.slice(0, 8).map(s => s.item)
+  })()
+
+  // Reset cursor cuando cambia la lista (para que no apunte a un index out of bounds).
+  useEffect(() => { setActive(0) }, [query])
+
+  // Keyboard navigation.
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault()
+      setActive(prev => Math.min(prev + 1, Math.max(0, results.length - 1)))
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault()
+      setActive(prev => Math.max(prev - 1, 0))
+    } else if (e.key === "Enter") {
+      e.preventDefault()
+      const hit = results[active]
+      if (hit) onSelect(hit)
+    } else if (e.key === "Escape") {
+      e.preventDefault()
+      onClose()
+    }
+  }
+
+  if (!open) return null
+
+  return (
+    <Portal>
+      <div className="fixed inset-0 z-[120] bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed inset-0 z-[130] flex items-start justify-center p-4 pt-[15vh]">
+        <div
+          className="w-full max-w-xl rounded-2xl border border-border bg-card shadow-2xl overflow-hidden"
+          onClick={e => e.stopPropagation()}
+        >
+          {/* Input */}
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
+            <Search className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              onKeyDown={onKeyDown}
+              placeholder="Buscar SOPs, recursos, accesos…"
+              className="flex-1 bg-transparent outline-none text-sm text-foreground placeholder:text-muted-foreground/60"
+            />
+            <button
+              onClick={onClose}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Cerrar"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Resultados */}
+          {results.length === 0 ? (
+            <div className="px-5 py-10 text-center">
+              <Search className="h-6 w-6 text-muted-foreground/40 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">
+                {query.trim() ? "Sin resultados" : "Empezá a tipear para buscar"}
+              </p>
+            </div>
+          ) : (
+            <ul className="max-h-[50vh] overflow-y-auto">
+              {results.map((r, i) => {
+                const cfg = TYPE_CONFIG[r.type] ?? TYPE_CONFIG.link
+                const RIcon = cfg.icon
+                const dept = r.department_id ? deptById.get(r.department_id) : undefined
+                const isActive = i === active
+                return (
+                  <li key={r.id}>
+                    <button
+                      type="button"
+                      onMouseEnter={() => setActive(i)}
+                      onClick={() => onSelect(r)}
+                      className={cn(
+                        "w-full flex items-center gap-3 px-4 py-3 text-left transition-colors",
+                        isActive ? "bg-[#1e3a8a]/[0.08]" : "hover:bg-muted",
+                      )}
+                    >
+                      <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted flex-shrink-0">
+                        <RIcon className={`h-3.5 w-3.5 ${cfg.color}`} />
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-foreground truncate">{r.title}</p>
+                        <p className="text-[11px] text-muted-foreground truncate mt-0.5">
+                          {sectionLabel(r.category)}
+                          {dept && <> · <span style={{ color: dept.color }}>{dept.name}</span></>}
+                          {r.description && <> · {r.description}</>}
+                        </p>
+                      </div>
+                      {isActive && <CornerDownLeft className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />}
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+
+          {/* Footer hints */}
+          <div className="flex items-center gap-4 px-4 py-2 border-t border-border bg-muted/40 text-[10px] text-muted-foreground">
+            <span className="inline-flex items-center gap-1">
+              <kbd className="rounded bg-card border border-border px-1 py-0.5 font-mono text-[9px]">↑↓</kbd>
+              navegar
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <kbd className="rounded bg-card border border-border px-1 py-0.5 font-mono text-[9px]">↵</kbd>
+              abrir
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <kbd className="rounded bg-card border border-border px-1 py-0.5 font-mono text-[9px]">esc</kbd>
+              cerrar
+            </span>
+            <span className="ml-auto inline-flex items-center gap-1">
+              <kbd className="rounded bg-card border border-border px-1 py-0.5 font-mono text-[9px]">⌘K</kbd>
+              abrir esto en cualquier momento
+            </span>
+          </div>
+        </div>
+      </div>
+    </Portal>
+  )
+}
+
 // ─── Main View ─────────────────────────────────────────────────────────────────
 
 export function AdminCentroOperativoView() {
@@ -1618,17 +1816,69 @@ export function AdminCentroOperativoView() {
     }
   }
 
+  // Cmd+K / Ctrl+K abre la búsqueda. Esc la cierra (manejado dentro del palette).
+  // Solo registra el listener mientras el componente está montado (esta página).
+  const [paletteOpen, setPaletteOpen] = useState(false)
+  // Cuando se selecciona algo en el palette, queremos: (1) cambiar a la sección
+  // del item para que el panel vea bien la lista, (2) abrir el modal de ese
+  // item. Como `setActiveItem` está dentro de SectionPanel, pasamos el id
+  // pendiente y SectionPanel lo recoge en un useEffect.
+  const [pendingOpenId, setPendingOpenId] = useState<string | null>(null)
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === "k" || e.key === "K")) {
+        e.preventDefault()
+        setPaletteOpen(open => !open)
+      }
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [])
+
+  const handlePaletteSelect = (item: Item) => {
+    setPaletteOpen(false)
+    // Cambiar a la sección del item si aplica
+    const cat = item.category
+    const isSectionId = (SECTIONS as readonly { id: string }[]).some(s => s.id === cat)
+    if (isSectionId) setActiveSection(cat as SectionId)
+    // Marcar como pending para que el SectionPanel abra el modal después del
+    // próximo render con la sección correcta.
+    setPendingOpenId(item.id)
+  }
+
   return (
     <div className="space-y-6">
+      {/* Palette de búsqueda global (Cmd+K) */}
+      <SearchPalette
+        open={paletteOpen}
+        items={items}
+        departments={departments}
+        onClose={() => setPaletteOpen(false)}
+        onSelect={handlePaletteSelect}
+      />
+
       {/* Header */}
-      <div>
-        <div className="flex items-center gap-2.5 mb-1">
-          <span className="h-4 w-[3px] rounded-full bg-[#1e3a8a]" />
-          <h1 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Centro Operativo</h1>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2.5 mb-1">
+            <span className="h-4 w-[3px] rounded-full bg-[#1e3a8a]" />
+            <h1 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Centro Operativo</h1>
+          </div>
+          <p className="text-xs text-muted-foreground ml-[18px]">
+            Base interna de SOPs, recursos, accesos y procesos del equipo GovBidder.
+          </p>
         </div>
-        <p className="text-xs text-muted-foreground ml-[18px]">
-          Base interna de SOPs, recursos, accesos y procesos del equipo GovBidder.
-        </p>
+        {/* CTA de búsqueda global. Muestra el atajo de teclado a la derecha. */}
+        <button
+          type="button"
+          onClick={() => setPaletteOpen(true)}
+          className="hidden sm:flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all"
+        >
+          <Search className="h-3.5 w-3.5" />
+          Buscar todo
+          <kbd className="rounded bg-muted border border-border px-1.5 py-0.5 font-mono text-[10px] ml-1">⌘K</kbd>
+        </button>
       </div>
 
       {/* Section tabs */}
@@ -1675,6 +1925,8 @@ export function AdminCentroOperativoView() {
           callerDeptId={callerDeptId}
           readState={readState}
           onToggleRead={handleToggleRead}
+          pendingOpenId={pendingOpenId}
+          onPendingConsumed={() => setPendingOpenId(null)}
           onAdd={handleAdd}
           onUpdate={handleUpdate}
           onDelete={handleDelete}
