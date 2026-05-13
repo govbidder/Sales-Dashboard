@@ -28,6 +28,27 @@ interface Item {
   type: ResourceType
   department_id: string | null
   created_at: string
+  updated_at: string | null
+}
+
+// Cuántos días atrás contamos como "actualizado recientemente" para el pill.
+const RECENTLY_UPDATED_DAYS = 7
+
+function fmtAgo(iso: string | null): string | null {
+  if (!iso) return null
+  const diff = Date.now() - new Date(iso).getTime()
+  const day = Math.floor(diff / 86_400_000)
+  if (day < 1) {
+    const hr = Math.floor(diff / 3_600_000)
+    return hr <= 0 ? "hace minutos" : `hace ${hr}h`
+  }
+  if (day < 30) return `hace ${day} ${day === 1 ? "día" : "días"}`
+  return null
+}
+
+function isRecentlyUpdated(iso: string | null): boolean {
+  if (!iso) return false
+  return Date.now() - new Date(iso).getTime() < RECENTLY_UPDATED_DAYS * 86_400_000
 }
 
 interface Department {
@@ -237,7 +258,7 @@ Dar de alta a un nuevo cliente en todos los sistemas de GovBidder.
   ],
 }
 
-const MOCK_SEED: Omit<Item, "id" | "created_at" | "department_id">[] = [
+const MOCK_SEED: Omit<Item, "id" | "created_at" | "updated_at" | "department_id">[] = [
   {
     title: "SOP Zapier — Automatizaciones internas",
     url: "#",
@@ -1126,6 +1147,14 @@ function ItemRow({
       </div>
 
       <div className="flex items-center gap-2 flex-shrink-0">
+        {isRecentlyUpdated(item.updated_at) && (
+          <span
+            className="text-[10px] font-semibold text-emerald-700 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-2 py-0.5"
+            title={item.updated_at ? `Actualizado ${fmtAgo(item.updated_at)}` : undefined}
+          >
+            {fmtAgo(item.updated_at)}
+          </span>
+        )}
         {department && (
           <span
             className="flex items-center gap-1 text-[10px] font-medium rounded-full px-2 py-0.5"
@@ -1560,15 +1589,18 @@ export function AdminCentroOperativoView() {
         const fetched: Item[] = (resData.resources ?? []).map((r: any) => ({
           ...r,
           department_id: r.department_id ?? null,
+          updated_at:    r.updated_at ?? r.created_at ?? null,
         }))
         const opCats: string[] = SECTIONS.map(s => s.id)
         const existing = fetched.filter(i => opCats.includes(i.category))
+        const nowIso = new Date().toISOString()
         if (existing.length === 0) {
           const seeded = MOCK_SEED.map((s, idx) => ({
             ...s,
             id: `mock-${idx}`,
             department_id: null,
-            created_at: new Date().toISOString(),
+            created_at: nowIso,
+            updated_at: nowIso,
           }))
           setItems([...fetched.filter(i => !opCats.includes(i.category)), ...seeded])
         } else {
@@ -1583,7 +1615,16 @@ export function AdminCentroOperativoView() {
   }, [])
 
   const section = SECTIONS.find(s => s.id === activeSection)!
-  const sectionItems = items.filter(i => i.category === activeSection)
+  // Sort por updated_at desc para que las ediciones recientes queden al top
+  // (fallback a created_at si la migration de updated_at todavía no se aplicó).
+  const sectionItems = items
+    .filter(i => i.category === activeSection)
+    .slice()
+    .sort((a, b) => {
+      const ta = new Date(a.updated_at ?? a.created_at).getTime()
+      const tb = new Date(b.updated_at ?? b.created_at).getTime()
+      return tb - ta
+    })
 
   const handleAdd    = (item: Item)   => setItems(prev => [item, ...prev])
   const handleUpdate = (item: Item)   => setItems(prev => prev.map(i => i.id === item.id ? item : i))
