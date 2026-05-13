@@ -7,6 +7,7 @@ import {
   Search, AlertTriangle, Link2, FileText, Video, File, X,
   ChevronRight, ArrowRight, Check, Copy, Pencil, Save,
   CheckCircle2, Circle,
+  Star,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Portal } from "@/components/ui/portal"
@@ -42,6 +43,8 @@ interface Department {
 const NO_DEPT_ID = "__no_dept__"
 // Sentinel para el filtro "No leídos".
 const UNREAD_FILTER = "__unread__"
+// Sentinel para el filtro "Favoritos" (chip especial — no es un depto).
+const FAVORITES_FILTER = "__favorites__"
 
 // Un item es "no leído" si el caller nunca lo marcó como leído.
 // (Una versión futura podría re-marcar si updated_at > read_at; por ahora
@@ -1089,27 +1092,59 @@ function ItemRow({
   item,
   department,
   isUnread,
+  isFavorite,
+  onToggleFavorite,
   onClick,
 }: {
   item: Item
   department?: Department
   isUnread?: boolean
+  isFavorite?: boolean
+  onToggleFavorite?: (id: string) => void
   onClick: () => void
 }) {
   const cfg = TYPE_CONFIG[item.type] ?? TYPE_CONFIG.link
   const Icon = cfg.icon
   const hasContent = !!item.content
 
+  // Root es <div role="button"> porque adentro hay otro <button> (estrella de
+  // favorito) — buttons anidados rompen accessibility en HTML.
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
-      className="w-full group flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 hover:border-border hover:bg-muted transition-all text-left"
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault()
+          onClick()
+        }
+      }}
+      className="w-full group flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 hover:border-border hover:bg-muted transition-all text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e3a8a]/30"
     >
       {/* Dot azul de "no leído" (Slack/Notion-style). Reserva espacio cuando
           está leído para que la columna no salte. */}
       <span className="w-1.5 flex-shrink-0 flex justify-center" aria-hidden>
         {isUnread && <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />}
       </span>
+
+      {/* Toggle de favorito — solo cuando hay handler (favorites enabled). */}
+      {onToggleFavorite && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onToggleFavorite(item.id) }}
+          aria-label={isFavorite ? "Quitar de favoritos" : "Marcar como favorito"}
+          aria-pressed={!!isFavorite}
+          className={cn(
+            "flex h-8 w-8 items-center justify-center rounded-lg flex-shrink-0 transition-all",
+            isFavorite
+              ? "text-amber-500 hover:text-amber-600"
+              : "text-muted-foreground/40 hover:text-amber-500",
+          )}
+        >
+          <Star className={cn("h-4 w-4", isFavorite && "fill-amber-500")} />
+        </button>
+      )}
 
       <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted flex-shrink-0">
         <Icon className={`h-4 w-4 ${cfg.color}`} />
@@ -1142,7 +1177,7 @@ function ItemRow({
         )}
         <ChevronRight className="h-4 w-4 text-muted-foreground/70 group-hover:text-muted-foreground transition-colors" />
       </div>
-    </button>
+    </div>
   )
 }
 
@@ -1208,6 +1243,8 @@ function SectionPanel({
   callerDeptId,
   readState,
   onToggleRead,
+  favorites,
+  onToggleFavorite,
   onAdd,
   onUpdate,
   onDelete,
@@ -1219,6 +1256,8 @@ function SectionPanel({
   callerDeptId: string | null
   readState: Record<string, string>
   onToggleRead: (id: string) => void
+  favorites: Set<string>
+  onToggleFavorite: (id: string) => void
   onAdd: (item: Item) => void
   onUpdate: (item: Item) => void
   onDelete: (id: string) => void
@@ -1256,9 +1295,11 @@ function SectionPanel({
     ? searchFiltered.filter(i =>
         activeDeptFilter === UNREAD_FILTER
           ? isUnread(i.id, readState)
-          : activeDeptFilter === NO_DEPT_ID
-            ? !i.department_id
-            : i.department_id === activeDeptFilter,
+          : activeDeptFilter === FAVORITES_FILTER
+            ? favorites.has(i.id)
+            : activeDeptFilter === NO_DEPT_ID
+              ? !i.department_id
+              : i.department_id === activeDeptFilter,
       )
     : searchFiltered
 
@@ -1266,8 +1307,10 @@ function SectionPanel({
   const countByDept = new Map<string, number>()
   let noDeptCount = 0
   let unreadCount = 0
+  let favCount    = 0
   for (const it of items) {
     if (isUnread(it.id, readState)) unreadCount++
+    if (favorites.has(it.id))       favCount++
     if (!it.department_id) noDeptCount++
     else countByDept.set(it.department_id, (countByDept.get(it.department_id) ?? 0) + 1)
   }
@@ -1409,6 +1452,31 @@ function SectionPanel({
               </span>
             </button>
           )}
+          {favCount > 0 && (
+            <button
+              type="button"
+              onClick={() => setActiveDeptFilter(FAVORITES_FILTER)}
+              className={cn(
+                "flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-all",
+                unreadCount === 0 ? "ml-auto" : "",
+                activeDeptFilter === FAVORITES_FILTER
+                  ? "border-amber-500/40 bg-amber-500/15 text-amber-700"
+                  : "border-border bg-muted text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <Star className={cn(
+                "h-3 w-3",
+                activeDeptFilter === FAVORITES_FILTER ? "fill-amber-500 text-amber-500" : "text-amber-500/70",
+              )} />
+              Favoritos
+              <span className={cn(
+                "text-[10px] rounded-full px-1.5 py-0.5",
+                activeDeptFilter === FAVORITES_FILTER ? "bg-foreground/10" : "bg-muted-foreground/10",
+              )}>
+                {favCount}
+              </span>
+            </button>
+          )}
         </div>
       )}
 
@@ -1436,17 +1504,21 @@ function SectionPanel({
         <div className="flex flex-col items-center justify-center py-14 gap-3">
           {activeDeptFilter === UNREAD_FILTER
             ? <CheckCircle2 className="h-8 w-8 text-emerald-600/70" />
-            : <FolderOpen className="h-8 w-8 text-muted-foreground/70" />}
+            : activeDeptFilter === FAVORITES_FILTER
+              ? <Star className="h-8 w-8 text-amber-500/70" />
+              : <FolderOpen className="h-8 w-8 text-muted-foreground/70" />}
           <p className="text-xs text-muted-foreground/70">
             {search
               ? "Sin resultados"
               : activeDeptFilter === UNREAD_FILTER
                 ? "Pusiste todo al día. No quedan SOPs sin leer."
-                : isSOP && activeDeptFilter !== null
-                  ? "No hay SOPs en esta área todavía"
-                  : "Todavía no hay ítems en esta sección"}
+                : activeDeptFilter === FAVORITES_FILTER
+                  ? "Todavía no marcaste favoritos. Tocá la estrella en cualquier SOP."
+                  : isSOP && activeDeptFilter !== null
+                    ? "No hay SOPs en esta área todavía"
+                    : "Todavía no hay ítems en esta sección"}
           </p>
-          {!showForm && !search && activeDeptFilter !== UNREAD_FILTER && (
+          {!showForm && !search && activeDeptFilter !== UNREAD_FILTER && activeDeptFilter !== FAVORITES_FILTER && (
             <button
               onClick={() => setShowForm(true)}
               className="text-xs text-[#E42D2C]/70 hover:text-[#E42D2C] transition-colors"
@@ -1490,6 +1562,8 @@ function SectionPanel({
               item={item}
               department={item.department_id ? deptById.get(item.department_id) : undefined}
               isUnread={isUnread(item.id, readState)}
+              isFavorite={favorites.has(item.id)}
+              onToggleFavorite={onToggleFavorite}
               onClick={() => setActiveItem(item)}
             />
           ))}
@@ -1534,6 +1608,8 @@ export function AdminCentroOperativoView() {
   const [callerDeptId, setCallerDeptId] = useState<string | null>(null)
   // Map { resource_id → read_at ISO } — items que el caller marcó como leídos.
   const [readState, setReadState] = useState<Record<string, string>>({})
+  // Set de resource_ids favoriteados por el caller. Optimistic updates.
+  const [favorites, setFavorites] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     const supabase = createClient()
@@ -1554,9 +1630,10 @@ export function AdminCentroOperativoView() {
       fetch("/api/resources").then(r => r.json()).catch(() => ({ resources: [] })),
       fetch("/api/departments").then(r => r.json()).catch(() => ({ departments: [] })),
       fetch("/api/resources/read-state").then(r => r.json()).catch(() => ({ readState: {} })),
+      fetch("/api/resources/favorites").then(r => r.json()).catch(() => ({ favorites: [] })),
       profilePromise,
     ])
-      .then(([resData, deptData, rsData, profile]) => {
+      .then(([resData, deptData, rsData, favData, profile]) => {
         const fetched: Item[] = (resData.resources ?? []).map((r: any) => ({
           ...r,
           department_id: r.department_id ?? null,
@@ -1576,11 +1653,38 @@ export function AdminCentroOperativoView() {
         }
         setDepartments(deptData.departments ?? [])
         setReadState(rsData.readState ?? {})
+        setFavorites(new Set<string>((favData.favorites ?? []) as string[]))
         setCallerRole(profile.role)
         setCallerDeptId(profile.department_id)
       })
       .finally(() => setLoading(false))
   }, [])
+
+  // Toggle de favorito con optimistic update.
+  const handleToggleFavorite = async (resourceId: string) => {
+    const wasFav = favorites.has(resourceId)
+    setFavorites(prev => {
+      const next = new Set(prev)
+      if (wasFav) next.delete(resourceId); else next.add(resourceId)
+      return next
+    })
+    try {
+      const res = wasFav
+        ? await fetch(`/api/resources/favorites?resource_id=${resourceId}`, { method: "DELETE" })
+        : await fetch("/api/resources/favorites", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ resource_id: resourceId }),
+          })
+      if (!res.ok) throw new Error(`${res.status}`)
+    } catch {
+      setFavorites(prev => {
+        const next = new Set(prev)
+        if (wasFav) next.add(resourceId); else next.delete(resourceId)
+        return next
+      })
+    }
+  }
 
   const section = SECTIONS.find(s => s.id === activeSection)!
   const sectionItems = items.filter(i => i.category === activeSection)
@@ -1675,6 +1779,8 @@ export function AdminCentroOperativoView() {
           callerDeptId={callerDeptId}
           readState={readState}
           onToggleRead={handleToggleRead}
+          favorites={favorites}
+          onToggleFavorite={handleToggleFavorite}
           onAdd={handleAdd}
           onUpdate={handleUpdate}
           onDelete={handleDelete}
